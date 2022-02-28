@@ -1,13 +1,13 @@
 openapi: 3.0.0
 info:
-  title: AppQualityApi
+  title: UnguessApi
   version: "1.0"
   description: An API to get all data for your bugfinding and ux research needs!
   contact:
     name: Developers
-    email: it@app-quality.com
+    email: it@unguess.io
 servers:
-  - url: "https://api.app-quality.com"
+  - url: "https://api.unguess.io"
 paths:
   /:
     get:
