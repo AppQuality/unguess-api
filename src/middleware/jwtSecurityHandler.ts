@@ -7,7 +7,7 @@ import authenticate from "../features/wp/authenticate";
 import getUserById from "../features/wp/getUserById";
 
 const wpAuth = wpAuthProvider.create({
-  wpurl: config.CROWD_URL,
+  wpurl: config.APP_URL,
   logged_in_key: config.wp.logged_in_key,
   logged_in_salt: config.wp.logged_in_salt,
   mysql_host: config.db.host,

@@ -1,4 +1,4 @@
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 
 dotenv.config();
 const config: {
@@ -26,7 +26,14 @@ const config: {
     password: string;
     database: string;
   };
-  CROWD_URL: string;
+  unguessDb: {
+    host: string;
+    port: number;
+    user: string;
+    password: string;
+    database: string;
+  };
+  APP_URL: string;
   ssl?: {
     chain: string;
     private: string;
@@ -54,9 +61,18 @@ const config: {
     port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 3306,
     user: process.env.DB_USER || "root",
     password: process.env.DB_PASSWORD || "",
-    database: process.env.DB_NAME || "tryber",
+    database: process.env.DB_NAME || "unguess_wp",
   },
-  CROWD_URL: process.env.CROWD_URL || "https://tryber.me/",
+  unguessDb: {
+    host: process.env.DB_SECONDARY_HOST || "127.0.0.1",
+    port: process.env.DB_SECONDARY_PORT
+      ? parseInt(process.env.DB_SECONDARY_PORT)
+      : 3306,
+    user: process.env.DB_SECONDARY_USER || "root",
+    password: process.env.DB_SECONDARY_PASSWORD || "",
+    database: process.env.DB_SECONDARY_NAME || "tryber_wp",
+  },
+  APP_URL: process.env.APP_URL || "https://app.unguess.io/",
 };
 
 if (process.env.SSL_CHAIN && process.env.SSL_PRIVATE) {
