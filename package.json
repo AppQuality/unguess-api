@@ -1,0 +1,84 @@
+{
+  "name": "new-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "coverage": "jest  ./dist --coverage",
+    "test": "npm run build && jest ./dist ",
+    "test:watch": "nodemon --exec \"npm test --\" ",
+    "clean": "rimraf dist",
+    "transpile": "babel ./src --out-dir dist --extensions \".ts,.js\"",
+    "copy-reference": "copyfiles -f src/reference/* dist/reference/",
+    "build": "npm-run-all clean transpile copy-reference",
+    "dev": "NODE_ENV=development npm-run-all build server",
+    "server": "tsc && node --enable-source-maps ./dist/index.js",
+    "watch:dev": "nodemon",
+    "start": "npm run watch:dev",
+    "prepare": "npx husky install",
+    "types": "npx openapi-typescript src/reference/openapi.yml --output src/schema.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@appquality/wp-auth": "^1.0.7",
+    "@babel/runtime": "^7.16.7",
+    "body-parser": "^1.19.1",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mysql": "^2.18.1",
+    "openapi-backend": "^3.9.2",
+    "parse-comments": "^1.0.0",
+    "php-unserialize": "^0.0.1",
+    "wordpress-hash-node": "^1.0.0"
+  },
+  "nodemonConfig": {
+    "exec": "npm run dev",
+    "watch": [
+      "src/*"
+    ],
+    "ext": "ts,json",
+    "ignore": [
+      "**/__tests__/**",
+      "*.test.js",
+      "*.spec.js"
+    ]
+  },
+  "jest": {
+    "modulePathIgnorePatterns": [
+      "<rootDir>/src"
+    ],
+    "moduleNameMapper": {
+      "jsonwebtoken": "<rootDir>/dist/__mocks__/jsonwebtoken"
+    }
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.16.0",
+    "@babel/core": "^7.16.0",
+    "@babel/plugin-transform-runtime": "^7.17.0",
+    "@babel/preset-env": "^7.16.4",
+    "@babel/preset-typescript": "^7.16.7",
+    "@types/cors": "^2.8.12",
+    "@types/express": "^4.17.13",
+    "@types/jest": "^27.4.0",
+    "@types/jsonwebtoken": "^8.5.8",
+    "@types/mysql": "^2.15.20",
+    "@types/supertest": "^2.0.11",
+    "@types/wordpress-hash-node": "^1.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.9.1",
+    "@typescript-eslint/parser": "^5.9.1",
+    "babel-plugin-module-resolver": "^4.1.0",
+    "copyfiles": "^2.4.1",
+    "jest": "^24.9.0",
+    "jest-cli": "^24.7.1",
+    "nodemon": "^2.0.15",
+    "openapi-typescript": "^5.1.1",
+    "rimraf": "^3.0.2",
+    "sqlite3": "^5.0.2",
+    "supertest": "^6.1.6",
+    "webpack": "^4.30.0",
+    "webpack-dev-middleware": "^3.6.2"
+  }
+}

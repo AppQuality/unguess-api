@@ -1,0 +1,13 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+FILES=$(git diff --cached --name-only --diff-filter=ACMR | sed 's| |\\ |g')
+[ -z "$FILES" ] && exit 0
+
+# Prettify all selected files
+npx prettier --ignore-unknown --write $(ls -1 $FILES | grep -v ".yml")
+
+# Add back the modified/prettified files to staging
+echo "$FILES" | xargs git add
+
+exit 0
