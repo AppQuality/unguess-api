@@ -5,8 +5,10 @@ import config from '../../config';
 export const format = (query: string, data: (string | number)[]) =>
   mysql.format(query, data);
 
-export const query = (query: string): Promise<any> => {
-  const connection = mysql.createConnection(config.db);
+export const query = (query: string, dbName: string = ""): Promise<any> => {
+  let currentDb = config.db;
+  if (dbName == "unguess") currentDb = config.unguessDb;
+  const connection = mysql.createConnection(currentDb);
   connection.connect();
   return new Promise((resolve, reject) => {
     return connection.query(query, function (error, results) {

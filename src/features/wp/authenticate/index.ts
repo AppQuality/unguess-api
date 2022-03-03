@@ -1,84 +1,38 @@
-import PHPUnserialize from 'php-unserialize';
-
 import * as db from '../../db';
 
 export default async (userData: {
-  testerId: number;
   ID: number;
   user_login: string;
   user_pass: string;
+  user_email: string;
 }): Promise<UserType | Error> => {
   let user: UserType = {
     ...userData,
-    capabilities: [],
-    permission: {},
-    role: "tester",
+    tryber_wp_user_id: 0,
+    profile_id: 0,
+    role: "customer",
   };
 
   try {
-    const userRolesSql =
-      'SELECT option_value from wp_options where option_name = "wp_user_roles"';
-    let results = await db.query(userRolesSql);
-    let roles = PHPUnserialize.unserialize(results[0].option_value);
-    const userMetaSql =
-      'SELECT meta_value from wp_usermeta where meta_key = "wp_capabilities" and user_id = ?';
-    let userMetaResults = await db.query(db.format(userMetaSql, [user.ID]));
-    let permissions = [];
-    if (userMetaResults.length) {
-      permissions = PHPUnserialize.unserialize(userMetaResults[0].meta_value);
+    // Check capabilities
+    const isAdminSql = "SELECT * FROM wp_usermeta WHERE meta_key = wp_capabilities AND meta_value LIKE '%administrator%' AND user_id = ?"
+    let isAdminResult = await db.query(db.format(isAdminSql, [userData.ID]), "unguess")
+    if (isAdminResult.length) {
+      user.role = "admin"
     }
-    user.role = "tester";
-    user.capabilities = [];
 
-    if (permissions) {
-      Object.keys(permissions).forEach((permission) => {
-        if (roles.hasOwnProperty(permission)) {
-          user.capabilities = user.capabilities.concat(
-            Object.keys(roles[permission].capabilities)
-          );
-          if (user.role == "tester") {
-            user.role = permission;
-          }
-        } else {
-          user.capabilities.push(permission);
-        }
-      });
+    // Check customer info
+    const customerInfoSql = "SELECT * FROM wp_unguess_user_to_customer WHERE unguess_wp_user_id = ?"
+    let customerInfoResult = await db.query(db.format(customerInfoSql, [userData.ID]), "unguess")
+    if (customerInfoResult.length) {
+      let result = customerInfoResult[0]
+      // The user is a customer
+      user.tryber_wp_user_id = result.tryber_wp_user_id
+      user.profile_id = result.profile_id
     }
   } catch (e) {
-    return e as Error;
-  }
-
-  const permissions: { [key: string]: boolean | string[] } = {};
-  user.capabilities.forEach((cap) => {
-    if (cap.endsWith("_full_access")) {
-      permissions[cap.replace("_full_access", "")] = true;
-    }
-  });
-
-  try {
-    const sql =
-      "SELECT main_id,type from wp_appq_olp_permissions where wp_user_id = ?";
-    const results = await db.query(db.format(sql, [user.ID]));
-    results.forEach((item: { type: string; main_id: string }) => {
-      if (!permissions.hasOwnProperty(item.type)) {
-        permissions[item.type] = [];
-      }
-      let permission = permissions[item.type];
-      if (Array.isArray(permission)) {
-        permission.push(item.main_id);
-        permissions[item.type] = permission;
-      }
-    });
-
-    if (!user.hasOwnProperty("permission")) {
-      user.permission = {};
-    }
-    if (!user.permission.hasOwnProperty("admin")) {
-      user.permission.admin = {};
-    }
-    user.permission.admin = permissions;
-  } catch (e) {
-    return e as Error;
+    console.error(e)
+    return e as Error
   }
 
   return user;

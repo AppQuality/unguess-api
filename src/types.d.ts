@@ -18,12 +18,12 @@ declare global {
 
   type UserType = {
     ID: number;
-    testerId: number;
     user_login: string;
     user_pass: string;
+    user_email: string;
+    tryber_wp_user_id: number;
+    profile_id: number;
     role: string;
-    capabilities: string[];
-    permission: { admin?: {} };
   };
 
   interface StoplightOperations extends operations {}

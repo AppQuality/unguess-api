@@ -61,16 +61,14 @@ const config: {
     port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 3306,
     user: process.env.DB_USER || "root",
     password: process.env.DB_PASSWORD || "",
-    database: process.env.DB_NAME || "unguess_wp",
+    database: process.env.DB_NAME || "tryber_wp",
   },
   unguessDb: {
     host: process.env.DB_SECONDARY_HOST || "127.0.0.1",
-    port: process.env.DB_SECONDARY_PORT
-      ? parseInt(process.env.DB_SECONDARY_PORT)
-      : 3306,
+    port: process.env.DB_SECONDARY_PORT ? parseInt(process.env.DB_SECONDARY_PORT) : 3306,
     user: process.env.DB_SECONDARY_USER || "root",
     password: process.env.DB_SECONDARY_PASSWORD || "",
-    database: process.env.DB_SECONDARY_NAME || "tryber_wp",
+    database: process.env.DB_SECONDARY_NAME || "unguess_wp",
   },
   APP_URL: process.env.APP_URL || "https://app.unguess.io/",
 };
