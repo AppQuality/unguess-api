@@ -51,8 +51,10 @@
       "<rootDir>/src"
     ],
     "moduleNameMapper": {
-      "jsonwebtoken": "<rootDir>/dist/__mocks__/jsonwebtoken"
-    }
+      "jsonwebtoken": "<rootDir>/dist/__mocks__/jsonwebtoken",
+      "@appquality/wp-auth": "<rootDir>/dist/__mocks__/@appquality-wp-auth"
+    },
+    "testTimeout": 15000
   },
   "devDependencies": {
     "@babel/cli": "^7.16.0",
@@ -77,7 +79,7 @@
     "npm-run-all": "^4.1.5",
     "openapi-typescript": "^5.1.1",
     "rimraf": "^3.0.2",
-    "sqlite3": "^5.0.2",
+    "better-sqlite3": "^7.5.0",
     "supertest": "^6.1.6",
     "webpack": "^4.30.0",
     "webpack-dev-middleware": "^3.6.2"

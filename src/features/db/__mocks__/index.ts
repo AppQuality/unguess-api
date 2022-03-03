@@ -8,14 +8,19 @@ export const query = (query: string): Promise<any> => {
   return new Promise(async (resolve, reject) => {
     try {
       let data;
-      if (query.includes("UPDATE")) {
-        data = await sqlite.run(query);
-      } else {
+      if (
+        query.includes("UPDATE") ||
+        query.includes("DELETE") ||
+        query.includes("INSERT")
+      ) {
+        data = await sqlite.run(query.replace(/"/g, "'")); }
+      else {
         data = await sqlite.all(query);
       }
-      resolve(data);
+      
+      return resolve(data);
     } catch (error) {
-      reject(error);
+      return reject(error);
     }
   });
 };

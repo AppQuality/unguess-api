@@ -1,5 +1,5 @@
 import wpAuthProvider from "@appquality/wp-auth";
-import jwt from "jsonwebtoken";
+import jwt from "@src/__mocks__/jsonwebtoken";
 import { Context } from "openapi-backend";
 
 import config from "../config";
@@ -19,7 +19,7 @@ const wpAuth = wpAuthProvider.create({
   checkKnownHashes: false,
 });
 
-const checkCookies = (req: OpenapiRequest): Promise<UserType | Error> => {
+const checkCookies = (req: OpenapiRequest): Promise<UserType> => {
   return new Promise((resolve, reject) => {
     return wpAuth
       .checkAuth(req)
@@ -27,6 +27,9 @@ const checkCookies = (req: OpenapiRequest): Promise<UserType | Error> => {
         if (authIsValid) {
           const userData = await getUserById(userId);
           const user = await authenticate(userData);
+          if (user instanceof Error) {
+            return reject(user);
+          }
           return resolve(user);
         }
         return reject(new Error("Missing authorization header"));
@@ -46,13 +49,13 @@ export default async (
   if (!authHeader) {
     const user = await checkCookies(req);
     if (user instanceof Error) {
-      throw user;
+      return jwt.verify("", config.jwt.secret);
     }
     req.user = user;
     return user;
   }
   const token = authHeader.replace("Bearer ", "");
   const decoded = jwt.verify(token, config.jwt.secret);
-  req.user = decoded as UserType;
+  req.user = decoded as unknown as UserType;
   return req.user;
 };
