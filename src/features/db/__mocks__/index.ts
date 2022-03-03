@@ -2,7 +2,7 @@ import sqlite from "@src/features/sqlite";
 import mysql from "mysql";
 
 export const format = (query: string, data: (string | number)[]) =>
-  mysql.format(query.replace(/NOW\(\)/g, "datetime('now')"), data);
+  mysql.format(query.replace(/"/g, "'"), data);
 
 export const query = (query: string): Promise<any> => {
   return new Promise(async (resolve, reject) => {
@@ -13,11 +13,12 @@ export const query = (query: string): Promise<any> => {
         query.includes("DELETE") ||
         query.includes("INSERT")
       ) {
-        data = await sqlite.run(query.replace(/"/g, "'")); }
+        data = await sqlite.run(query);
+      }
       else {
         data = await sqlite.all(query);
       }
-      
+
       return resolve(data);
     } catch (error) {
       return reject(error);
