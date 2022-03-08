@@ -15,7 +15,7 @@ export default async (userData: {
 
   try {
     // Check capabilities
-    const isAdminSql = "SELECT * FROM wp_usermeta WHERE meta_key = wp_capabilities AND meta_value LIKE '%administrator%' AND user_id = ?"
+    const isAdminSql = "SELECT * FROM wp_usermeta WHERE meta_key = 'wp_capabilities' AND meta_value LIKE '%administrator%' AND user_id = ?"
     let isAdminResult = await db.query(db.format(isAdminSql, [userData.ID]), "unguess")
     if (isAdminResult.length) {
       user.role = "admin"
