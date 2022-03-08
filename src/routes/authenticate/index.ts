@@ -39,6 +39,8 @@ export default async (c: Context, req: Request, res: OpenapiResponse) => {
     profile_id: data.profile_id,
   };
 
+  
+
   const token = jwt.sign(user, config.jwt.secret, {
     expiresIn: process.env.JWT_EXPIRATION, // token expires in 15 minutes
   });
@@ -52,6 +54,10 @@ export default async (c: Context, req: Request, res: OpenapiResponse) => {
   const responseJson = {
     id: data.ID,
     username: data.user_login,
+    email: data.user_email,
+    role: data.role,
+    tryber_id: data.tryber_wp_user_id,
+    profile_id: data.profile_id,
     token: token,
     iat: iat,
     exp: exp,
