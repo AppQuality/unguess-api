@@ -1,20 +1,20 @@
 openapi: 3.1.0
 info:
   title: UnguessApi
-  version: "1.0"
+  version: '1.0'
   description: An API to get all data for your bugfinding and ux research needs!
   contact:
     name: Developers
     email: it@unguess.io
 servers:
-  - url: "https://api.unguess.io"
+  - url: 'https://api.unguess.io'
 paths:
   /:
     get:
       summary: Get API description
       tags: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -33,9 +33,9 @@ paths:
       summary: Authenticate to the API
       operationId: post-authenticate
       responses:
-        "200":
-          $ref: "#/components/responses/Authentication"
-        "401":
+        '200':
+          $ref: '#/components/responses/Authentication'
+        '401':
           description: Unauthorized
           content:
             application/json:
@@ -73,7 +73,7 @@ paths:
       tags:
         - Projects
       responses:
-        "200":
+        '200':
           description: A list of projects
           content:
             application/json:
@@ -91,11 +91,17 @@ paths:
                           type: string
                         description:
                           type: string
-
-        "403":
-          $ref: "#/components/responses/NotAuthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
+              examples:
+                example-1:
+                  value:
+                    items:
+                      - id: 1
+                        name: My project
+                        description: My project description
+        '403':
+          $ref: '#/components/responses/NotAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
       operationId: get-projects
       parameters:
         - schema:
@@ -106,12 +112,36 @@ paths:
           description: A generic query parameter
       security:
         - JWT: []
+  /users/me:
+    get:
+      summary: Get user data
+      tags:
+        - User
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                  email:
+                    type: string
+        '403':
+          $ref: '#/components/responses/NotAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      operationId: get-users-me
+      security:
+        - JWT: []
 components:
   schemas:
     User:
       title: User
       type: object
-      description: ""
+      description: ''
       properties:
         username:
           type: string
@@ -140,7 +170,7 @@ components:
             name: string
             surname: string
             email: user@example.com
-            image: "http://example.com"
+            image: 'http://example.com'
             id: 0
             wp_user_id: 0
             role: string
@@ -188,14 +218,14 @@ components:
     JWT:
       type: http
       scheme: bearer
-      description: ""
+      description: ''
   responses:
     UserData:
       description: A user
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/User"
+            $ref: '#/components/schemas/User'
           examples:
             example:
               value:
@@ -336,7 +366,7 @@ components:
           - ASC
           - DESC
         default: DESC
-      description: "How to order values (ASC, DESC)"
+      description: 'How to order values (ASC, DESC)'
     locale:
       name: locale
       in: query
