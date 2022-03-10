@@ -125,10 +125,16 @@ paths:
               schema:
                 type: object
                 properties:
-                  username:
+                  ID:
+                    type: number
+                  user_email:
                     type: string
-                  email:
+                  role:
                     type: string
+                  tryber_wp_user_id:
+                    type: number
+                  profile_id:
+                    type: number
         '403':
           $ref: '#/components/responses/NotAuthorized'
         '404':
