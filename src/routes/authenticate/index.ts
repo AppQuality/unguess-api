@@ -1,11 +1,11 @@
 /** OPENAPI-ROUTE: post-authenticate */
-import jwt from 'jsonwebtoken';
-import { Context, Request } from 'openapi-backend';
-import hasher from 'wordpress-hash-node';
+import jwt from "jsonwebtoken";
+import { Context, Request } from "openapi-backend";
+import hasher from "wordpress-hash-node";
 
-import config from '../../config';
-import authenticate from '../../features/wp/authenticate';
-import getUserByName from '../../features/wp/getUserByName';
+import config from "../../config";
+import authenticate from "../../features/wp/authenticate";
+import getUserByName from "../../features/wp/getUserByName";
 
 export default async (c: Context, req: Request, res: OpenapiResponse) => {
   const { username, password } = req.body;
@@ -38,8 +38,6 @@ export default async (c: Context, req: Request, res: OpenapiResponse) => {
     tryber_wp_user_id: data.tryber_wp_user_id,
     profile_id: data.profile_id,
   };
-
-  
 
   const token = jwt.sign(user, config.jwt.secret, {
     expiresIn: process.env.JWT_EXPIRATION, // token expires in 15 minutes
