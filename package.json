@@ -82,6 +82,7 @@
     "rimraf": "^3.0.2",
     "supertest": "^6.1.6",
     "webpack": "^4.30.0",
-    "webpack-dev-middleware": "^3.6.2"
+    "webpack-dev-middleware": "^3.6.2",
+    "commitizen": "^4.2.4"
   }
 }
