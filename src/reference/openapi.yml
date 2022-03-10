@@ -132,6 +132,10 @@ paths:
                     type: number
                   profile_id:
                     type: number
+                required:
+                  - ID
+                  - user_email
+                  - role
         '403':
           $ref: '#/components/responses/NotAuthorized'
         '404':
