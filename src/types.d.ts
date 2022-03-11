@@ -17,13 +17,13 @@ declare global {
   }
 
   type UserType = {
-    ID: number;
+    id: number;
     user_login: string;
     user_pass: string;
-    user_email: string;
-    tryber_wp_user_id: number;
-    profile_id: number;
+    email: string;
     role: string;
+    tryber_wp_user_id?: number;
+    profile_id?: number;
   };
 
   interface StoplightOperations extends operations {}

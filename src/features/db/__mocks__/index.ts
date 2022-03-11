@@ -1,13 +1,13 @@
 import sqlite from "@src/features/sqlite";
 import mysql from "mysql";
 
-const unguessDb = sqlite("unguess.db");
-const tryberDb = sqlite("tryber.db");
+const unguessDb = sqlite("unguess");
+const tryberDb = sqlite("tryber");
 export const format = (query: string, data: (string | number)[]) =>
   mysql.format(query.replace(/"/g, "'"), data);
 
 export const query = (query: string, db: string): Promise<any> => {
-  const myDb = db === "unguess" ? tryberDb : unguessDb;
+  const myDb = db === "unguess" ? unguessDb : tryberDb;
   return new Promise(async (resolve, reject) => {
     try {
       let data;
@@ -29,7 +29,7 @@ export const query = (query: string, db: string): Promise<any> => {
 };
 
 export const insert = (table: string, data: any, db: string): Promise<any> => {
-  const myDb = db === "unguess" ? tryberDb : unguessDb;
+  const myDb = db === "unguess" ? unguessDb : tryberDb;
   return new Promise(async (resolve, reject) => {
     const sql = "INSERT INTO ?? SET ?";
     const query = mysql.format(sql, [table, data]);
