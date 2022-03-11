@@ -122,9 +122,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  ID:
+                  id:
                     type: number
-                  user_email:
+                  email:
                     type: string
                   role:
                     type: string
@@ -132,9 +132,11 @@ paths:
                     type: number
                   profile_id:
                     type: number
+                  name:
+                    type: string
                 required:
-                  - ID
-                  - user_email
+                  - id
+                  - email
                   - role
         '403':
           $ref: '#/components/responses/NotAuthorized'
