@@ -47,6 +47,7 @@ export default async (
     authHeader = authHeader.join(" ");
   }
   if (!authHeader) {
+    console.log("OK1");
     const user = await checkCookies(req);
     if (user instanceof Error) {
       return jwt.verify("", config.jwt.secret);

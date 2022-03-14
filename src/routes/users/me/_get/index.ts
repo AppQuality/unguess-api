@@ -9,6 +9,8 @@ export default async (
 ) => {
   let user = req.user;
 
+  console.log(user);
+
   res.status_code = 200;
 
   if (user.profile_id) {
@@ -19,6 +21,8 @@ export default async (
         db.format(profileSql, [user.profile_id]),
         "tryber"
       );
+
+      profile = profile[0];
 
       return {
         id: user.id,
