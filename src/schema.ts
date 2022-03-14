@@ -13,9 +13,9 @@ export interface paths {
     /** A request to login with your username and password */
     post: operations["post-authenticate"];
   };
-  "/projects": {
+  "/users/me": {
     /** Get all projects that you can view. A project is a collection of campaigns linked with your account. */
-    get: operations["get-projects"];
+    get: operations["get-users-me"];
   };
 }
 
@@ -148,23 +148,18 @@ export interface operations {
     };
   };
   /** Get all projects that you can view. A project is a collection of campaigns linked with your account. */
-  "get-projects": {
-    parameters: {
-      query: {
-        /** A generic query parameter */
-        "my-parameter"?: number;
-      };
-    };
+  "get-users-me": {
+    parameters: {};
     responses: {
-      /** A list of projects */
       200: {
         content: {
           "application/json": {
-            items?: {
-              id?: number;
-              name?: string;
-              description?: string;
-            }[];
+            id: number;
+            email: string;
+            role: string;
+            name: string;
+            tryber_wp_user_id?: number;
+            profile_id?: number;
           };
         };
       };
