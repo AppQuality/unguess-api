@@ -13,8 +13,12 @@ export interface paths {
     /** A request to login with your username and password */
     post: operations["post-authenticate"];
   };
-  "/users/me": {
+  "/projects": {
     /** Get all projects that you can view. A project is a collection of campaigns linked with your account. */
+    get: operations["get-projects"];
+  };
+  "/users/me": {
+    /** Get current logged user's info */
     get: operations["get-users-me"];
   };
 }
@@ -148,6 +152,31 @@ export interface operations {
     };
   };
   /** Get all projects that you can view. A project is a collection of campaigns linked with your account. */
+  "get-projects": {
+    parameters: {
+      query: {
+        /** A generic query parameter */
+        "my-parameter"?: number;
+      };
+    };
+    responses: {
+      /** A list of projects */
+      200: {
+        content: {
+          "application/json": {
+            items?: {
+              id?: number;
+              name?: string;
+              description?: string;
+            }[];
+          };
+        };
+      };
+      403: components["responses"]["NotAuthorized"];
+      404: components["responses"]["NotFound"];
+    };
+  };
+  /** Get current logged user's info */
   "get-users-me": {
     parameters: {};
     responses: {
