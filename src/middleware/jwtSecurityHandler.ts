@@ -57,7 +57,7 @@ export default async (
       }
 
       req.user = user;
-      // console.log(">>>> checkCookies user", user);
+      console.log(">>>> checkCookies user", user);
 
       return user;
     } catch (e) {
