@@ -46,15 +46,23 @@ export default async (
   if (Array.isArray(authHeader)) {
     authHeader = authHeader.join(" ");
   }
+
   if (!authHeader) {
-    console.log("OK1");
-    const user = await checkCookies(req);
-    if (user instanceof Error) {
-      return jwt.verify("", config.jwt.secret);
+    try {
+      const user = await checkCookies(req);
+      if (user instanceof Error) {
+        return jwt.verify("", config.jwt.secret);
+      }
+
+      req.user = user;
+      console.log(">>>> checkCookies user", user);
+
+      return user;
+    } catch (e) {
+      console.error(">>>> checkCookies error", e);
     }
-    req.user = user;
-    return user;
   }
+
   const token = authHeader.replace("Bearer ", "");
   const decoded = jwt.verify(token, config.jwt.secret);
   req.user = decoded as unknown as UserType;
