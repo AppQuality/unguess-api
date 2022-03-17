@@ -112,7 +112,8 @@ components:
           type: string
         workspaces:
           type: array
-          items: {}
+          items:
+            $ref: '#/components/schemas/Workspace'
         profile_id:
           type: integer
         tryber_wp_user_id:
@@ -123,45 +124,23 @@ components:
         - role
         - name
         - workspaces
-    Project:
-      title: Project
+    Workspace:
+      title: Workspace
       type: object
-      x-examples:
-        example-1:
-          name: string
-          campaigns:
-            - name: string
-              customer_title: string
-              internal_id: string
-              dates:
-                start: string
-                end: string
-                close: string
-              status: true
-              language: string
-              public: true
-              hasBugParade: true
-              devices:
-                - id: string
-              minNumberOfMedia: 0
-              titleRule: true
-              allowed:
-                severities:
-                  - id: string
-                bug_types:
-                  - id: string
-                replicabilities:
-                  - id: string
-              projectManager:
-                id: 0
-                name: string
-              customerCanViewReviewing: true
-              additionalFields:
-                - id: string
-              id: 0
       properties:
-        name:
+        id:
+          type: integer
+        company:
           type: string
+        logo:
+          type: string
+        tokens:
+          type: number
+      required:
+        - id
+        - company
+        - logo
+        - tokens
   securitySchemes:
     JWT:
       type: http
