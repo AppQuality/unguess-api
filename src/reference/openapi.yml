@@ -82,6 +82,29 @@ paths:
       operationId: get-users-me
       security:
         - JWT: []
+  '/workspaces/{wid}/campaigns':
+    parameters:
+      - schema:
+          type: string
+        name: wid
+        in: path
+        required: true
+        description: Workspace (company) id
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Campaign'
+      operationId: get-workspace-campaigns
+      security:
+        - JWT: []
 components:
   schemas:
     User:
@@ -141,6 +164,32 @@ components:
         - company
         - logo
         - tokens
+    Campaign:
+      title: Campaign
+      type: object
+      properties:
+        id:
+          type: integer
+        start_date:
+          type: string
+        end_date:
+          type: string
+        close_date:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        status_id:
+          type: number
+        is_public:
+          type: integer
+        campaign_type_id:
+          type: integer
+        project_id:
+          type: integer
+        customer_title:
+          type: string
   securitySchemes:
     JWT:
       type: http
