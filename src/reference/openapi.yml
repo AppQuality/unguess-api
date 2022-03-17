@@ -105,6 +105,17 @@ paths:
       operationId: get-workspace-campaigns
       security:
         - JWT: []
+  /workspaces:
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+      operationId: get-workspaces
+      parameters: []
+      security:
+        - JWT: []
 components:
   schemas:
     User:
