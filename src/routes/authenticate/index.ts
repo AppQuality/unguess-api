@@ -12,6 +12,10 @@ export default async (c: Context, req: Request, res: OpenapiResponse) => {
   let userData;
   try {
     userData = await getUserByName(username);
+    if (!userData) {
+      res.status_code = 404;
+      return "User not found";
+    }
   } catch (e) {
     res.status_code = 401;
     return "Invalid data";
