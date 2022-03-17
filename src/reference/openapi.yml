@@ -63,7 +63,6 @@ paths:
                   password: my-strong-password
         description: A JSON containing username and password
       parameters: []
-  /projects: {}
   /users/me:
     get:
       summary: Get user data
@@ -75,24 +74,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    type: number
-                  email:
-                    type: string
-                  role:
-                    type: string
-                  tryber_wp_user_id:
-                    type: number
-                  profile_id:
-                    type: number
-                  name:
-                    type: string
-                required:
-                  - id
-                  - email
-                  - role
+                $ref: '#/components/schemas/User'
         '403':
           $ref: '#/components/responses/NotAuthorized'
         '404':
@@ -106,27 +88,6 @@ components:
       title: User
       type: object
       description: ''
-      properties:
-        username:
-          type: string
-        name:
-          type: string
-        surname:
-          type: string
-        email:
-          type: string
-          format: email
-        image:
-          type: string
-          format: uri
-        id:
-          type: integer
-        wp_user_id:
-          type: integer
-        role:
-          type: string
-        is_verified:
-          type: boolean
       x-examples:
         example-1:
           value:
@@ -139,6 +100,25 @@ components:
             wp_user_id: 0
             role: string
             is_verified: true
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+        name:
+          type: string
+        profile_id:
+          type: integer
+        tryber_wp_user_id:
+          type: integer
+      required:
+        - id
+        - email
+        - role
+        - name
     Project:
       title: Project
       type: object
