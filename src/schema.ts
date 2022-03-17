@@ -17,6 +17,10 @@ export interface paths {
     /** Get all projects that you can view. A project is a collection of campaigns linked with your account. */
     get: operations["get-projects"];
   };
+  "/users/me": {
+    /** Get current logged user's info */
+    get: operations["get-users-me"];
+  };
 }
 
 export interface components {
@@ -165,6 +169,26 @@ export interface operations {
               name?: string;
               description?: string;
             }[];
+          };
+        };
+      };
+      403: components["responses"]["NotAuthorized"];
+      404: components["responses"]["NotFound"];
+    };
+  };
+  /** Get current logged user's info */
+  "get-users-me": {
+    parameters: {};
+    responses: {
+      200: {
+        content: {
+          "application/json": {
+            id: number;
+            email: string;
+            role: string;
+            name: string;
+            tryber_wp_user_id?: number;
+            profile_id?: number;
           };
         };
       };

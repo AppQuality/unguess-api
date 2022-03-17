@@ -32,8 +32,8 @@ export default async (c: Context, req: Request, res: OpenapiResponse) => {
   }
 
   const user = {
-    ID: data.ID,
-    user_email: data.user_email,
+    id: data.id,
+    email: data.email,
     role: data.role,
     tryber_wp_user_id: data.tryber_wp_user_id,
     profile_id: data.profile_id,
@@ -50,9 +50,9 @@ export default async (c: Context, req: Request, res: OpenapiResponse) => {
 
   const { iat, exp } = tokenData;
   const responseJson = {
-    id: data.ID,
+    id: data.id,
     username: data.user_login,
-    email: data.user_email,
+    email: data.email,
     role: data.role,
     tryber_id: data.tryber_wp_user_id,
     profile_id: data.profile_id,

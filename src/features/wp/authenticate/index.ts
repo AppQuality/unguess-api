@@ -4,13 +4,12 @@ export default async (userData: {
   ID: number;
   user_login: string;
   user_pass: string;
-  user_email: string;
+  email: string;
 }): Promise<UserType | Error> => {
   let user: UserType = {
     ...userData,
-    tryber_wp_user_id: 0,
-    profile_id: 0,
     role: "customer",
+    id: 0,
   };
 
   try {
@@ -27,7 +26,7 @@ export default async (userData: {
 
     // Check customer info
     const customerInfoSql =
-      "SELECT * FROM wp_unguess_user_to_customer WHERE unguess_wp_user_id = ?";
+      "SELECT u.user_email, u.user_login, utc.* FROM wp_unguess_user_to_customer utc JOIN wp_users u ON (u.ID = utc.unguess_wp_user_id) WHERE utc.unguess_wp_user_id = ?";
     let customerInfoResult = await db.query(
       db.format(customerInfoSql, [userData.ID]),
       "unguess"
@@ -37,6 +36,8 @@ export default async (userData: {
       // The user is a customer
       user.tryber_wp_user_id = result.tryber_wp_user_id;
       user.profile_id = result.profile_id;
+      user.id = result.tryber_wp_user_id;
+      user.email = result.user_email;
     }
   } catch (e) {
     console.error(e);
