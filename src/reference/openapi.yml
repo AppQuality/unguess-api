@@ -63,52 +63,7 @@ paths:
                   password: my-strong-password
         description: A JSON containing username and password
       parameters: []
-  /projects:
-    get:
-      description: Get all projects that you can view. A project is a collection of campaigns linked with your account.
-      summary: Get All Projects
-      tags:
-        - Projects
-      responses:
-        '200':
-          description: A list of projects
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: number
-                        name:
-                          type: string
-                        description:
-                          type: string
-              examples:
-                example-1:
-                  value:
-                    items:
-                      - id: 1
-                        name: My project
-                        description: My project description
-        '403':
-          $ref: '#/components/responses/NotAuthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      operationId: get-projects
-      parameters:
-        - schema:
-            type: number
-          name: my-parameter
-          in: query
-          required: false
-          description: A generic query parameter
-      security:
-        - JWT: []
+  /projects: {}
   /users/me:
     get:
       summary: Get user data
