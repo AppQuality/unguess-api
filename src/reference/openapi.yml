@@ -110,6 +110,9 @@ components:
           type: string
         name:
           type: string
+        workspaces:
+          type: array
+          items: {}
         profile_id:
           type: integer
         tryber_wp_user_id:
@@ -119,6 +122,7 @@ components:
         - email
         - role
         - name
+        - workspaces
     Project:
       title: Project
       type: object
