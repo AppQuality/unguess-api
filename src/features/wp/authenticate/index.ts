@@ -10,6 +10,7 @@ export default async (userData: {
     ...userData,
     role: "customer",
     id: 0,
+    workspaces: [],
   };
 
   try {

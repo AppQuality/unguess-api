@@ -47,8 +47,6 @@ export default async (
     authHeader = authHeader.join(" ");
   }
 
-  // console.log(">>>> jwtSecurityHandler authHeader", authHeader)
-
   if (!authHeader || typeof authHeader === "undefined") {
     try {
       const user = await checkCookies(req);
@@ -57,18 +55,15 @@ export default async (
       }
 
       req.user = user;
-      console.log(">>>> checkCookies user", user);
 
       return user;
     } catch (e) {
-      console.error(">>>> checkCookies error", e);
+      // console.error(">>>> checkCookies error", e);
+      return jwt.verify("", config.jwt.secret);
     }
   }
 
   const token = authHeader.replace("Bearer ", "");
-
-  // console.log(">>>> jwtSecurityHandler jwt", token)
-
   const decoded = jwt.verify(token, config.jwt.secret);
   req.user = decoded as unknown as UserType;
 

@@ -3,7 +3,7 @@ export default {
     if (token === "customer") {
       return {
         id: 1,
-        email: "customer@email.com",
+        email: "customer@unguess.io",
         role: "customer",
         tryber_wp_user_id: 1,
         profile_id: 1,
@@ -13,7 +13,7 @@ export default {
     if (token === "administrator") {
       return {
         id: 2,
-        email: "administrator@email.com",
+        email: "admin@unguess.io",
         role: "administrator",
       };
     }

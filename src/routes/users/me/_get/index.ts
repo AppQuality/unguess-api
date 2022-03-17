@@ -9,13 +9,13 @@ export default async (
 ) => {
   let user = req.user;
 
-  console.log(user);
-
   res.status_code = 200;
 
-  if (user.profile_id) {
+  if (user.profile_id && user.tryber_wp_user_id) {
+    // Is customer
+
     try {
-      // Get customer name from appq_evd_profile
+      // Get customer name
       const profileSql = "SELECT * FROM wp_appq_evd_profile WHERE id = ?";
       let profile = await db.query(
         db.format(profileSql, [user.profile_id]),
@@ -24,6 +24,14 @@ export default async (
 
       profile = profile[0];
 
+      // Get workspaces for current customer
+      const workspacesSql =
+        "SELECT * FROM wp_appq_customer c JOIN wp_appq_user_to_customer utc ON (c.id = utc.customer_id) WHERE utc.wp_user_id = ?";
+      let workspaces = await db.query(
+        db.format(workspacesSql, [user.tryber_wp_user_id]),
+        "tryber"
+      );
+
       return {
         id: user.id,
         email: user.email,
@@ -31,17 +39,24 @@ export default async (
         profile_id: user.profile_id,
         tryber_wp_user_id: user.tryber_wp_user_id,
         name: profile.name + " " + profile.surname,
+        workspaces: workspaces,
       };
     } catch (error) {
       console.error(error);
     }
   } else {
-    // Is admin, so name is hardcoded
+    // Is admin
+
+    // Get all workspaces
+    const workspacesSql = "SELECT * FROM wp_appq_customer c";
+    let workspaces = await db.query(workspacesSql, "tryber");
+
     return {
       id: user.id,
       email: user.email,
       role: user.role,
       name: "Name Surname",
+      workspaces: workspaces,
     };
   }
 };

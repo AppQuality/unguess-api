@@ -24,6 +24,7 @@ declare global {
     role: string;
     tryber_wp_user_id?: number;
     profile_id?: number;
+    workspaces: Array;
   };
 
   interface StoplightOperations extends operations {}
