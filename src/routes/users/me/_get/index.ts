@@ -32,6 +32,16 @@ export default async (
         "tryber"
       );
 
+      let workspaces_data: any = [];
+      workspaces.forEach((workspace: any) => {
+        let workspace_data: any = {};
+        workspace_data.id = workspace.id;
+        workspace_data.company = workspace.company;
+        workspace_data.logo = workspace.company_logo;
+        workspace_data.tokens = workspace.tokens;
+        workspaces_data.push(workspace_data);
+      });
+
       return {
         id: user.id,
         email: user.email,
@@ -39,7 +49,7 @@ export default async (
         profile_id: user.profile_id,
         tryber_wp_user_id: user.tryber_wp_user_id,
         name: profile.name + " " + profile.surname,
-        workspaces: workspaces,
+        workspaces: workspaces_data,
       };
     } catch (error) {
       console.error(error);
@@ -51,12 +61,22 @@ export default async (
     const workspacesSql = "SELECT * FROM wp_appq_customer c";
     let workspaces = await db.query(workspacesSql, "tryber");
 
+    let workspaces_data: any = [];
+    workspaces.forEach((workspace: any) => {
+      let workspace_data: any = {};
+      workspace_data.id = workspace.id;
+      workspace_data.company = workspace.company;
+      workspace_data.logo = workspace.company_logo;
+      workspace_data.tokens = workspace.tokens;
+      workspaces_data.push(workspace_data);
+    });
+
     return {
       id: user.id,
       email: user.email,
       role: user.role,
       name: "Name Surname",
-      workspaces: workspaces,
+      workspaces: workspaces_data,
     };
   }
 };
