@@ -110,15 +110,7 @@ paths:
     get:
       summary: Your GET endpoint
       tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Campaign'
+      responses: {}
       operationId: get-workspace-campaigns
       security:
         - JWT: []
@@ -133,15 +125,7 @@ paths:
     get:
       summary: Your GET endpoint
       tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Project'
+      responses: {}
       operationId: get-workspace-projects
       security:
         - JWT: []
@@ -204,43 +188,6 @@ components:
         - company
         - logo
         - tokens
-    Campaign:
-      title: Campaign
-      type: object
-      properties:
-        id:
-          type: integer
-        start_date:
-          type: string
-        end_date:
-          type: string
-        close_date:
-          type: string
-        title:
-          type: string
-        description:
-          type: string
-        status_id:
-          type: number
-        is_public:
-          type: integer
-        campaign_type_id:
-          type: integer
-        project_id:
-          type: integer
-        customer_title:
-          type: string
-    Project:
-      title: Project
-      type: object
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-      required:
-        - id
-        - name
   securitySchemes:
     JWT:
       type: http
