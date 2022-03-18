@@ -33,6 +33,8 @@ const customer_profile_1 = {
 const customer_1 = {
   id: 1,
   company: "Company",
+  company_logo: "logo.png",
+  tokens: 100,
 };
 
 const user_to_customer_1 = {
@@ -62,6 +64,8 @@ describe("GET /users/me", () => {
         await tryberDb.createTable("wp_appq_customer", [
           "id int(11) PRIMARY KEY",
           "company varchar(64)",
+          "company_logo varchar(300)",
+          "tokens int(11)",
         ]);
 
         await tryberDb.createTable("wp_appq_user_to_customer", [
