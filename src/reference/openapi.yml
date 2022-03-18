@@ -82,6 +82,17 @@ paths:
       operationId: get-users-me
       security:
         - JWT: []
+  /workspaces:
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+      operationId: get-workspaces
+      parameters: []
+      security:
+        - JWT: []
   '/workspaces/{wid}/campaigns':
     parameters:
       - schema:
@@ -105,15 +116,27 @@ paths:
       operationId: get-workspace-campaigns
       security:
         - JWT: []
-  /workspaces:
+  '/workspaces/{wid}/projects':
+    parameters:
+      - schema:
+          type: string
+        name: wid
+        in: path
+        required: true
+        description: Workspace (company) id
     get:
       summary: Your GET endpoint
       tags: []
       responses:
         '200':
           description: OK
-      operationId: get-workspaces
-      parameters: []
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
+      operationId: get-workspaces-wid-projects
       security:
         - JWT: []
 components:
@@ -201,6 +224,17 @@ components:
           type: integer
         customer_title:
           type: string
+    Project:
+      title: Project
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
   securitySchemes:
     JWT:
       type: http
