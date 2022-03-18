@@ -247,16 +247,6 @@ components:
       scheme: bearer
       description: ''
   responses:
-    UserData:
-      description: A user
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/User'
-          examples:
-            example:
-              value:
-                username: Elon71
     Authentication:
       description: Authentication data. The token can be used to authenticate the protected requests
       content:
