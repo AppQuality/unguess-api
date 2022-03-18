@@ -35,4 +35,11 @@ describe("GET /workspaces", () => {
     const response = await request(app).get("/workspaces");
     expect(response.status).toBe(403);
   });
+
+  it("Should answer 200 if logged in", async () => {
+    const response = await request(app)
+      .get("/workspaces")
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(200);
+  });
 });

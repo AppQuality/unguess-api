@@ -1,7 +1,7 @@
-import { Context } from 'openapi-backend';
-import process from 'process';
+import { Context } from "openapi-backend";
+import process from "process";
 
-export default (c : Context, req : Request, res : OpenapiResponse)  => {
+export default (c: Context, req: Request, res: OpenapiResponse) => {
   if (!res.skip_post_response_handler) {
     const valid = c.api.validateResponse(
       c.response,
@@ -12,6 +12,7 @@ export default (c : Context, req : Request, res : OpenapiResponse)  => {
     if (valid.errors) {
       if (process.env && process.env.DEBUG) {
         console.log(c.response);
+        console.log(valid.errors);
       }
       // response validation failed
       return res.status(502).json({

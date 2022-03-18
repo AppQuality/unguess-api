@@ -12,7 +12,14 @@ export default async (
   res.status_code = 200;
 
   try {
-    return true;
+    return [
+      {
+        id: 1,
+        company: "",
+        logo: "",
+        tokens: 1,
+      },
+    ];
   } catch (error) {
     console.error(error);
   }
