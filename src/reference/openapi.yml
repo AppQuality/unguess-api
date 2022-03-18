@@ -89,6 +89,12 @@ paths:
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Workspace'
       operationId: get-workspaces
       parameters: []
       security:
@@ -136,7 +142,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Project'
-      operationId: get-workspaces-wid-projects
+      operationId: get-workspace-projects
       security:
         - JWT: []
 components:
