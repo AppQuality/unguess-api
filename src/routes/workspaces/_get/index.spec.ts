@@ -8,10 +8,25 @@ jest.mock("@appquality/wp-auth");
 const unguessDb = db("unguess");
 const tryberDb = db("tryber");
 
+const customer_1 = {
+  id: 1,
+  company: "Company",
+  company_logo: "logo.png",
+  tokens: 100,
+};
+
 describe("GET /workspaces", () => {
   beforeAll(async () => {
     return new Promise(async (resolve) => {
       try {
+        await tryberDb.createTable("wp_appq_customer", [
+          "id int(11) PRIMARY KEY",
+          "company varchar(64)",
+          "company_logo varchar(300)",
+          "tokens int(11)",
+        ]);
+
+        await tryberDb.insert("wp_appq_customer", customer_1);
       } catch (error) {
         console.log(error);
       }
@@ -23,6 +38,7 @@ describe("GET /workspaces", () => {
   afterAll(async () => {
     return new Promise(async (resolve) => {
       try {
+        await tryberDb.dropTable("wp_appq_customer");
       } catch (error) {
         console.log(error);
       }
@@ -41,5 +57,19 @@ describe("GET /workspaces", () => {
       .get("/workspaces")
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
+  });
+
+  it("Should answer with an array of workspaces", async () => {
+    const response = await request(app)
+      .get("/workspaces")
+      .set("authorization", "Bearer customer");
+    expect(response.body).toMatchObject(
+      Array({
+        id: customer_1.id,
+        company: customer_1.company,
+        logo: customer_1.company_logo,
+        tokens: customer_1.tokens,
+      })
+    );
   });
 });
