@@ -1,4 +1,4 @@
-/** OPENAPI-ROUTE: get-workspace-campaigns */
+/** OPENAPI-ROUTE: get-workspace-projects */
 import { Context } from "openapi-backend";
 import * as db from "../../../../../features/db";
 
