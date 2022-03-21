@@ -137,12 +137,19 @@ describe("GET /workspaces/{wid}", () => {
     }
   });
 
-  // it('Should return a workspace', async () => {
-  //     try {
-  //         let workspace = await getWorkspace(1);
-  //         console.log(workspace)
-  //     } catch (error) {
-  //         console.error(error)
-  //     }
-  // });
+  it("Should return a workspace", async () => {
+    try {
+      let workspace = await getWorkspace(1);
+      expect(JSON.stringify(workspace)).toBe(
+        JSON.stringify({
+          id: customer_1.id,
+          company: customer_1.company,
+          logo: customer_1.company_logo,
+          tokens: customer_1.tokens,
+        })
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  });
 });
