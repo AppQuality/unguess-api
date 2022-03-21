@@ -87,10 +87,15 @@ describe("GET /users/me", () => {
   });
   afterAll(async () => {
     return new Promise(async (resolve) => {
-      await unguessDb.dropTable("wp_users");
-      await tryberDb.dropTable("wp_appq_evd_profile");
-      await tryberDb.dropTable("wp_appq_customer");
-      await tryberDb.dropTable("wp_appq_user_to_customer");
+      try {
+        await unguessDb.dropTable("wp_users");
+        await tryberDb.dropTable("wp_appq_evd_profile");
+        await tryberDb.dropTable("wp_appq_customer");
+        await tryberDb.dropTable("wp_appq_user_to_customer");
+      } catch (error) {
+        console.error(error);
+      }
+
       resolve(true);
     });
   });
