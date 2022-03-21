@@ -99,6 +99,27 @@ paths:
       parameters: []
       security:
         - JWT: []
+  '/workspaces/{wid}':
+    parameters:
+      - schema:
+          type: string
+        name: wid
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workspace'
+      operationId: get-workspaces-wid
+      parameters: []
+      security:
+        - JWT: []
   '/workspaces/{wid}/campaigns':
     parameters:
       - schema:
