@@ -15,7 +15,7 @@ export default async (
     try {
       // Get customer name
       const customerSql =
-        "SELECT * FROM wp_appq_customer c LEFT JOIN wp_appq_user_to_customer utc ON (c.id = utc.customer_id) WHERE utc.wp_user_id = ?";
+        "SELECT * FROM wp_appq_customer c JOIN wp_appq_user_to_customer utc ON (c.id = utc.customer_id) WHERE utc.wp_user_id = ?";
       let customers = await db.query(
         db.format(customerSql, [user.tryber_wp_user_id]),
         "tryber"
