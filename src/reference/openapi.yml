@@ -311,8 +311,6 @@ components:
           type: integer
         name:
           type: string
-        customer_id:
-          type: integer
   securitySchemes:
     JWT:
       type: http
