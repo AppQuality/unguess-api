@@ -11,6 +11,6 @@ export default async (userName: string) => {
     }
     return false;
   } catch (e) {
-    return Error("No user with name " + userName);
+    throw Error("No user with name " + userName);
   }
 };

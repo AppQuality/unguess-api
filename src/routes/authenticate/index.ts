@@ -25,7 +25,7 @@ export default async (c: Context, req: Request, res: OpenapiResponse) => {
 
   if (!checked) {
     res.status_code = 401;
-    return "Password " + password + " not matching " + userData.user_login;
+    return "Password: " + password + " not matching " + userData.user_login;
   }
 
   const data = await authenticate(userData);
