@@ -166,6 +166,58 @@ paths:
       operationId: get-workspace-projects
       security:
         - JWT: []
+  '/workspaces/{wid}/projects/{pid}':
+    parameters:
+      - schema:
+          type: string
+        name: wid
+        in: path
+        required: true
+        description: Workspace (company) id
+      - schema:
+          type: string
+        name: pid
+        in: path
+        required: true
+        description: Project id
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+      operationId: get-workspace-project
+  '/workspaces/{wid}/projects/{pid}/campaigns':
+    parameters:
+      - schema:
+          type: string
+        name: wid
+        in: path
+        required: true
+        description: Workspace (company) id
+      - schema:
+          type: string
+        name: pid
+        in: path
+        required: true
+        description: Project id
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Campaign'
+      operationId: get-workspace-project-campaigns
 components:
   schemas:
     User:
