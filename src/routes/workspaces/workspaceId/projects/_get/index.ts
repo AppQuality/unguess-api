@@ -16,12 +16,10 @@ export default async (
     {
       id: 1,
       name: "Projettino unoh",
-      customer_id: 1,
     },
     {
       id: 2,
       name: "Projettino dueh",
-      customer_id: 1,
     },
   ];
 };

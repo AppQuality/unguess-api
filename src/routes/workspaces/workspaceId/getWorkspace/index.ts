@@ -21,8 +21,7 @@ export default async (workspaceId: number): Promise<Workspace | {}> => {
       };
     }
 
-    if (!workspace.length) throw Error("No workspace found");
-    return {};
+    throw Error("No workspace found");
   } catch (error) {
     throw error;
   }

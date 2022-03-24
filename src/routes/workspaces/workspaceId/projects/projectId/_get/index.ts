@@ -1,7 +1,7 @@
-/** OPENAPI-ROUTE: get-workspace */
+/** OPENAPI-ROUTE: get-workspace-project */
 import { Context } from "openapi-backend";
-import * as db from "../../../../features/db";
-import getWorkspace from "../getWorkspace";
+import * as db from "../../../../../../features/db";
+import getProject from "../getProject";
 
 export default async (
   c: Context,
@@ -14,8 +14,6 @@ export default async (
 
   return {
     id: 1,
-    company: "Company",
-    logo: "logo.png",
-    tokens: 100,
+    name: "Projettino unoh",
   };
 };
