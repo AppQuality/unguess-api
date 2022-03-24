@@ -116,7 +116,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Workspace'
-      operationId: get-workspaces-wid
+      operationId: get-workspace
       parameters: []
       security:
         - JWT: []
