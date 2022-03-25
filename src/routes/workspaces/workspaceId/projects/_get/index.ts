@@ -16,10 +16,12 @@ export default async (
     {
       id: 1,
       name: "Projettino unoh",
+      campaigns_count: 5,
     },
     {
       id: 2,
       name: "Projettino dueh",
+      campaigns_count: 10,
     },
   ];
 };

@@ -2,6 +2,7 @@ import * as db from "@src/features/db";
 
 export default async (projectId: number): Promise<Project | {}> => {
   try {
+    // TODO: add join with campaigns to get the campaigns_count value
     const sql = db.format(
       `SELECT * FROM wp_appq_project p 
             WHERE p.id = ? `,
@@ -16,6 +17,7 @@ export default async (projectId: number): Promise<Project | {}> => {
       return {
         id: project.id,
         name: project.display_name,
+        // TODO: add campaigns_count
       };
     }
 

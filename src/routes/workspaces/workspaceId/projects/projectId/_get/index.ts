@@ -15,5 +15,6 @@ export default async (
   return {
     id: 1,
     name: "Projettino unoh",
+    campaigns_count: 5,
   };
 };
