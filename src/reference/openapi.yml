@@ -311,6 +311,8 @@ components:
           type: integer
         name:
           type: string
+        campaigns_count:
+          type: integer
   securitySchemes:
     JWT:
       type: http
