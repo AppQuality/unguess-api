@@ -11,32 +11,28 @@ export default async (
 
   res.status_code = 200;
 
-  return [
-    {
-      id: 1,
-      start_date: "2017-07-20 00:00:00",
-      end_date: "2017-07-20 00:00:00",
-      close_date: "2017-07-20 00:00:00",
-      title: "Campagnetta Provetta",
-      description: "Descrizione della campagnazione",
-      status_id: 1,
-      is_public: 0,
-      campaign_type_id: 1,
-      project_id: 1,
-      customer_title: "Campagnettina Provettina",
-    },
-    {
-      id: 2,
-      start_date: "2020-10-15 00:00:00",
-      end_date: "2020-10-15 00:00:00",
-      close_date: "2020-10-15 00:00:00",
-      title: "Campagnona Provolona",
-      description: "Descriziona della campagno",
-      status_id: 1,
-      is_public: 0,
-      campaign_type_id: 1,
-      project_id: 1,
-      customer_title: "Campagnettona Provolettona",
-    },
-  ];
+  const exampleCampaigns: any = [];
+  [...Array(10).keys()].forEach((projectId) => {
+    let baseId = projectId * 10;
+    [...Array(10).keys()].forEach((id) => {
+      let cp_id = baseId + (id + 1);
+      exampleCampaigns.push({
+        id: cp_id,
+        start_date: "2017-07-20 00:00:00",
+        end_date: "2017-07-20 00:00:00",
+        close_date: "2017-07-20 00:00:00",
+        title: "Campagnetta Provetta " + cp_id,
+        description: "Descrizione della campagnazione",
+        status_id: 1,
+        is_public: 0,
+        campaign_type_id: 1,
+        project_id: projectId + 1,
+        customer_title: "Campagnettina Provettina",
+      });
+    });
+  });
+
+  console.log(exampleCampaigns);
+
+  return exampleCampaigns;
 };
