@@ -102,10 +102,11 @@ paths:
   '/workspaces/{wid}':
     parameters:
       - schema:
-          type: string
+          type: integer
         name: wid
         in: path
         required: true
+        description: Workspace (company) id
     get:
       summary: Your GET endpoint
       tags: []
@@ -123,7 +124,7 @@ paths:
   '/workspaces/{wid}/campaigns':
     parameters:
       - schema:
-          type: string
+          type: integer
         name: wid
         in: path
         required: true
@@ -146,7 +147,7 @@ paths:
   '/workspaces/{wid}/projects':
     parameters:
       - schema:
-          type: string
+          type: integer
         name: wid
         in: path
         required: true
@@ -169,13 +170,13 @@ paths:
   '/workspaces/{wid}/projects/{pid}':
     parameters:
       - schema:
-          type: string
+          type: integer
         name: wid
         in: path
         required: true
         description: Workspace (company) id
       - schema:
-          type: string
+          type: integer
         name: pid
         in: path
         required: true
@@ -194,13 +195,13 @@ paths:
   '/workspaces/{wid}/projects/{pid}/campaigns':
     parameters:
       - schema:
-          type: string
+          type: integer
         name: wid
         in: path
         required: true
         description: Workspace (company) id
       - schema:
-          type: string
+          type: integer
         name: pid
         in: path
         required: true
@@ -268,14 +269,13 @@ components:
           type: integer
         company:
           type: string
-        logo:
-          type: string
         tokens:
           type: number
+        logo:
+          type: string
       required:
         - id
         - company
-        - logo
         - tokens
     Campaign:
       title: Campaign
@@ -291,6 +291,8 @@ components:
           type: string
         title:
           type: string
+        customer_title:
+          type: string
         description:
           type: string
         status_id:
@@ -301,8 +303,21 @@ components:
           type: integer
         project_id:
           type: integer
-        customer_title:
+        project_name:
           type: string
+      required:
+        - id
+        - start_date
+        - end_date
+        - close_date
+        - title
+        - customer_title
+        - description
+        - status_id
+        - is_public
+        - campaign_type_id
+        - project_id
+        - project_name
     Project:
       title: Project
       type: object
@@ -313,6 +328,10 @@ components:
           type: string
         campaigns_count:
           type: integer
+      required:
+        - id
+        - name
+        - campaigns_count
   securitySchemes:
     JWT:
       type: http
