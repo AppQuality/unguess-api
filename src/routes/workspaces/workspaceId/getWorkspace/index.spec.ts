@@ -60,7 +60,7 @@ const customer_profile_1 = {
   email: "customer@unguess.io",
 };
 
-describe("GET /workspaces/{wid}", () => {
+describe("", () => {
   beforeAll(async () => {
     return new Promise(async (resolve) => {
       try {
@@ -134,6 +134,31 @@ describe("GET /workspaces/{wid}", () => {
       fail("Should throw error");
     } catch (error) {
       expect((error as OpenapiError).message).toBe("No workspace found");
+    }
+  });
+
+  it("Should have all the required fields", async () => {
+    try {
+      const workspace = (await getWorkspace(1)) as Workspace;
+      const { company, id, tokens } = workspace;
+      expect(company).not.toBeNull();
+      expect(id).not.toBeNull();
+      expect(tokens).not.toBeNull();
+    } catch (e) {
+      console.log(e);
+    }
+  });
+
+  it("Should have all the types matching the requirements", async () => {
+    try {
+      const workspace = (await getWorkspace(1)) as Workspace;
+      const { company, id, tokens } = workspace;
+      console.log(workspace);
+      expect(typeof company).toBe("string");
+      expect(typeof tokens).toBe("number");
+      expect(typeof id).toBe("number");
+    } catch (e) {
+      console.log(e);
     }
   });
 
