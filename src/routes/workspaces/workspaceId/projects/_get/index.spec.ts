@@ -33,14 +33,26 @@ const customer_profile_1 = {
 
 const customer_1 = {
   id: 1,
-  company: "Company",
-  company_logo: "logo.png",
+  company: "Company 1",
+  company_logo: "logo1.png",
   tokens: 100,
+};
+
+const customer_2 = {
+  id: 2,
+  company: "Company 2",
+  company_logo: "logo2.png",
+  tokens: 200,
 };
 
 const user_to_customer_1 = {
   wp_user_id: 1,
   customer_id: 1,
+};
+
+const user_to_customer_2 = {
+  wp_user_id: 1,
+  customer_id: 2,
 };
 
 const project_1 = {
@@ -96,7 +108,9 @@ describe("GET /workspaces/{wid}/projects", () => {
         await unguessDb.insert("wp_users", admin_user_1);
         await tryberDb.insert("wp_appq_evd_profile", customer_profile_1);
         await tryberDb.insert("wp_appq_customer", customer_1);
+        await tryberDb.insert("wp_appq_customer", customer_2);
         await tryberDb.insert("wp_appq_user_to_customer", user_to_customer_1);
+        await tryberDb.insert("wp_appq_user_to_customer", user_to_customer_2);
         await tryberDb.insert("wp_appq_project", project_1);
         await tryberDb.insert("wp_appq_project", project_2);
       } catch (error) {
@@ -129,9 +143,26 @@ describe("GET /workspaces/{wid}/projects", () => {
 
   it("Should answer 200 if logged in", async () => {
     const response = await request(app)
-      .get("/workspaces/1/projects")
+      .get(`/workspaces/${customer_1.id}/projects`)
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
+  });
+
+  it("Should answer 400 if wid is a string", async () => {
+    const response = await request(app)
+      .get(`/workspaces/asd/projects`)
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(400);
+  });
+
+  it("Should throw an error 'No workspace found' if workspace is not found", async () => {
+    try {
+      const response = await request(app)
+        .get(`/workspaces/9999/projects`)
+        .set("authorization", "Bearer customer");
+    } catch (error) {
+      expect((error as OpenapiError).message).toBe("No workspace found");
+    }
   });
 
   it("Should return a list of projects if customer is present and has some projects", async () => {
@@ -146,16 +177,33 @@ describe("GET /workspaces/{wid}/projects", () => {
         .set("authorization", "Bearer customer");
       expect(response.status).toBe(200);
 
-      // const projectSql = "SELECT id, display_name, customer_id FROM wp_appq_project WHERE customer_id = ?";
-      // let projects = await tryberDb.all(projectSql, [customer_1.id]);
-
       expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body).toHaveLength(response.body.length);
+      expect(response.body.length).toBeGreaterThan(0);
       response.body.forEach((project: Object) => {
         expect(project).toHaveProperty("id");
-        expect(project).toHaveProperty("display_name");
-        expect(project).toHaveProperty("customer_id");
+        expect(project).toHaveProperty("name");
+        expect(project).toHaveProperty("campaigns_count");
       });
+    } catch (error) {
+      console.log(error);
+      expect((error as OpenapiError).message).toBe("No workspace found");
+    }
+  });
+
+  it("Should return an empty list if customer is present but has no projects", async () => {
+    try {
+      let workspace = await getWorkspace(customer_2.id);
+      expect(workspace).toHaveProperty("id");
+      expect(workspace).toHaveProperty("company");
+      expect(workspace).toHaveProperty("tokens");
+
+      const response = await request(app)
+        .get(`/workspaces/${customer_2.id}/projects`)
+        .set("authorization", "Bearer customer");
+      expect(response.status).toBe(200);
+
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.length).toBe(0);
     } catch (error) {
       console.log(error);
       expect((error as OpenapiError).message).toBe("No workspace found");
