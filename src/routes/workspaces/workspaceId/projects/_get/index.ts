@@ -12,32 +12,53 @@ export default async (
 
   res.status_code = 200;
 
-  let params = c.request.params;
-  let workspaceId =
-    params.wid as StoplightOperations["get-workspace-projects"]["parameters"]["path"]["wid"];
+  // Get wid path parameter
+  let workspaceId;
+  if (typeof c.request.params.wid == "string") {
+    workspaceId = parseInt(
+      c.request.params.wid
+    ) as StoplightOperations["get-workspace-projects"]["parameters"]["path"]["wid"];
+  }
 
-  let workspace = await getWorkspace(workspaceId);
+  // Check if workspaceId is valid
+  if (!workspaceId) {
+    res.status_code = 400;
+    return;
+  }
 
-  // const sql = db.format(
-  //   `SELECT * FROM wp_appq_customer c
-  //   JOIN wp_appq_user_to_customer utc ON (c.id = utc.customer_id)
-  //   WHERE c.id = ?
-  //   AND utc.wp_user_id = ?`,
-  //   [1, 1]
-  // );
+  // Get workspace
+  let workspace;
+  try {
+    workspace = await getWorkspace(workspaceId);
+  } catch (error) {
+    if ((error as OpenapiError).message == "No workspace found") {
+      res.status_code = 404;
+      return;
+    } else {
+      res.status_code = 500;
+      throw error;
+    }
+  }
 
-  // let workspace = await db.query(sql);
+  if (workspace) {
+    // Get workspace projects
+    const projectSql =
+      "SELECT id, display_name, customer_id FROM wp_appq_project WHERE customer_id = ?";
+    let projects = await db.query(db.format(projectSql, [workspaceId]));
 
-  // if (workspace.length) {
-  //   workspace = workspace[0];
+    let returnProjects: Array<StoplightComponents["schemas"]["Project"]> = [];
+    if (projects) {
+      projects.forEach((project: any) => {
+        returnProjects.push({
+          id: project.id,
+          name: project.display_name,
+          campaigns_count: 0,
+        });
+      });
+    }
 
-  //   return {
-  //     id: workspace.id,
-  //     company: workspace.company,
-  //     logo: workspace.company_logo,
-  //     tokens: workspace.tokens,
-  //   };
-  // }
+    return returnProjects;
+  }
 
-  // throw Error("No workspace found");
+  res.status_code = 404;
 };
