@@ -12,16 +12,32 @@ export default async (
 
   res.status_code = 200;
 
-  return [
-    {
-      id: 1,
-      name: "Projettino unoh",
-      campaigns_count: 5,
-    },
-    {
-      id: 2,
-      name: "Projettino dueh",
-      campaigns_count: 10,
-    },
-  ];
+  let params = c.request.params;
+  let workspaceId =
+    params.wid as StoplightOperations["get-workspace-projects"]["parameters"]["path"]["wid"];
+
+  let workspace = await getWorkspace(workspaceId);
+
+  // const sql = db.format(
+  //   `SELECT * FROM wp_appq_customer c
+  //   JOIN wp_appq_user_to_customer utc ON (c.id = utc.customer_id)
+  //   WHERE c.id = ?
+  //   AND utc.wp_user_id = ?`,
+  //   [1, 1]
+  // );
+
+  // let workspace = await db.query(sql);
+
+  // if (workspace.length) {
+  //   workspace = workspace[0];
+
+  //   return {
+  //     id: workspace.id,
+  //     company: workspace.company,
+  //     logo: workspace.company_logo,
+  //     tokens: workspace.tokens,
+  //   };
+  // }
+
+  // throw Error("No workspace found");
 };
