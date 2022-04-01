@@ -21,9 +21,13 @@ export default async (
   }
 
   // Check if workspaceId is valid
-  if (!workspaceId) {
+  if (
+    typeof workspaceId == "undefined" ||
+    workspaceId == null ||
+    workspaceId < 0
+  ) {
     res.status_code = 400;
-    return;
+    return "Workspace id is not valid";
   }
 
   // Get workspace
@@ -41,10 +45,10 @@ export default async (
   }
 
   // Get workspace projects
-  let projects;
+  let projects: any;
   try {
     const projectSql =
-      "SELECT id, display_name FROM wp_appq_project WHERE customer_id = ?";
+      "SELECT id, display_name FROM wp_appq_project WHERE customer_id = ? ORDER BY id";
     projects = await db.query(db.format(projectSql, [workspaceId]));
   } catch (error) {
     res.status_code = 500;
@@ -53,24 +57,26 @@ export default async (
 
   let returnProjects: Array<StoplightComponents["schemas"]["Project"]> = [];
   if (projects) {
-    projects.forEach(async (project: any) => {
+    for (const project of projects) {
       // Get campaigns count
       let campaigns;
       try {
         const campaignSql =
-          "SELECT COUNT(*) AS count FROM wp_evd_appq_campaign WHERE project_id = ?";
+          "SELECT COUNT(*) AS count FROM wp_appq_evd_campaign WHERE project_id = ?";
         campaigns = await db.query(db.format(campaignSql, [project.id]));
       } catch (error) {
         res.status_code = 500;
         throw error;
       }
 
-      returnProjects.push({
+      let item: StoplightComponents["schemas"]["Project"] = {
         id: project.id,
         name: project.display_name,
         campaigns_count: campaigns[0].count,
-      });
-    });
+      };
+
+      returnProjects.push(item);
+    }
   }
 
   return returnProjects;
