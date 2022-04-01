@@ -1,8 +1,7 @@
 /** OPENAPI-ROUTE: get-workspace-campaigns */
 import { Context } from "openapi-backend";
 import * as db from "../../../../../features/db";
-
-//appq_edv_campaign
+import getWorkspace from "@src/routes/workspaces/workspaceId/getWorkspace";
 
 export default async (
   c: Context,
@@ -22,9 +21,24 @@ export default async (
       return "Bad request";
     }
 
+    await getWorkspace(customer_id);
+
     const query =
-      "SELECT c.*, p.display_name FROM wp_appq_evd_campaign c JOIN wp_appq_project p ON c.project_id = wp_appq_project.id WHERE c.customer_id = ?";
-    let campaigns = await db.query(db.format(query, [customer_id]));
+      "SELECT c.id, " +
+      "c.start_date, " +
+      "c.end_date, " +
+      "c.close_date, " +
+      "c.title, " +
+      "c.customer_title, " +
+      "c.description, " +
+      "c.status_id, " +
+      "c.is_public, " +
+      "c.campaign_type_id, " +
+      "c.project_id, " +
+      "c.customer_id, " +
+      "p.display_name FROM wp_appq_evd_campaign c JOIN wp_appq_project p ON c.project_id = p.id WHERE c.customer_id = ?";
+    const campaigns = await db.query(db.format(query, [customer_id]));
+
     if (!campaigns.length) return [];
 
     let stoplightCampaign = campaigns.map((campaign: any) => {
@@ -44,10 +58,16 @@ export default async (
         project_name: campaign.display_name,
       };
     });
+
     return stoplightCampaign as Array<
       StoplightComponents["schemas"]["Campaign"]
     >;
   } catch (e) {
+    if ((e as OpenapiError).message === "No workspace found") {
+      res.status_code = 404;
+      return "Workspace not found";
+    }
+    res.status_code = 500;
     throw e;
   }
 };
