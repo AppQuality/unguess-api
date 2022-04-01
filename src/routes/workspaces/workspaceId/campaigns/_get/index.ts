@@ -23,7 +23,7 @@ export default async (
     }
 
     const query =
-      "SELECT c.*, wp_appq_project.display_name FROM wp_appq_evd_campaign AS c JOIN wp_appq_project ON c.project_id = wp_appq_project.id WHERE c.customer_id = ?";
+      "SELECT c.*, p.display_name FROM wp_appq_evd_campaign c JOIN wp_appq_project p ON c.project_id = wp_appq_project.id WHERE c.customer_id = ?";
     let campaigns = await db.query(db.format(query, [customer_id]));
     if (!campaigns.length) return [];
 
