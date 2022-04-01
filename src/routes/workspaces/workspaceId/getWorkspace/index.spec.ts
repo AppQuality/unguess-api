@@ -60,7 +60,7 @@ const customer_profile_1 = {
   email: "customer@unguess.io",
 };
 
-describe("", () => {
+describe("getWorkspace", () => {
   beforeAll(async () => {
     return new Promise(async (resolve) => {
       try {
@@ -152,11 +152,12 @@ describe("", () => {
   it("Should have all the types matching the requirements", async () => {
     try {
       const workspace = (await getWorkspace(1)) as Workspace;
-      const { company, id, tokens } = workspace;
+      const { company, id, tokens, logo } = workspace;
       console.log(workspace);
       expect(typeof company).toBe("string");
       expect(typeof tokens).toBe("number");
       expect(typeof id).toBe("number");
+      expect(typeof logo).toBe("string");
     } catch (e) {
       console.log(e);
     }
