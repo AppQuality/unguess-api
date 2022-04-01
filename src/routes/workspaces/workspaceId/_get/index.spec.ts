@@ -44,7 +44,7 @@ const user_to_customer_1 = {
 
 describe("GET /workspaces/{wid}", () => {
   beforeAll(async () => {
-    return new Promise(async (resolve) => {
+    return new Promise(async (resolve, reject) => {
       try {
         await unguessDb.createTable("wp_users", [
           "ID int(11) PRIMARY KEY",
@@ -80,13 +80,14 @@ describe("GET /workspaces/{wid}", () => {
         await tryberDb.insert("wp_appq_user_to_customer", user_to_customer_1);
       } catch (error) {
         console.log(error);
+        reject(error);
       }
 
       resolve(true);
     });
   });
   afterAll(async () => {
-    return new Promise(async (resolve) => {
+    return new Promise(async (resolve, reject) => {
       try {
         await unguessDb.dropTable("wp_users");
         await tryberDb.dropTable("wp_appq_evd_profile");
@@ -94,6 +95,7 @@ describe("GET /workspaces/{wid}", () => {
         await tryberDb.dropTable("wp_appq_user_to_customer");
       } catch (error) {
         console.error(error);
+        reject(error);
       }
 
       resolve(true);

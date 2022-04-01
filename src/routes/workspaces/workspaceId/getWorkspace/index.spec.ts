@@ -62,7 +62,7 @@ const customer_profile_1 = {
 
 describe("getWorkspace", () => {
   beforeAll(async () => {
-    return new Promise(async (resolve) => {
+    return new Promise(async (resolve, reject) => {
       try {
         await unguessDb.createTable("wp_users", [
           "ID int(11) PRIMARY KEY",
@@ -78,7 +78,7 @@ describe("getWorkspace", () => {
           "tokens int(11)",
         ]);
 
-        await unguessDb.createTable("wp_appq_evd_profile", [
+        await tryberDb.createTable("wp_appq_evd_profile", [
           "id int(11) PRIMARY KEY",
           "wp_user_id int(20)",
           "name VARCHAR(45)",
@@ -98,7 +98,7 @@ describe("getWorkspace", () => {
         ]);
 
         await unguessDb.insert("wp_users", customer_user_1);
-        await unguessDb.insert("wp_appq_evd_profile", customer_profile_1);
+        await tryberDb.insert("wp_appq_evd_profile", customer_profile_1);
         await tryberDb.insert("wp_appq_customer", customer_1);
         await tryberDb.insert("wp_appq_customer", customer_2);
         await tryberDb.insert("wp_appq_user_to_customer", user_to_customer_1);
@@ -107,21 +107,23 @@ describe("getWorkspace", () => {
         await tryberDb.insert("wp_appq_project", project_2);
       } catch (error) {
         console.log(error);
+        reject(error);
       }
 
       resolve(true);
     });
   });
   afterAll(async () => {
-    return new Promise(async (resolve) => {
+    return new Promise(async (resolve, reject) => {
       try {
         await unguessDb.dropTable("wp_users");
-        await unguessDb.dropTable("wp_appq_evd_profile");
+        await tryberDb.dropTable("wp_appq_evd_profile");
         await tryberDb.dropTable("wp_appq_customer");
         await tryberDb.dropTable("wp_appq_user_to_customer");
         await tryberDb.dropTable("wp_appq_project");
       } catch (error) {
         console.error(error);
+        reject(error);
       }
 
       resolve(true);
@@ -153,7 +155,7 @@ describe("getWorkspace", () => {
     try {
       const workspace = (await getWorkspace(1)) as Workspace;
       const { company, id, tokens, logo } = workspace;
-      console.log(workspace);
+
       expect(typeof company).toBe("string");
       expect(typeof tokens).toBe("number");
       expect(typeof id).toBe("number");

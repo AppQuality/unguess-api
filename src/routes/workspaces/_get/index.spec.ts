@@ -17,7 +17,7 @@ const customer_1 = {
 
 describe("GET /workspaces", () => {
   beforeAll(async () => {
-    return new Promise(async (resolve) => {
+    return new Promise(async (resolve, reject) => {
       try {
         await tryberDb.createTable("wp_appq_customer", [
           "id int(11) PRIMARY KEY",
@@ -26,12 +26,12 @@ describe("GET /workspaces", () => {
           "tokens int(11)",
         ]);
 
-        await tryberDb.insert("wp_appq_customer", customer_1);
-
         await tryberDb.createTable("wp_appq_user_to_customer", [
           "wp_user_id int(11) ",
           "customer_id int(11) not null",
         ]);
+
+        await tryberDb.insert("wp_appq_customer", customer_1);
 
         await tryberDb.insert("wp_appq_user_to_customer", {
           wp_user_id: 1,
@@ -39,6 +39,7 @@ describe("GET /workspaces", () => {
         });
       } catch (error) {
         console.log(error);
+        reject(error);
       }
 
       resolve(true);
@@ -46,11 +47,13 @@ describe("GET /workspaces", () => {
   });
 
   afterAll(async () => {
-    return new Promise(async (resolve) => {
+    return new Promise(async (resolve, reject) => {
       try {
         await tryberDb.dropTable("wp_appq_customer");
+        await tryberDb.dropTable("wp_appq_user_to_customer");
       } catch (error) {
         console.log(error);
+        reject(error);
       }
 
       resolve(true);

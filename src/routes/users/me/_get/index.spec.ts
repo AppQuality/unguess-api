@@ -44,7 +44,7 @@ const user_to_customer_1 = {
 
 describe("GET /users/me", () => {
   beforeAll(async () => {
-    return new Promise(async (resolve) => {
+    return new Promise(async (resolve, reject) => {
       try {
         await unguessDb.createTable("wp_users", [
           "ID int(11) PRIMARY KEY",
@@ -80,13 +80,14 @@ describe("GET /users/me", () => {
         await tryberDb.insert("wp_appq_user_to_customer", user_to_customer_1);
       } catch (error) {
         console.log(error);
+        reject(error);
       }
 
       resolve(true);
     });
   });
   afterAll(async () => {
-    return new Promise(async (resolve) => {
+    return new Promise(async (resolve, reject) => {
       try {
         await unguessDb.dropTable("wp_users");
         await tryberDb.dropTable("wp_appq_evd_profile");
@@ -94,6 +95,7 @@ describe("GET /users/me", () => {
         await tryberDb.dropTable("wp_appq_user_to_customer");
       } catch (error) {
         console.error(error);
+        reject(error);
       }
 
       resolve(true);
@@ -146,12 +148,4 @@ describe("GET /users/me", () => {
     expect(response.body.role).toBe("customer");
     expect(response.body).toHaveProperty("workspaces");
   });
-
-  // it("Should return the user profile pic", async () => {
-  //   const response = await request(app)
-  //     .get("/users/me")
-  //     .set("authorization", "Bearer customer");
-  //   expect(response.body.role).toBe("customer");
-  //   expect(response.body).toHaveProperty("profileSrc");
-  // });
 });
