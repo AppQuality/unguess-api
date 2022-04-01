@@ -82,10 +82,49 @@ paths:
       operationId: get-users-me
       security:
         - JWT: []
+  /workspaces:
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Workspace'
+      operationId: get-workspaces
+      parameters: []
+      security:
+        - JWT: []
+  '/workspaces/{wid}':
+    parameters:
+      - schema:
+          type: integer
+        name: wid
+        in: path
+        required: true
+        description: Workspace (company) id
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workspace'
+      operationId: get-workspace
+      parameters: []
+      security:
+        - JWT: []
   '/workspaces/{wid}/campaigns':
     parameters:
       - schema:
-          type: string
+          type: integer
         name: wid
         in: path
         required: true
@@ -105,6 +144,81 @@ paths:
       operationId: get-workspace-campaigns
       security:
         - JWT: []
+  '/workspaces/{wid}/projects':
+    parameters:
+      - schema:
+          type: integer
+        name: wid
+        in: path
+        required: true
+        description: Workspace (company) id
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
+      operationId: get-workspace-projects
+      security:
+        - JWT: []
+  '/workspaces/{wid}/projects/{pid}':
+    parameters:
+      - schema:
+          type: integer
+        name: wid
+        in: path
+        required: true
+        description: Workspace (company) id
+      - schema:
+          type: integer
+        name: pid
+        in: path
+        required: true
+        description: Project id
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+      operationId: get-workspace-project
+  '/workspaces/{wid}/projects/{pid}/campaigns':
+    parameters:
+      - schema:
+          type: integer
+        name: wid
+        in: path
+        required: true
+        description: Workspace (company) id
+      - schema:
+          type: integer
+        name: pid
+        in: path
+        required: true
+        description: Project id
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Campaign'
+      operationId: get-workspace-project-campaigns
 components:
   schemas:
     User:
@@ -155,14 +269,13 @@ components:
           type: integer
         company:
           type: string
-        logo:
-          type: string
         tokens:
           type: number
+        logo:
+          type: string
       required:
         - id
         - company
-        - logo
         - tokens
     Campaign:
       title: Campaign
@@ -178,34 +291,53 @@ components:
           type: string
         title:
           type: string
+        customer_title:
+          type: string
         description:
           type: string
         status_id:
           type: number
         is_public:
-          type: integer
+          type: number
         campaign_type_id:
           type: integer
         project_id:
           type: integer
-        customer_title:
+        project_name:
           type: string
+      required:
+        - id
+        - start_date
+        - end_date
+        - close_date
+        - title
+        - customer_title
+        - description
+        - status_id
+        - is_public
+        - campaign_type_id
+        - project_id
+        - project_name
+    Project:
+      title: Project
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        campaigns_count:
+          type: integer
+      required:
+        - id
+        - name
+        - campaigns_count
   securitySchemes:
     JWT:
       type: http
       scheme: bearer
       description: ''
   responses:
-    UserData:
-      description: A user
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/User'
-          examples:
-            example:
-              value:
-                username: Elon71
     Authentication:
       description: Authentication data. The token can be used to authenticate the protected requests
       content:
