@@ -146,4 +146,12 @@ describe("GET /users/me", () => {
     expect(response.body.role).toBe("customer");
     expect(response.body).toHaveProperty("workspaces");
   });
+
+  // it("Should return the user profile pic", async () => {
+  //   const response = await request(app)
+  //     .get("/users/me")
+  //     .set("authorization", "Bearer customer");
+  //   expect(response.body.role).toBe("customer");
+  //   expect(response.body).toHaveProperty("profileSrc");
+  // });
 });
