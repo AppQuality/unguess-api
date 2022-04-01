@@ -1,6 +1,5 @@
 /** OPENAPI-ROUTE: get-workspace */
 import { Context } from "openapi-backend";
-import * as db from "../../../../features/db";
 import getWorkspace from "../getWorkspace";
 
 export default async (
@@ -8,14 +7,30 @@ export default async (
   req: OpenapiRequest,
   res: OpenapiResponse
 ) => {
-  let user = req.user;
-
+  let workspace;
   res.status_code = 200;
+  try {
+    let wid;
+    if (typeof c.request.params.wid == "string")
+      wid = parseInt(
+        c.request.params.wid
+      ) as StoplightOperations["get-workspace"]["parameters"]["path"]["wid"];
 
-  return {
-    id: 1,
-    company: "Company",
-    logo: "logo.png",
-    tokens: 100,
-  };
+    if (!wid) {
+      res.status_code = 400;
+      return "Bad request";
+    }
+
+    workspace = await getWorkspace(wid);
+  } catch (e) {
+    if ((e as OpenapiError).message === "No workspace found") {
+      res.status_code = 404;
+      return (e as OpenapiError).message;
+    } else {
+      res.status_code = 500;
+      throw e;
+    }
+  }
+
+  return workspace as StoplightComponents["schemas"]["Workspace"];
 };

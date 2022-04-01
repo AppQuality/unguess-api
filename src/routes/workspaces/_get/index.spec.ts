@@ -27,6 +27,16 @@ describe("GET /workspaces", () => {
         ]);
 
         await tryberDb.insert("wp_appq_customer", customer_1);
+
+        await tryberDb.createTable("wp_appq_user_to_customer", [
+          "wp_user_id int(11) ",
+          "customer_id int(11) not null",
+        ]);
+
+        await tryberDb.insert("wp_appq_user_to_customer", {
+          wp_user_id: 1,
+          customer_id: customer_1.id,
+        });
       } catch (error) {
         console.log(error);
       }
