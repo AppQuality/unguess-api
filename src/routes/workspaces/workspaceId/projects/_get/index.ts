@@ -33,32 +33,45 @@ export default async (
   } catch (error) {
     if ((error as OpenapiError).message == "No workspace found") {
       res.status_code = 404;
-      return;
+      return (error as OpenapiError).message;
     } else {
       res.status_code = 500;
       throw error;
     }
   }
 
-  if (workspace) {
-    // Get workspace projects
+  // Get workspace projects
+  let projects;
+  try {
     const projectSql =
-      "SELECT id, display_name, customer_id FROM wp_appq_project WHERE customer_id = ?";
-    let projects = await db.query(db.format(projectSql, [workspaceId]));
-
-    let returnProjects: Array<StoplightComponents["schemas"]["Project"]> = [];
-    if (projects) {
-      projects.forEach((project: any) => {
-        returnProjects.push({
-          id: project.id,
-          name: project.display_name,
-          campaigns_count: 0,
-        });
-      });
-    }
-
-    return returnProjects;
+      "SELECT id, display_name FROM wp_appq_project WHERE customer_id = ?";
+    projects = await db.query(db.format(projectSql, [workspaceId]));
+  } catch (error) {
+    res.status_code = 500;
+    throw error;
   }
 
-  res.status_code = 404;
+  let returnProjects: Array<StoplightComponents["schemas"]["Project"]> = [];
+  if (projects) {
+    projects.forEach(async (project: any) => {
+      // Get campaigns count
+      let campaigns;
+      try {
+        const campaignSql =
+          "SELECT COUNT(*) AS count FROM wp_evd_appq_campaign WHERE project_id = ?";
+        campaigns = await db.query(db.format(campaignSql, [project.id]));
+      } catch (error) {
+        res.status_code = 500;
+        throw error;
+      }
+
+      returnProjects.push({
+        id: project.id,
+        name: project.display_name,
+        campaigns_count: campaigns[0].count,
+      });
+    });
+  }
+
+  return returnProjects;
 };
