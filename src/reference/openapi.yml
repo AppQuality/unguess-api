@@ -301,6 +301,8 @@ components:
           type: number
         campaign_type_id:
           type: integer
+        campaign_type_name:
+          type: string
         project_id:
           type: integer
         project_name:
@@ -316,6 +318,7 @@ components:
         - status_id
         - is_public
         - campaign_type_id
+        - campaign_type_name
         - project_id
         - project_name
     Project:
