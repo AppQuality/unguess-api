@@ -37,12 +37,13 @@ export default async (
       "c.project_id, " +
       "c.customer_id, " +
       "ct.name, " +
+      "ct.type, " +
       "p.display_name FROM wp_appq_evd_campaign c " +
       "JOIN wp_appq_project p ON c.project_id = p.id " +
       "JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id " +
       "WHERE c.customer_id = ?";
     const campaigns = await db.query(db.format(query, [customer_id]));
-    console.log(campaigns);
+
     if (!campaigns.length) return [];
 
     let stoplightCampaign = campaigns.map((campaign: any) => {
@@ -58,6 +59,7 @@ export default async (
         is_public: campaign.is_public,
         campaign_type_id: campaign.campaign_type_id,
         campaign_type_name: campaign.name,
+        test_type_name: campaign.type === 1 ? "Experiential" : "Functional",
         project_id: campaign.project_id,
         customer_id: campaign.customer_id,
         project_name: campaign.display_name,
