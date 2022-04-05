@@ -30,7 +30,6 @@ const data: {
 
 data.basicCampaign = async (params) => {
   const item = {
-    id: 1,
     start_date: "2017-07-20 00:00:00",
     end_date: "2017-07-20 00:00:00",
     close_date: "2017-07-20 00:00:00",

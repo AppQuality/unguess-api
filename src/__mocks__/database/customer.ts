@@ -22,7 +22,6 @@ const data: {
 
 data.basicItem = async (params) => {
   const item = {
-    id: 43,
     company: "Company",
     company_logo: "logo.png",
     tokens: 100,

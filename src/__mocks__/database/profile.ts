@@ -25,7 +25,6 @@ const data: {
 
 data.basicCustomer = async (params) => {
   const item = {
-    id: 1,
     name: "Mario",
     surname: "Rossi",
     email: "mario.rossi@example.com",

@@ -19,15 +19,13 @@ import {
 } from "./user_to_customer";
 
 interface dataObject {
-  profiles: Array<any>;
-  companies: Array<any>;
-  projects: Array<any>;
-  campaigns: Array<any>;
-  userToProjects: Array<any>;
-  userToCustomers: Array<any>;
+  profiles?: Array<any>;
+  companies?: Array<any>;
+  projects?: Array<any>;
+  campaigns?: Array<any>;
+  userToProjects?: Array<any>;
+  userToCustomers?: Array<any>;
 }
-
-const db = sqlite3("tryber");
 
 export const adapter = {
   create: async () => {
@@ -46,34 +44,41 @@ export const adapter = {
     await userToCustomerTable.drop();
     await userToProjectTable.drop();
   },
-  add: async (params: dataObject) => {
-    params.profiles &&
-      params.profiles.forEach(async (profile) => {
+  add: async ({
+    profiles = [],
+    companies = [],
+    projects = [],
+    campaigns = [],
+    userToProjects = [],
+    userToCustomers = [],
+  }: dataObject) => {
+    profiles.length &&
+      profiles.forEach(async (profile) => {
         await profileData.basicCustomer(profile);
       });
 
-    params.companies &&
-      params.companies.forEach(async (company) => {
+    companies.length &&
+      companies.forEach(async (company) => {
         await customerData.basicItem(company);
       });
 
-    params.projects &&
-      params.projects.forEach(async (project) => {
+    projects.length &&
+      projects.forEach(async (project) => {
         await projectData.basicProject(project);
       });
 
-    params.campaigns &&
-      params.campaigns.forEach(async (campaign) => {
+    campaigns.length &&
+      campaigns.forEach(async (campaign) => {
         await campaignData.basicCampaign(campaign);
       });
 
-    params.userToProjects &&
-      params.userToProjects.forEach(async (userToProject) => {
+    userToProjects.length &&
+      userToProjects.forEach(async (userToProject) => {
         await userToProjectData.basicItem(userToProject);
       });
 
-    params.userToCustomers &&
-      params.userToCustomers.forEach(async (userToCustomer) => {
+    userToCustomers.length &&
+      userToCustomers.forEach(async (userToCustomer) => {
         await userToCustomerData.basicItem(userToCustomer);
       });
   },
