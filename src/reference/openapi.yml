@@ -144,6 +144,10 @@ paths:
       operationId: get-workspace-campaigns
       security:
         - JWT: []
+      description: ''
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
   '/workspaces/{wid}/projects':
     parameters:
       - schema:
@@ -452,7 +456,6 @@ components:
     limit:
       name: limit
       in: query
-      required: false
       schema:
         type: integer
       description: Max items to retrieve
