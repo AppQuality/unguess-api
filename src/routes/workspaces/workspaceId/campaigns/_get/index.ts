@@ -11,10 +11,22 @@ export default async (
   res.status_code = 200;
   try {
     let customer_id;
-    if (typeof c.request.params.wid == "string")
+    if (typeof c.request.params.wid === "string")
       customer_id = parseInt(
         c.request.params.wid
       ) as StoplightOperations["get-workspace-campaigns"]["parameters"]["path"]["wid"];
+
+    let limit;
+    if (typeof c.request.query.limit === "string")
+      limit = parseInt(
+        c.request.query.limit
+      ) as StoplightOperations["get-workspace-campaigns"]["parameters"]["query"]["limit"];
+
+    let start;
+    if (typeof c.request.query.start === "string")
+      start = parseInt(
+        c.request.query.start
+      ) as StoplightOperations["get-workspace-campaigns"]["parameters"]["query"]["start"];
 
     if (!customer_id) {
       res.status_code = 400;
@@ -23,25 +35,27 @@ export default async (
 
     await getWorkspace(customer_id);
 
-    const query =
-      "SELECT c.id, " +
-      "c.start_date, " +
-      "c.end_date, " +
-      "c.close_date, " +
-      "c.title, " +
-      "c.customer_title, " +
-      "c.description, " +
-      "c.status_id, " +
-      "c.is_public, " +
-      "c.campaign_type_id, " +
-      "c.project_id, " +
-      "c.customer_id, " +
-      "ct.name, " +
-      "ct.type, " +
-      "p.display_name FROM wp_appq_evd_campaign c " +
-      "JOIN wp_appq_project p ON c.project_id = p.id " +
-      "JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id " +
-      "WHERE c.customer_id = ?";
+    const query = `SELECT c.id,  
+      c.start_date,  
+      c.end_date,
+      c.close_date,
+      c.title,
+      c.customer_title,
+      c.description,
+      c.status_id,
+      c.is_public,
+      c.campaign_type_id,
+      c.project_id,
+      c.customer_id,
+      ct.name,
+      ct.type,
+      p.display_name FROM wp_appq_evd_campaign c 
+      JOIN wp_appq_project p ON c.project_id = p.id 
+      JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id 
+      WHERE c.customer_id = ? 
+      ${limit ? `LIMIT ${limit}` : ``} 
+      ${start ? `OFFSET ${start}` : ``}`;
+
     const campaigns = await db.query(db.format(query, [customer_id]));
 
     if (!campaigns.length) return [];

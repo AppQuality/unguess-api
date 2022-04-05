@@ -235,6 +235,27 @@ describe("GET /workspaces/{wid}/campaigns", () => {
     expect(response.status).toBe(400);
   });
 
+  it("Should return 400 if the query parameter limit is not integer", async () => {
+    const response = await request(app)
+      .get("/workspaces/1/campaigns?limit=banana")
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(400);
+  });
+
+  it("Should return 400 if the query parameter start is not integer", async () => {
+    const response = await request(app)
+      .get("/workspaces/1/campaigns?limit=10&start=banana")
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(400);
+  });
+
+  it("Should return 400 if the query parameters start and limit are not integer", async () => {
+    const response = await request(app)
+      .get("/workspaces/1/campaigns?limit=banana&start=banana")
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(400);
+  });
+
   it("Should return 404 if the customer is not found", async () => {
     const response = await request(app)
       .get("/workspaces/999898978/campaigns")
@@ -270,7 +291,21 @@ describe("GET /workspaces/{wid}/campaigns", () => {
     );
   });
 
-  it("Should return an array of campaigns with more than one element", async () => {
+  it("Should return an array of 1 elements because of limit =1", async () => {
+    const response = await request(app)
+      .get("/workspaces/2/campaigns?limit=1&start=0")
+      .set("authorization", "Bearer customer");
+    expect(response.body.length).toBe(1);
+  });
+
+  it("Should return an array of 1 element because start is set to 1", async () => {
+    const response = await request(app)
+      .get("/workspaces/2/campaigns?limit=1&start=1")
+      .set("authorization", "Bearer customer");
+    expect(response.body.length).toBe(1);
+  });
+
+  it("Should return an array of campaigns with 2 elements becase no limit or start are in the request", async () => {
     const response = await request(app)
       .get("/workspaces/2/campaigns")
       .set("authorization", "Bearer customer");
