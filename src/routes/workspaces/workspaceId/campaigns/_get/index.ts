@@ -53,8 +53,9 @@ export default async (
       JOIN wp_appq_project p ON c.project_id = p.id 
       JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id 
       WHERE c.customer_id = ? 
-      ${limit ? `LIMIT ${limit}` : ``} 
-      ${start ? `OFFSET ${start}` : ``}`;
+      ${
+        limit && (start || start === 0) ? `LIMIT ${limit} OFFSET ${start}` : ``
+      }`;
 
     const campaigns = await db.query(db.format(query, [customer_id]));
 
