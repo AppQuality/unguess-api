@@ -259,6 +259,12 @@ export interface operations {
         /** Workspace (company) id */
         wid: number;
       };
+      query: {
+        /** Max items to retrieve */
+        limit?: components["parameters"]["limit"];
+        /** Items to skip for pagination */
+        start?: components["parameters"]["start"];
+      };
     };
     responses: {
       /** OK */
