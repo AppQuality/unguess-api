@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "start_date": "2017-07-20 00:00:00",
+    "end_date": "2017-07-20 00:00:00",
+    "close_date": "2017-07-20 00:00:00",
+    "title": "Campagnetta Provetta 1",
+    "customer_title": "titolo 1",
+    "description": "Descrizione della campagnazione",
+    "status_id": 1,
+    "is_public": 0,
+    "campaign_type_id": 1
+  },
+  {
+    "id": 2,
+    "start_date": "2017-07-20 00:00:00",
+    "end_date": "2017-07-20 00:00:00",
+    "close_date": "2017-07-20 00:00:00",
+    "title": "Campagnetta Provetta 2",
+    "customer_title": "titolo 2",
+    "description": "Descrizione della campagnazione",
+    "status_id": 1,
+    "is_public": 0,
+    "campaign_type_id": 1
+  },
+  {
+    "id": 3,
+    "start_date": "2017-07-20 00:00:00",
+    "end_date": "2017-07-20 00:00:00",
+    "close_date": "2017-07-20 00:00:00",
+    "title": "Campagnetta Provetta 3",
+    "customer_title": "titolo 3",
+    "description": "Descrizione della campagnazione",
+    "status_id": 1,
+    "is_public": 0,
+    "campaign_type_id": 1
+  },
+  {
+    "id": 4,
+    "start_date": "2017-07-20 00:00:00",
+    "end_date": "2017-07-20 00:00:00",
+    "close_date": "2017-07-20 00:00:00",
+    "title": "Campagnetta Provetta 4",
+    "customer_title": "titolo 4",
+    "description": "Descrizione della campagnazione",
+    "status_id": 1,
+    "is_public": 0,
+    "campaign_type_id": 32
+  },
+  {
+    "id": 5,
+    "start_date": "2017-07-20 00:00:00",
+    "end_date": "2017-07-20 00:00:00",
+    "close_date": "2017-07-20 00:00:00",
+    "title": "Campagnetta Provetta 5",
+    "customer_title": "titolo 5",
+    "description": "Descrizione della campagnazione",
+    "status_id": 1,
+    "is_public": 0,
+    "campaign_type_id": 2
+  },
+  {
+    "id": 6,
+    "start_date": "2017-07-20 00:00:00",
+    "end_date": "2017-07-20 00:00:00",
+    "close_date": "2017-07-20 00:00:00",
+    "title": "Campagnetta Provetta 6",
+    "customer_title": "titolo 6",
+    "description": "Descrizione della campagnazione",
+    "status_id": 1,
+    "is_public": 0,
+    "campaign_type_id": 2
+  }
+]
