@@ -102,6 +102,7 @@ export interface components {
       status_id: number;
       is_public: number;
       campaign_type_id: number;
+      campaign_type_name: string;
       project_id: number;
       project_name: string;
     };

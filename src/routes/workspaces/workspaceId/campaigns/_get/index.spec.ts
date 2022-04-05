@@ -94,7 +94,7 @@ const campaign_3 = {
   description: "Descrizione della campagnazione",
   status_id: 1,
   is_public: 0,
-  campaign_type_id: 1,
+  campaign_type_id: 2,
   project_id: 1,
   customer_id: 2,
 };
@@ -106,6 +106,16 @@ const project_1 = {
   edited_by: 42,
   created_on: "2017-07-20 00:00:00",
   last_edit: "2017-07-20 00:00:00",
+};
+
+const campaign_type_1 = {
+  id: 1,
+  name: "Banana campaign",
+};
+
+const campaign_type_2 = {
+  id: 2,
+  name: "NANANANANANNA BATMAN",
 };
 
 describe("GET /workspaces/{wid}/campaigns", () => {
@@ -133,6 +143,10 @@ describe("GET /workspaces/{wid}/campaigns", () => {
           "edited_by int(11)",
           "created_on timestamp",
           "last_edit timestamp",
+        ]);
+        await tryberDb.createTable("wp_appq_campaign_type", [
+          "id int(11)",
+          "name varchar(45)",
         ]);
 
         await unguessDb.createTable("wp_users", [
@@ -173,6 +187,8 @@ describe("GET /workspaces/{wid}/campaigns", () => {
         await tryberDb.insert("wp_appq_evd_campaign", campaign_1);
         await tryberDb.insert("wp_appq_evd_campaign", campaign_2);
         await tryberDb.insert("wp_appq_evd_campaign", campaign_3);
+        await tryberDb.insert("wp_appq_campaign_type", campaign_type_1);
+        await tryberDb.insert("wp_appq_campaign_type", campaign_type_2);
       } catch (e) {
         console.log(e);
       }
@@ -189,6 +205,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
         await tryberDb.dropTable("wp_appq_user_to_customer");
         await tryberDb.dropTable("wp_appq_evd_campaign");
         await tryberDb.dropTable("wp_appq_project");
+        await tryberDb.dropTable("wp_appq_campaign_type");
       } catch (error) {
         console.error(error);
       }
@@ -238,9 +255,10 @@ describe("GET /workspaces/{wid}/campaigns", () => {
           description: campaign_1.description,
           status_id: campaign_1.status_id,
           is_public: campaign_1.is_public,
-          campaign_type_id: campaign_1.campaign_type_id,
+          campaign_type_id: campaign_type_1.id,
+          campaign_type_name: campaign_type_1.name,
           project_id: campaign_1.project_id,
-          customer_id: campaign_1.project_id,
+          customer_id: campaign_1.customer_id,
           project_name: project_1.display_name,
         },
       ])
@@ -251,7 +269,8 @@ describe("GET /workspaces/{wid}/campaigns", () => {
     const response = await request(app)
       .get("/workspaces/2/campaigns")
       .set("authorization", "Bearer customer");
-    expect(JSON.stringify(response.body)).toBe(
+    console.log(response.body);
+    expect(JSON.stringify(response.body)).toStrictEqual(
       JSON.stringify([
         {
           id: campaign_2.id,
@@ -263,9 +282,10 @@ describe("GET /workspaces/{wid}/campaigns", () => {
           description: campaign_2.description,
           status_id: campaign_2.status_id,
           is_public: campaign_2.is_public,
-          campaign_type_id: campaign_2.campaign_type_id,
+          campaign_type_id: campaign_type_1.id,
+          campaign_type_name: campaign_type_1.name,
           project_id: campaign_2.project_id,
-          customer_id: campaign_2.project_id,
+          customer_id: campaign_2.customer_id,
           project_name: project_1.display_name,
         },
         {
@@ -278,9 +298,10 @@ describe("GET /workspaces/{wid}/campaigns", () => {
           description: campaign_3.description,
           status_id: campaign_3.status_id,
           is_public: campaign_3.is_public,
-          campaign_type_id: campaign_3.campaign_type_id,
+          campaign_type_id: campaign_type_2.id,
+          campaign_type_name: campaign_type_2.name,
           project_id: campaign_3.project_id,
-          customer_id: campaign_3.project_id,
+          customer_id: campaign_3.customer_id,
           project_name: project_1.display_name,
         },
       ])
@@ -292,7 +313,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       const response = await request(app)
         .get("/workspaces/43/campaigns")
         .set("authorization", "Bearer customer");
-      expect(JSON.stringify(response.body)).toBe(JSON.stringify([]));
+      expect(JSON.stringify(response.body)).toStrictEqual(JSON.stringify([]));
     } catch (e) {
       console.log(e);
     }
