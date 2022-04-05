@@ -111,11 +111,13 @@ const project_1 = {
 const campaign_type_1 = {
   id: 1,
   name: "Banana campaign",
+  type: 1,
 };
 
 const campaign_type_2 = {
   id: 2,
   name: "NANANANANANNA BATMAN",
+  type: 1,
 };
 
 describe("GET /workspaces/{wid}/campaigns", () => {
@@ -147,6 +149,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
         await tryberDb.createTable("wp_appq_campaign_type", [
           "id int(11)",
           "name varchar(45)",
+          "type int(11)",
         ]);
 
         await unguessDb.createTable("wp_users", [
@@ -257,6 +260,8 @@ describe("GET /workspaces/{wid}/campaigns", () => {
           is_public: campaign_1.is_public,
           campaign_type_id: campaign_type_1.id,
           campaign_type_name: campaign_type_1.name,
+          test_type_name:
+            campaign_type_1.type === 1 ? "Experiential" : "Functional",
           project_id: campaign_1.project_id,
           customer_id: campaign_1.customer_id,
           project_name: project_1.display_name,
@@ -269,7 +274,6 @@ describe("GET /workspaces/{wid}/campaigns", () => {
     const response = await request(app)
       .get("/workspaces/2/campaigns")
       .set("authorization", "Bearer customer");
-    console.log(response.body);
     expect(JSON.stringify(response.body)).toStrictEqual(
       JSON.stringify([
         {
@@ -284,6 +288,8 @@ describe("GET /workspaces/{wid}/campaigns", () => {
           is_public: campaign_2.is_public,
           campaign_type_id: campaign_type_1.id,
           campaign_type_name: campaign_type_1.name,
+          test_type_name:
+            campaign_type_1.type === 1 ? "Experiential" : "Functional",
           project_id: campaign_2.project_id,
           customer_id: campaign_2.customer_id,
           project_name: project_1.display_name,
@@ -300,6 +306,8 @@ describe("GET /workspaces/{wid}/campaigns", () => {
           is_public: campaign_3.is_public,
           campaign_type_id: campaign_type_2.id,
           campaign_type_name: campaign_type_2.name,
+          test_type_name:
+            campaign_type_1.type === 1 ? "Experiential" : "Functional",
           project_id: campaign_3.project_id,
           customer_id: campaign_3.customer_id,
           project_name: project_1.display_name,
