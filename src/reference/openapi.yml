@@ -148,6 +148,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/filterBy'
+        - $ref: '#/components/parameters/order'
   '/workspaces/{wid}/projects':
     parameters:
       - schema:
