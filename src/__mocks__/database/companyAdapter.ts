@@ -1,11 +1,6 @@
-import sqlite3 from "@src/features/sqlite";
-
 import { table as customerTable, data as customerData } from "./customer";
-
 import { table as profileTable, data as profileData } from "./profile";
-
 import { table as projectTable, data as projectData } from "./project";
-
 import { table as campaignTable, data as campaignData } from "./campaign";
 
 import {
