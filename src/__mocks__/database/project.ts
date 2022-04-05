@@ -8,7 +8,6 @@ export const table = {
       "id int(11) PRIMARY KEY",
       "display_name varchar(64)",
       "customer_id int(11)",
-      "edited_by int(11)",
       "created_on timestamp",
       "last_edit timestamp",
     ]);
@@ -26,7 +25,6 @@ data.basicProject = async (params) => {
   const item = {
     display_name: "Nome del progetto abbastanza figo",
     customer_id: 123,
-    edited_by: 42,
     created_on: "2017-07-20 00:00:00",
     last_edit: "2017-07-20 00:00:00",
     ...params,

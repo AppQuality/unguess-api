@@ -1,27 +1,10 @@
 import app from "@src/app";
 import request from "supertest";
-import db from "@src/features/sqlite";
 import getWorkspace from "../../getWorkspace";
+import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
-
-const unguessDb = db("unguess");
-const tryberDb = db("tryber");
-
-const customer_user_1 = {
-  ID: 1,
-  user_login: "customer@unguess.io",
-  user_pass: "password",
-  user_email: "customer@unguess.io",
-};
-
-const admin_user_1 = {
-  ID: 2,
-  user_login: "admin@unguess.io",
-  user_pass: "password",
-  user_email: "admin@unguess.io",
-};
 
 const customer_profile_1 = {
   id: 1,
@@ -55,6 +38,11 @@ const user_to_customer_2 = {
   customer_id: 2,
 };
 
+const user_to_project = {
+  wp_user_id: 2,
+  project_id: 1,
+};
+
 const project_1 = {
   id: 1,
   display_name: "Projettino unoh",
@@ -71,48 +59,15 @@ describe("GET /workspaces/{wid}/projects", () => {
   beforeAll(async () => {
     return new Promise(async (resolve) => {
       try {
-        await unguessDb.createTable("wp_users", [
-          "ID int(11) PRIMARY KEY",
-          "user_login VARCHAR(60)",
-          "user_pass VARCHAR(255)",
-          "user_email VARCHAR(100)",
-        ]);
+        await dbAdapter.create();
 
-        await tryberDb.createTable("wp_appq_evd_profile", [
-          "id int(11) PRIMARY KEY",
-          "wp_user_id int(20)",
-          "name VARCHAR(45)",
-          "surname VARCHAR(45)",
-          "email VARCHAR(100)",
-        ]);
-
-        await tryberDb.createTable("wp_appq_customer", [
-          "id int(11) PRIMARY KEY",
-          "company varchar(64)",
-          "company_logo varchar(300)",
-          "tokens int(11)",
-        ]);
-
-        await tryberDb.createTable("wp_appq_user_to_customer", [
-          "wp_user_id int(11)",
-          "customer_id int(11)",
-        ]);
-
-        await tryberDb.createTable("wp_appq_project", [
-          "id int(11)",
-          "display_name varchar(64)",
-          "customer_id int(11)",
-        ]);
-
-        await unguessDb.insert("wp_users", customer_user_1);
-        await unguessDb.insert("wp_users", admin_user_1);
-        await tryberDb.insert("wp_appq_evd_profile", customer_profile_1);
-        await tryberDb.insert("wp_appq_customer", customer_1);
-        await tryberDb.insert("wp_appq_customer", customer_2);
-        await tryberDb.insert("wp_appq_user_to_customer", user_to_customer_1);
-        await tryberDb.insert("wp_appq_user_to_customer", user_to_customer_2);
-        await tryberDb.insert("wp_appq_project", project_1);
-        await tryberDb.insert("wp_appq_project", project_2);
+        await dbAdapter.add({
+          profiles: [customer_profile_1],
+          companies: [customer_1, customer_2],
+          projects: [project_1, project_2],
+          userToCustomers: [user_to_customer_1, user_to_customer_2],
+          userToProjects: [user_to_project],
+        });
       } catch (error) {
         console.log(error);
       }
@@ -124,10 +79,7 @@ describe("GET /workspaces/{wid}/projects", () => {
   afterAll(async () => {
     return new Promise(async (resolve) => {
       try {
-        await unguessDb.dropTable("wp_users");
-        await tryberDb.dropTable("wp_appq_evd_profile");
-        await tryberDb.dropTable("wp_appq_customer");
-        await tryberDb.dropTable("wp_appq_user_to_customer");
+        await dbAdapter.drop();
       } catch (error) {
         console.log(error);
       }
@@ -146,6 +98,19 @@ describe("GET /workspaces/{wid}/projects", () => {
       .get(`/workspaces/${customer_1.id}/projects`)
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
+  });
+
+  it("Should answer 200 with only the visible projects", async () => {
+    const response = await request(app)
+      .get(`/workspaces/${customer_1.id}/projects`)
+      .set("authorization", "Bearer customer");
+    expect(response.body).toMatchObject([
+      {
+        id: project_2.id,
+        display_name: project_2.display_name,
+        campaigns_count: 0,
+      },
+    ]);
   });
 
   it("Should answer 400 if wid is a string", async () => {
