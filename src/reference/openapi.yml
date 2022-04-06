@@ -170,11 +170,6 @@ paths:
                       $ref: '#/components/schemas/Campaign'
                   page:
                     type: object
-                    required:
-                      - limit
-                      - start
-                      - size
-                      - totalSize
                     properties:
                       limit:
                         type: integer
@@ -186,7 +181,6 @@ paths:
                         type: integer
                 required:
                   - campaigns
-                  - page
               examples:
                 example-1:
                   value:
@@ -218,7 +212,9 @@ paths:
       security:
         - JWT: []
       description: ''
-      parameters: []
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
   '/workspaces/{wid}/projects':
     parameters:
       - schema:
