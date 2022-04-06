@@ -59,7 +59,18 @@ export default async (
 
     const campaigns = await db.query(db.format(query, [customer_id]));
 
-    if (!campaigns.length) return [];
+    const countQuery = `SELECT COUNT(*) FROM wp_appq_evd_campaign c WHERE c.customer_id = ?`;
+    let totalSize = await db.query(db.format(countQuery, [customer_id]));
+    totalSize = totalSize.map((el: any) => el["COUNT(*)"])[0];
+
+    if (!campaigns.length)
+      return {
+        items: [],
+        limit: 0,
+        start: 0,
+        size: 0,
+        total: 0,
+      };
 
     let stoplightCampaign = campaigns.map((campaign: any) => {
       return {
@@ -81,9 +92,13 @@ export default async (
       };
     });
 
-    return stoplightCampaign as Array<
-      StoplightComponents["schemas"]["Campaign"]
-    >;
+    return {
+      items: stoplightCampaign,
+      limit,
+      start,
+      size: stoplightCampaign.length,
+      total: totalSize,
+    };
   } catch (e) {
     if ((e as OpenapiError).message === "No workspace found") {
       res.status_code = 404;
