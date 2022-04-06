@@ -1,6 +1,5 @@
 import app from "@src/app";
 import request from "supertest";
-import getWorkspace from "../../getWorkspace";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 
 jest.mock("@src/features/db");

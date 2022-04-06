@@ -7,10 +7,10 @@ export default async (
   req: OpenapiRequest,
   res: OpenapiResponse
 ) => {
-  let workspace;
   let user = req.user;
 
   res.status_code = 200;
+
   try {
     let wid;
     if (typeof c.request.params.wid == "string")
@@ -23,7 +23,10 @@ export default async (
       return "Bad request";
     }
 
-    workspace = await getWorkspace(wid, user.id);
+    return (await getWorkspace(
+      wid,
+      user.id
+    )) as StoplightComponents["schemas"]["Workspace"];
   } catch (e) {
     if ((e as OpenapiError).message === "No workspace found") {
       res.status_code = 404;
@@ -36,6 +39,4 @@ export default async (
       throw e;
     }
   }
-
-  return workspace as StoplightComponents["schemas"]["Workspace"];
 };
