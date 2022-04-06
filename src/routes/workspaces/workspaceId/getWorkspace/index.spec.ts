@@ -60,6 +60,7 @@ describe("getWorkspace", () => {
       resolve(true);
     });
   });
+
   afterAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
@@ -71,6 +72,15 @@ describe("getWorkspace", () => {
 
       resolve(true);
     });
+  });
+
+  it("Should have workspaceId and userId parameters", async () => {
+    try {
+      await getWorkspace(0, 0);
+      fail("Should throw error");
+    } catch (error) {
+      expect((error as OpenapiError).message).toBe("Bad request");
+    }
   });
 
   it("Should throw 'You have no permission to get this workspace' error on no permission", async () => {
@@ -94,48 +104,30 @@ describe("getWorkspace", () => {
   });
 
   it("Should have all the required fields", async () => {
-    try {
-      const workspace = (await getWorkspace(
-        1,
-        customer_user_1.ID
-      )) as Workspace;
-      expect(workspace).toHaveProperty("company");
-      expect(workspace).toHaveProperty("id");
-      expect(workspace).toHaveProperty("tokens");
-    } catch (e) {
-      console.log(e);
-    }
+    const workspace = (await getWorkspace(1, customer_user_1.ID)) as Workspace;
+    expect(workspace).toHaveProperty("company");
+    expect(workspace).toHaveProperty("id");
+    expect(workspace).toHaveProperty("tokens");
   });
 
   it("Should have all the types matching the requirements", async () => {
-    try {
-      const workspace = (await getWorkspace(
-        1,
-        customer_user_1.ID
-      )) as Workspace;
-      const { company, id, tokens, logo } = workspace;
-      expect(typeof company).toBe("string");
-      expect(typeof tokens).toBe("number");
-      expect(typeof id).toBe("number");
-      expect(typeof logo).toBe("string");
-    } catch (e) {
-      console.log(e);
-    }
+    const workspace = (await getWorkspace(1, customer_user_1.ID)) as Workspace;
+    const { company, id, tokens, logo } = workspace;
+    expect(typeof company).toBe("string");
+    expect(typeof tokens).toBe("number");
+    expect(typeof id).toBe("number");
+    expect(typeof logo).toBe("string");
   });
 
   it("Should return a workspace", async () => {
-    try {
-      let workspace = await getWorkspace(1, customer_user_1.ID);
-      expect(JSON.stringify(workspace)).toBe(
-        JSON.stringify({
-          id: customer_1.id,
-          company: customer_1.company,
-          logo: customer_1.company_logo,
-          tokens: customer_1.tokens,
-        })
-      );
-    } catch (error) {
-      console.error(error);
-    }
+    let workspace = await getWorkspace(1, customer_user_1.ID);
+    expect(JSON.stringify(workspace)).toBe(
+      JSON.stringify({
+        id: customer_1.id,
+        company: customer_1.company,
+        logo: customer_1.company_logo,
+        tokens: customer_1.tokens,
+      })
+    );
   });
 });

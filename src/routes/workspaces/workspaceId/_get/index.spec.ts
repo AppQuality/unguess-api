@@ -1,12 +1,9 @@
 import app from "@src/app";
 import request from "supertest";
-import db from "@src/features/sqlite";
+import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
-
-const unguessDb = db("unguess");
-const tryberDb = db("tryber");
 
 const customer_user_1 = {
   ID: 1,
@@ -46,38 +43,13 @@ describe("GET /workspaces/{wid}", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await unguessDb.createTable("wp_users", [
-          "ID int(11) PRIMARY KEY",
-          "user_login VARCHAR(60)",
-          "user_pass VARCHAR(255)",
-          "user_email VARCHAR(100)",
-        ]);
+        await dbAdapter.create();
 
-        await tryberDb.createTable("wp_appq_evd_profile", [
-          "id int(11) PRIMARY KEY",
-          "wp_user_id int(20)",
-          "name VARCHAR(45)",
-          "surname VARCHAR(45)",
-          "email VARCHAR(100)",
-        ]);
-
-        await tryberDb.createTable("wp_appq_customer", [
-          "id int(11) PRIMARY KEY",
-          "company varchar(64)",
-          "company_logo varchar(300)",
-          "tokens int(11)",
-        ]);
-
-        await tryberDb.createTable("wp_appq_user_to_customer", [
-          "wp_user_id int(11)",
-          "customer_id int(11)",
-        ]);
-
-        await unguessDb.insert("wp_users", customer_user_1);
-        await unguessDb.insert("wp_users", admin_user_1);
-        await tryberDb.insert("wp_appq_evd_profile", customer_profile_1);
-        await tryberDb.insert("wp_appq_customer", customer_1);
-        await tryberDb.insert("wp_appq_user_to_customer", user_to_customer_1);
+        await dbAdapter.add({
+          profiles: [customer_profile_1],
+          companies: [customer_1],
+          userToCustomers: [user_to_customer_1],
+        });
       } catch (error) {
         console.log(error);
         reject(error);
@@ -89,10 +61,7 @@ describe("GET /workspaces/{wid}", () => {
   afterAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await unguessDb.dropTable("wp_users");
-        await tryberDb.dropTable("wp_appq_evd_profile");
-        await tryberDb.dropTable("wp_appq_customer");
-        await tryberDb.dropTable("wp_appq_user_to_customer");
+        await dbAdapter.drop();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -103,13 +72,13 @@ describe("GET /workspaces/{wid}", () => {
   });
 
   it("Should answer 403 if not logged in", async () => {
-    const response = await request(app).get("/workspaces/12");
+    const response = await request(app).get(`/workspaces/${customer_1.id}`);
     expect(response.status).toBe(403);
   });
 
   it("Should answer 200 if logged in", async () => {
     const response = await request(app)
-      .get("/workspaces/1")
+      .get(`/workspaces/${customer_1.id}`)
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
   });
@@ -126,5 +95,20 @@ describe("GET /workspaces/{wid}", () => {
       .get("/workspaces/banana")
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(400);
+  });
+
+  it("Should answer with a workspace object", async () => {
+    const response = await request(app)
+      .get(`/workspaces/${customer_1.id}`)
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(200);
+    expect(JSON.stringify(response.body)).toBe(
+      JSON.stringify({
+        id: customer_1.id,
+        company: customer_1.company,
+        logo: customer_1.company_logo,
+        tokens: customer_1.tokens,
+      })
+    );
   });
 });

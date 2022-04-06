@@ -16,7 +16,7 @@ describe("GET /users/me", () => {
         //Company without projects
         await dbAdapter.add(companyBasic);
       } catch (error) {
-        console.log(error);
+        console.error(error);
         reject(error);
       }
 

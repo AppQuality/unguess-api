@@ -33,7 +33,7 @@ export default async (
   // Get workspace
   let workspace;
   try {
-    workspace = await getWorkspace(workspaceId);
+    workspace = await getWorkspace(workspaceId, user.id);
   } catch (error) {
     if ((error as OpenapiError).message == "No workspace found") {
       res.status_code = 404;
@@ -45,7 +45,10 @@ export default async (
   }
 
   // Get workspace projects
-  let projects: any;
+  let projects: Array<{
+    id: number;
+    display_name: string;
+  }> = [];
   try {
     const projectSql =
       "SELECT id, display_name FROM wp_appq_project WHERE customer_id = ? ORDER BY id";
@@ -58,6 +61,41 @@ export default async (
   let returnProjects: Array<StoplightComponents["schemas"]["Project"]> = [];
   if (projects) {
     for (const project of projects) {
+      // Check if user can see this project
+      let hasPermission = false;
+      const userToProjectSql =
+        "SELECT * FROM wp_appq_user_to_project WHERE project_id = ?";
+      let userToProjectRows: Array<{
+        wp_user_id: number;
+        project_id: number;
+      }>;
+      try {
+        userToProjectRows = await db.query(
+          db.format(userToProjectSql, [project.id])
+        );
+      } catch (error) {
+        res.status_code = 500;
+        throw error;
+      }
+
+      if (userToProjectRows.length) {
+        // Check if the wp_user_id is in the userToProjectRows array
+        for (const userToProjectRow of userToProjectRows) {
+          if (userToProjectRow.wp_user_id == user.id) {
+            // The user has permission to see this project
+            hasPermission = true;
+            break;
+          }
+        }
+      } else {
+        // The project has no permission limits
+        hasPermission = true;
+      }
+
+      if (!hasPermission) {
+        continue;
+      }
+
       // Get campaigns count
       let campaigns;
       try {

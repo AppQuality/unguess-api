@@ -1,19 +1,20 @@
 import app from "@src/app";
 import request from "supertest";
-import db from "@src/features/sqlite";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
-
-const unguessDb = db("unguess");
-const tryberDb = db("tryber");
 
 const customer_1 = {
   id: 1,
   company: "Company",
   company_logo: "logo.png",
   tokens: 100,
+};
+
+const user_to_customer_1 = {
+  wp_user_id: 1,
+  customer_id: 1,
 };
 
 describe("GET /workspaces", () => {
@@ -24,12 +25,7 @@ describe("GET /workspaces", () => {
 
         await dbAdapter.add({
           companies: [customer_1],
-          userToCustomers: [
-            {
-              wp_user_id: 1,
-              customer_id: 1,
-            },
-          ],
+          userToCustomers: [user_to_customer_1],
         });
       } catch (error) {
         console.log(error);

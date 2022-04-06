@@ -5,6 +5,15 @@ export default async (
   userId: number
 ): Promise<Workspace | {}> => {
   try {
+    // Check parameters
+    if (workspaceId == null || workspaceId <= 0) {
+      throw Error("Bad request");
+    }
+
+    if (userId == null || userId <= 0) {
+      throw Error("Bad request");
+    }
+
     // Check if workspace exists
     const customerSql = db.format(
       `SELECT c.* 
@@ -37,7 +46,7 @@ export default async (
         company: workspace.company,
         logo: workspace.company_logo,
         tokens: workspace.tokens,
-      };
+      } as StoplightComponents["schemas"]["Workspace"];
     }
 
     throw Error("No workspace found");
