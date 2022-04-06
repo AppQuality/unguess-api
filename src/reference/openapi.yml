@@ -190,20 +190,26 @@ paths:
               examples:
                 example-1:
                   value:
-                    - id: 0
-                      start_date: string
-                      end_date: string
-                      close_date: string
-                      title: string
-                      customer_title: string
-                      description: string
-                      status_id: 0
-                      is_public: 0
-                      campaign_type_id: 0
-                      campaign_type_name: string
-                      test_type_name: string
-                      project_id: 0
-                      project_name: string
+                    campaign:
+                      - id: 0
+                        start_date: string
+                        end_date: string
+                        close_date: string
+                        title: string
+                        customer_title: string
+                        description: string
+                        status_id: 0
+                        is_public: 0
+                        campaign_type_id: 0
+                        campaign_type_name: string
+                        test_type_name: string
+                        project_id: 0
+                        project_name: string
+                    page:
+                      limit: 0
+                      start: 0
+                      size: 0
+                      totalSize: 0
             application/xml:
               schema:
                 type: object
@@ -212,9 +218,7 @@ paths:
       security:
         - JWT: []
       description: ''
-      parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/start'
+      parameters: []
   '/workspaces/{wid}/projects':
     parameters:
       - schema:
