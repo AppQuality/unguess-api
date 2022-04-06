@@ -291,11 +291,25 @@ describe("GET /workspaces/{wid}/campaigns", () => {
     );
   });
 
-  it("Should return an array of 1 elements because of limit =1", async () => {
+  it("Should return an array of 1 elements because of limit = 1", async () => {
     const response = await request(app)
       .get("/workspaces/2/campaigns?limit=1&start=0")
       .set("authorization", "Bearer customer");
     expect(response.body.length).toBe(1);
+  });
+
+  it("Should return an array of 2 elements because only start is passed", async () => {
+    const response = await request(app)
+      .get("/workspaces/2/campaigns?start=1")
+      .set("authorization", "Bearer customer");
+    expect(response.body.length).toBe(2);
+  });
+
+  it("Should return an array of 2 elements because only limit is passed", async () => {
+    const response = await request(app)
+      .get("/workspaces/2/campaigns?limit=1")
+      .set("authorization", "Bearer customer");
+    expect(response.body.length).toBe(2);
   });
 
   it("Should return an array of 1 element because start is set to 1", async () => {
@@ -305,7 +319,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
     expect(response.body.length).toBe(1);
   });
 
-  it("Should return an array of campaigns with 2 elements becase no limit or start are in the request", async () => {
+  it("Should return an array of campaigns with 2 elements because no limit or start are in the request", async () => {
     const response = await request(app)
       .get("/workspaces/2/campaigns")
       .set("authorization", "Bearer customer");
