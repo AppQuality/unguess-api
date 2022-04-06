@@ -138,9 +138,77 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Campaign'
+                description: ''
+                type: object
+                x-examples:
+                  example-1:
+                    campaigns:
+                      - id: 0
+                        start_date: string
+                        end_date: string
+                        close_date: string
+                        title: string
+                        customer_title: string
+                        description: string
+                        status_id: 0
+                        is_public: 0
+                        campaign_type_id: 0
+                        campaign_type_name: string
+                        test_type_name: string
+                        project_id: 0
+                        project_name: string
+                    page:
+                      limit: 0
+                      start: 0
+                      size: 0
+                      totalSize: 0
+                properties:
+                  campaigns:
+                    type: array
+                    uniqueItems: true
+                    minItems: 1
+                    items:
+                      $ref: '#/components/schemas/Campaign'
+                  page:
+                    type: object
+                    required:
+                      - limit
+                      - start
+                      - size
+                      - totalSize
+                    properties:
+                      limit:
+                        type: integer
+                      start:
+                        type: integer
+                      size:
+                        type: integer
+                      totalSize:
+                        type: integer
+                required:
+                  - campaigns
+                  - page
+              examples:
+                example-1:
+                  value:
+                    - id: 0
+                      start_date: string
+                      end_date: string
+                      close_date: string
+                      title: string
+                      customer_title: string
+                      description: string
+                      status_id: 0
+                      is_public: 0
+                      campaign_type_id: 0
+                      campaign_type_name: string
+                      test_type_name: string
+                      project_id: 0
+                      project_name: string
+            application/xml:
+              schema:
+                type: object
+                properties: {}
       operationId: get-workspace-campaigns
       security:
         - JWT: []
