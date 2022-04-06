@@ -236,7 +236,6 @@ describe("GET /workspaces/{wid}/projects", () => {
     const response = await request(app)
       .get(`/workspaces/${customer_1.id}/projects`)
       .set("authorization", "Bearer customer");
-    console.log(">>>>> response:", response.body);
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject([
       {
@@ -256,7 +255,6 @@ describe("GET /workspaces/{wid}/projects", () => {
     const response = await request(app)
       .get(`/workspaces/${customer_1.id}/projects`)
       .set("authorization", "Bearer customer");
-    console.log(">>>>> response:", response.body);
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject([
       {

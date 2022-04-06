@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "coverage": "jest  ./dist --coverage",
+    "coverage": "jest  ./dist --coverage --runInBand",
     "test": "npm run build && jest ./dist --runInBand",
     "test:watch": "nodemon --exec \"npm test --\" ",
     "clean": "rimraf dist",
