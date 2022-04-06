@@ -163,24 +163,22 @@ paths:
                       size: 0
                       totalSize: 0
                 properties:
-                  campaigns:
+                  items:
                     type: array
                     uniqueItems: false
                     items:
                       $ref: '#/components/schemas/Campaign'
-                  page:
-                    type: object
-                    properties:
-                      limit:
-                        type: integer
-                      start:
-                        type: integer
-                      size:
-                        type: integer
-                      totalSize:
-                        type: integer
+                  total:
+                    type: integer
+                  start:
+                    type: integer
+                  size:
+                    type: integer
+                  limit:
+                    type: integer
                 required:
-                  - campaigns
+                  - items
+                  - total
               examples:
                 example-1:
                   value:
