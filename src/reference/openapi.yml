@@ -165,8 +165,7 @@ paths:
                 properties:
                   campaigns:
                     type: array
-                    uniqueItems: true
-                    minItems: 1
+                    uniqueItems: false
                     items:
                       $ref: '#/components/schemas/Campaign'
                   page:
