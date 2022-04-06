@@ -61,7 +61,7 @@ const campaign_1 = {
   customer_id: 1,
 };
 
-describe("GET /workspaces/{wid}", () => {
+describe("GET /workspaces/{wid}/projects/{pid}", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
