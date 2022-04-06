@@ -8,6 +8,8 @@ export default async (
   res: OpenapiResponse
 ) => {
   let workspace;
+  let user = req.user;
+
   res.status_code = 200;
   try {
     let wid;
@@ -21,7 +23,7 @@ export default async (
       return "Bad request";
     }
 
-    workspace = await getWorkspace(wid);
+    workspace = await getWorkspace(wid, user.id);
   } catch (e) {
     if ((e as OpenapiError).message === "No workspace found") {
       res.status_code = 404;
