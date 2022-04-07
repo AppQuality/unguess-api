@@ -72,9 +72,9 @@ const campaign_1 = {
 
 const campaign_2 = {
   id: 43,
-  start_date: "2017-07-20 00:00:00",
-  end_date: "2017-07-20 00:00:00",
-  close_date: "2017-07-20 00:00:00",
+  start_date: "2016-07-20 00:00:00",
+  end_date: "2016-07-20 00:00:00",
+  close_date: "2016-07-20 00:00:00",
   title: "Campagnetta Provetta ",
   customer_title: "titolo",
   description: "Descrizione della campagnazione",
@@ -303,6 +303,90 @@ describe("GET /workspaces/{wid}/campaigns", () => {
               campaign_type_1.type === 1 ? "Experiential" : "Functional",
             project_id: campaign_3.project_id,
             customer_id: campaign_3.customer_id,
+            project_name: project_1.display_name,
+          },
+        ],
+        size: 2,
+        total: 2,
+      })
+    );
+  });
+
+  it("Should return 400 because the order parameter is wrong", async () => {
+    const response = await request(app)
+      .get("/workspaces/1/campaigns?order=banana")
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(400);
+  });
+
+  it("Should return 400 because the orderBy is missing but the order is valid", async () => {
+    const response = await request(app)
+      .get("/workspaces/1/campaigns?order=DESC")
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(400);
+  });
+
+  it("Should return 400 because the orderBy parameter is wrong", async () => {
+    const response = await request(app)
+      .get("/workspaces/1/campaigns?orderBy=BANANA")
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(400);
+  });
+
+  it("Should return 400 because the order parameter is wrong but the orderBy is valid", async () => {
+    const response = await request(app)
+      .get("/workspaces/1/campaigns?orderBy=start_date")
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(400);
+  });
+  it("Should return 400 because the order parameter is wrong but the orderBy is valid", async () => {
+    const response = await request(app)
+      .get("/workspaces/1/campaigns?order=DESC&orderBy=banana")
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(400);
+  });
+
+  it("Should return an array of campaigns with 2 elements in reverse order", async () => {
+    const response = await request(app)
+      .get("/workspaces/2/campaigns?order=DESC&orderBy=start_date")
+      .set("authorization", "Bearer customer");
+    expect(JSON.stringify(response.body)).toStrictEqual(
+      JSON.stringify({
+        items: [
+          {
+            id: campaign_3.id,
+            start_date: campaign_3.start_date,
+            end_date: campaign_3.end_date,
+            close_date: campaign_3.close_date,
+            title: campaign_3.title,
+            customer_title: campaign_3.customer_title,
+            description: campaign_3.description,
+            status_id: campaign_3.status_id,
+            is_public: campaign_3.is_public,
+            campaign_type_id: campaign_type_2.id,
+            campaign_type_name: campaign_type_2.name,
+            test_type_name:
+              campaign_type_1.type === 1 ? "Experiential" : "Functional",
+            project_id: campaign_3.project_id,
+            customer_id: campaign_3.customer_id,
+            project_name: project_1.display_name,
+          },
+          {
+            id: campaign_2.id,
+            start_date: campaign_2.start_date,
+            end_date: campaign_2.end_date,
+            close_date: campaign_2.close_date,
+            title: campaign_2.title,
+            customer_title: campaign_2.customer_title,
+            description: campaign_2.description,
+            status_id: campaign_2.status_id,
+            is_public: campaign_2.is_public,
+            campaign_type_id: campaign_type_1.id,
+            campaign_type_name: campaign_type_1.name,
+            test_type_name:
+              campaign_type_1.type === 1 ? "Experiential" : "Functional",
+            project_id: campaign_2.project_id,
+            customer_id: campaign_2.customer_id,
             project_name: project_1.display_name,
           },
         ],
