@@ -264,6 +264,8 @@ export interface operations {
         limit?: components["parameters"]["limit"];
         /** Items to skip for pagination */
         start?: components["parameters"]["start"];
+        /** How to order values (ASC, DESC) */
+        order?: components["parameters"]["order"];
       };
     };
     responses: {
