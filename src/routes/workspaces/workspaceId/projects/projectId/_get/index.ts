@@ -1,13 +1,14 @@
 /** OPENAPI-ROUTE: get-workspace-project */
 import { Context } from "openapi-backend";
-import * as db from "../../../../../../features/db";
 import getProject from "../getProject";
+import getWorkspace from "../../../getWorkspace";
 
 export default async (
   c: Context,
   req: OpenapiRequest,
   res: OpenapiResponse
 ) => {
+  let user = req.user;
   res.status_code = 200;
 
   let workspaceId;
@@ -41,12 +42,28 @@ export default async (
   }
 
   try {
-    let returnProject: StoplightComponents["schemas"]["Project"] =
-      await getProject(projectId);
+    let workspace = (await getWorkspace(
+      workspaceId,
+      user.id
+    )) as StoplightComponents["schemas"]["Workspace"];
+
+    let returnProject = (await getProject(
+      projectId,
+      workspaceId
+    )) as StoplightComponents["schemas"]["Project"];
 
     return returnProject;
   } catch (error) {
-    if ((error as OpenapiError).message == "No project found") {
+    if ((error as OpenapiError).message == "No workspace found") {
+      res.status_code = 404;
+      return (error as OpenapiError).message;
+    } else if (
+      (error as OpenapiError).message ===
+      "You have no permission to get this workspace"
+    ) {
+      res.status_code = 403;
+      return (error as OpenapiError).message;
+    } else if ((error as OpenapiError).message == "No project found") {
       res.status_code = 404;
       return (error as OpenapiError).message;
     } else {

@@ -4,6 +4,18 @@ import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
 
+const customer_1 = {
+  id: 1,
+  company: "Company",
+  company_logo: "logo.png",
+  tokens: 100,
+};
+
+const user_to_customer_1 = {
+  wp_user_id: 1,
+  customer_id: 1,
+};
+
 const project_1 = {
   id: 1,
   display_name: "Projettino unoh",
@@ -48,9 +60,11 @@ describe("getProject", () => {
         await dbAdapter.create();
 
         await dbAdapter.add({
+          companies: [customer_1],
           campaigns: [campaign_1],
           projects: [project_1, project_2],
           userToProjects: [user_to_project_1, user_to_project_2],
+          userToCustomers: [user_to_customer_1],
         });
       } catch (error) {
         console.log(error);
@@ -74,9 +88,9 @@ describe("getProject", () => {
     });
   });
 
-  it("Should have projectId parameter", async () => {
+  it("Should have projectId and workspaceId valid parameters", async () => {
     try {
-      await getProject(0);
+      await getProject(0, 0);
       fail("Should throw error");
     } catch (error) {
       expect((error as OpenapiError).message).toBe("Bad request");
@@ -85,7 +99,7 @@ describe("getProject", () => {
 
   it("Should throw 'No project found' error on no results", async () => {
     try {
-      await getProject(9999);
+      await getProject(9999, customer_1.id);
       fail("Should throw error");
     } catch (error) {
       expect((error as OpenapiError).message).toBe("No project found");
@@ -94,7 +108,7 @@ describe("getProject", () => {
 
   it("Should return a project", async () => {
     try {
-      let project = await getProject(project_1.id);
+      let project = await getProject(project_1.id, customer_1.id);
       expect(JSON.stringify(project)).toBe(
         JSON.stringify({
           id: project_1.id,

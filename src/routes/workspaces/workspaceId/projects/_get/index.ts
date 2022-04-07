@@ -33,7 +33,10 @@ export default async (
   // Get workspace
   let workspace;
   try {
-    workspace = await getWorkspace(workspaceId, user.id);
+    workspace = (await getWorkspace(
+      workspaceId,
+      user.id
+    )) as StoplightComponents["schemas"]["Workspace"];
   } catch (error) {
     if ((error as OpenapiError).message == "No workspace found") {
       res.status_code = 404;
