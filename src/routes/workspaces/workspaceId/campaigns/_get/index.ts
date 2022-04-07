@@ -41,11 +41,39 @@ export default async (
     ) {
       // if the parameter is not as described in stoplight is still 400, so this is useless
       res.status_code = 400;
-      return "Bad request, data pagination is not valid";
+      return "Bad request, pagination data is not valid";
     }
 
-    let order = c.request.query
-      .order as StoplightOperations["get-workspace-campaigns"]["parameters"]["query"]["order"];
+    let order;
+    if (typeof c.request.query.order === "string")
+      order = c.request.query
+        .order as StoplightOperations["get-workspace-campaigns"]["parameters"]["query"]["order"];
+
+    if (order && order !== "ASC" && order !== "DESC") {
+      res.status_code = 400;
+      return "Bad request, order data is not valid";
+    }
+
+    const validOrderByFields = [
+      "start_date",
+      "end_date",
+      "close_date",
+      "title",
+    ];
+    let orderBy;
+    if (typeof c.request.query.orderBy === "string")
+      orderBy = c.request.query
+        .orderBy as StoplightOperations["get-workspace-campaigns"]["parameters"]["query"]["orderBy"];
+
+    if (orderBy && !validOrderByFields.includes(orderBy)) {
+      res.status_code = 400;
+      return "Bad request, orderBy value not allowed";
+    }
+
+    if ((order && !orderBy) || (!order && orderBy)) {
+      res.status_code = 400;
+      return "Bad request, ordination data is not valid";
+    }
 
     await getWorkspace(customer_id);
 
@@ -68,7 +96,7 @@ export default async (
       JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id 
       WHERE c.customer_id = ? 
       ${limit && (start || start === 0) ? `LIMIT ${limit} OFFSET ${start}` : ``}
-      ${order ? `ORDER BY ${order}` : ``}
+      ${order && orderBy ? `ORDER BY ${orderBy} ${order}` : ``}
       `;
 
     const campaigns = await db.query(db.format(query, [customer_id]));

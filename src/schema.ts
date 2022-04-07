@@ -177,6 +177,8 @@ export interface components {
     searchBy: string;
     /** @description The value to search for */
     search: string;
+    /** @description The field used as reference to order the result */
+    orderBy: string;
   };
 }
 
@@ -266,6 +268,8 @@ export interface operations {
         start?: components["parameters"]["start"];
         /** How to order values (ASC, DESC) */
         order?: components["parameters"]["order"];
+        /** The field used as reference to order the result */
+        orderBy?: components["parameters"]["orderBy"];
       };
     };
     responses: {
