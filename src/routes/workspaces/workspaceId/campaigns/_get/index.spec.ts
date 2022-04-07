@@ -268,26 +268,30 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       .get("/workspaces/1/campaigns")
       .set("authorization", "Bearer customer");
     expect(JSON.stringify(response.body)).toBe(
-      JSON.stringify([
-        {
-          id: campaign_1.id,
-          start_date: campaign_1.start_date,
-          end_date: campaign_1.end_date,
-          close_date: campaign_1.close_date,
-          title: campaign_1.title,
-          customer_title: campaign_1.customer_title,
-          description: campaign_1.description,
-          status_id: campaign_1.status_id,
-          is_public: campaign_1.is_public,
-          campaign_type_id: campaign_type_1.id,
-          campaign_type_name: campaign_type_1.name,
-          test_type_name:
-            campaign_type_1.type === 1 ? "Experiential" : "Functional",
-          project_id: campaign_1.project_id,
-          customer_id: campaign_1.customer_id,
-          project_name: project_1.display_name,
-        },
-      ])
+      JSON.stringify({
+        items: [
+          {
+            id: campaign_1.id,
+            start_date: campaign_1.start_date,
+            end_date: campaign_1.end_date,
+            close_date: campaign_1.close_date,
+            title: campaign_1.title,
+            customer_title: campaign_1.customer_title,
+            description: campaign_1.description,
+            status_id: campaign_1.status_id,
+            is_public: campaign_1.is_public,
+            campaign_type_id: campaign_type_1.id,
+            campaign_type_name: campaign_type_1.name,
+            test_type_name:
+              campaign_type_1.type === 1 ? "Experiential" : "Functional",
+            project_id: campaign_1.project_id,
+            customer_id: campaign_1.customer_id,
+            project_name: project_1.display_name,
+          },
+        ],
+        size: 1,
+        total: 1,
+      })
     );
   });
 
@@ -295,28 +299,29 @@ describe("GET /workspaces/{wid}/campaigns", () => {
     const response = await request(app)
       .get("/workspaces/2/campaigns?limit=1&start=0")
       .set("authorization", "Bearer customer");
-    expect(response.body.length).toBe(1);
+
+    expect(response.body.items.length).toBe(1);
   });
 
   it("Should return an array of 2 elements because only start is passed", async () => {
     const response = await request(app)
       .get("/workspaces/2/campaigns?start=1")
       .set("authorization", "Bearer customer");
-    expect(response.body.length).toBe(2);
+    expect(response.body.items.length).toBe(2);
   });
 
   it("Should return an array of 2 elements because only limit is passed", async () => {
     const response = await request(app)
       .get("/workspaces/2/campaigns?limit=1")
       .set("authorization", "Bearer customer");
-    expect(response.body.length).toBe(2);
+    expect(response.body.items.length).toBe(2);
   });
 
   it("Should return an array of 1 element because start is set to 1", async () => {
     const response = await request(app)
       .get("/workspaces/2/campaigns?limit=1&start=1")
       .set("authorization", "Bearer customer");
-    expect(response.body.length).toBe(1);
+    expect(response.body.items.length).toBe(1);
   });
 
   it("Should return an array of campaigns with 2 elements because no limit or start are in the request", async () => {
@@ -324,53 +329,65 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       .get("/workspaces/2/campaigns")
       .set("authorization", "Bearer customer");
     expect(JSON.stringify(response.body)).toStrictEqual(
-      JSON.stringify([
-        {
-          id: campaign_2.id,
-          start_date: campaign_2.start_date,
-          end_date: campaign_2.end_date,
-          close_date: campaign_2.close_date,
-          title: campaign_2.title,
-          customer_title: campaign_2.customer_title,
-          description: campaign_2.description,
-          status_id: campaign_2.status_id,
-          is_public: campaign_2.is_public,
-          campaign_type_id: campaign_type_1.id,
-          campaign_type_name: campaign_type_1.name,
-          test_type_name:
-            campaign_type_1.type === 1 ? "Experiential" : "Functional",
-          project_id: campaign_2.project_id,
-          customer_id: campaign_2.customer_id,
-          project_name: project_1.display_name,
-        },
-        {
-          id: campaign_3.id,
-          start_date: campaign_3.start_date,
-          end_date: campaign_3.end_date,
-          close_date: campaign_3.close_date,
-          title: campaign_3.title,
-          customer_title: campaign_3.customer_title,
-          description: campaign_3.description,
-          status_id: campaign_3.status_id,
-          is_public: campaign_3.is_public,
-          campaign_type_id: campaign_type_2.id,
-          campaign_type_name: campaign_type_2.name,
-          test_type_name:
-            campaign_type_1.type === 1 ? "Experiential" : "Functional",
-          project_id: campaign_3.project_id,
-          customer_id: campaign_3.customer_id,
-          project_name: project_1.display_name,
-        },
-      ])
+      JSON.stringify({
+        items: [
+          {
+            id: campaign_2.id,
+            start_date: campaign_2.start_date,
+            end_date: campaign_2.end_date,
+            close_date: campaign_2.close_date,
+            title: campaign_2.title,
+            customer_title: campaign_2.customer_title,
+            description: campaign_2.description,
+            status_id: campaign_2.status_id,
+            is_public: campaign_2.is_public,
+            campaign_type_id: campaign_type_1.id,
+            campaign_type_name: campaign_type_1.name,
+            test_type_name:
+              campaign_type_1.type === 1 ? "Experiential" : "Functional",
+            project_id: campaign_2.project_id,
+            customer_id: campaign_2.customer_id,
+            project_name: project_1.display_name,
+          },
+          {
+            id: campaign_3.id,
+            start_date: campaign_3.start_date,
+            end_date: campaign_3.end_date,
+            close_date: campaign_3.close_date,
+            title: campaign_3.title,
+            customer_title: campaign_3.customer_title,
+            description: campaign_3.description,
+            status_id: campaign_3.status_id,
+            is_public: campaign_3.is_public,
+            campaign_type_id: campaign_type_2.id,
+            campaign_type_name: campaign_type_2.name,
+            test_type_name:
+              campaign_type_1.type === 1 ? "Experiential" : "Functional",
+            project_id: campaign_3.project_id,
+            customer_id: campaign_3.customer_id,
+            project_name: project_1.display_name,
+          },
+        ],
+        size: 2,
+        total: 2,
+      })
     );
   });
 
-  it("Should return empty an array if no campaign are found for that customer", async () => {
+  it("Should return empty an array of campaigns and page if no campaign are found for that customer", async () => {
     try {
       const response = await request(app)
         .get("/workspaces/43/campaigns")
         .set("authorization", "Bearer customer");
-      expect(JSON.stringify(response.body)).toStrictEqual(JSON.stringify([]));
+      expect(JSON.stringify(response.body)).toStrictEqual(
+        JSON.stringify({
+          items: [],
+          limit: 0,
+          start: 0,
+          size: 0,
+          total: 0,
+        })
+      );
     } catch (e) {
       console.log(e);
     }

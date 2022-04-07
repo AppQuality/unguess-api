@@ -270,7 +270,14 @@ export interface operations {
       /** OK */
       200: {
         content: {
-          "application/json": components["schemas"]["Campaign"][];
+          "application/json": {
+            items: components["schemas"]["Campaign"][];
+            total: number;
+            start?: number;
+            size?: number;
+            limit?: number;
+          };
+          "application/xml": { [key: string]: unknown };
         };
       };
     };
