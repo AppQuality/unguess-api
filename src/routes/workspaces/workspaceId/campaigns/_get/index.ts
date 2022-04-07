@@ -16,6 +16,11 @@ export default async (
         c.request.params.wid
       ) as StoplightOperations["get-workspace-campaigns"]["parameters"]["path"]["wid"];
 
+    if (!customer_id) {
+      res.status_code = 400;
+      return "Customer not valid";
+    }
+
     let limit;
     if (typeof c.request.query.limit === "string")
       limit = parseInt(
@@ -28,10 +33,19 @@ export default async (
         c.request.query.start
       ) as StoplightOperations["get-workspace-campaigns"]["parameters"]["query"]["start"];
 
-    if (!customer_id) {
+    if (
+      (start && !limit) ||
+      (!start && start !== 0 && limit) ||
+      Number.isNaN(start) ||
+      Number.isNaN(limit)
+    ) {
+      // if the parameter is not as described in stoplight is still 400, so this is useless
       res.status_code = 400;
-      return "Bad request";
+      return "Bad request, data pagination is not valid";
     }
+
+    let order = c.request.query
+      .order as StoplightOperations["get-workspace-campaigns"]["parameters"]["query"]["order"];
 
     await getWorkspace(customer_id);
 
@@ -53,9 +67,9 @@ export default async (
       JOIN wp_appq_project p ON c.project_id = p.id 
       JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id 
       WHERE c.customer_id = ? 
-      ${
-        limit && (start || start === 0) ? `LIMIT ${limit} OFFSET ${start}` : ``
-      }`;
+      ${limit && (start || start === 0) ? `LIMIT ${limit} OFFSET ${start}` : ``}
+      ${order ? `ORDER BY ${order}` : ``}
+      `;
 
     const campaigns = await db.query(db.format(query, [customer_id]));
 
@@ -66,9 +80,6 @@ export default async (
     if (!campaigns.length)
       return {
         items: [],
-        limit: 0,
-        start: 0,
-        size: 0,
         total: 0,
       };
 
@@ -100,9 +111,10 @@ export default async (
       total: totalSize,
     };
   } catch (e) {
-    if ((e as OpenapiError).message === "No workspace found") {
+    const message = (e as OpenapiError).message;
+    if (message === "No workspace found") {
       res.status_code = 404;
-      return "Workspace not found";
+      return message;
     }
     res.status_code = 500;
     throw e;

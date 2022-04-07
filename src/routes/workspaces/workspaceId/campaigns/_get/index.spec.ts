@@ -263,6 +263,34 @@ describe("GET /workspaces/{wid}/campaigns", () => {
     expect(response.status).toBe(404);
   });
 
+  it("Should return an array of 1 elements because of limit = 1", async () => {
+    const response = await request(app)
+      .get("/workspaces/2/campaigns?limit=1&start=0")
+      .set("authorization", "Bearer customer");
+    expect(response.body.items.length).toBe(1);
+  });
+
+  it("Should return 400 because only start is passed", async () => {
+    const response = await request(app)
+      .get("/workspaces/2/campaigns?start=1")
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(400);
+  });
+
+  it("Should return 400 because only limit is passed", async () => {
+    const response = await request(app)
+      .get("/workspaces/2/campaigns?limit=1")
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(400);
+  });
+
+  it("Should return an array of 1 element because start is set to 1", async () => {
+    const response = await request(app)
+      .get("/workspaces/2/campaigns?limit=1&start=1")
+      .set("authorization", "Bearer customer");
+    expect(response.body.items.length).toBe(1);
+  });
+
   it("Should return an array of campaigns", async () => {
     const response = await request(app)
       .get("/workspaces/1/campaigns")
@@ -293,35 +321,6 @@ describe("GET /workspaces/{wid}/campaigns", () => {
         total: 1,
       })
     );
-  });
-
-  it("Should return an array of 1 elements because of limit = 1", async () => {
-    const response = await request(app)
-      .get("/workspaces/2/campaigns?limit=1&start=0")
-      .set("authorization", "Bearer customer");
-
-    expect(response.body.items.length).toBe(1);
-  });
-
-  it("Should return an array of 2 elements because only start is passed", async () => {
-    const response = await request(app)
-      .get("/workspaces/2/campaigns?start=1")
-      .set("authorization", "Bearer customer");
-    expect(response.body.items.length).toBe(2);
-  });
-
-  it("Should return an array of 2 elements because only limit is passed", async () => {
-    const response = await request(app)
-      .get("/workspaces/2/campaigns?limit=1")
-      .set("authorization", "Bearer customer");
-    expect(response.body.items.length).toBe(2);
-  });
-
-  it("Should return an array of 1 element because start is set to 1", async () => {
-    const response = await request(app)
-      .get("/workspaces/2/campaigns?limit=1&start=1")
-      .set("authorization", "Bearer customer");
-    expect(response.body.items.length).toBe(1);
   });
 
   it("Should return an array of campaigns with 2 elements because no limit or start are in the request", async () => {
@@ -382,9 +381,6 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       expect(JSON.stringify(response.body)).toStrictEqual(
         JSON.stringify({
           items: [],
-          limit: 0,
-          start: 0,
-          size: 0,
           total: 0,
         })
       );
