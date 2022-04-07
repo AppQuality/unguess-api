@@ -34,6 +34,12 @@ export default async (
     } else if ((e as OpenapiError).message === "Bad request") {
       res.status_code = 400;
       return (e as OpenapiError).message;
+    } else if (
+      (e as OpenapiError).message ===
+      "You have no permission to get this workspace"
+    ) {
+      res.status_code = 403;
+      return (e as OpenapiError).message;
     } else {
       res.status_code = 500;
       throw e;

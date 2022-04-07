@@ -38,6 +38,12 @@ export default async (
     if ((error as OpenapiError).message == "No workspace found") {
       res.status_code = 404;
       return (error as OpenapiError).message;
+    } else if (
+      (error as OpenapiError).message ===
+      "You have no permission to get this workspace"
+    ) {
+      res.status_code = 403;
+      return (error as OpenapiError).message;
     } else {
       res.status_code = 500;
       throw error;

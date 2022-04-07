@@ -41,6 +41,8 @@ export default async (
   }
 
   try {
+    // getWorkspace
+
     let project: StoplightComponents["schemas"]["Project"] = await getProject(
       projectId
     );
@@ -54,9 +56,9 @@ export default async (
     for (let campaign of campaigns) {
       returnCampaigns.push({
         id: campaign.id,
-        start_date: campaign.start_date,
-        end_date: campaign.end_date,
-        close_date: campaign.close_date,
+        start_date: new Date(campaign.start_date).toISOString(),
+        end_date: new Date(campaign.end_date).toISOString(),
+        close_date: new Date(campaign.close_date).toISOString(),
         title: campaign.title,
         customer_title: campaign.customer_title,
         description: campaign.description,
