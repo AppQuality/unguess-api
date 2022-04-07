@@ -214,6 +214,7 @@ paths:
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/start'
         - $ref: '#/components/parameters/order'
+        - $ref: '#/components/parameters/orderBy'
   '/workspaces/{wid}/projects':
     parameters:
       - schema:
