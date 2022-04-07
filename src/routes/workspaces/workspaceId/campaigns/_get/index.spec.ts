@@ -1,6 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import db from "@src/features/sqlite";
+import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
@@ -103,8 +104,6 @@ const project_1 = {
   id: 1,
   display_name: "Nome del progetto abbastanza figo",
   customer_id: 123,
-  edited_by: 42,
-  created_on: "2017-07-20 00:00:00",
   last_edit: "2017-07-20 00:00:00",
 };
 
@@ -122,96 +121,36 @@ const campaign_type_2 = {
 
 describe("GET /workspaces/{wid}/campaigns", () => {
   beforeAll(async () => {
-    return new Promise(async (resolve) => {
+    return new Promise(async (res, rej) => {
       try {
-        await tryberDb.createTable("wp_appq_evd_campaign", [
-          "id int(11) PRIMARY KEY",
-          "start_date datetime",
-          "end_date datetime",
-          "close_date datetime",
-          "title varchar(256)",
-          "customer_title varchar(256)",
-          "description varchar(512)",
-          "status_id int(1)",
-          "is_public int(1)",
-          "campaign_type_id int(11)",
-          "project_id int(11)",
-          "customer_id int(11)",
-        ]);
-        await tryberDb.createTable("wp_appq_project", [
-          "id int(11) PRIMARY KEY",
-          "display_name varchar(64)",
-          "customer_id int(11)",
-          "edited_by int(11)",
-          "created_on timestamp",
-          "last_edit timestamp",
-        ]);
-        await tryberDb.createTable("wp_appq_campaign_type", [
-          "id int(11)",
-          "name varchar(45)",
-          "type int(11)",
-        ]);
+        await dbAdapter.create();
 
-        await unguessDb.createTable("wp_users", [
-          "ID int(11) PRIMARY KEY",
-          "user_login VARCHAR(60)",
-          "user_pass VARCHAR(255)",
-          "user_email VARCHAR(100)",
-        ]);
-
-        await tryberDb.createTable("wp_appq_customer", [
-          "id int(11) PRIMARY KEY",
-          "company varchar(64)",
-          "company_logo varchar(300)",
-          "tokens int(11)",
-        ]);
-
-        await unguessDb.createTable("wp_appq_evd_profile", [
-          "id int(11) PRIMARY KEY",
-          "wp_user_id int(20)",
-          "name VARCHAR(45)",
-          "surname VARCHAR(45)",
-          "email VARCHAR(100)",
-        ]);
-
-        await tryberDb.createTable("wp_appq_user_to_customer", [
-          "wp_user_id int(11)",
-          "customer_id int(11)",
-        ]);
-
-        await unguessDb.insert("wp_users", customer_user_1);
-        await unguessDb.insert("wp_appq_evd_profile", customer_profile_1);
-        await tryberDb.insert("wp_appq_customer", customer_1);
-        await tryberDb.insert("wp_appq_customer", customer_2);
-        await tryberDb.insert("wp_appq_customer", customer_3);
-        await tryberDb.insert("wp_appq_user_to_customer", user_to_customer_1);
-        await tryberDb.insert("wp_appq_user_to_customer", user_to_customer_2);
-        await tryberDb.insert("wp_appq_project", project_1);
-        await tryberDb.insert("wp_appq_evd_campaign", campaign_1);
-        await tryberDb.insert("wp_appq_evd_campaign", campaign_2);
-        await tryberDb.insert("wp_appq_evd_campaign", campaign_3);
-        await tryberDb.insert("wp_appq_campaign_type", campaign_type_1);
-        await tryberDb.insert("wp_appq_campaign_type", campaign_type_2);
+        await dbAdapter.add({
+          campaigns: [campaign_1, campaign_2, campaign_3],
+          profiles: [customer_profile_1],
+          projects: [project_1],
+          campaignTypes: [campaign_type_1, campaign_type_2],
+          users: [customer_user_1],
+          customers: [customer_1, customer_2, customer_3],
+          userToCustomers: [user_to_customer_1, user_to_customer_2],
+        });
       } catch (e) {
         console.log(e);
+        rej(e);
       }
-      resolve(true);
+      res(true);
     });
   });
 
   afterAll(async () => {
-    return new Promise(async (resolve) => {
+    return new Promise(async (resolve, reject) => {
       try {
-        await unguessDb.dropTable("wp_users");
-        await unguessDb.dropTable("wp_appq_evd_profile");
-        await tryberDb.dropTable("wp_appq_customer");
-        await tryberDb.dropTable("wp_appq_user_to_customer");
-        await tryberDb.dropTable("wp_appq_evd_campaign");
-        await tryberDb.dropTable("wp_appq_project");
-        await tryberDb.dropTable("wp_appq_campaign_type");
+        await dbAdapter.drop();
       } catch (error) {
-        console.error(error);
+        console.log(error);
+        reject(error);
       }
+
       resolve(true);
     });
   });
@@ -227,7 +166,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
   });
-
+  //
   it("Should return 400 if the request parameter has a bad format", async () => {
     const response = await request(app)
       .get("/workspaces/banana/campaigns")
@@ -263,6 +202,34 @@ describe("GET /workspaces/{wid}/campaigns", () => {
     expect(response.status).toBe(404);
   });
 
+  it("Should return an array of 1 elements because of limit = 1", async () => {
+    const response = await request(app)
+      .get("/workspaces/2/campaigns?limit=1&start=0")
+      .set("authorization", "Bearer customer");
+    expect(response.body.items.length).toBe(1);
+  });
+
+  it("Should return 400 because only start is passed", async () => {
+    const response = await request(app)
+      .get("/workspaces/2/campaigns?start=1")
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(400);
+  });
+
+  it("Should return 400 because only limit is passed", async () => {
+    const response = await request(app)
+      .get("/workspaces/2/campaigns?limit=1")
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(400);
+  });
+
+  it("Should return an array of 1 element because start is set to 1", async () => {
+    const response = await request(app)
+      .get("/workspaces/2/campaigns?limit=1&start=1")
+      .set("authorization", "Bearer customer");
+    expect(response.body.items.length).toBe(1);
+  });
+
   it("Should return an array of campaigns", async () => {
     const response = await request(app)
       .get("/workspaces/1/campaigns")
@@ -293,35 +260,6 @@ describe("GET /workspaces/{wid}/campaigns", () => {
         total: 1,
       })
     );
-  });
-
-  it("Should return an array of 1 elements because of limit = 1", async () => {
-    const response = await request(app)
-      .get("/workspaces/2/campaigns?limit=1&start=0")
-      .set("authorization", "Bearer customer");
-
-    expect(response.body.items.length).toBe(1);
-  });
-
-  it("Should return an array of 2 elements because only start is passed", async () => {
-    const response = await request(app)
-      .get("/workspaces/2/campaigns?start=1")
-      .set("authorization", "Bearer customer");
-    expect(response.body.items.length).toBe(2);
-  });
-
-  it("Should return an array of 2 elements because only limit is passed", async () => {
-    const response = await request(app)
-      .get("/workspaces/2/campaigns?limit=1")
-      .set("authorization", "Bearer customer");
-    expect(response.body.items.length).toBe(2);
-  });
-
-  it("Should return an array of 1 element because start is set to 1", async () => {
-    const response = await request(app)
-      .get("/workspaces/2/campaigns?limit=1&start=1")
-      .set("authorization", "Bearer customer");
-    expect(response.body.items.length).toBe(1);
   });
 
   it("Should return an array of campaigns with 2 elements because no limit or start are in the request", async () => {
@@ -382,9 +320,6 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       expect(JSON.stringify(response.body)).toStrictEqual(
         JSON.stringify({
           items: [],
-          limit: 0,
-          start: 0,
-          size: 0,
           total: 0,
         })
       );
