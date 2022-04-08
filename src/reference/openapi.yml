@@ -179,6 +179,9 @@ paths:
                 required:
                   - items
                   - total
+                  - start
+                  - size
+                  - limit
               examples:
                 example-1:
                   value:
