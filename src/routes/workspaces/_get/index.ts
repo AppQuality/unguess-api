@@ -48,13 +48,15 @@ export default async (
       let customers = await db.query(customerSql, "tryber");
 
       if (customers.length) {
-        let customers_data: any = [];
+        let customers_data: Array<StoplightComponents["schemas"]["Workspace"]> =
+          [];
         customers.forEach((customer: any) => {
-          let customer_data: any = {};
-          customer_data.id = customer.id;
-          customer_data.company = customer.company;
-          customer_data.logo = customer.company_logo || "";
-          customer_data.tokens = customer.tokens;
+          let customer_data: StoplightComponents["schemas"]["Workspace"] = {
+            id: customer.id,
+            company: customer.company,
+            logo: customer.company_logo || "",
+            tokens: customer.tokens,
+          };
           customers_data.push(customer_data);
         });
 

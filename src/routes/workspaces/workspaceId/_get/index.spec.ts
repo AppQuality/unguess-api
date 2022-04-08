@@ -5,6 +5,28 @@ import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
 
+const customer_user_1 = {
+  ID: 1,
+  user_login: "customer@unguess.io",
+  user_pass: "password",
+  user_email: "customer@unguess.io",
+};
+
+const admin_user_1 = {
+  ID: 2,
+  user_login: "admin@unguess.io",
+  user_pass: "password",
+  user_email: "admin@unguess.io",
+};
+
+const customer_profile_1 = {
+  id: 1,
+  wp_user_id: 1,
+  name: "Customer",
+  surname: "Customer",
+  email: "customer@unguess.io",
+};
+
 const customer_1 = {
   id: 1,
   company: "Company",
@@ -17,13 +39,14 @@ const user_to_customer_1 = {
   customer_id: 1,
 };
 
-describe("GET /workspaces", () => {
+describe("GET /workspaces/{wid}", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
         await dbAdapter.create();
 
         await dbAdapter.add({
+          profiles: [customer_profile_1],
           companies: [customer_1],
           userToCustomers: [user_to_customer_1],
         });
@@ -35,13 +58,12 @@ describe("GET /workspaces", () => {
       resolve(true);
     });
   });
-
   afterAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
         await dbAdapter.drop();
       } catch (error) {
-        console.log(error);
+        console.error(error);
         reject(error);
       }
 
@@ -50,23 +72,38 @@ describe("GET /workspaces", () => {
   });
 
   it("Should answer 403 if not logged in", async () => {
-    const response = await request(app).get("/workspaces");
+    const response = await request(app).get(`/workspaces/${customer_1.id}`);
     expect(response.status).toBe(403);
   });
 
   it("Should answer 200 if logged in", async () => {
     const response = await request(app)
-      .get("/workspaces")
+      .get(`/workspaces/${customer_1.id}`)
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
   });
 
-  it("Should answer with an array of workspaces", async () => {
+  it("Should answer 404 if no workspaces are found", async () => {
     const response = await request(app)
-      .get("/workspaces")
+      .get("/workspaces/99999291")
       .set("authorization", "Bearer customer");
-    expect(response.body).toMatchObject(
-      Array({
+    expect(response.status).toBe(404);
+  });
+
+  it("Should answer 400 of the requested parameter is wrong", async () => {
+    const response = await request(app)
+      .get("/workspaces/banana")
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(400);
+  });
+
+  it("Should answer with a workspace object", async () => {
+    const response = await request(app)
+      .get(`/workspaces/${customer_1.id}`)
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(200);
+    expect(JSON.stringify(response.body)).toBe(
+      JSON.stringify({
         id: customer_1.id,
         company: customer_1.company,
         logo: customer_1.company_logo,

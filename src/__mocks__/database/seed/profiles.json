@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "name": "Mario",
+    "surname": "Rossi",
+    "email": "mario.rossi@example.com",
+    "wp_user_id": 1
+  },
+  {
+    "id": 2,
+    "name": "Giovanni",
+    "surname": "Bianchi",
+    "email": "giovanni.bianchi@example.com",
+    "wp_user_id": 2
+  },
+  {
+    "id": 3,
+    "name": "Paolo",
+    "surname": "Verdi",
+    "email": "paolo.verdi@example.com",
+    "wp_user_id": 3
+  },
+  {
+    "id": 4,
+    "name": "Luca",
+    "surname": "Gialli",
+    "email": "luca.gialli@example.com",
+    "wp_user_id": 4
+  },
+  {
+    "id": 5,
+    "name": "Francesco",
+    "surname": "Neri",
+    "email": "francesco.neri@example.com",
+    "wp_user_id": 5
+  }
+]

@@ -21,8 +21,23 @@ export default async (userData: {
       db.format(isAdminSql, [userData.ID]),
       "unguess"
     );
+
     if (isAdminResult.length) {
       user.role = "administrator";
+
+      const adminInfo = await db.query(
+        db.format("SELECT user_email FROM wp_users WHERE ID = ?", [
+          userData.ID,
+        ]),
+        "unguess"
+      );
+
+      if (adminInfo) {
+        user.id = 0;
+        user.email = adminInfo[0].user_email;
+
+        return user;
+      }
     }
 
     // Check customer info
