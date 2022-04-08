@@ -98,15 +98,5 @@ export const adapter = {
       userToCustomers.forEach(async (userToCustomer) => {
         await userToCustomerData.basicItem(userToCustomer);
       });
-
-    users.length &&
-      users.forEach(async (user) => {
-        await userData.basicUser(user);
-      });
-
-    customers.length &&
-      customers.forEach(async (customer) => {
-        await customerData.basicItem(customer);
-      });
   },
 };
