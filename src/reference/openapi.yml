@@ -138,13 +138,87 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Campaign'
-              examples: {}
+                description: ''
+                type: object
+                x-examples:
+                  example-1:
+                    campaigns:
+                      - id: 0
+                        start_date: string
+                        end_date: string
+                        close_date: string
+                        title: string
+                        customer_title: string
+                        description: string
+                        status_id: 0
+                        is_public: 0
+                        campaign_type_id: 0
+                        campaign_type_name: string
+                        test_type_name: string
+                        project_id: 0
+                        project_name: string
+                    page:
+                      limit: 0
+                      start: 0
+                      size: 0
+                      totalSize: 0
+                properties:
+                  items:
+                    type: array
+                    uniqueItems: false
+                    items:
+                      $ref: '#/components/schemas/Campaign'
+                  total:
+                    type: integer
+                  start:
+                    type: integer
+                  size:
+                    type: integer
+                  limit:
+                    type: integer
+                required:
+                  - items
+                  - total
+                  - start
+                  - size
+                  - limit
+              examples:
+                example-1:
+                  value:
+                    campaign:
+                      - id: 0
+                        start_date: string
+                        end_date: string
+                        close_date: string
+                        title: string
+                        customer_title: string
+                        description: string
+                        status_id: 0
+                        is_public: 0
+                        campaign_type_id: 0
+                        campaign_type_name: string
+                        test_type_name: string
+                        project_id: 0
+                        project_name: string
+                    page:
+                      limit: 0
+                      start: 0
+                      size: 0
+                      totalSize: 0
+            application/xml:
+              schema:
+                type: object
+                properties: {}
       operationId: get-workspace-campaigns
       security:
         - JWT: []
+      description: ''
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/order'
+        - $ref: '#/components/parameters/orderBy'
+        - $ref: '#/components/parameters/filterBy'
   '/workspaces/{wid}/projects':
     parameters:
       - schema:
@@ -307,6 +381,10 @@ components:
           type: number
         campaign_type_id:
           type: integer
+        campaign_type_name:
+          type: string
+        test_type_name:
+          type: string
         project_id:
           type: integer
         project_name:
@@ -322,6 +400,8 @@ components:
         - status_id
         - is_public
         - campaign_type_id
+        - campaign_type_name
+        - test_type_name
         - project_id
         - project_name
     Project:
@@ -452,7 +532,6 @@ components:
     limit:
       name: limit
       in: query
-      required: false
       schema:
         type: integer
       description: Max items to retrieve
@@ -505,6 +584,13 @@ components:
       schema:
         type: string
       description: The value to search for
+    orderBy:
+      name: orderBy
+      in: query
+      required: false
+      schema:
+        type: string
+      description: The field used as reference to order the result
 tags:
   - name: Authentication
   - name: Campaign
