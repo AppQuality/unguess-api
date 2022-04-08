@@ -19,19 +19,19 @@ export default async (
     if (user.role === "administrator") {
       projectsSql = db.format(
         `
-                SELECT p.*
-                FROM wp_appq_project p
-                WHERE p.customer_id = ?
-            `,
+          SELECT p.*
+          FROM wp_appq_project p
+          WHERE p.customer_id = ?
+        `,
         [workspaceId]
       );
     } else {
       projectsSql = db.format(
         `
-                SELECT p.*, utp.wp_user_id AS limit_user_id
-                FROM wp_appq_project p
-                LEFT JOIN wp_appq_user_to_project utp ON (utp.project_id = p.id)
-                WHERE p.customer_id = ?
+          SELECT p.*, utp.wp_user_id AS limit_user_id
+          FROM wp_appq_project p
+          LEFT JOIN wp_appq_user_to_project utp ON (utp.project_id = p.id)
+          WHERE p.customer_id = ?
             `,
         [workspaceId]
       );
@@ -46,17 +46,15 @@ export default async (
         return await formattedProjects(projects);
       }
 
-      for (const project of projects) {
-        if (!(project.id in returnProjects)) {
-          if (project.limit_user_id) {
-            if (project.limit_user_id === user.tryber_wp_user_id) {
-              returnProjects[project.id] = { ...project };
-            }
-          } else {
-            returnProjects[project.id] = { ...project };
+      projects.map((project: any) => {
+        if (project.limit_user_id) {
+          if (project.limit_user_id === user.tryber_wp_user_id) {
+            returnProjects.push(project);
           }
+        } else {
+          returnProjects.push(project);
         }
-      }
+      });
     }
 
     return await formattedProjects(returnProjects);

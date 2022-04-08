@@ -24,24 +24,23 @@ export default async (
       return "Customer not valid";
     }
 
-    let limit;
+    let limit = 10;
     if (typeof c.request.query.limit === "string")
-      limit = parseInt(
-        c.request.query.limit
-      ) as StoplightOperations["get-workspace-campaigns"]["parameters"]["query"]["limit"];
+      limit =
+        (parseInt(
+          c.request.query.limit
+        ) as StoplightOperations["get-workspace-campaigns"]["parameters"]["query"]["limit"]) ||
+        10;
 
-    let start;
+    let start = 0;
     if (typeof c.request.query.start === "string")
-      start = parseInt(
-        c.request.query.start
-      ) as StoplightOperations["get-workspace-campaigns"]["parameters"]["query"]["start"];
+      start =
+        (parseInt(
+          c.request.query.start
+        ) as StoplightOperations["get-workspace-campaigns"]["parameters"]["query"]["start"]) ||
+        0;
 
-    if (
-      (start && !limit) ||
-      (!start && start !== 0 && limit) ||
-      (start && start < 0) ||
-      (limit && limit < 0)
-    ) {
+    if (start < 0 || limit < 0) {
       res.status_code = 400;
       return "Bad request, pagination data is not valid";
     }
@@ -153,7 +152,7 @@ export default async (
       FROM wp_appq_evd_campaign c 
       JOIN wp_appq_project p ON c.project_id = p.id 
       JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id 
-      WHERE p.project_id IN (?)
+      WHERE p.id IN (?)
       ${AND}
       ${limit && (start || start === 0) ? `LIMIT ${limit} OFFSET ${start}` : ``}
       ${order && orderBy ? `ORDER BY ${orderBy} ${order}` : ``}
