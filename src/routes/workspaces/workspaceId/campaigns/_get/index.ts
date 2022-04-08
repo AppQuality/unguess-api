@@ -2,6 +2,7 @@
 import { Context } from "openapi-backend";
 import * as db from "../../../../../features/db";
 import getWorkspace from "@src/routes/workspaces/workspaceId/getWorkspace";
+import getUserProjects from "../../getUserProjects";
 
 export default async (
   c: Context,
@@ -118,30 +119,47 @@ export default async (
 
     await getWorkspace(customer_id, user);
 
-    const query = `SELECT c.id,  
-      c.start_date,  
-      c.end_date,
-      c.close_date,
-      c.title,
-      c.customer_title,
-      c.description,
-      c.status_id,
-      c.is_public,
-      c.campaign_type_id,
-      c.project_id,
-      c.customer_id,
-      ct.name,
-      ct.type,
-      p.display_name FROM wp_appq_evd_campaign c 
+    let userProjects = await getUserProjects(customer_id, user);
+
+    if (!userProjects.length) {
+      return {
+        items: [],
+        total: 0,
+        limit: 0,
+        start: 0,
+        size: 0,
+      };
+    }
+
+    // Return all the user projects ids
+    let userProjectsID = userProjects.map((p) => p.id).join(",");
+
+    const query = `SELECT 
+        c.id,  
+        c.start_date,  
+        c.end_date,
+        c.close_date,
+        c.title,
+        c.customer_title,
+        c.description,
+        c.status_id,
+        c.is_public,
+        c.campaign_type_id,
+        c.project_id,
+        c.customer_id,
+        ct.name AS campaign_type_name,
+        ct.type AS test_type_id,
+        p.display_name 
+      FROM wp_appq_evd_campaign c 
       JOIN wp_appq_project p ON c.project_id = p.id 
       JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id 
-      WHERE c.customer_id = ?
+      WHERE p.project_id IN (?)
       ${AND}
       ${limit && (start || start === 0) ? `LIMIT ${limit} OFFSET ${start}` : ``}
       ${order && orderBy ? `ORDER BY ${orderBy} ${order}` : ``}
-      `;
+    `;
 
-    const campaigns = await db.query(db.format(query, [customer_id]));
+    const campaigns = await db.query(db.format(query, [userProjectsID]));
 
     const countQuery = `SELECT COUNT(*) FROM wp_appq_evd_campaign c WHERE c.customer_id = ?`;
     let totalSize = await db.query(db.format(countQuery, [customer_id]));
@@ -151,6 +169,9 @@ export default async (
       return {
         items: [],
         total: 0,
+        limit: 0,
+        start: 0,
+        size: 0,
       };
 
     let stoplightCampaign = campaigns.map((campaign: any) => {
@@ -165,8 +186,9 @@ export default async (
         status_id: campaign.status_id,
         is_public: campaign.is_public,
         campaign_type_id: campaign.campaign_type_id,
-        campaign_type_name: campaign.name,
-        test_type_name: campaign.type === 1 ? "Experiential" : "Functional",
+        campaign_type_name: campaign.campaign_type_name,
+        test_type_name:
+          campaign.test_type_id === 1 ? "Experiential" : "Functional",
         project_id: campaign.project_id,
         customer_id: campaign.customer_id,
         project_name: campaign.display_name,

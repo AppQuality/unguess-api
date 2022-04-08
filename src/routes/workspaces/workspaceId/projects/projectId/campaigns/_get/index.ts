@@ -68,7 +68,7 @@ export default async (
         c.project_id,
         c.customer_id,
         ct.name AS campaign_type_name,
-        ct.type AS test_type_name,
+        ct.type AS test_type_id,
         p.display_name 
       FROM wp_appq_evd_campaign c 
       JOIN wp_appq_project p ON c.project_id = p.id 
@@ -93,7 +93,7 @@ export default async (
         project_id: campaign.project_id,
         project_name: project.name,
         test_type_name:
-          campaign.test_type_name === 1 ? "Experiential" : "Functional",
+          campaign.test_type_id === 1 ? "Experiential" : "Functional",
       });
     }
 
