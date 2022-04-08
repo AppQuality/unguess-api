@@ -20,12 +20,12 @@ export default async (
 
     if (!wid) {
       res.status_code = 400;
-      return "Bad request";
+      throw Error("Bad request");
     }
 
     return (await getWorkspace(
       wid,
-      user.id
+      user
     )) as StoplightComponents["schemas"]["Workspace"];
   } catch (e) {
     if ((e as OpenapiError).message === "No workspace found") {

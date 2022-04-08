@@ -35,7 +35,7 @@ export default async (
   try {
     workspace = (await getWorkspace(
       workspaceId,
-      user.id
+      user
     )) as StoplightComponents["schemas"]["Workspace"];
   } catch (error) {
     if ((error as OpenapiError).message == "No workspace found") {

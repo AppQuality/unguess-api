@@ -45,7 +45,7 @@ export default async (
   try {
     let workspace = (await getWorkspace(
       workspaceId,
-      user.id
+      user
     )) as StoplightComponents["schemas"]["Workspace"];
 
     let project = (await getProject(

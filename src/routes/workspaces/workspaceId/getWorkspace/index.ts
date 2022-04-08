@@ -2,7 +2,7 @@ import * as db from "@src/features/db";
 
 export default async (
   workspaceId: number,
-  userId: number
+  user: UserType
 ): Promise<Workspace | {}> => {
   try {
     // Check parameters
@@ -10,7 +10,7 @@ export default async (
       throw Error("Bad request");
     }
 
-    if (userId == null || userId <= 0) {
+    if (user.id == null || user.id <= 0) {
       throw Error("Bad request");
     }
 
@@ -27,18 +27,20 @@ export default async (
     if (workspace.length) {
       workspace = workspace[0];
 
-      // Check if user has permission to get the customer
-      const userToCustomerSql = db.format(
-        `SELECT * FROM wp_appq_user_to_customer WHERE wp_user_id = ? AND customer_id = ?`,
-        [userId, workspaceId]
-      );
+      if (user.role !== "administrator") {
+        // Check if user has permission to get the customer
+        const userToCustomerSql = db.format(
+          `SELECT * FROM wp_appq_user_to_customer WHERE wp_user_id = ? AND customer_id = ?`,
+          [user.id, workspaceId]
+        );
 
-      let userToCustomer = await db.query(userToCustomerSql);
+        let userToCustomer = await db.query(userToCustomerSql);
 
-      if (userToCustomer.length) {
-        userToCustomer = userToCustomer[0];
-      } else {
-        throw Error("You have no permission to get this workspace");
+        if (userToCustomer.length) {
+          userToCustomer = userToCustomer[0];
+        } else {
+          throw Error("You have no permission to get this workspace");
+        }
       }
 
       return {
