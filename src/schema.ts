@@ -1,512 +1,347 @@
-openapi: 3.1.0
-info:
-  title: UnguessApi
-  version: '1.0'
-  description: An API to get all data for your bugfinding and ux research needs!
-  contact:
-    name: Developers
-    email: it@unguess.io
-servers:
-  - url: 'https://api.unguess.io'
-paths:
-  /:
-    get:
-      summary: Get API description
-      tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-      operationId: get-root
-      description: Get all routes available for this apis
-    parameters: []
-  /authenticate:
-    post:
-      description: A request to login with your username and password
-      summary: Authenticate to the API
-      operationId: post-authenticate
-      responses:
-        '200':
-          $ref: '#/components/responses/Authentication'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: string
-              examples:
-                example-1:
-                  value: string
-      tags:
-        - Authentication
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                password:
-                  type: string
-              required:
-                - username
-                - password
-            examples:
-              example:
-                value:
-                  username: Elon71
-                  password: my-strong-password
-        description: A JSON containing username and password
-      parameters: []
-  /users/me:
-    get:
-      summary: Get user data
-      tags:
-        - User
-      responses:
-        '200':
-          description: ''
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-        '201':
-          description: Created
-        '403':
-          $ref: '#/components/responses/NotAuthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      operationId: get-users-me
-      security:
-        - JWT: []
-  /workspaces:
-    get:
-      summary: Your GET endpoint
-      tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Workspace'
-      operationId: get-workspaces
-      parameters: []
-      security:
-        - JWT: []
-  '/workspaces/{wid}':
-    parameters:
-      - schema:
-          type: integer
-        name: wid
-        in: path
-        required: true
-        description: Workspace (company) id
-    get:
-      summary: Your GET endpoint
-      tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Workspace'
-      operationId: get-workspace
-      parameters: []
-      security:
-        - JWT: []
-  '/workspaces/{wid}/campaigns':
-    parameters:
-      - schema:
-          type: integer
-        name: wid
-        in: path
-        required: true
-        description: Workspace (company) id
-    get:
-      summary: Your GET endpoint
-      tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Campaign'
-      operationId: get-workspace-campaigns
-      security:
-        - JWT: []
-  '/workspaces/{wid}/projects':
-    parameters:
-      - schema:
-          type: integer
-        name: wid
-        in: path
-        required: true
-        description: Workspace (company) id
-    get:
-      summary: Your GET endpoint
-      tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Project'
-      operationId: get-workspace-projects
-      security:
-        - JWT: []
-  '/workspaces/{wid}/projects/{pid}':
-    parameters:
-      - schema:
-          type: integer
-        name: wid
-        in: path
-        required: true
-        description: Workspace (company) id
-      - schema:
-          type: integer
-        name: pid
-        in: path
-        required: true
-        description: Project id
-    get:
-      summary: Your GET endpoint
-      tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Project'
-      operationId: get-workspace-project
-  '/workspaces/{wid}/projects/{pid}/campaigns':
-    parameters:
-      - schema:
-          type: integer
-        name: wid
-        in: path
-        required: true
-        description: Workspace (company) id
-      - schema:
-          type: integer
-        name: pid
-        in: path
-        required: true
-        description: Project id
-    get:
-      summary: Your GET endpoint
-      tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Campaign'
-      operationId: get-workspace-project-campaigns
-components:
-  schemas:
-    User:
-      title: User
-      type: object
-      description: ''
-      x-examples:
-        example-1:
-          value:
-            username: string
-            name: string
-            surname: string
-            email: user@example.com
-            image: 'http://example.com'
-            id: 0
-            wp_user_id: 0
-            role: string
-            is_verified: true
-      properties:
-        id:
-          type: integer
-        email:
-          type: string
-          format: email
-        role:
-          type: string
-        name:
-          type: string
-        workspaces:
-          type: array
-          items:
-            $ref: '#/components/schemas/Workspace'
-        profile_id:
-          type: integer
-        tryber_wp_user_id:
-          type: integer
-      required:
-        - id
-        - email
-        - role
-        - name
-        - workspaces
-    Workspace:
-      title: Workspace
-      type: object
-      properties:
-        id:
-          type: integer
-        company:
-          type: string
-        tokens:
-          type: number
-        logo:
-          type: string
-      required:
-        - id
-        - company
-        - tokens
-    Campaign:
-      title: Campaign
-      type: object
-      properties:
-        id:
-          type: integer
-        start_date:
-          type: string
-        end_date:
-          type: string
-        close_date:
-          type: string
-        title:
-          type: string
-        customer_title:
-          type: string
-        description:
-          type: string
-        status_id:
-          type: number
-        is_public:
-          type: number
-        campaign_type_id:
-          type: integer
-        project_id:
-          type: integer
-        project_name:
-          type: string
-      required:
-        - id
-        - start_date
-        - end_date
-        - close_date
-        - title
-        - customer_title
-        - description
-        - status_id
-        - is_public
-        - campaign_type_id
-        - project_id
-        - project_name
-    Project:
-      title: Project
-      type: object
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-        campaigns_count:
-          type: integer
-      required:
-        - id
-        - name
-        - campaigns_count
-  securitySchemes:
-    JWT:
-      type: http
-      scheme: bearer
-      description: ''
-  responses:
-    Authentication:
-      description: Authentication data. The token can be used to authenticate the protected requests
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              id:
-                type: number
-              firstName:
-                type: string
-              lastName:
-                type: string
-              token:
-                type: string
-              username:
-                type: string
-          examples:
-            example:
-              value:
-                id: 42
-                firstName: Elon
-                lastName: Musk
-                token: my-jwt-token
-                username: Elon71
-    NotFound:
-      description: An error due to the resource not existing
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              element:
-                type: string
-              id:
-                type: integer
-              message:
-                type: string
-            required:
-              - element
-              - id
-              - message
-          examples:
-            example-1:
-              value:
-                element: campaign
-                id: 1
-                message: No campaign with id 1
-    MissingParameters:
-      description: An error due to missing required parameters
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              message:
-                type: string
-            required:
-              - message
-          examples:
-            example:
-              value:
-                message: Missing parameters
-    NotAuthorized:
-      description: An error due to insufficient authorization to access the resource
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              message:
-                type: string
-          examples:
-            example:
-              value:
-                message: Not Authorized.
-  parameters:
-    campaign:
-      name: campaign
-      in: path
-      required: true
-      schema:
-        type: string
-      description: A campaign id
-    task:
-      name: task
-      in: path
-      required: true
-      schema:
-        type: string
-      description: A task id
-    customer:
-      name: customer
-      in: path
-      required: true
-      schema:
-        type: string
-      description: A customer id
-    project:
-      name: project
-      in: path
-      required: true
-      schema:
-        type: string
-      description: A project id
-    limit:
-      name: limit
-      in: query
-      required: false
-      schema:
-        type: integer
-      description: Max items to retrieve
-    start:
-      name: start
-      in: query
-      required: false
-      schema:
-        type: integer
-      description: Items to skip for pagination
-    filterBy:
-      name: filterBy
-      in: query
-      required: false
-      schema:
-        type: object
-      description: Key-value Array for item filtering
-    order:
-      name: order
-      in: query
-      required: false
-      schema:
-        type: string
-        enum:
-          - ASC
-          - DESC
-        default: DESC
-      description: 'How to order values (ASC, DESC)'
-    locale:
-      name: locale
-      in: query
-      required: false
-      schema:
-        type: string
-        enum:
-          - en
-          - it
-        default: en
-      description: How to localize values
-    searchBy:
-      name: searchBy
-      in: query
-      schema:
-        type: string
-      description: A comma separated list of fields which will be searched
-    search:
-      name: search
-      in: query
-      required: false
-      schema:
-        type: string
-      description: The value to search for
-tags:
-  - name: Authentication
-  - name: Campaign
-  - name: Customer
-  - name: Projects
-  - name: Task
-  - name: User
-  - name: Admin
-  - name: Devices
+/**
+ * This file was auto-generated by openapi-typescript.
+ * Do not make direct changes to the file.
+ */
+
+export interface paths {
+  "/": {
+    /** Get all routes available for this apis */
+    get: operations["get-root"];
+    parameters: {};
+  };
+  "/authenticate": {
+    /** A request to login with your username and password */
+    post: operations["post-authenticate"];
+  };
+  "/users/me": {
+    get: operations["get-users-me"];
+  };
+  "/workspaces": {
+    get: operations["get-workspaces"];
+  };
+  "/workspaces/{wid}": {
+    get: operations["get-workspace"];
+    parameters: {
+      path: {
+        /** Workspace (company) id */
+        wid: number;
+      };
+    };
+  };
+  "/workspaces/{wid}/campaigns": {
+    get: operations["get-workspace-campaigns"];
+    parameters: {
+      path: {
+        /** Workspace (company) id */
+        wid: number;
+      };
+    };
+  };
+  "/workspaces/{wid}/projects": {
+    get: operations["get-workspace-projects"];
+    parameters: {
+      path: {
+        /** Workspace (company) id */
+        wid: number;
+      };
+    };
+  };
+  "/workspaces/{wid}/projects/{pid}": {
+    get: operations["get-workspace-project"];
+    parameters: {
+      path: {
+        /** Workspace (company) id */
+        wid: number;
+        /** Project id */
+        pid: number;
+      };
+    };
+  };
+  "/workspaces/{wid}/projects/{pid}/campaigns": {
+    get: operations["get-workspace-project-campaigns"];
+    parameters: {
+      path: {
+        /** Workspace (company) id */
+        wid: number;
+        /** Project id */
+        pid: number;
+      };
+    };
+  };
+}
+
+export interface components {
+  schemas: {
+    /** User */
+    User: {
+      id: number;
+      /** Format: email */
+      email: string;
+      role: string;
+      name: string;
+      workspaces: components["schemas"]["Workspace"][];
+      profile_id?: number;
+      tryber_wp_user_id?: number;
+    };
+    /** Workspace */
+    Workspace: {
+      id: number;
+      company: string;
+      tokens: number;
+      logo?: string;
+    };
+    /** Campaign */
+    Campaign: {
+      id: number;
+      start_date: string;
+      end_date: string;
+      close_date: string;
+      title: string;
+      customer_title: string;
+      description: string;
+      status_id: number;
+      is_public: number;
+      campaign_type_id: number;
+      campaign_type_name: string;
+      test_type_name: string;
+      project_id: number;
+      project_name: string;
+    };
+    /** Project */
+    Project: {
+      id: number;
+      name: string;
+      campaigns_count: number;
+    };
+  };
+  responses: {
+    /** Authentication data. The token can be used to authenticate the protected requests */
+    Authentication: {
+      content: {
+        "application/json": {
+          id?: number;
+          firstName?: string;
+          lastName?: string;
+          token?: string;
+          username?: string;
+        };
+      };
+    };
+    /** An error due to the resource not existing */
+    NotFound: {
+      content: {
+        "application/json": {
+          element: string;
+          id: number;
+          message: string;
+        };
+      };
+    };
+    /** An error due to missing required parameters */
+    MissingParameters: {
+      content: {
+        "application/json": {
+          message: string;
+        };
+      };
+    };
+    /** An error due to insufficient authorization to access the resource */
+    NotAuthorized: {
+      content: {
+        "application/json": {
+          message?: string;
+        };
+      };
+    };
+  };
+  parameters: {
+    /** @description A campaign id */
+    campaign: string;
+    /** @description A task id */
+    task: string;
+    /** @description A customer id */
+    customer: string;
+    /** @description A project id */
+    project: string;
+    /** @description Max items to retrieve */
+    limit: number;
+    /** @description Items to skip for pagination */
+    start: number;
+    /** @description Key-value Array for item filtering */
+    filterBy: { [key: string]: unknown };
+    /** @description How to order values (ASC, DESC) */
+    order: "ASC" | "DESC";
+    /** @description How to localize values */
+    locale: "en" | "it";
+    /** @description A comma separated list of fields which will be searched */
+    searchBy: string;
+    /** @description The value to search for */
+    search: string;
+    /** @description The field used as reference to order the result */
+    orderBy: string;
+  };
+}
+
+export interface operations {
+  /** Get all routes available for this apis */
+  "get-root": {
+    parameters: {};
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": { [key: string]: unknown };
+        };
+      };
+    };
+  };
+  /** A request to login with your username and password */
+  "post-authenticate": {
+    parameters: {};
+    responses: {
+      200: components["responses"]["Authentication"];
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": string;
+        };
+      };
+    };
+    /** A JSON containing username and password */
+    requestBody: {
+      content: {
+        "application/json": {
+          username: string;
+          password: string;
+        };
+      };
+    };
+  };
+  "get-users-me": {
+    responses: {
+      200: {
+        content: {
+          "application/json": components["schemas"]["User"];
+        };
+      };
+      403: components["responses"]["NotAuthorized"];
+      404: components["responses"]["NotFound"];
+    };
+  };
+  "get-workspaces": {
+    parameters: {};
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Workspace"][];
+        };
+      };
+    };
+  };
+  "get-workspace": {
+    parameters: {
+      path: {
+        /** Workspace (company) id */
+        wid: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Workspace"];
+        };
+      };
+    };
+  };
+  "get-workspace-campaigns": {
+    parameters: {
+      path: {
+        /** Workspace (company) id */
+        wid: number;
+      };
+      query: {
+        /** Max items to retrieve */
+        limit?: components["parameters"]["limit"];
+        /** Items to skip for pagination */
+        start?: components["parameters"]["start"];
+        /** How to order values (ASC, DESC) */
+        order?: components["parameters"]["order"];
+        /** The field used as reference to order the result */
+        orderBy?: components["parameters"]["orderBy"];
+        /** Key-value Array for item filtering */
+        filterBy?: components["parameters"]["filterBy"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            items: components["schemas"]["Campaign"][];
+            total: number;
+            start: number;
+            size: number;
+            limit: number;
+          };
+          "application/xml": { [key: string]: unknown };
+        };
+      };
+    };
+  };
+  "get-workspace-projects": {
+    parameters: {
+      path: {
+        /** Workspace (company) id */
+        wid: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Project"][];
+        };
+      };
+    };
+  };
+  "get-workspace-project": {
+    parameters: {
+      path: {
+        /** Workspace (company) id */
+        wid: number;
+        /** Project id */
+        pid: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Project"];
+        };
+      };
+    };
+  };
+  "get-workspace-project-campaigns": {
+    parameters: {
+      path: {
+        /** Workspace (company) id */
+        wid: number;
+        /** Project id */
+        pid: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Campaign"][];
+        };
+      };
+    };
+  };
+}
+
+export interface external {}

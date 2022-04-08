@@ -54,8 +54,26 @@ export default async (
     )) as StoplightComponents["schemas"]["Project"];
 
     // Get project campaigns
-    const campaignsSql =
-      "SELECT id, start_date, end_date, close_date, title, customer_title, description, status_id, is_public, campaign_type_id, project_id, customer_id FROM wp_appq_evd_campaign WHERE project_id = ?";
+    const campaignsSql = `SELECT 
+        c.id,  
+        c.start_date,  
+        c.end_date,
+        c.close_date,
+        c.title,
+        c.customer_title,
+        c.description,
+        c.status_id,
+        c.is_public,
+        c.campaign_type_id,
+        c.project_id,
+        c.customer_id,
+        ct.name AS campaign_type_name,
+        ct.type AS test_type_name,
+        p.display_name 
+      FROM wp_appq_evd_campaign c 
+      JOIN wp_appq_project p ON c.project_id = p.id 
+      JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id 
+      WHERE c.project_id = ?`;
     let campaigns = await db.query(db.format(campaignsSql, [project.id]));
 
     let returnCampaigns: Array<StoplightComponents["schemas"]["Campaign"]> = [];
@@ -71,8 +89,11 @@ export default async (
         status_id: campaign.status_id,
         is_public: campaign.is_public,
         campaign_type_id: campaign.campaign_type_id,
+        campaign_type_name: campaign.campaign_type_name,
         project_id: campaign.project_id,
         project_name: project.name,
+        test_type_name:
+          campaign.test_type_name === 1 ? "Experiential" : "Functional",
       });
     }
 

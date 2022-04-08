@@ -28,8 +28,6 @@ interface dataObject {
   userToCustomers?: Array<any>;
   users?: Array<any>;
   customers?: Array<any>;
-  userToProjects?: Array<any>;
-  userToCustomers?: Array<any>;
 }
 
 export const adapter = {

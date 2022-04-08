@@ -8,7 +8,9 @@ export default async (
   req: OpenapiRequest,
   res: OpenapiResponse
 ) => {
+  let user = req.user;
   res.status_code = 200;
+
   try {
     let customer_id;
     if (typeof c.request.params.wid === "string")
@@ -77,9 +79,9 @@ export default async (
     const validFilterByFields: { [key: string]: string } = {
       customer_title: "c.customer_title",
       title: "c.title",
-      campaign_type_name: "ct.name", //name
-      test_type_name: "ct.type", //type
-      project_name: "p.display_name", //display_name
+      campaign_type_name: "ct.name",
+      test_type_name: "ct.type",
+      project_name: "p.display_name",
     };
 
     let filterBy = req.query.filterBy as { [key: string]: string | string[] };
@@ -114,7 +116,7 @@ export default async (
       }
     }
 
-    await getWorkspace(customer_id);
+    await getWorkspace(customer_id, user);
 
     const query = `SELECT c.id,  
       c.start_date,  
