@@ -16,7 +16,7 @@ export default async (
         c.request.params.wid
       ) as StoplightOperations["get-workspace-campaigns"]["parameters"]["path"]["wid"];
 
-    if (!customer_id) {
+    if (!customer_id || customer_id < 0) {
       res.status_code = 400;
       return "Customer not valid";
     }
@@ -36,10 +36,9 @@ export default async (
     if (
       (start && !limit) ||
       (!start && start !== 0 && limit) ||
-      Number.isNaN(start) ||
-      Number.isNaN(limit)
+      (start && start < 0) ||
+      (limit && limit < 0)
     ) {
-      // if the parameter is not as described in stoplight is still 400, so this is useless
       res.status_code = 400;
       return "Bad request, pagination data is not valid";
     }
@@ -75,6 +74,46 @@ export default async (
       return "Bad request, ordination data is not valid";
     }
 
+    const validFilterByFields: { [key: string]: string } = {
+      customer_title: "c.customer_title",
+      title: "c.title",
+      campaign_type_name: "ct.name", //name
+      test_type_name: "ct.type", //type
+      project_name: "p.display_name", //display_name
+    };
+
+    let filterBy = req.query.filterBy as { [key: string]: string | string[] };
+    let AND = ``;
+
+    if (filterBy) {
+      let filterByQuery: string[] = [];
+      let acceptedFilters = Object.keys(validFilterByFields).filter((f) =>
+        Object.keys(filterBy).includes(f)
+      );
+
+      if (!acceptedFilters.length) {
+        res.status_code = 400;
+        return "Bad request, filter value not allowed";
+      } else {
+        acceptedFilters = acceptedFilters.map((k) => {
+          const v = filterBy[k];
+          if (typeof v === "string") {
+            filterByQuery.push(`%${v}%`);
+            return `${validFilterByFields[k]} LIKE ?`;
+          }
+          const orQuery = v
+            .map((el: string) => {
+              filterByQuery.push(`%${el}%`);
+              return `${validFilterByFields[k]} LIKE ?`;
+            })
+            .join(" OR ");
+          return ` ( ${orQuery} ) `;
+        });
+        AND = `AND ${Object.values(acceptedFilters).join(` AND `)}`;
+        AND = db.format(AND, filterByQuery);
+      }
+    }
+
     await getWorkspace(customer_id);
 
     const query = `SELECT c.id,  
@@ -94,7 +133,8 @@ export default async (
       p.display_name FROM wp_appq_evd_campaign c 
       JOIN wp_appq_project p ON c.project_id = p.id 
       JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id 
-      WHERE c.customer_id = ? 
+      WHERE c.customer_id = ?
+      ${AND}
       ${limit && (start || start === 0) ? `LIMIT ${limit} OFFSET ${start}` : ``}
       ${order && orderBy ? `ORDER BY ${orderBy} ${order}` : ``}
       `;

@@ -1,13 +1,9 @@
 import app from "@src/app";
 import request from "supertest";
-import db from "@src/features/sqlite";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
-
-const unguessDb = db("unguess");
-const tryberDb = db("tryber");
 
 const customer_1 = {
   id: 1,
@@ -90,7 +86,7 @@ const campaign_3 = {
   start_date: "2017-07-20 00:00:00",
   end_date: "2017-07-20 00:00:00",
   close_date: "2017-07-20 00:00:00",
-  title: "Campagnetta Provetta ",
+  title: "Campagnetta della banana",
   customer_title: "titolo",
   description: "Descrizione della campagnazione",
   status_id: 1,
@@ -339,6 +335,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(400);
   });
+
   it("Should return 400 because the order parameter is wrong but the orderBy is valid", async () => {
     const response = await request(app)
       .get("/workspaces/1/campaigns?order=DESC&orderBy=banana")
@@ -410,5 +407,51 @@ describe("GET /workspaces/{wid}/campaigns", () => {
     } catch (e) {
       console.log(e);
     }
+  });
+
+  it("Should return 400 because the filterBy parameter is not allowed", async () => {
+    const response = await request(app)
+      .get("/workspaces/1/campaigns?filterBy[banana]=banana")
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(400);
+  });
+
+  it("Should return 200 because the filterBy parameter has the right format", async () => {
+    const response = await request(app)
+      .get("/workspaces/1/campaigns?filterBy[title]=Campagnetta Provetta ")
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(200);
+  });
+
+  it("Should return an empty array because no data is found with this value", async () => {
+    const response = await request(app)
+      .get("/workspaces/1/campaigns?filterBy[title]=banana")
+      .set("authorization", "Bearer customer");
+    expect(JSON.stringify(response.body)).toStrictEqual(
+      JSON.stringify({ items: [], total: 0 })
+    );
+  });
+
+  it("Should return one element using title", async () => {
+    const response = await request(app)
+      .get("/workspaces/2/campaigns?filterBy[title]=Campagnetta della banana")
+      .set("authorization", "Bearer customer");
+    expect(response.body.items.length).toBe(1);
+  });
+
+  it("Should return an array with two elements using project_name", async () => {
+    const response = await request(app)
+      .get(
+        "/workspaces/2/campaigns?filterBy[project_name]=Nome del progetto abbastanza figo"
+      )
+      .set("authorization", "Bearer customer");
+    expect(response.body.items.length).toBe(2);
+  });
+
+  it("Should return an array with one element using only a part of the title", async () => {
+    const response = await request(app)
+      .get("/workspaces/2/campaigns?filterBy[title]=della banana")
+      .set("authorization", "Bearer customer");
+    expect(response.body.items.length).toBe(1);
   });
 });

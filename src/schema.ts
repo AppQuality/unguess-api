@@ -270,6 +270,8 @@ export interface operations {
         order?: components["parameters"]["order"];
         /** The field used as reference to order the result */
         orderBy?: components["parameters"]["orderBy"];
+        /** Key-value Array for item filtering */
+        filterBy?: components["parameters"]["filterBy"];
       };
     };
     responses: {
