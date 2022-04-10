@@ -201,8 +201,6 @@ describe("GET /workspaces/{wid}/campaigns", () => {
     const response = await request(app)
       .get("/workspaces/2/campaigns?limit=1&start=0")
       .set("authorization", "Bearer customer");
-
-    console.log(response.body);
     expect(response.body.items.length).toBe(1);
   });
 

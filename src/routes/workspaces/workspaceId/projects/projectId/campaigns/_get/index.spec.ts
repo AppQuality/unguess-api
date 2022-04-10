@@ -5,13 +5,6 @@ import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
 
-const customer_user_1 = {
-  ID: 1,
-  user_login: "customer@unguess.io",
-  user_pass: "password",
-  user_email: "customer@unguess.io",
-};
-
 const customer_profile_1 = {
   id: 1,
   wp_user_id: 1,
@@ -127,6 +120,12 @@ const campaign_3 = {
   customer_id: 2,
 };
 
+const campaign_type_1 = {
+  id: 1,
+  name: "Functional Bug Finding",
+  type: 1,
+};
+
 describe("GET /workspaces/{wid}/projects/{pid}/campaigns", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
@@ -145,6 +144,7 @@ describe("GET /workspaces/{wid}/projects/{pid}/campaigns", () => {
             user_to_project_3,
             user_to_project_4,
           ],
+          campaignTypes: [campaign_type_1],
         });
       } catch (error) {
         console.log(error);
