@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "company": "Company",
+    "company_logo": "logo.png",
+    "tokens": 100
+  },
+  {
+    "id": 2,
+    "company": "Company with zero tokens",
+    "company_logo": "logo.png",
+    "tokens": 0
+  },
+  {
+    "id": 3,
+    "company": "Company without tokens",
+    "company_logo": "logo.png",
+    "tokens": -1
+  },
+  {
+    "id": 4,
+    "company": "Company with a very long name",
+    "company_logo": "logo.png",
+    "tokens": 100
+  }
+]

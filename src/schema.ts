@@ -102,6 +102,8 @@ export interface components {
       status_id: number;
       is_public: number;
       campaign_type_id: number;
+      campaign_type_name: string;
+      test_type_name: string;
       project_id: number;
       project_name: string;
     };
@@ -175,6 +177,8 @@ export interface components {
     searchBy: string;
     /** @description The value to search for */
     search: string;
+    /** @description The field used as reference to order the result */
+    orderBy: string;
   };
 }
 
@@ -257,12 +261,31 @@ export interface operations {
         /** Workspace (company) id */
         wid: number;
       };
+      query: {
+        /** Max items to retrieve */
+        limit?: components["parameters"]["limit"];
+        /** Items to skip for pagination */
+        start?: components["parameters"]["start"];
+        /** How to order values (ASC, DESC) */
+        order?: components["parameters"]["order"];
+        /** The field used as reference to order the result */
+        orderBy?: components["parameters"]["orderBy"];
+        /** Key-value Array for item filtering */
+        filterBy?: components["parameters"]["filterBy"];
+      };
     };
     responses: {
       /** OK */
       200: {
         content: {
-          "application/json": components["schemas"]["Campaign"][];
+          "application/json": {
+            items: components["schemas"]["Campaign"][];
+            total: number;
+            start: number;
+            size: number;
+            limit: number;
+          };
+          "application/xml": { [key: string]: unknown };
         };
       };
     };

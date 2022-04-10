@@ -12,25 +12,10 @@ const customer_user_1 = {
   user_email: "customer@unguess.io",
 };
 
-const admin_user_1 = {
-  ID: 2,
-  user_login: "admin@unguess.io",
-  user_pass: "password",
-  user_email: "admin@unguess.io",
-};
-
-const customer_profile_1 = {
-  id: 1,
-  wp_user_id: 1,
-  name: "Customer",
-  surname: "Customer",
-  email: "customer@unguess.io",
-};
-
 const customer_1 = {
   id: 1,
-  company: "Company",
-  company_logo: "logo.png",
+  company: "Company 1",
+  company_logo: "logo1.png",
   tokens: 100,
 };
 
@@ -39,14 +24,53 @@ const user_to_customer_1 = {
   customer_id: 1,
 };
 
-describe("GET /workspaces/{wid}", () => {
+const project_1 = {
+  id: 1,
+  display_name: "Projettino unoh",
+  customer_id: 1,
+};
+
+const project_2 = {
+  id: 2,
+  display_name: "Projettino dueh",
+  customer_id: 1,
+};
+
+const user_to_project_1 = {
+  wp_user_id: 1,
+  project_id: 1,
+};
+
+const user_to_project_2 = {
+  wp_user_id: 1,
+  project_id: 2,
+};
+
+const campaign_1 = {
+  id: 1,
+  start_date: "2020-01-01",
+  end_date: "2020-01-02",
+  close_date: "2020-01-03",
+  title: "Campagna 1",
+  customer_title: "Campagna 1",
+  description: "Descrizione campagna 1",
+  status_id: 1,
+  is_public: 1,
+  campaign_type_id: 1,
+  project_id: 1,
+  customer_id: 1,
+};
+
+describe("GET /workspaces/{wid}/projects/{pid}", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
         await dbAdapter.create();
 
         await dbAdapter.add({
-          profiles: [customer_profile_1],
+          projects: [project_1, project_2],
+          userToProjects: [user_to_project_1, user_to_project_2],
+          campaigns: [campaign_1],
           companies: [customer_1],
           userToCustomers: [user_to_customer_1],
         });
@@ -72,43 +96,41 @@ describe("GET /workspaces/{wid}", () => {
   });
 
   it("Should answer 403 if not logged in", async () => {
-    const response = await request(app).get(`/workspaces/${customer_1.id}`);
+    const response = await request(app).get(
+      `/workspaces/${customer_1.id}/projects/${project_1.id}`
+    );
     expect(response.status).toBe(403);
   });
 
   it("Should answer 200 if logged in", async () => {
     const response = await request(app)
-      .get(`/workspaces/${customer_1.id}`)
+      .get(`/workspaces/${customer_1.id}/projects/${project_1.id}`)
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
   });
 
   it("Should answer 404 if no workspaces are found", async () => {
     const response = await request(app)
-      .get("/workspaces/99999291")
+      .get(`/workspaces/${customer_1.id}/projects/999999`)
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(404);
   });
 
   it("Should answer 400 of the requested parameter is wrong", async () => {
     const response = await request(app)
-      .get("/workspaces/banana")
+      .get(`/workspaces/${customer_1.id}/projects/a`)
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(400);
   });
 
-  it("Should answer with a workspace object", async () => {
+  it("Should answer with a project object", async () => {
     const response = await request(app)
-      .get(`/workspaces/${customer_1.id}`)
+      .get(`/workspaces/${customer_1.id}/projects/${project_1.id}`)
       .set("authorization", "Bearer customer");
-    expect(response.status).toBe(200);
-    expect(JSON.stringify(response.body)).toBe(
-      JSON.stringify({
-        id: customer_1.id,
-        company: customer_1.company,
-        logo: customer_1.company_logo,
-        tokens: customer_1.tokens,
-      })
-    );
+    expect(response.body).toMatchObject({
+      id: 1,
+      name: "Projettino unoh",
+      campaigns_count: 1,
+    });
   });
 });

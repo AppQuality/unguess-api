@@ -7,8 +7,10 @@ export default async (
   req: OpenapiRequest,
   res: OpenapiResponse
 ) => {
-  let workspace;
+  let user = req.user;
+
   res.status_code = 200;
+
   try {
     let wid;
     if (typeof c.request.params.wid == "string")
@@ -18,19 +20,29 @@ export default async (
 
     if (!wid) {
       res.status_code = 400;
-      return "Bad request";
+      throw Error("Bad request");
     }
 
-    workspace = await getWorkspace(wid);
+    return (await getWorkspace(
+      wid,
+      user
+    )) as StoplightComponents["schemas"]["Workspace"];
   } catch (e) {
     if ((e as OpenapiError).message === "No workspace found") {
       res.status_code = 404;
+      return (e as OpenapiError).message;
+    } else if ((e as OpenapiError).message === "Bad request") {
+      res.status_code = 400;
+      return (e as OpenapiError).message;
+    } else if (
+      (e as OpenapiError).message ===
+      "You have no permission to get this workspace"
+    ) {
+      res.status_code = 403;
       return (e as OpenapiError).message;
     } else {
       res.status_code = 500;
       throw e;
     }
   }
-
-  return workspace as StoplightComponents["schemas"]["Workspace"];
 };
