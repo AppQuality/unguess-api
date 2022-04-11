@@ -7,11 +7,9 @@ on:
     branches: [ develop, master ]
 
 jobs:
-
-  push-to-ecr:
-    name: Push Image
+  build:
+    
     runs-on: ubuntu-latest
-    environment: production
 
     steps:
       - name: Checkout
