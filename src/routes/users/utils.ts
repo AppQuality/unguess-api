@@ -3,6 +3,8 @@ import axios from "axios";
 
 //Return Gravatar Picture or boolean if 404
 export const getGravatar = async (email: string) => {
+  if (!email) return false;
+
   const hash = crypto.createHash("md5").update(email).digest("hex");
 
   // Make a request for a user with a given ID

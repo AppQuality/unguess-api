@@ -90,6 +90,7 @@ export interface components {
       company: string;
       tokens: number;
       logo?: string;
+      csm: components["schemas"]["User"];
     };
     /** Campaign */
     Campaign: {

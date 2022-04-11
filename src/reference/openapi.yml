@@ -361,7 +361,8 @@ components:
         - id
         - company
         - tokens
-      examples:
+        - csm
+      x-examples:
         - id: 0
           company: string
           tokens: 0
@@ -369,9 +370,9 @@ components:
           csm:
             email: user@example.com
             role: string
-            name: string
+            name: Teomondo Scrofalo
             workspaces: []
-            picture: string
+            picture: https://pbs.twimg.com/media/Ccp6RXFWIAAQQ2V.jpg
     Campaign:
       title: Campaign
       type: object
