@@ -8,6 +8,11 @@ on:
   workflow_dispatch:
 
 jobs:
+
+  # This check needs to be in place to prevent a publish loop with auto and github actions
+  if: "contains(github.event.head_commit.message, 'ci build') || contains(github.event.head_commit.message, 'build ci') || contains(github.ref_name, 'master') || contains(github.ref_name, 'develop')"
+    
+
   push-to-ecr:
     name: Push Image
     runs-on: ubuntu-latest
@@ -29,12 +34,16 @@ jobs:
           echo "##[set-output name=tag;]$TAG"
         id: extract_branch
 
-      - name: Docker ECR
-        uses: kciter/aws-ecr-action@v2
-        with:
-          access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          account_id: ${{ secrets.AWS_ACCOUNT_ID }}
-          region: eu-west-1
-          repo: unguess-api
-          tags: ${{ steps.extract_branch.outputs.tag }}
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: unguess-api
+          IMAGE_TAG: ${{ steps.extract_branch.outputs.tag }}
+        run: |
+            # Build a docker container and
+            # push it to ECR so that it can
+            # be deployed to ECS.
+            docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+            docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+            echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
