@@ -2,9 +2,11 @@ name: Push image to ECR
 
 on:
   push:
-    branches: [ develop ]
-  pull_request:
-    branches: [ develop, master ]
+    branches:    
+      - '*'         # matches every branch that doesn't contain a '/'
+      - '*/*'       # matches every branch containing a single '/'
+      - '**'        # matches every branch
+  workflow_dispatch:
 
 jobs:
   build:
