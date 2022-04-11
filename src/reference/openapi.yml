@@ -185,7 +185,7 @@ paths:
               examples:
                 example-1:
                   value:
-                    campaign:
+                    items:
                       - id: 0
                         start_date: string
                         end_date: string
@@ -200,11 +200,10 @@ paths:
                         test_type_name: string
                         project_id: 0
                         project_name: string
-                    page:
-                      limit: 0
-                      start: 0
-                      size: 0
-                      totalSize: 0
+                    total: 0
+                    start: 0
+                    size: 0
+                    limit: 0
             application/xml:
               schema:
                 type: object
@@ -347,7 +346,7 @@ components:
         - id: 0
           email: user@example.com
           role: string
-          name: Pippo Baudo
+          name: string
           workspaces:
             - id: 0
               company: string
@@ -355,7 +354,7 @@ components:
               logo: string
           profile_id: 0
           tryber_wp_user_id: 0
-          picture: 'https://www.gravatar.com/avatar/617f61a54df8f1805ba1a3481e960eb7'
+          picture: string
     Workspace:
       title: Workspace
       type: object
