@@ -138,12 +138,86 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Campaign'
+                description: ''
+                type: object
+                x-examples:
+                  example-1:
+                    campaigns:
+                      - id: 0
+                        start_date: string
+                        end_date: string
+                        close_date: string
+                        title: string
+                        customer_title: string
+                        description: string
+                        status_id: 0
+                        is_public: 0
+                        campaign_type_id: 0
+                        campaign_type_name: string
+                        test_type_name: string
+                        project_id: 0
+                        project_name: string
+                    page:
+                      limit: 0
+                      start: 0
+                      size: 0
+                      totalSize: 0
+                properties:
+                  items:
+                    type: array
+                    uniqueItems: false
+                    items:
+                      $ref: '#/components/schemas/Campaign'
+                  total:
+                    type: integer
+                  start:
+                    type: integer
+                  size:
+                    type: integer
+                  limit:
+                    type: integer
+                required:
+                  - items
+                  - total
+                  - start
+                  - size
+                  - limit
+              examples:
+                example-1:
+                  value:
+                    items:
+                      - id: 0
+                        start_date: string
+                        end_date: string
+                        close_date: string
+                        title: string
+                        customer_title: string
+                        description: string
+                        status_id: 0
+                        is_public: 0
+                        campaign_type_id: 0
+                        campaign_type_name: string
+                        test_type_name: string
+                        project_id: 0
+                        project_name: string
+                    total: 0
+                    start: 0
+                    size: 0
+                    limit: 0
+            application/xml:
+              schema:
+                type: object
+                properties: {}
       operationId: get-workspace-campaigns
       security:
         - JWT: []
+      description: ''
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/order'
+        - $ref: '#/components/parameters/orderBy'
+        - $ref: '#/components/parameters/filterBy'
   '/workspaces/{wid}/projects':
     parameters:
       - schema:
@@ -192,6 +266,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Project'
       operationId: get-workspace-project
+      security:
+        - JWT: []
   '/workspaces/{wid}/projects/{pid}/campaigns':
     parameters:
       - schema:
@@ -219,6 +295,9 @@ paths:
                 items:
                   $ref: '#/components/schemas/Campaign'
       operationId: get-workspace-project-campaigns
+      parameters: []
+      security:
+        - JWT: []
 components:
   schemas:
     User:
@@ -255,27 +334,12 @@ components:
           type: integer
         tryber_wp_user_id:
           type: integer
-        picture:
-          type: string
       required:
         - id
         - email
         - role
         - name
         - workspaces
-      examples:
-        - id: 0
-          email: user@example.com
-          role: string
-          name: Pippo Baudo
-          workspaces:
-            - id: 0
-              company: string
-              tokens: 0
-              logo: string
-          profile_id: 0
-          tryber_wp_user_id: 0
-          picture: 'https://www.gravatar.com/avatar/617f61a54df8f1805ba1a3481e960eb7'
     Workspace:
       title: Workspace
       type: object
@@ -316,6 +380,10 @@ components:
           type: number
         campaign_type_id:
           type: integer
+        campaign_type_name:
+          type: string
+        test_type_name:
+          type: string
         project_id:
           type: integer
         project_name:
@@ -331,6 +399,8 @@ components:
         - status_id
         - is_public
         - campaign_type_id
+        - campaign_type_name
+        - test_type_name
         - project_id
         - project_name
     Project:
@@ -461,7 +531,6 @@ components:
     limit:
       name: limit
       in: query
-      required: false
       schema:
         type: integer
       description: Max items to retrieve
@@ -514,6 +583,13 @@ components:
       schema:
         type: string
       description: The value to search for
+    orderBy:
+      name: orderBy
+      in: query
+      required: false
+      schema:
+        type: string
+      description: The field used as reference to order the result
 tags:
   - name: Authentication
   - name: Campaign
