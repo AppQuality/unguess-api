@@ -49,7 +49,8 @@ export default async (
 
     let returnProject = (await getProject(
       projectId,
-      workspaceId
+      workspaceId,
+      user
     )) as StoplightComponents["schemas"]["Project"];
 
     return returnProject;
