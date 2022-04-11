@@ -1,6 +1,7 @@
 /** OPENAPI-ROUTE: get-users-me */
 import { Context } from "openapi-backend";
 import * as db from "../../../../features/db";
+import { getGravatar } from "../../utils";
 
 export default async (
   c: Context,
@@ -74,7 +75,8 @@ const setWorkspaces = (user: UserType, workspaces: Array<object>) => {
   }
 };
 
-const formattedUser = (user: any, profile: any): any => {
+const formattedUser = async (user: any, profile: any): Promise<any> => {
+  const picUrl = await getGravatar(user.email);
   return {
     id: user.id,
     email: user.email,
@@ -83,5 +85,6 @@ const formattedUser = (user: any, profile: any): any => {
     tryber_wp_user_id: user.tryber_wp_user_id,
     name: profile.name + " " + profile.surname,
     workspaces: user.workspaces,
+    ...(picUrl && { picture: picUrl }),
   };
 };

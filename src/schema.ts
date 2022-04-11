@@ -82,6 +82,7 @@ export interface components {
       workspaces: components["schemas"]["Workspace"][];
       profile_id?: number;
       tryber_wp_user_id?: number;
+      picture?: string;
     };
     /** Workspace */
     Workspace: {
@@ -89,6 +90,7 @@ export interface components {
       company: string;
       tokens: number;
       logo?: string;
+      csm: components["schemas"]["User"];
     };
     /** Campaign */
     Campaign: {

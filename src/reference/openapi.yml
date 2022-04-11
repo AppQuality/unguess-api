@@ -185,7 +185,7 @@ paths:
               examples:
                 example-1:
                   value:
-                    campaign:
+                    items:
                       - id: 0
                         start_date: string
                         end_date: string
@@ -200,11 +200,10 @@ paths:
                         test_type_name: string
                         project_id: 0
                         project_name: string
-                    page:
-                      limit: 0
-                      start: 0
-                      size: 0
-                      totalSize: 0
+                    total: 0
+                    start: 0
+                    size: 0
+                    limit: 0
             application/xml:
               schema:
                 type: object
@@ -335,6 +334,8 @@ components:
           type: integer
         tryber_wp_user_id:
           type: integer
+        picture:
+          type: string
       required:
         - id
         - email
@@ -353,10 +354,25 @@ components:
           type: number
         logo:
           type: string
+        csm:
+          oneOf:
+            - $ref: '#/components/schemas/User'
       required:
         - id
         - company
         - tokens
+        - csm
+      x-examples:
+        - id: 0
+          company: string
+          tokens: 0
+          logo: string
+          csm:
+            email: user@example.com
+            role: string
+            name: Teomondo Scrofalo
+            workspaces: []
+            picture: https://pbs.twimg.com/media/Ccp6RXFWIAAQQ2V.jpg
     Campaign:
       title: Campaign
       type: object

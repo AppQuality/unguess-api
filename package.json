@@ -23,6 +23,7 @@
   "dependencies": {
     "@appquality/wp-auth": "^1.0.7",
     "@babel/runtime": "^7.16.7",
+    "axios": "^0.26.1",
     "body-parser": "^1.19.1",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",

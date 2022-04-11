@@ -1,4 +1,23 @@
 import * as db from "@src/features/db";
+import { getGravatar } from "@src/routes/users/utils";
+
+const fallBackCsmProfile = {
+  id: 20739,
+  name: "Gianluca",
+  surname: "Peretti",
+  email: "gianluca.peretti@unguess.io",
+  role: "admin",
+  workspaces: [],
+};
+
+const loadCsmData = async (
+  csm: StoplightComponents["schemas"]["Workspace"]["csm"]
+) => {
+  let profilePic = await getGravatar(csm.email);
+  if (profilePic) csm.picture = profilePic;
+
+  return csm;
+};
 
 export default async (
   workspaceId: number,
@@ -16,8 +35,9 @@ export default async (
 
     // Check if workspace exists
     const customerSql = db.format(
-      `SELECT c.* 
+      `SELECT c.*, p.name as csmName, p.surname as csmSurname, p.email as csmEmail
       FROM wp_appq_customer c
+        LEFT JOIN wp_appq_evd_profile p ON (p.id = c.pm_id)
       WHERE c.id = ?`,
       [workspaceId]
     );
@@ -43,11 +63,26 @@ export default async (
         }
       }
 
+      //Add CSM info
+
+      let rawCsm = workspace.pm_id
+        ? {
+            id: workspace.pm_id,
+            name: workspace.csmName + " " + workspace.csmSurname,
+            email: workspace.csmEmail,
+            role: "admin",
+            workspaces: [],
+          }
+        : fallBackCsmProfile;
+
+      let csm = await loadCsmData(rawCsm);
+
       return {
         id: workspace.id,
         company: workspace.company,
         logo: workspace.company_logo,
         tokens: workspace.tokens,
+        csm: csm,
       } as StoplightComponents["schemas"]["Workspace"];
     }
 
