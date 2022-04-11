@@ -140,6 +140,32 @@ describe("getProject", () => {
 
   it("Should return a project because is an admin", async () => {
     try {
+      await getProject(2, customer_1.id, admin_user_1);
+    } catch (error) {
+      expect((error as OpenapiError).message).toBe("You have no permission");
+    }
+  });
+
+  it("Should throw 'You have no permission' error on no results for admins", async () => {
+    try {
+      await getProject(9999, customer_1.id, admin_user_1);
+      fail("Should throw error");
+    } catch (error) {
+      expect((error as OpenapiError).message).toBe("No project found");
+    }
+  });
+
+  it("Should throw 'No project found' error on no results for normal customers", async () => {
+    try {
+      await getProject(2, customer_1.id, customer_user_2);
+      fail("Should throw error");
+    } catch (error) {
+      expect((error as OpenapiError).message).toBe("You have no permission");
+    }
+  });
+
+  it("Should return a project because is an admin", async () => {
+    try {
       const proj = await getProject(project_2.id, customer_1.id, admin_user_1);
       expect(JSON.stringify(proj)).toBe(
         JSON.stringify({ id: 2, name: "Projettino dueh", campaigns_count: 0 })
