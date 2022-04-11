@@ -2,6 +2,7 @@
 import { Context } from "openapi-backend";
 import * as db from "../../../../features/db";
 import { getGravatar } from "../../utils";
+import getUserWorkspaces from "@src/routes/workspaces/getUserWorkspaces";
 
 export default async (
   c: Context,
@@ -15,34 +16,8 @@ export default async (
   //Get User Profile (wp_appq_evd_profile)
   let profileData = await getProfile(user.profile_id);
 
-  if (user.role === "customer" && user.tryber_wp_user_id) {
-    // Is customer
-    try {
-      // Get workspaces for current customer
-      const workspacesSql =
-        "SELECT c.* FROM wp_appq_customer c JOIN wp_appq_user_to_customer utc ON (c.id = utc.customer_id) WHERE utc.wp_user_id = ?";
-      let workspaces = await db.query(
-        db.format(workspacesSql, [user.tryber_wp_user_id]),
-        "tryber"
-      );
-
-      setWorkspaces(user, workspaces);
-    } catch (error) {
-      console.log(error);
-      return error as Error;
-    }
-  } else {
-    // Is admin
-    try {
-      // Get all workspaces
-      const workspacesSql = "SELECT * FROM wp_appq_customer c";
-      let workspaces = await db.query(workspacesSql, "tryber");
-      setWorkspaces(user, workspaces);
-    } catch (error) {
-      console.log(error);
-      return error as Error;
-    }
-  }
+  let workspaces = await getUserWorkspaces(user);
+  setWorkspaces(user, workspaces);
 
   return formattedUser(user, profileData);
 };
@@ -70,6 +45,7 @@ const setWorkspaces = (user: UserType, workspaces: Array<object>) => {
         company: workspace.company,
         logo: workspace.company_logo || "",
         tokens: workspace.tokens,
+        csm: workspace.csm,
       });
     });
   }
