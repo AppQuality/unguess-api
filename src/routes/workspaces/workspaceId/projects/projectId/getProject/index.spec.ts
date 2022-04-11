@@ -140,9 +140,12 @@ describe("getProject", () => {
 
   it("Should return a project because is an admin", async () => {
     try {
-      await getProject(2, customer_1.id, admin_user_1);
-    } catch (error) {
-      expect((error as OpenapiError).message).toBe("You have no permission");
+      const proj = await getProject(project_2.id, customer_1.id, admin_user_1);
+      expect(JSON.stringify(proj)).toBe(
+        JSON.stringify({ id: 2, name: "Projettino dueh", campaigns_count: 0 })
+      );
+    } catch (e) {
+      console.log(e);
     }
   });
 
