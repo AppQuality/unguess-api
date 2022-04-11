@@ -9,14 +9,14 @@ on:
 
 jobs:
 
-  # This check needs to be in place to prevent a publish loop with auto and github actions
-  if: "contains(github.event.head_commit.message, 'ci build') || contains(github.event.head_commit.message, 'build ci') || contains(github.ref_name, 'master') || contains(github.ref_name, 'develop')"
-    
-
   push-to-ecr:
     name: Push Image
     runs-on: ubuntu-latest
     environment: production
+
+    # This check needs to be in place to prevent a publish loop with auto and github actions
+    if: "contains(github.event.head_commit.message, 'ci build') || contains(github.event.head_commit.message, 'build ci') || contains(github.ref_name, 'master') || contains(github.ref_name, 'develop')"
+    
 
     steps:
       - name: Checkout
