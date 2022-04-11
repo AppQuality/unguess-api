@@ -367,10 +367,24 @@ components:
           type: number
         logo:
           type: string
+        csm:
+          oneOf:
+            - $ref: '#/components/schemas/User'
       required:
         - id
         - company
         - tokens
+      examples:
+        - id: 0
+          company: string
+          tokens: 0
+          logo: string
+          csm:
+            email: user@example.com
+            role: string
+            name: string
+            workspaces: []
+            picture: string
     Campaign:
       title: Campaign
       type: object
