@@ -4,6 +4,33 @@ import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
 
+const admin_user_1 = {
+  id: 3,
+  user_login: "admin@unguess.io",
+  user_pass: "password",
+  email: "admin@unguess.io",
+  role: "administrator",
+  workspaces: {},
+};
+
+const customer_user_1 = {
+  id: 1,
+  user_login: "customer1@unguess.io",
+  user_pass: "password",
+  email: "customer1@unguess.io",
+  role: "customer",
+  workspaces: {},
+};
+
+const customer_user_2 = {
+  id: 2,
+  user_login: "customer1@unguess.io",
+  user_pass: "password",
+  email: "customer1@unguess.io",
+  role: "customer",
+  workspaces: {},
+};
+
 const customer_1 = {
   id: 1,
   company: "Company",
@@ -14,6 +41,11 @@ const customer_1 = {
 const user_to_customer_1 = {
   wp_user_id: 1,
   customer_id: 1,
+};
+
+const user_to_customer_2 = {
+  wp_user_id: 1,
+  customer_id: 2,
 };
 
 const project_1 = {
@@ -64,7 +96,7 @@ describe("getProject", () => {
           campaigns: [campaign_1],
           projects: [project_1, project_2],
           userToProjects: [user_to_project_1, user_to_project_2],
-          userToCustomers: [user_to_customer_1],
+          userToCustomers: [user_to_customer_1, user_to_customer_2],
         });
       } catch (error) {
         console.log(error);
@@ -90,16 +122,42 @@ describe("getProject", () => {
 
   it("Should have projectId and workspaceId valid parameters", async () => {
     try {
-      await getProject(0, 0);
+      await getProject(0, 0, customer_user_1);
       fail("Should throw error");
     } catch (error) {
       expect((error as OpenapiError).message).toBe("Bad request");
     }
   });
 
-  it("Should throw 'No project found' error on no results", async () => {
+  it("Should throw 'You have no permission' error on no results", async () => {
     try {
-      await getProject(9999, customer_1.id);
+      await getProject(2, customer_1.id, customer_user_2);
+      fail("Should throw error");
+    } catch (error) {
+      expect((error as OpenapiError).message).toBe("You have no permission");
+    }
+  });
+
+  it("Should return a project because is an admin", async () => {
+    try {
+      await getProject(2, customer_1.id, admin_user_1);
+    } catch (error) {
+      expect((error as OpenapiError).message).toBe("You have no permission");
+    }
+  });
+
+  it("Should throw 'No project found' error on no results for admins", async () => {
+    try {
+      await getProject(9999, customer_1.id, admin_user_1);
+      fail("Should throw error");
+    } catch (error) {
+      expect((error as OpenapiError).message).toBe("No project found");
+    }
+  });
+
+  it("Should throw 'No project found' error on no results for normal customers", async () => {
+    try {
+      await getProject(9999, customer_1.id, customer_user_1);
       fail("Should throw error");
     } catch (error) {
       expect((error as OpenapiError).message).toBe("No project found");
@@ -108,7 +166,11 @@ describe("getProject", () => {
 
   it("Should return a project", async () => {
     try {
-      let project = await getProject(project_1.id, customer_1.id);
+      let project = await getProject(
+        project_1.id,
+        customer_1.id,
+        customer_user_1
+      );
       expect(JSON.stringify(project)).toBe(
         JSON.stringify({
           id: project_1.id,

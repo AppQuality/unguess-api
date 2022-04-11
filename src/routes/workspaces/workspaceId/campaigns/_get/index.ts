@@ -161,8 +161,8 @@ export default async (
     const campaigns = await db.query(db.format(query, [userProjectsID]));
 
     const countQuery = `SELECT COUNT(*) FROM wp_appq_evd_campaign c WHERE c.customer_id = ?`;
-    let totalSize = await db.query(db.format(countQuery, [customer_id]));
-    totalSize = totalSize.map((el: any) => el["COUNT(*)"])[0];
+    let total = await db.query(db.format(countQuery, [customer_id]));
+    total = total.map((el: any) => el["COUNT(*)"])[0];
 
     if (!campaigns.length)
       return {
@@ -199,7 +199,7 @@ export default async (
       limit,
       start,
       size: stoplightCampaign.length,
-      total: totalSize,
+      total,
     };
   } catch (e) {
     const message = (e as OpenapiError).message;
