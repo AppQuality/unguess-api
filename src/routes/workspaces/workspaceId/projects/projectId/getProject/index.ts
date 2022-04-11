@@ -1,8 +1,10 @@
 import * as db from "@src/features/db";
+import getUserProjects from "@src/routes/workspaces/workspaceId/getUserProjects";
 
 export default async (
   projectId: number,
-  workspaceId: number
+  workspaceId: number,
+  user: UserType
 ): Promise<StoplightComponents["schemas"]["Project"]> => {
   try {
     // Check parameters
@@ -24,6 +26,11 @@ export default async (
 
     if (project.length) {
       project = project[0];
+
+      const userProjects = await getUserProjects(workspaceId, user);
+      if (!userProjects.length) {
+        throw Error("You have no permission");
+      }
 
       // Get campaigns count
       const campaignsSql =
