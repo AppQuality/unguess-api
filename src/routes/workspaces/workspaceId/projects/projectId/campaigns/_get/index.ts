@@ -50,7 +50,8 @@ export default async (
 
     let project = (await getProject(
       projectId,
-      workspaceId
+      workspaceId,
+      user
     )) as StoplightComponents["schemas"]["Project"];
 
     // Get project campaigns
