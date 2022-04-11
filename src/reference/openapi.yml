@@ -342,19 +342,6 @@ components:
         - role
         - name
         - workspaces
-      examples:
-        - id: 0
-          email: user@example.com
-          role: string
-          name: string
-          workspaces:
-            - id: 0
-              company: string
-              tokens: 0
-              logo: string
-          profile_id: 0
-          tryber_wp_user_id: 0
-          picture: string
     Workspace:
       title: Workspace
       type: object
