@@ -92,11 +92,38 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Workspace'
+                description: ''
+                type: object
+                x-examples:
+                  example-1:
+                    items: []
+                    total: 0
+                    size: 0
+                    start: 0
+                    limit: 0
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Workspace'
+                  total:
+                    type: integer
+                  size:
+                    type: integer
+                  start:
+                    type: integer
+                  limit:
+                    type: integer
+                required:
+                  - items
+                  - total
+                  - size
+                  - start
+                  - limit
       operationId: get-workspaces
-      parameters: []
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
       security:
         - JWT: []
   '/workspaces/{wid}':
