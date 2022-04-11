@@ -20,7 +20,7 @@ jobs:
       - name: Extract branch name
         shell: bash
         run: |
-          BRANCH=$(echo ${GITHUB_REF#refs/heads/})
+          BRANCH=$(echo ${{ github.event.client_payload.branch }})
           if [ "$BRANCH" = "master" ]; then
               TAG="latest"
           else
