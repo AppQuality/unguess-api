@@ -151,17 +151,17 @@ export default async (
         p.display_name 
       FROM wp_appq_evd_campaign c 
       JOIN wp_appq_project p ON c.project_id = p.id 
-      JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id 
-      WHERE p.id IN (?)
+      LEFT JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id 
+      WHERE p.id IN (${userProjectsID})
       ${AND}
       ${order && orderBy ? `ORDER BY ${orderBy} ${order}` : ``}
       ${limit && (start || start === 0) ? `LIMIT ${limit} OFFSET ${start}` : ``}
     `;
 
-    const campaigns = await db.query(db.format(query, [userProjectsID]));
+    const campaigns = await db.query(query);
 
-    const countQuery = `SELECT COUNT(*) FROM wp_appq_evd_campaign c WHERE c.customer_id = ?`;
-    let totalSize = await db.query(db.format(countQuery, [customer_id]));
+    const countQuery = `SELECT COUNT(*) FROM wp_appq_evd_campaign c JOIN wp_appq_project p ON c.project_id = p.id WHERE p.id IN (${userProjectsID})`;
+    let totalSize = await db.query(countQuery);
     totalSize = totalSize.map((el: any) => el["COUNT(*)"])[0];
 
     if (!campaigns.length)
@@ -185,9 +185,13 @@ export default async (
         status_id: campaign.status_id,
         is_public: campaign.is_public,
         campaign_type_id: campaign.campaign_type_id,
-        campaign_type_name: campaign.campaign_type_name,
+        campaign_type_name: campaign.campaign_type_name
+          ? campaign.campaign_type_name
+          : "Crowd Test",
         test_type_name:
-          campaign.test_type_id === 1 ? "Experiential" : "Functional",
+          campaign.test_type_id && campaign.test_type_id === 1
+            ? "Experiential"
+            : "Functional",
         project_id: campaign.project_id,
         customer_id: campaign.customer_id,
         project_name: campaign.display_name,

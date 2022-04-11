@@ -9,6 +9,7 @@ export const table = {
       "company varchar(64)",
       "company_logo varchar(300)",
       "tokens int(11)",
+      "pm_id int(11) DEFAULT NULL",
     ]);
   },
   drop: async () => {
