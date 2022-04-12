@@ -3,7 +3,10 @@ import { Context } from "openapi-backend";
 import * as db from "../../../../../features/db";
 import getWorkspace from "@src/routes/workspaces/workspaceId/getWorkspace";
 import getUserProjects from "../../getUserProjects";
-import paginateItems, { formatCount } from "@src/paginateItems";
+import paginateItems, {
+  formatCount,
+  formatPagination,
+} from "@src/paginateItems";
 
 export default async (
   c: Context,
@@ -27,6 +30,13 @@ export default async (
 
     let limit = c.request.query.limit || 10;
     let start = c.request.query.start || 0;
+
+    const { formattedLimit, formattedStart } = await formatPagination(
+      limit,
+      start
+    );
+    limit = formattedLimit;
+    start = formattedStart;
 
     let order;
     if (typeof c.request.query.order === "string")
@@ -178,8 +188,7 @@ export default async (
     if (message === "No workspace found") {
       res.status_code = 404;
       return message;
-    }
-    res.status_code = 500;
+    } else if (message === "") res.status_code = 500;
     throw e;
   }
 };

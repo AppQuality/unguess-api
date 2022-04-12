@@ -1,6 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
+import paginateItems from "@src/paginateItems";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
@@ -66,12 +67,40 @@ describe("GET /workspaces", () => {
       .get("/workspaces")
       .set("authorization", "Bearer customer");
     expect(response.body).toMatchObject(
-      Array({
-        id: customer_1.id,
-        company: customer_1.company,
-        logo: customer_1.company_logo,
-        tokens: customer_1.tokens,
+      paginateItems({
+        items: [
+          {
+            id: customer_1.id,
+            company: customer_1.company,
+            logo: customer_1.company_logo,
+            tokens: customer_1.tokens,
+          },
+        ],
+        start: 0,
+        limit: 10,
+        total: 1,
       })
     );
+  });
+
+  it("Should return 400 status because not valid limit", async () => {
+    const response = await request(app)
+      .get("/workspaces?limit=banana")
+      .set("authorization", "Bearer customer");
+    expect(response.statusCode).toBe(400);
+  });
+
+  it("Should return 400 status because not valid start", async () => {
+    const response = await request(app)
+      .get("/workspaces?start=banana")
+      .set("authorization", "Bearer customer");
+    expect(response.statusCode).toBe(400);
+  });
+
+  it("Should return 400 status because not valid start and limit", async () => {
+    const response = await request(app)
+      .get("/workspaces?start=-1&limit=-1")
+      .set("authorization", "Bearer customer");
+    expect(response.statusCode).toBe(400);
   });
 });

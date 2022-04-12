@@ -18,6 +18,18 @@ type Pagination = {
 export default async (data: Pagination) => {
   let { items, limit, start, total } = data;
 
+  return items.length
+    ? {
+        items,
+        start,
+        limit,
+        size: items.length,
+        total,
+      }
+    : getEmptyPage();
+};
+
+export const formatPagination = async (limit: any, start: any) => {
   if (typeof limit === "string") {
     limit = parseInt(limit) as StoplightComponents["parameters"]["limit"];
   }
@@ -29,16 +41,7 @@ export default async (data: Pagination) => {
   if (start < 0 || limit < 0) {
     throw Error("Bad request, pagination data is not valid");
   }
-
-  return items.length
-    ? {
-        items,
-        start,
-        limit,
-        size: items.length,
-        total,
-      }
-    : getEmptyPage();
+  return { formattedLimit: limit, formattedStart: start };
 };
 
 export const formatCount = (count: any[]) => {

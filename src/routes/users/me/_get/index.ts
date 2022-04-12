@@ -16,8 +16,8 @@ export default async (
   //Get User Profile (wp_appq_evd_profile)
   let profileData = await getProfile(user.profile_id);
 
-  let workspaces = await getUserWorkspaces(user);
-  setWorkspaces(user, workspaces);
+  let userWorkspaces = await getUserWorkspaces(user, 1, 1); //TODO FIX REAL PAGINANTION
+  setWorkspaces(user, userWorkspaces.workspaces);
 
   return formattedUser(user, profileData);
 };
