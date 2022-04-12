@@ -19,11 +19,11 @@ export default async (data: Pagination) => {
   let { items, limit, start, total } = data;
 
   if (typeof limit === "string") {
-    limit = parseInt(limit);
+    limit = parseInt(limit) as StoplightComponents["parameters"]["limit"];
   }
 
   if (typeof start === "string") {
-    start = parseInt(start);
+    start = parseInt(start) as StoplightComponents["parameters"]["start"];
   }
 
   if (start < 0 || limit < 0) {
