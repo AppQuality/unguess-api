@@ -13,13 +13,60 @@ export interface paths {
     /** A request to login with your username and password */
     post: operations["post-authenticate"];
   };
-  "/projects": {
-    /** Get all projects that you can view. A project is a collection of campaigns linked with your account. */
-    get: operations["get-projects"];
-  };
   "/users/me": {
-    /** Get current logged user's info */
     get: operations["get-users-me"];
+  };
+  "/workspaces": {
+    get: operations["get-workspaces"];
+  };
+  "/workspaces/{wid}": {
+    get: operations["get-workspace"];
+    parameters: {
+      path: {
+        /** Workspace (company) id */
+        wid: number;
+      };
+    };
+  };
+  "/workspaces/{wid}/campaigns": {
+    get: operations["get-workspace-campaigns"];
+    parameters: {
+      path: {
+        /** Workspace (company) id */
+        wid: number;
+      };
+    };
+  };
+  "/workspaces/{wid}/projects": {
+    get: operations["get-workspace-projects"];
+    parameters: {
+      path: {
+        /** Workspace (company) id */
+        wid: number;
+      };
+    };
+  };
+  "/workspaces/{wid}/projects/{pid}": {
+    get: operations["get-workspace-project"];
+    parameters: {
+      path: {
+        /** Workspace (company) id */
+        wid: number;
+        /** Project id */
+        pid: number;
+      };
+    };
+  };
+  "/workspaces/{wid}/projects/{pid}/campaigns": {
+    get: operations["get-workspace-project-campaigns"];
+    parameters: {
+      path: {
+        /** Workspace (company) id */
+        wid: number;
+        /** Project id */
+        pid: number;
+      };
+    };
   };
 }
 
@@ -27,30 +74,49 @@ export interface components {
   schemas: {
     /** User */
     User: {
-      username?: string;
-      name?: string;
-      surname?: string;
+      id: number;
       /** Format: email */
-      email?: string;
-      /** Format: uri */
-      image?: string;
-      id?: number;
-      wp_user_id?: number;
-      role?: string;
-      is_verified?: boolean;
+      email: string;
+      role: string;
+      name: string;
+      workspaces: components["schemas"]["Workspace"][];
+      profile_id?: number;
+      tryber_wp_user_id?: number;
+      picture?: string;
+    };
+    /** Workspace */
+    Workspace: {
+      id: number;
+      company: string;
+      tokens: number;
+      logo?: string;
+      csm: components["schemas"]["User"];
+    };
+    /** Campaign */
+    Campaign: {
+      id: number;
+      start_date: string;
+      end_date: string;
+      close_date: string;
+      title: string;
+      customer_title: string;
+      description: string;
+      status_id: number;
+      is_public: number;
+      campaign_type_id: number;
+      campaign_type_name: string;
+      test_type_name: string;
+      project_id: number;
+      project_name: string;
     };
     /** Project */
     Project: {
-      name?: string;
+      id: number;
+      name: string;
+      campaigns_count: number;
     };
   };
   responses: {
-    /** A user */
-    UserData: {
-      content: {
-        "application/json": components["schemas"]["User"];
-      };
-    };
     /** Authentication data. The token can be used to authenticate the protected requests */
     Authentication: {
       content: {
@@ -113,6 +179,8 @@ export interface components {
     searchBy: string;
     /** @description The value to search for */
     search: string;
+    /** @description The field used as reference to order the result */
+    orderBy: string;
   };
 }
 
@@ -151,49 +219,129 @@ export interface operations {
       };
     };
   };
-  /** Get all projects that you can view. A project is a collection of campaigns linked with your account. */
-  "get-projects": {
-    parameters: {
-      query: {
-        /** A generic query parameter */
-        "my-parameter"?: number;
-      };
-    };
+  "get-users-me": {
     responses: {
-      /** A list of projects */
       200: {
         content: {
-          "application/json": {
-            items?: {
-              id?: number;
-              name?: string;
-              description?: string;
-            }[];
-          };
+          "application/json": components["schemas"]["User"];
         };
       };
       403: components["responses"]["NotAuthorized"];
       404: components["responses"]["NotFound"];
     };
   };
-  /** Get current logged user's info */
-  "get-users-me": {
+  "get-workspaces": {
     parameters: {};
     responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Workspace"][];
+        };
+      };
+    };
+  };
+  "get-workspace": {
+    parameters: {
+      path: {
+        /** Workspace (company) id */
+        wid: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Workspace"];
+        };
+      };
+    };
+  };
+  "get-workspace-campaigns": {
+    parameters: {
+      path: {
+        /** Workspace (company) id */
+        wid: number;
+      };
+      query: {
+        /** Max items to retrieve */
+        limit?: components["parameters"]["limit"];
+        /** Items to skip for pagination */
+        start?: components["parameters"]["start"];
+        /** How to order values (ASC, DESC) */
+        order?: components["parameters"]["order"];
+        /** The field used as reference to order the result */
+        orderBy?: components["parameters"]["orderBy"];
+        /** Key-value Array for item filtering */
+        filterBy?: components["parameters"]["filterBy"];
+      };
+    };
+    responses: {
+      /** OK */
       200: {
         content: {
           "application/json": {
-            id: number;
-            email: string;
-            role: string;
-            name: string;
-            tryber_wp_user_id?: number;
-            profile_id?: number;
+            items: components["schemas"]["Campaign"][];
+            total: number;
+            start: number;
+            size: number;
+            limit: number;
           };
+          "application/xml": { [key: string]: unknown };
         };
       };
-      403: components["responses"]["NotAuthorized"];
-      404: components["responses"]["NotFound"];
+    };
+  };
+  "get-workspace-projects": {
+    parameters: {
+      path: {
+        /** Workspace (company) id */
+        wid: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Project"][];
+        };
+      };
+    };
+  };
+  "get-workspace-project": {
+    parameters: {
+      path: {
+        /** Workspace (company) id */
+        wid: number;
+        /** Project id */
+        pid: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Project"];
+        };
+      };
+    };
+  };
+  "get-workspace-project-campaigns": {
+    parameters: {
+      path: {
+        /** Workspace (company) id */
+        wid: number;
+        /** Project id */
+        pid: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Campaign"][];
+        };
+      };
     };
   };
 }

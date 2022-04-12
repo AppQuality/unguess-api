@@ -1,0 +1,25 @@
+name: Run tests
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop, master ]
+
+jobs:
+  build:
+
+    # This check needs to be in place to prevent a publish loop with auto and github actions
+    if: "contains(github.event.head_commit.message, 'ci build') || contains(github.event.head_commit.message, 'build ci') || contains(github.ref_name, 'master') || contains(github.ref_name, 'develop')"
+  
+
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js 16.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16.x
+        cache: 'npm'
+    - run: npm ci
+    - run: npm test

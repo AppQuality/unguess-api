@@ -1,6 +1,8 @@
 /** OPENAPI-ROUTE: get-users-me */
 import { Context } from "openapi-backend";
 import * as db from "../../../../features/db";
+import { getGravatar } from "../../utils";
+import getUserWorkspaces from "@src/routes/workspaces/getUserWorkspaces";
 
 export default async (
   c: Context,
@@ -11,72 +13,54 @@ export default async (
 
   res.status_code = 200;
 
-  if (user.profile_id && user.tryber_wp_user_id) {
-    // Is customer
+  //Get User Profile (wp_appq_evd_profile)
+  let profileData = await getProfile(user.profile_id);
 
-    try {
-      // Get customer name
-      const profileSql = "SELECT * FROM wp_appq_evd_profile WHERE id = ?";
-      let profile = await db.query(
-        db.format(profileSql, [user.profile_id]),
-        "tryber"
-      );
+  let workspaces = await getUserWorkspaces(user);
+  setWorkspaces(user, workspaces);
 
-      profile = profile[0];
+  return formattedUser(user, profileData);
+};
 
-      // Get workspaces for current customer
-      const workspacesSql =
-        "SELECT * FROM wp_appq_customer c JOIN wp_appq_user_to_customer utc ON (c.id = utc.customer_id) WHERE utc.wp_user_id = ?";
-      let workspaces = await db.query(
-        db.format(workspacesSql, [user.tryber_wp_user_id]),
-        "tryber"
-      );
+const getProfile = async (profile_id: number | undefined): Promise<any> => {
+  const emptyProfile = { name: "name", surname: "surname" };
 
-      let workspaces_data: any = [];
-      workspaces.forEach((workspace: any) => {
-        let workspace_data: any = {};
-        workspace_data.id = workspace.id;
-        workspace_data.company = workspace.company;
-        workspace_data.logo = workspace.company_logo;
-        workspace_data.tokens = workspace.tokens;
-        workspaces_data.push(workspace_data);
-      });
+  if (profile_id) {
+    const profileSql = "SELECT * FROM wp_appq_evd_profile WHERE id = ?";
+    let profile = await db.query(db.format(profileSql, [profile_id]), "tryber");
 
-      return {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-        profile_id: user.profile_id,
-        tryber_wp_user_id: user.tryber_wp_user_id,
-        name: profile.name + " " + profile.surname,
-        workspaces: workspaces_data,
-      };
-    } catch (error) {
-      console.error(error);
-    }
-  } else {
-    // Is admin
-
-    // Get all workspaces
-    const workspacesSql = "SELECT * FROM wp_appq_customer c";
-    let workspaces = await db.query(workspacesSql, "tryber");
-
-    let workspaces_data: any = [];
-    workspaces.forEach((workspace: any) => {
-      let workspace_data: any = {};
-      workspace_data.id = workspace.id;
-      workspace_data.company = workspace.company;
-      workspace_data.logo = workspace.company_logo;
-      workspace_data.tokens = workspace.tokens;
-      workspaces_data.push(workspace_data);
-    });
-
-    return {
-      id: user.id,
-      email: user.email,
-      role: user.role,
-      name: "Name Surname",
-      workspaces: workspaces_data,
-    };
+    return profile ? profile[0] : emptyProfile;
   }
+
+  return emptyProfile;
+};
+
+const setWorkspaces = (user: UserType, workspaces: Array<object>) => {
+  user.workspaces = [];
+
+  if (workspaces.length) {
+    workspaces.forEach((workspace: any) => {
+      user.workspaces.push({
+        id: workspace.id,
+        company: workspace.company,
+        logo: workspace.company_logo || "",
+        tokens: workspace.tokens,
+        csm: workspace.csm,
+      });
+    });
+  }
+};
+
+const formattedUser = async (user: any, profile: any): Promise<any> => {
+  const picUrl = await getGravatar(user.email);
+  return {
+    id: user.id,
+    email: user.email,
+    role: user.role,
+    profile_id: user.profile_id,
+    tryber_wp_user_id: user.tryber_wp_user_id,
+    name: profile.name + " " + profile.surname,
+    workspaces: user.workspaces,
+    ...(picUrl && { picture: picUrl }),
+  };
 };

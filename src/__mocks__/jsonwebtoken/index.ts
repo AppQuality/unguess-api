@@ -1,20 +1,29 @@
+import profiles from "../database/seed/profiles.json";
+
 export default {
   verify: (token: string, secret: string) => {
     if (token === "customer") {
       return {
-        id: 1,
-        email: "customer@unguess.io",
+        ...profiles[0],
         role: "customer",
-        tryber_wp_user_id: 1,
-        profile_id: 1,
+        tryber_wp_user_id: profiles[0].wp_user_id,
+        profile_id: profiles[0].id,
       };
     }
 
     if (token === "administrator") {
       return {
-        id: 2,
-        email: "admin@unguess.io",
+        ...profiles[1],
         role: "administrator",
+      };
+    }
+
+    if (token === "userWithLimitedPermissions") {
+      return {
+        ...profiles[2],
+        role: "customer",
+        tryber_wp_user_id: profiles[2].wp_user_id,
+        profile_id: profiles[2].id,
       };
     }
   },

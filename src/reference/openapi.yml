@@ -82,10 +82,146 @@ paths:
       operationId: get-users-me
       security:
         - JWT: []
+  /workspaces:
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Workspace'
+      operationId: get-workspaces
+      parameters: []
+      security:
+        - JWT: []
+  '/workspaces/{wid}':
+    parameters:
+      - schema:
+          type: integer
+        name: wid
+        in: path
+        required: true
+        description: Workspace (company) id
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workspace'
+      operationId: get-workspace
+      parameters: []
+      security:
+        - JWT: []
   '/workspaces/{wid}/campaigns':
     parameters:
       - schema:
-          type: string
+          type: integer
+        name: wid
+        in: path
+        required: true
+        description: Workspace (company) id
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                x-examples:
+                  example-1:
+                    campaigns:
+                      - id: 0
+                        start_date: string
+                        end_date: string
+                        close_date: string
+                        title: string
+                        customer_title: string
+                        description: string
+                        status_id: 0
+                        is_public: 0
+                        campaign_type_id: 0
+                        campaign_type_name: string
+                        test_type_name: string
+                        project_id: 0
+                        project_name: string
+                    page:
+                      limit: 0
+                      start: 0
+                      size: 0
+                      totalSize: 0
+                properties:
+                  items:
+                    type: array
+                    uniqueItems: false
+                    items:
+                      $ref: '#/components/schemas/Campaign'
+                  total:
+                    type: integer
+                  start:
+                    type: integer
+                  size:
+                    type: integer
+                  limit:
+                    type: integer
+                required:
+                  - items
+                  - total
+                  - start
+                  - size
+                  - limit
+              examples:
+                example-1:
+                  value:
+                    items:
+                      - id: 0
+                        start_date: string
+                        end_date: string
+                        close_date: string
+                        title: string
+                        customer_title: string
+                        description: string
+                        status_id: 0
+                        is_public: 0
+                        campaign_type_id: 0
+                        campaign_type_name: string
+                        test_type_name: string
+                        project_id: 0
+                        project_name: string
+                    total: 0
+                    start: 0
+                    size: 0
+                    limit: 0
+            application/xml:
+              schema:
+                type: object
+                properties: {}
+      operationId: get-workspace-campaigns
+      security:
+        - JWT: []
+      description: ''
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/order'
+        - $ref: '#/components/parameters/orderBy'
+        - $ref: '#/components/parameters/filterBy'
+  '/workspaces/{wid}/projects':
+    parameters:
+      - schema:
+          type: integer
         name: wid
         in: path
         required: true
@@ -101,8 +237,65 @@ paths:
               schema:
                 type: array
                 items:
+                  $ref: '#/components/schemas/Project'
+      operationId: get-workspace-projects
+      security:
+        - JWT: []
+  '/workspaces/{wid}/projects/{pid}':
+    parameters:
+      - schema:
+          type: integer
+        name: wid
+        in: path
+        required: true
+        description: Workspace (company) id
+      - schema:
+          type: integer
+        name: pid
+        in: path
+        required: true
+        description: Project id
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+      operationId: get-workspace-project
+      security:
+        - JWT: []
+  '/workspaces/{wid}/projects/{pid}/campaigns':
+    parameters:
+      - schema:
+          type: integer
+        name: wid
+        in: path
+        required: true
+        description: Workspace (company) id
+      - schema:
+          type: integer
+        name: pid
+        in: path
+        required: true
+        description: Project id
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
                   $ref: '#/components/schemas/Campaign'
-      operationId: get-workspace-campaigns
+      operationId: get-workspace-project-campaigns
+      parameters: []
       security:
         - JWT: []
 components:
@@ -141,6 +334,8 @@ components:
           type: integer
         tryber_wp_user_id:
           type: integer
+        picture:
+          type: string
       required:
         - id
         - email
@@ -155,15 +350,29 @@ components:
           type: integer
         company:
           type: string
-        logo:
-          type: string
         tokens:
           type: number
+        logo:
+          type: string
+        csm:
+          oneOf:
+            - $ref: '#/components/schemas/User'
       required:
         - id
         - company
-        - logo
         - tokens
+        - csm
+      x-examples:
+        - id: 0
+          company: string
+          tokens: 0
+          logo: string
+          csm:
+            email: user@example.com
+            role: string
+            name: Teomondo Scrofalo
+            workspaces: []
+            picture: https://pbs.twimg.com/media/Ccp6RXFWIAAQQ2V.jpg
     Campaign:
       title: Campaign
       type: object
@@ -178,34 +387,59 @@ components:
           type: string
         title:
           type: string
+        customer_title:
+          type: string
         description:
           type: string
         status_id:
           type: number
         is_public:
-          type: integer
+          type: number
         campaign_type_id:
           type: integer
+        campaign_type_name:
+          type: string
+        test_type_name:
+          type: string
         project_id:
           type: integer
-        customer_title:
+        project_name:
           type: string
+      required:
+        - id
+        - start_date
+        - end_date
+        - close_date
+        - title
+        - customer_title
+        - description
+        - status_id
+        - is_public
+        - campaign_type_id
+        - campaign_type_name
+        - test_type_name
+        - project_id
+        - project_name
+    Project:
+      title: Project
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        campaigns_count:
+          type: integer
+      required:
+        - id
+        - name
+        - campaigns_count
   securitySchemes:
     JWT:
       type: http
       scheme: bearer
       description: ''
   responses:
-    UserData:
-      description: A user
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/User'
-          examples:
-            example:
-              value:
-                username: Elon71
     Authentication:
       description: Authentication data. The token can be used to authenticate the protected requests
       content:
@@ -314,7 +548,6 @@ components:
     limit:
       name: limit
       in: query
-      required: false
       schema:
         type: integer
       description: Max items to retrieve
@@ -367,6 +600,13 @@ components:
       schema:
         type: string
       description: The value to search for
+    orderBy:
+      name: orderBy
+      in: query
+      required: false
+      schema:
+        type: string
+      description: The field used as reference to order the result
 tags:
   - name: Authentication
   - name: Campaign

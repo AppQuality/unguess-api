@@ -25,7 +25,7 @@ export default async (c: Context, req: Request, res: OpenapiResponse) => {
 
   if (!checked) {
     res.status_code = 401;
-    return "Password " + password + " not matching " + userData.user_login;
+    return "Password: " + password + " not matching " + userData.user_login;
   }
 
   const data = await authenticate(userData);
@@ -44,7 +44,7 @@ export default async (c: Context, req: Request, res: OpenapiResponse) => {
   };
 
   const token = jwt.sign(user, config.jwt.secret, {
-    expiresIn: process.env.JWT_EXPIRATION, // token expires in 15 minutes
+    expiresIn: process.env.JWT_EXPIRATION || "15m", // token expires in 15 minutes
   });
   const tokenData = jwt.decode(token);
   if (tokenData === null || typeof tokenData === "string") {
