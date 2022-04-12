@@ -29,8 +29,10 @@ export default async (
       throw Error("Bad request");
     }
 
-    if (user.id == null || user.id <= 0) {
-      throw Error("Bad request");
+    if (user.role !== "administrator") {
+      if (user.id == null || user.id <= 0) {
+        throw Error("Bad request");
+      }
     }
 
     // Check if workspace exists
