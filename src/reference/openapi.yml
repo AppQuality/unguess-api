@@ -262,9 +262,34 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Project'
+                description: ''
+                type: object
+                x-examples:
+                  example-1:
+                    items: []
+                    total: 0
+                    size: 0
+                    start: 0
+                    limit: 0
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Project'
+                  total:
+                    type: integer
+                  size:
+                    type: integer
+                  start:
+                    type: integer
+                  limit:
+                    type: integer
+                required:
+                  - items
+                  - total
+                  - size
+                  - start
+                  - limit
       operationId: get-workspace-projects
       security:
         - JWT: []
@@ -399,7 +424,7 @@ components:
             role: string
             name: Teomondo Scrofalo
             workspaces: []
-            picture: https://pbs.twimg.com/media/Ccp6RXFWIAAQQ2V.jpg
+            picture: 'https://pbs.twimg.com/media/Ccp6RXFWIAAQQ2V.jpg'
     Campaign:
       title: Campaign
       type: object
