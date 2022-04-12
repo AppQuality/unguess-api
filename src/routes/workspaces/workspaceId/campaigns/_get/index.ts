@@ -3,7 +3,7 @@ import { Context } from "openapi-backend";
 import * as db from "../../../../../features/db";
 import getWorkspace from "@src/routes/workspaces/workspaceId/getWorkspace";
 import getUserProjects from "../../getUserProjects";
-import paginateItems from "@src/paginateItems";
+import paginateItems, { formatCount } from "@src/paginateItems";
 
 export default async (
   c: Context,
@@ -139,7 +139,7 @@ export default async (
 
     const countQuery = `SELECT COUNT(*) FROM wp_appq_evd_campaign c JOIN wp_appq_project p ON c.project_id = p.id WHERE p.id IN (${userProjectsID})`;
     let total = await db.query(countQuery);
-    total = total.map((el: any) => el["COUNT(*)"])[0];
+    total = formatCount(total);
 
     if (!campaigns.length) return await paginateItems({ items: [] });
 

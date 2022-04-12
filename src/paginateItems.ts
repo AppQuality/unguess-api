@@ -40,3 +40,7 @@ export default async (data: Pagination) => {
       }
     : getEmptyPage();
 };
+
+export const formatCount = (count: any[]) => {
+  return count.map((el: any) => el["COUNT(*)"])[0];
+};
