@@ -1,7 +1,7 @@
 /** OPENAPI-ROUTE: get-workspaces */
 import { Context } from "openapi-backend";
 import getUserWorkspaces from "../getUserWorkspaces";
-import paginateItems, { formatPagination } from "@src/paginateItems";
+import paginateItems, { formatPaginationParams } from "@src/paginateItems";
 
 export default async (
   c: Context,
@@ -12,7 +12,7 @@ export default async (
     let limit = c.request.query.limit || 10;
     let start = c.request.query.start || 0;
 
-    const { formattedLimit, formattedStart } = await formatPagination(
+    const { formattedLimit, formattedStart } = await formatPaginationParams(
       limit,
       start
     );

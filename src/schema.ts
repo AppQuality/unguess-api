@@ -311,6 +311,12 @@ export interface operations {
         /** Workspace (company) id */
         wid: number;
       };
+      query: {
+        /** Max items to retrieve */
+        limit?: components["parameters"]["limit"];
+        /** Items to skip for pagination */
+        start?: components["parameters"]["start"];
+      };
     };
     responses: {
       /** OK */
@@ -353,12 +359,24 @@ export interface operations {
         /** Project id */
         pid: number;
       };
+      query: {
+        /** Max items to retrieve */
+        limit?: components["parameters"]["limit"];
+        /** Items to skip for pagination */
+        start?: components["parameters"]["start"];
+      };
     };
     responses: {
       /** OK */
       200: {
         content: {
-          "application/json": components["schemas"]["Campaign"][];
+          "application/json": {
+            items: components["schemas"]["Campaign"][];
+            total: number;
+            size: number;
+            start: number;
+            limit: number;
+          };
         };
       };
     };

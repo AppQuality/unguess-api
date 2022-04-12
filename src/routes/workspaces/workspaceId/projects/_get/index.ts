@@ -4,7 +4,7 @@ import * as db from "../../../../../features/db";
 import getWorkspace from "../../getWorkspace/";
 import paginateItems, {
   formatCount,
-  formatPagination,
+  formatPaginationParams,
 } from "@src/paginateItems";
 
 export default async (
@@ -20,13 +20,17 @@ export default async (
   let start = c.request.query.start || 0;
   let total;
 
-  const { formattedLimit, formattedStart } = await formatPagination(
-    limit,
-    start
-  );
-
-  limit = formattedLimit;
-  start = formattedStart;
+  try {
+    const { formattedLimit, formattedStart } = await formatPaginationParams(
+      limit,
+      start
+    );
+    limit = formattedLimit;
+    start = formattedStart;
+  } catch (e) {
+    res.status_code = 400;
+    return (e as OpenapiError).message;
+  }
 
   // Get wid path parameter
   let workspaceId;

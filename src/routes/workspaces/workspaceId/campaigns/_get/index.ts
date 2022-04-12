@@ -5,7 +5,7 @@ import getWorkspace from "@src/routes/workspaces/workspaceId/getWorkspace";
 import getUserProjects from "../../getUserProjects";
 import paginateItems, {
   formatCount,
-  formatPagination,
+  formatPaginationParams,
 } from "@src/paginateItems";
 
 export default async (
@@ -31,7 +31,7 @@ export default async (
     let limit = c.request.query.limit || 10;
     let start = c.request.query.start || 0;
 
-    const { formattedLimit, formattedStart } = await formatPagination(
+    const { formattedLimit, formattedStart } = await formatPaginationParams(
       limit,
       start
     );

@@ -204,9 +204,9 @@ describe("GET /workspaces/{wid}/projects/{pid}/campaigns", () => {
       .get(`/workspaces/${customer_1.id}/projects/${project_1.id}/campaigns`)
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
-    expect(Array.isArray(response.body)).toBe(true);
-    expect(response.body.length).toBeGreaterThan(0);
-    response.body.forEach((project: Object) => {
+    expect(Array.isArray(response.body.items)).toBe(true);
+    expect(response.body.items.length).toBeGreaterThan(0);
+    response.body.items.forEach((project: Object) => {
       expect(project).toHaveProperty("id");
       expect(project).toHaveProperty("start_date");
       expect(project).toHaveProperty("end_date");
@@ -220,5 +220,41 @@ describe("GET /workspaces/{wid}/projects/{pid}/campaigns", () => {
       expect(project).toHaveProperty("project_id");
       expect(project).toHaveProperty("project_name");
     });
+  });
+
+  it("Should return 400 status if limit is string", async () => {
+    const response = await request(app)
+      .get(
+        `/workspaces/${customer_1.id}/projects/${project_1.id}/campaigns?start=banana&limit=1`
+      )
+      .set("authorization", "Bearer customer");
+    expect(response.statusCode).toBe(400);
+  });
+
+  it("Should return 400 status if start is string", async () => {
+    const response = await request(app)
+      .get(
+        `/workspaces/${customer_1.id}/projects/${project_1.id}/campaigns?start=1&limit=banana`
+      )
+      .set("authorization", "Bearer customer");
+    expect(response.statusCode).toBe(400);
+  });
+
+  it("Should return 400 status if start is negative", async () => {
+    const response = await request(app)
+      .get(
+        `/workspaces/${customer_1.id}/projects/${project_1.id}/campaigns?start=-1&limit=10`
+      )
+      .set("authorization", "Bearer customer");
+    expect(response.statusCode).toBe(400);
+  });
+
+  it("Should return 400 status if start is negative", async () => {
+    const response = await request(app)
+      .get(
+        `/workspaces/${customer_1.id}/projects/${project_1.id}/campaigns?start=-1&limit=10`
+      )
+      .set("authorization", "Bearer customer");
+    expect(response.statusCode).toBe(400);
   });
 });

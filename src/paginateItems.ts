@@ -29,7 +29,7 @@ export default async (data: Pagination) => {
     : getEmptyPage();
 };
 
-export const formatPagination = async (limit: any, start: any) => {
+export const formatPaginationParams = async (limit: any, start: any) => {
   if (typeof limit === "string") {
     limit = parseInt(limit) as StoplightComponents["parameters"]["limit"];
   }
