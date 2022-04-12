@@ -231,12 +231,25 @@ export interface operations {
     };
   };
   "get-workspaces": {
-    parameters: {};
+    parameters: {
+      query: {
+        /** Max items to retrieve */
+        limit?: components["parameters"]["limit"];
+        /** Items to skip for pagination */
+        start?: components["parameters"]["start"];
+      };
+    };
     responses: {
       /** OK */
       200: {
         content: {
-          "application/json": components["schemas"]["Workspace"][];
+          "application/json": {
+            items: components["schemas"]["Workspace"][];
+            total: number;
+            size: number;
+            start: number;
+            limit: number;
+          };
         };
       };
     };
@@ -303,7 +316,13 @@ export interface operations {
       /** OK */
       200: {
         content: {
-          "application/json": components["schemas"]["Project"][];
+          "application/json": {
+            items: components["schemas"]["Project"][];
+            total: number;
+            size: number;
+            start: number;
+            limit: number;
+          };
         };
       };
     };

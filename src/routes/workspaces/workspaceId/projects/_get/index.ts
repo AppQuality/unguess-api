@@ -2,6 +2,10 @@
 import { Context } from "openapi-backend";
 import * as db from "../../../../../features/db";
 import getWorkspace from "../../getWorkspace/";
+import paginateItems, {
+  formatCount,
+  formatPagination,
+} from "@src/paginateItems";
 
 export default async (
   c: Context,
@@ -11,6 +15,18 @@ export default async (
   let user = req.user;
 
   res.status_code = 200;
+
+  let limit = c.request.query.limit || 10;
+  let start = c.request.query.start || 0;
+  let total;
+
+  const { formattedLimit, formattedStart } = await formatPagination(
+    limit,
+    start
+  );
+
+  limit = formattedLimit;
+  start = formattedStart;
 
   // Get wid path parameter
   let workspaceId;
@@ -59,9 +75,11 @@ export default async (
     display_name: string;
   }> = [];
   try {
-    const projectSql =
-      "SELECT id, display_name FROM wp_appq_project WHERE customer_id = ? ORDER BY id";
+    const projectSql = `SELECT id, display_name FROM wp_appq_project WHERE customer_id = ? ORDER BY id LIMIT ${limit} OFFSET ${start}`;
     projects = await db.query(db.format(projectSql, [workspaceId]));
+    const countQuery = `SELECT COUNT(*) FROM wp_appq_project WHERE customer_id = ?`;
+    total = await db.query(db.format(countQuery, [workspaceId]));
+    total = await formatCount(total);
   } catch (error) {
     res.status_code = 500;
     throw error;
@@ -126,5 +144,5 @@ export default async (
     }
   }
 
-  return returnProjects;
+  return paginateItems({ items: returnProjects, start, limit, total });
 };
