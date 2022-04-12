@@ -19,6 +19,7 @@ const customer_user_1 = {
   user_pass: "password",
   email: "customer1@unguess.io",
   role: "customer",
+  tryber_wp_user_id: 1,
   workspaces: {},
 };
 
@@ -150,6 +151,14 @@ describe("getWorkspace", () => {
         company: customer_1.company,
         logo: customer_1.company_logo,
         tokens: customer_1.tokens,
+        csm: {
+          id: 20739,
+          name: "Gianluca",
+          surname: "Peretti",
+          email: "gianluca.peretti@unguess.io",
+          role: "admin",
+          workspaces: [],
+        },
       })
     );
   });
