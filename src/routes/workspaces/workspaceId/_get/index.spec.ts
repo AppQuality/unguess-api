@@ -108,6 +108,14 @@ describe("GET /workspaces/{wid}", () => {
         company: customer_1.company,
         logo: customer_1.company_logo,
         tokens: customer_1.tokens,
+        csm: {
+          id: 20739,
+          name: "Gianluca",
+          surname: "Peretti",
+          email: "gianluca.peretti@unguess.io",
+          role: "admin",
+          workspaces: [],
+        },
       })
     );
   });
