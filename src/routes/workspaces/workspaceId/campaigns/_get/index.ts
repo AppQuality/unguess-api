@@ -6,7 +6,7 @@ import getUserProjects from "../../getUserProjects";
 import paginateItems, {
   formatCount,
   formatPaginationParams,
-} from "@src/paginateItems";
+} from "@src/routes/workspaces/paginateItems";
 
 export default async (
   c: Context,

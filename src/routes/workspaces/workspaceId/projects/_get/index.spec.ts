@@ -1,7 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import paginateItems from "@src/paginateItems";
+import paginateItems from "@src/routes/workspaces/paginateItems";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");

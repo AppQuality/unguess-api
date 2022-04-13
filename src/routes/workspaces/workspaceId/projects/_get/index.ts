@@ -5,7 +5,7 @@ import getWorkspace from "../../getWorkspace/";
 import paginateItems, {
   formatCount,
   formatPaginationParams,
-} from "@src/paginateItems";
+} from "@src/routes/workspaces/paginateItems";
 
 export default async (
   c: Context,

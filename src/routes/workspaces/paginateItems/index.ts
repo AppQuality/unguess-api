@@ -1,10 +1,10 @@
 const getEmptyPage = () => {
   return {
     items: [],
-    total: 0,
-    limit: 0,
     start: 0,
+    limit: 0,
     size: 0,
+    total: 0,
   };
 };
 
@@ -17,6 +17,8 @@ type Pagination = {
 
 export default async (data: Pagination) => {
   let { items, limit, start, total } = data;
+
+  if (total < 0) throw Error("Bad request, pagination data is not valid");
 
   return items.length
     ? {
@@ -44,6 +46,6 @@ export const formatPaginationParams = async (limit: any, start: any) => {
   return { formattedLimit: limit, formattedStart: start };
 };
 
-export const formatCount = (count: any[]) => {
-  return count.map((el: any) => el["COUNT(*)"])[0];
+export const formatCount = (count: any[]): number => {
+  return parseInt(count.map((el: any) => el["COUNT(*)"])[0]);
 };

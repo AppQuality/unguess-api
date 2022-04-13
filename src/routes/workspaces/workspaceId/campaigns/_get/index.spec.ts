@@ -1,7 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import paginateItems from "@src/paginateItems";
+import paginateItems from "@src/routes/workspaces/paginateItems";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
@@ -419,7 +419,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       .get("/workspaces/1/campaigns?filterBy[title]=banana")
       .set("authorization", "Bearer customer");
     expect(JSON.stringify(response.body)).toStrictEqual(
-      JSON.stringify({ items: [], total: 0, limit: 0, start: 0, size: 0 })
+      JSON.stringify({ items: [], start: 0, limit: 0, size: 0, total: 0 })
     );
   });
 

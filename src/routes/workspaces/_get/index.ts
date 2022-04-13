@@ -1,7 +1,9 @@
 /** OPENAPI-ROUTE: get-workspaces */
 import { Context } from "openapi-backend";
 import getUserWorkspaces from "../getUserWorkspaces";
-import paginateItems, { formatPaginationParams } from "@src/paginateItems";
+import paginateItems, {
+  formatPaginationParams,
+} from "@src/routes/workspaces/paginateItems";
 
 export default async (
   c: Context,
