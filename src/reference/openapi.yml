@@ -399,25 +399,26 @@ components:
         - id
         - name
         - campaigns_count
+    Error:
+      title: Error
+      type: object
+      properties:
+        message:
+          type: string
+        code:
+          type: number
   securitySchemes:
     JWT:
       type: http
       scheme: bearer
       description: ''
   responses:
-    NotAuthorized:
-      description: An error due to insufficient authorization to access the resource
+    Error:
+      description: Example response
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              message:
-                type: string
-          examples:
-            example:
-              value:
-                message: Not Authorized.
+            $ref: '#/components/schemas/Error'
   parameters:
     wid:
       name: wid
