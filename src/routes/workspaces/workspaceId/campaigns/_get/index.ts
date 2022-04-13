@@ -185,10 +185,8 @@ export default async (
     });
   } catch (e) {
     const message = (e as OpenapiError).message;
-    if (message === "No workspace found") {
-      res.status_code = 404;
-      return message;
-    } else if (message === "") res.status_code = 500;
-    throw e;
+    if (message === "No workspace found") res.status_code = 404;
+    else res.status_code = 500;
+    return message;
   }
 };

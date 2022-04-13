@@ -1,7 +1,6 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import paginateItems from "@src/routes/workspaces/paginateItems";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
@@ -162,31 +161,10 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
   });
-  //
+
   it("Should return 400 if the request parameter has a bad format", async () => {
     const response = await request(app)
       .get("/workspaces/banana/campaigns")
-      .set("authorization", "Bearer customer");
-    expect(response.status).toBe(400);
-  });
-
-  it("Should return 400 if the query parameter limit is not integer", async () => {
-    const response = await request(app)
-      .get("/workspaces/1/campaigns?limit=banana")
-      .set("authorization", "Bearer customer");
-    expect(response.status).toBe(400);
-  });
-
-  it("Should return 400 if the query parameter start is not integer", async () => {
-    const response = await request(app)
-      .get("/workspaces/1/campaigns?limit=10&start=banana")
-      .set("authorization", "Bearer customer");
-    expect(response.status).toBe(400);
-  });
-
-  it("Should return 400 if the query parameters start and limit are not integer", async () => {
-    const response = await request(app)
-      .get("/workspaces/1/campaigns?limit=banana&start=banana")
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(400);
   });
@@ -216,83 +194,86 @@ describe("GET /workspaces/{wid}/campaigns", () => {
     const response = await request(app)
       .get("/workspaces/1/campaigns")
       .set("authorization", "Bearer customer");
-    const expectedResult = await paginateItems({
-      items: [
-        {
-          id: campaign_1.id,
-          start_date: campaign_1.start_date,
-          end_date: campaign_1.end_date,
-          close_date: campaign_1.close_date,
-          title: campaign_1.title,
-          customer_title: campaign_1.customer_title,
-          description: campaign_1.description,
-          status_id: campaign_1.status_id,
-          is_public: campaign_1.is_public,
-          campaign_type_id: campaign_type_1.id,
-          campaign_type_name: campaign_type_1.name,
-          test_type_name:
-            campaign_type_1.type === 1 ? "Experiential" : "Functional",
-          project_id: campaign_1.project_id,
-          customer_id: campaign_1.customer_id,
-          project_name: project_1.display_name,
-        },
-      ],
-      limit: 10,
-      start: 0,
-      total: 1,
-    });
-    expect(JSON.stringify(response.body)).toBe(JSON.stringify(expectedResult));
+    expect(JSON.stringify(response.body)).toBe(
+      JSON.stringify({
+        items: [
+          {
+            id: campaign_1.id,
+            start_date: campaign_1.start_date,
+            end_date: campaign_1.end_date,
+            close_date: campaign_1.close_date,
+            title: campaign_1.title,
+            customer_title: campaign_1.customer_title,
+            description: campaign_1.description,
+            status_id: campaign_1.status_id,
+            is_public: campaign_1.is_public,
+            campaign_type_id: campaign_type_1.id,
+            campaign_type_name: campaign_type_1.name,
+            test_type_name:
+              campaign_type_1.type === 1 ? "Experiential" : "Functional",
+            project_id: campaign_1.project_id,
+            customer_id: campaign_1.customer_id,
+            project_name: project_1.display_name,
+          },
+        ],
+        start: 0,
+        limit: 10,
+        size: 1,
+        total: 1,
+      })
+    );
   });
 
   it("Should return an array of campaigns with 2 elements because no limit or start are in the request", async () => {
     const response = await request(app)
       .get("/workspaces/2/campaigns")
       .set("authorization", "Bearer customer");
-    const expectedResult = await paginateItems({
-      items: [
-        {
-          id: campaign_2.id,
-          start_date: campaign_2.start_date,
-          end_date: campaign_2.end_date,
-          close_date: campaign_2.close_date,
-          title: campaign_2.title,
-          customer_title: campaign_2.customer_title,
-          description: campaign_2.description,
-          status_id: campaign_2.status_id,
-          is_public: campaign_2.is_public,
-          campaign_type_id: campaign_type_1.id,
-          campaign_type_name: campaign_type_1.name,
-          test_type_name:
-            campaign_type_1.type === 1 ? "Experiential" : "Functional",
-          project_id: campaign_2.project_id,
-          customer_id: campaign_2.customer_id,
-          project_name: project_1.display_name,
-        },
-        {
-          id: campaign_3.id,
-          start_date: campaign_3.start_date,
-          end_date: campaign_3.end_date,
-          close_date: campaign_3.close_date,
-          title: campaign_3.title,
-          customer_title: campaign_3.customer_title,
-          description: campaign_3.description,
-          status_id: campaign_3.status_id,
-          is_public: campaign_3.is_public,
-          campaign_type_id: campaign_type_2.id,
-          campaign_type_name: campaign_type_2.name,
-          test_type_name:
-            campaign_type_1.type === 1 ? "Experiential" : "Functional",
-          project_id: campaign_3.project_id,
-          customer_id: campaign_3.customer_id,
-          project_name: project_1.display_name,
-        },
-      ],
-      limit: 10,
-      start: 0,
-      total: 2,
-    });
+    expect(Array.isArray(response.body.items)).toBeTruthy();
     expect(JSON.stringify(response.body)).toStrictEqual(
-      JSON.stringify(expectedResult)
+      JSON.stringify({
+        items: [
+          {
+            id: campaign_2.id,
+            start_date: campaign_2.start_date,
+            end_date: campaign_2.end_date,
+            close_date: campaign_2.close_date,
+            title: campaign_2.title,
+            customer_title: campaign_2.customer_title,
+            description: campaign_2.description,
+            status_id: campaign_2.status_id,
+            is_public: campaign_2.is_public,
+            campaign_type_id: campaign_type_1.id,
+            campaign_type_name: campaign_type_1.name,
+            test_type_name:
+              campaign_type_1.type === 1 ? "Experiential" : "Functional",
+            project_id: campaign_2.project_id,
+            customer_id: campaign_2.customer_id,
+            project_name: project_1.display_name,
+          },
+          {
+            id: campaign_3.id,
+            start_date: campaign_3.start_date,
+            end_date: campaign_3.end_date,
+            close_date: campaign_3.close_date,
+            title: campaign_3.title,
+            customer_title: campaign_3.customer_title,
+            description: campaign_3.description,
+            status_id: campaign_3.status_id,
+            is_public: campaign_3.is_public,
+            campaign_type_id: campaign_type_2.id,
+            campaign_type_name: campaign_type_2.name,
+            test_type_name:
+              campaign_type_1.type === 1 ? "Experiential" : "Functional",
+            project_id: campaign_3.project_id,
+            customer_id: campaign_3.customer_id,
+            project_name: project_1.display_name,
+          },
+        ],
+        start: 0,
+        limit: 10,
+        size: 2,
+        total: 2,
+      })
     );
   });
 
@@ -335,51 +316,52 @@ describe("GET /workspaces/{wid}/campaigns", () => {
     const response = await request(app)
       .get("/workspaces/2/campaigns?order=DESC&orderBy=start_date")
       .set("authorization", "Bearer customer");
-    const expectedResult = await paginateItems({
-      items: [
-        {
-          id: campaign_3.id,
-          start_date: campaign_3.start_date,
-          end_date: campaign_3.end_date,
-          close_date: campaign_3.close_date,
-          title: campaign_3.title,
-          customer_title: campaign_3.customer_title,
-          description: campaign_3.description,
-          status_id: campaign_3.status_id,
-          is_public: campaign_3.is_public,
-          campaign_type_id: campaign_type_2.id,
-          campaign_type_name: campaign_type_2.name,
-          test_type_name:
-            campaign_type_1.type === 1 ? "Experiential" : "Functional",
-          project_id: campaign_3.project_id,
-          customer_id: campaign_3.customer_id,
-          project_name: project_1.display_name,
-        },
-        {
-          id: campaign_2.id,
-          start_date: campaign_2.start_date,
-          end_date: campaign_2.end_date,
-          close_date: campaign_2.close_date,
-          title: campaign_2.title,
-          customer_title: campaign_2.customer_title,
-          description: campaign_2.description,
-          status_id: campaign_2.status_id,
-          is_public: campaign_2.is_public,
-          campaign_type_id: campaign_type_1.id,
-          campaign_type_name: campaign_type_1.name,
-          test_type_name:
-            campaign_type_1.type === 1 ? "Experiential" : "Functional",
-          project_id: campaign_2.project_id,
-          customer_id: campaign_2.customer_id,
-          project_name: project_1.display_name,
-        },
-      ],
-      limit: 10,
-      start: 0,
-      total: 2,
-    });
+    expect(Array.isArray(response.body.items)).toBeTruthy();
     expect(JSON.stringify(response.body)).toStrictEqual(
-      JSON.stringify(expectedResult)
+      JSON.stringify({
+        items: [
+          {
+            id: campaign_3.id,
+            start_date: campaign_3.start_date,
+            end_date: campaign_3.end_date,
+            close_date: campaign_3.close_date,
+            title: campaign_3.title,
+            customer_title: campaign_3.customer_title,
+            description: campaign_3.description,
+            status_id: campaign_3.status_id,
+            is_public: campaign_3.is_public,
+            campaign_type_id: campaign_type_2.id,
+            campaign_type_name: campaign_type_2.name,
+            test_type_name:
+              campaign_type_1.type === 1 ? "Experiential" : "Functional",
+            project_id: campaign_3.project_id,
+            customer_id: campaign_3.customer_id,
+            project_name: project_1.display_name,
+          },
+          {
+            id: campaign_2.id,
+            start_date: campaign_2.start_date,
+            end_date: campaign_2.end_date,
+            close_date: campaign_2.close_date,
+            title: campaign_2.title,
+            customer_title: campaign_2.customer_title,
+            description: campaign_2.description,
+            status_id: campaign_2.status_id,
+            is_public: campaign_2.is_public,
+            campaign_type_id: campaign_type_1.id,
+            campaign_type_name: campaign_type_1.name,
+            test_type_name:
+              campaign_type_1.type === 1 ? "Experiential" : "Functional",
+            project_id: campaign_2.project_id,
+            customer_id: campaign_2.customer_id,
+            project_name: project_1.display_name,
+          },
+        ],
+        start: 0,
+        limit: 10,
+        size: 2,
+        total: 2,
+      })
     );
   });
 
