@@ -3,6 +3,10 @@ import { Context } from "openapi-backend";
 import * as db from "../../../../../features/db";
 import getWorkspace from "@src/routes/workspaces/workspaceId/getWorkspace";
 import getUserProjects from "../../getUserProjects";
+import paginateItems, {
+  formatCount,
+  formatPaginationParams,
+} from "@src/routes/workspaces/paginateItems";
 
 export default async (
   c: Context,
@@ -24,26 +28,15 @@ export default async (
       return "Customer not valid";
     }
 
-    let limit = 10;
-    if (typeof c.request.query.limit === "string")
-      limit =
-        (parseInt(
-          c.request.query.limit
-        ) as StoplightOperations["get-workspace-campaigns"]["parameters"]["query"]["limit"]) ||
-        10;
+    let limit = c.request.query.limit || 10;
+    let start = c.request.query.start || 0;
 
-    let start = 0;
-    if (typeof c.request.query.start === "string")
-      start =
-        (parseInt(
-          c.request.query.start
-        ) as StoplightOperations["get-workspace-campaigns"]["parameters"]["query"]["start"]) ||
-        0;
-
-    if (start < 0 || limit < 0) {
-      res.status_code = 400;
-      return "Bad request, pagination data is not valid";
-    }
+    const { formattedLimit, formattedStart } = await formatPaginationParams(
+      limit,
+      start
+    );
+    limit = formattedLimit;
+    start = formattedStart;
 
     let order;
     if (typeof c.request.query.order === "string")
@@ -121,13 +114,7 @@ export default async (
     let userProjects = await getUserProjects(customer_id, user);
 
     if (!userProjects.length) {
-      return {
-        items: [],
-        total: 0,
-        limit: 0,
-        start: 0,
-        size: 0,
-      };
+      return await paginateItems({ items: [] });
     }
 
     // Return all the user projects ids
@@ -161,17 +148,10 @@ export default async (
     const campaigns = await db.query(query);
 
     const countQuery = `SELECT COUNT(*) FROM wp_appq_evd_campaign c JOIN wp_appq_project p ON c.project_id = p.id WHERE p.id IN (${userProjectsID})`;
-    let totalSize = await db.query(countQuery);
-    totalSize = totalSize.map((el: any) => el["COUNT(*)"])[0];
+    let total = await db.query(countQuery);
+    total = formatCount(total);
 
-    if (!campaigns.length)
-      return {
-        items: [],
-        total: 0,
-        limit: 0,
-        start: 0,
-        size: 0,
-      };
+    if (!campaigns.length) return await paginateItems({ items: [] });
 
     let stoplightCampaign = campaigns.map((campaign: any) => {
       return {
@@ -197,21 +177,16 @@ export default async (
         project_name: campaign.display_name,
       };
     });
-
-    return {
+    return await paginateItems({
       items: stoplightCampaign,
       limit,
       start,
-      size: stoplightCampaign.length,
-      total: totalSize,
-    };
+      total,
+    });
   } catch (e) {
     const message = (e as OpenapiError).message;
-    if (message === "No workspace found") {
-      res.status_code = 404;
-      return message;
-    }
-    res.status_code = 500;
-    throw e;
+    if (message === "No workspace found") res.status_code = 404;
+    else res.status_code = 500;
+    return message;
   }
 };

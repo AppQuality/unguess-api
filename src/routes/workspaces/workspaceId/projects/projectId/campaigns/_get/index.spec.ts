@@ -204,9 +204,9 @@ describe("GET /workspaces/{wid}/projects/{pid}/campaigns", () => {
       .get(`/workspaces/${customer_1.id}/projects/${project_1.id}/campaigns`)
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
-    expect(Array.isArray(response.body)).toBe(true);
-    expect(response.body.length).toBeGreaterThan(0);
-    response.body.forEach((project: Object) => {
+    expect(Array.isArray(response.body.items)).toBe(true);
+    expect(response.body.items.length).toBeGreaterThan(0);
+    response.body.items.forEach((project: Object) => {
       expect(project).toHaveProperty("id");
       expect(project).toHaveProperty("start_date");
       expect(project).toHaveProperty("end_date");
@@ -217,8 +217,58 @@ describe("GET /workspaces/{wid}/projects/{pid}/campaigns", () => {
       expect(project).toHaveProperty("status_id");
       expect(project).toHaveProperty("is_public");
       expect(project).toHaveProperty("campaign_type_id");
+      expect(project).toHaveProperty("campaign_type_name");
       expect(project).toHaveProperty("project_id");
       expect(project).toHaveProperty("project_name");
     });
+  });
+
+  it("Should return a list formatted for pagination", async () => {
+    const response = await request(app)
+      .get(`/workspaces/${customer_1.id}/projects/${project_1.id}/campaigns`)
+      .set("authorization", "Bearer customer");
+
+    expect(JSON.stringify(response.body)).toStrictEqual(
+      JSON.stringify({
+        items: [
+          {
+            id: 1,
+            start_date: "2017-07-19T22:00:00.000Z",
+            end_date: "2017-07-19T22:00:00.000Z",
+            close_date: "2017-07-19T22:00:00.000Z",
+            title: "Campagnetta Funzionale Provetta 1",
+            customer_title: "titolo 1",
+            description: "Descrizione della campagnazione 1",
+            status_id: 1,
+            is_public: 0,
+            campaign_type_id: 1,
+            campaign_type_name: "Functional Bug Finding",
+            project_id: 1,
+            project_name: "Projettino unoh",
+            test_type_name: "Experiential",
+          },
+          {
+            id: 2,
+            start_date: "2017-07-19T22:00:00.000Z",
+            end_date: "2017-07-19T22:00:00.000Z",
+            close_date: "2017-07-19T22:00:00.000Z",
+            title: "Campagnetta Funzionale Provetta 2",
+            customer_title: "titolo 2",
+            description: "Descrizione della campagnazione 2",
+            status_id: 1,
+            is_public: 0,
+            campaign_type_id: 1,
+            campaign_type_name: "Functional Bug Finding",
+            project_id: 1,
+            project_name: "Projettino unoh",
+            test_type_name: "Experiential",
+          },
+        ],
+        start: 0,
+        limit: 10,
+        size: 2,
+        total: 2,
+      })
+    );
   });
 });

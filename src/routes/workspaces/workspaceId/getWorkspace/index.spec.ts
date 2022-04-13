@@ -19,7 +19,6 @@ const customer_user_1 = {
   user_pass: "password",
   email: "customer1@unguess.io",
   role: "customer",
-  tryber_wp_user_id: 1,
   workspaces: {},
 };
 

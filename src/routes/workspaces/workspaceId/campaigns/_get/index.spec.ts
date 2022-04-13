@@ -161,31 +161,10 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
   });
-  //
+
   it("Should return 400 if the request parameter has a bad format", async () => {
     const response = await request(app)
       .get("/workspaces/banana/campaigns")
-      .set("authorization", "Bearer customer");
-    expect(response.status).toBe(400);
-  });
-
-  it("Should return 400 if the query parameter limit is not integer", async () => {
-    const response = await request(app)
-      .get("/workspaces/1/campaigns?limit=banana")
-      .set("authorization", "Bearer customer");
-    expect(response.status).toBe(400);
-  });
-
-  it("Should return 400 if the query parameter start is not integer", async () => {
-    const response = await request(app)
-      .get("/workspaces/1/campaigns?limit=10&start=banana")
-      .set("authorization", "Bearer customer");
-    expect(response.status).toBe(400);
-  });
-
-  it("Should return 400 if the query parameters start and limit are not integer", async () => {
-    const response = await request(app)
-      .get("/workspaces/1/campaigns?limit=banana&start=banana")
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(400);
   });
@@ -237,8 +216,8 @@ describe("GET /workspaces/{wid}/campaigns", () => {
             project_name: project_1.display_name,
           },
         ],
-        limit: 10,
         start: 0,
+        limit: 10,
         size: 1,
         total: 1,
       })
@@ -249,6 +228,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
     const response = await request(app)
       .get("/workspaces/2/campaigns")
       .set("authorization", "Bearer customer");
+    expect(Array.isArray(response.body.items)).toBeTruthy();
     expect(JSON.stringify(response.body)).toStrictEqual(
       JSON.stringify({
         items: [
@@ -289,8 +269,8 @@ describe("GET /workspaces/{wid}/campaigns", () => {
             project_name: project_1.display_name,
           },
         ],
-        limit: 10,
         start: 0,
+        limit: 10,
         size: 2,
         total: 2,
       })
@@ -336,6 +316,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
     const response = await request(app)
       .get("/workspaces/2/campaigns?order=DESC&orderBy=start_date")
       .set("authorization", "Bearer customer");
+    expect(Array.isArray(response.body.items)).toBeTruthy();
     expect(JSON.stringify(response.body)).toStrictEqual(
       JSON.stringify({
         items: [
@@ -376,8 +357,8 @@ describe("GET /workspaces/{wid}/campaigns", () => {
             project_name: project_1.display_name,
           },
         ],
-        limit: 10,
         start: 0,
+        limit: 10,
         size: 2,
         total: 2,
       })
@@ -420,7 +401,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       .get("/workspaces/1/campaigns?filterBy[title]=banana")
       .set("authorization", "Bearer customer");
     expect(JSON.stringify(response.body)).toStrictEqual(
-      JSON.stringify({ items: [], total: 0, limit: 0, start: 0, size: 0 })
+      JSON.stringify({ items: [], start: 0, limit: 0, size: 0, total: 0 })
     );
   });
 

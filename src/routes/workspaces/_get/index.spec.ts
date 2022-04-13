@@ -65,12 +65,28 @@ describe("GET /workspaces", () => {
     const response = await request(app)
       .get("/workspaces")
       .set("authorization", "Bearer customer");
-    expect(response.body).toMatchObject(
-      Array({
-        id: customer_1.id,
-        company: customer_1.company,
-        logo: customer_1.company_logo,
-        tokens: customer_1.tokens,
+    expect(JSON.stringify(response.body)).toStrictEqual(
+      JSON.stringify({
+        items: [
+          {
+            id: customer_1.id,
+            company: customer_1.company,
+            logo: customer_1.company_logo,
+            tokens: customer_1.tokens,
+            csm: {
+              id: 20739,
+              name: "Gianluca",
+              surname: "Peretti",
+              email: "gianluca.peretti@unguess.io",
+              role: "admin",
+              workspaces: [],
+            },
+          },
+        ],
+        start: 0,
+        limit: 10,
+        size: 1,
+        total: 1,
       })
     );
   });
