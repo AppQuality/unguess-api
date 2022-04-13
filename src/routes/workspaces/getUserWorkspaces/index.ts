@@ -19,58 +19,43 @@ export default async (
   workspaces: StoplightComponents["schemas"]["Workspace"][] | [];
   total: number;
 }> => {
-  const baseCustomerSql =
-    "SELECT c.*, p.name as csmName, p.surname as csmSurname, p.email as csmEmail FROM wp_appq_customer c JOIN wp_appq_user_to_customer utc ON (c.id = utc.customer_id) LEFT JOIN wp_appq_evd_profile p ON (p.id = c.pm_id)";
-
   const LIMIT = `LIMIT ${limit} OFFSET ${start}`;
 
-  const countQuery = `SELECT COUNT(*) FROM wp_appq_customer c 
-                       JOIN wp_appq_user_to_customer utc ON (c.id = utc.customer_id) 
-                       LEFT JOIN wp_appq_evd_profile p ON (p.id = c.pm_id)`;
+  let query = `SELECT c.*, p.name as csmName, p.surname as csmSurname, p.email as csmEmail 
+        FROM wp_appq_customer c 
+        JOIN wp_appq_user_to_customer utc ON (c.id = utc.customer_id) 
+        LEFT JOIN wp_appq_evd_profile p ON (p.id = c.pm_id)
+        ${user.role !== "administrator" ? `WHERE utc.wp_user_id = ?` : ``}
+        ${LIMIT}`;
 
-  if (user.role !== "administrator") {
-    if (!user.profile_id || !user.tryber_wp_user_id) {
+  let countQuery = `SELECT COUNT(*) 
+        FROM wp_appq_customer c 
+        JOIN wp_appq_user_to_customer utc ON (c.id = utc.customer_id) 
+        LEFT JOIN wp_appq_evd_profile p ON (p.id = c.pm_id)
+        ${user.role !== "administrator" ? `WHERE utc.wp_user_id = ?` : ``}
+        ${LIMIT}`;
+
+  try {
+    if (
+      user.role !== "administrator" &&
+      (!user.profile_id || !user.tryber_wp_user_id)
+    )
       return { workspaces: [], total: 0 };
-    }
 
-    try {
-      // Get customer name
-      const customerSql = `${baseCustomerSql} WHERE utc.wp_user_id = ? ${LIMIT}`;
-      let customers = await db.query(
-        db.format(customerSql, [user.tryber_wp_user_id]),
-        "tryber"
-      );
-      const customerCountQuery = `${countQuery} WHERE utc.wp_user_id = ? ${LIMIT}`;
-      let total = await db.query(
-        db.format(customerCountQuery, [user.tryber_wp_user_id])
-      );
-      total = formatCount(total);
+    query = db.format(query, [user.tryber_wp_user_id || 0]);
+    countQuery = db.format(countQuery, [user.tryber_wp_user_id || 0]);
+    const result = await db.query(query, "tryber");
+    const countResult = await db.query(countQuery, "tryber");
 
-      if (customers.length) {
-        return { workspaces: await prepareResponse(customers), total };
-      }
+    if (result.length)
+      return {
+        workspaces: await prepareResponse(result),
+        total: formatCount(countResult),
+      };
 
-      return { workspaces: [], total: 0 };
-    } catch (error) {
-      console.error(error);
-      return { workspaces: [], total: 0 };
-    }
-  } else {
-    try {
-      // Get customer name
-      let customers = await db.query(`${baseCustomerSql} ${LIMIT}`, "tryber");
-      let total = await db.query(countQuery);
-      total = formatCount(total);
-
-      if (customers.length) {
-        return { workspaces: await prepareResponse(customers), total };
-      }
-
-      return { workspaces: [], total: 0 };
-    } catch (error) {
-      console.error(error);
-      return { workspaces: [], total: 0 };
-    }
+    return { workspaces: [], total: 0 };
+  } catch (e) {
+    return { workspaces: [], total: 0 };
   }
 };
 
@@ -113,7 +98,7 @@ const prepareResponse = async (
       company: customer.company,
       logo: customer.company_logo || "",
       tokens: customer.tokens,
-      csm: csm,
+      csm,
     });
   }
 
