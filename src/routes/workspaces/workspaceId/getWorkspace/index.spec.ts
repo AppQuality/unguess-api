@@ -10,6 +10,8 @@ const admin_user_1 = {
   user_pass: "password",
   email: "admin@unguess.io",
   role: "administrator",
+  tryber_wp_user_id: 0,
+  profile_id: 0,
   workspaces: {},
 };
 
@@ -19,6 +21,8 @@ const customer_user_1 = {
   user_pass: "password",
   email: "customer1@unguess.io",
   role: "customer",
+  tryber_wp_user_id: 1,
+  profile_id: 1,
   workspaces: {},
 };
 
@@ -28,6 +32,8 @@ const customer_user_2 = {
   user_pass: "password",
   email: "customer2@unguess.io",
   role: "customer",
+  tryber_wp_user_id: 2,
+  profile_id: 2,
   workspaces: {},
 };
 
@@ -156,6 +162,8 @@ describe("getWorkspace", () => {
           surname: "Peretti",
           email: "gianluca.peretti@unguess.io",
           role: "admin",
+          tryber_wp_user_id: 0,
+          profile_id: 0,
           workspaces: [],
         },
       })
