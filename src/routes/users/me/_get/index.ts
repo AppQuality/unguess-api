@@ -37,7 +37,6 @@ const getProfile = async (profile_id: number | undefined): Promise<any> => {
 
 const setWorkspaces = (user: UserType, workspaces: Array<object>) => {
   user.workspaces = [];
-
   if (workspaces.length) {
     workspaces.forEach((workspace: any) => {
       user.workspaces.push({

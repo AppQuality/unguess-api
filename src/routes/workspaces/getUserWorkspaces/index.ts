@@ -8,6 +8,8 @@ const fallBackCsmProfile = {
   surname: "Peretti",
   email: "gianluca.peretti@unguess.io",
   role: "admin",
+  tryber_wp_user_id: 21605,
+  profile_id: 20739,
   workspaces: [],
 };
 
@@ -21,7 +23,7 @@ export default async (
 }> => {
   const LIMIT = `LIMIT ${limit} OFFSET ${start}`;
 
-  let query = `SELECT c.*, p.name as csmName, p.surname as csmSurname, p.email as csmEmail 
+  let query = `SELECT c.*, p.name as csmName, p.surname as csmSurname, p.email as csmEmail, p.id as csmProfileId, p.wp_user_id as csmTryberWpUserId 
         FROM wp_appq_customer c 
         JOIN wp_appq_user_to_customer utc ON (c.id = utc.customer_id) 
         LEFT JOIN wp_appq_evd_profile p ON (p.id = c.pm_id)
@@ -87,6 +89,8 @@ const prepareResponse = async (
           name: customer.csmName + " " + customer.csmSurname,
           email: customer.csmEmail,
           role: "admin",
+          profile_id: customer.csmProfileId,
+          tryber_wp_user_id: customer.csmTryberWpUserId,
           workspaces: [],
         }
       : fallBackCsmProfile;

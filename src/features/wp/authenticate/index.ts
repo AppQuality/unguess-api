@@ -35,6 +35,8 @@ export default async (userData: {
       if (adminInfo) {
         user.id = 0;
         user.email = adminInfo[0].user_email;
+        user.tryber_wp_user_id = 0;
+        user.profile_id = 0;
 
         return user;
       }

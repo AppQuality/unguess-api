@@ -79,6 +79,8 @@ describe("GET /workspaces", () => {
               surname: "Peretti",
               email: "gianluca.peretti@unguess.io",
               role: "admin",
+              tryber_wp_user_id: 0,
+              profile_id: 0,
               workspaces: [],
             },
           },
