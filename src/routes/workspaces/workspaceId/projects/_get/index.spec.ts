@@ -1,7 +1,6 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import paginateItems from "@src/routes/workspaces/paginateItems";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
@@ -187,71 +186,47 @@ describe("GET /workspaces/{wid}/projects", () => {
     const response = await request(app)
       .get(`/workspaces/${customer_1.id}/projects`)
       .set("authorization", "Bearer customer");
-    const expectedResult = paginateItems({
-      items: [
-        {
-          id: project_1.id,
-          name: project_1.display_name,
-          campaigns_count: 2,
-        },
-        {
-          id: project_3.id,
-          name: project_3.display_name,
-          campaigns_count: 1,
-        },
-      ],
-      total: 2,
-      start: 0,
-      limit: 10,
-    });
-    expect(response.body).toMatchObject(expectedResult);
+    expect(JSON.stringify(response.body)).toStrictEqual(
+      JSON.stringify({
+        items: [
+          {
+            id: project_1.id,
+            name: project_1.display_name,
+            campaigns_count: 2,
+          },
+          {
+            id: project_3.id,
+            name: project_3.display_name,
+            campaigns_count: 1,
+          },
+        ],
+        start: 0,
+        limit: 10,
+        size: 2,
+        total: 2,
+      })
+    );
   });
 
-  it("Should return 400 status if limit is string", async () => {
-    const response = await request(app)
-      .get(`/workspaces/${customer_1.id}/projects?start=banana&limit=1`)
-      .set("authorization", "Bearer customer");
-    expect(response.statusCode).toBe(400);
-  });
-
-  it("Should return 400 status if start is string", async () => {
-    const response = await request(app)
-      .get(`/workspaces/${customer_1.id}/projects?start=1&limit=banana`)
-      .set("authorization", "Bearer customer");
-    expect(response.statusCode).toBe(400);
-  });
-
-  it("Should return 400 status if start is negative", async () => {
-    const response = await request(app)
-      .get(`/workspaces/${customer_1.id}/projects?start=-1&limit=10`)
-      .set("authorization", "Bearer customer");
-    expect(response.statusCode).toBe(400);
-  });
-
-  it("Should return 400 status if limit is negative", async () => {
-    const response = await request(app)
-      .get(`/workspaces/${customer_1.id}/projects?limit=-10`)
-      .set("authorization", "Bearer customer");
-    expect(response.statusCode).toBe(400);
-  });
-
-  it("Should answer with only one visible project", async () => {
+  it("Should answer with only one visible project because of limit 1", async () => {
     const response = await request(app)
       .get(`/workspaces/${customer_1.id}/projects?start=0&limit=1`)
       .set("authorization", "Bearer customer");
-    const expectedResult = paginateItems({
-      items: [
-        {
-          id: project_1.id,
-          name: project_1.display_name,
-          campaigns_count: 2,
-        },
-      ],
-      total: 1,
-      start: 0,
-      limit: 1,
-    });
-    expect(response.body).toMatchObject(expectedResult);
+    expect(JSON.stringify(response.body)).toStrictEqual(
+      JSON.stringify({
+        items: [
+          {
+            id: project_1.id,
+            name: project_1.display_name,
+            campaigns_count: 2,
+          },
+        ],
+        start: 0,
+        limit: 1,
+        size: 1,
+        total: 2,
+      })
+    );
   });
 
   it("Should answer 400 if wid is a string", async () => {
@@ -290,24 +265,26 @@ describe("GET /workspaces/{wid}/projects", () => {
       .get(`/workspaces/${customer_1.id}/projects`)
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
-    const expectedResult = paginateItems({
-      items: [
-        {
-          id: project_1.id,
-          name: project_1.display_name,
-          campaigns_count: 2,
-        },
-        {
-          id: project_3.id,
-          name: project_3.display_name,
-          campaigns_count: 1,
-        },
-      ],
-      total: 2,
-      start: 0,
-      limit: 10,
-    });
-    expect(response.body).toMatchObject(expectedResult);
+    expect(JSON.stringify(response.body)).toStrictEqual(
+      JSON.stringify({
+        items: [
+          {
+            id: project_1.id,
+            name: project_1.display_name,
+            campaigns_count: 2,
+          },
+          {
+            id: project_3.id,
+            name: project_3.display_name,
+            campaigns_count: 1,
+          },
+        ],
+        start: 0,
+        limit: 10,
+        size: 2,
+        total: 2,
+      })
+    );
   });
 
   it("Should return only the projects that the user can see with the correct campaigns count", async () => {
@@ -315,23 +292,25 @@ describe("GET /workspaces/{wid}/projects", () => {
       .get(`/workspaces/${customer_1.id}/projects`)
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
-    const expectedResult = paginateItems({
-      items: [
-        {
-          id: project_1.id,
-          name: project_1.display_name,
-          campaigns_count: 2,
-        },
-        {
-          id: project_3.id,
-          name: project_3.display_name,
-          campaigns_count: 1,
-        },
-      ],
-      total: 2,
-      start: 0,
-      limit: 10,
-    });
-    expect(response.body).toMatchObject(expectedResult);
+    expect(JSON.stringify(response.body)).toStrictEqual(
+      JSON.stringify({
+        items: [
+          {
+            id: project_1.id,
+            name: project_1.display_name,
+            campaigns_count: 2,
+          },
+          {
+            id: project_3.id,
+            name: project_3.display_name,
+            campaigns_count: 1,
+          },
+        ],
+        start: 0,
+        limit: 10,
+        size: 2,
+        total: 2,
+      })
+    );
   });
 });

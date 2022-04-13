@@ -217,44 +217,58 @@ describe("GET /workspaces/{wid}/projects/{pid}/campaigns", () => {
       expect(project).toHaveProperty("status_id");
       expect(project).toHaveProperty("is_public");
       expect(project).toHaveProperty("campaign_type_id");
+      expect(project).toHaveProperty("campaign_type_name");
       expect(project).toHaveProperty("project_id");
       expect(project).toHaveProperty("project_name");
     });
   });
 
-  it("Should return 400 status if limit is string", async () => {
+  it("Should return a list formatted for pagination", async () => {
     const response = await request(app)
-      .get(
-        `/workspaces/${customer_1.id}/projects/${project_1.id}/campaigns?start=banana&limit=1`
-      )
+      .get(`/workspaces/${customer_1.id}/projects/${project_1.id}/campaigns`)
       .set("authorization", "Bearer customer");
-    expect(response.statusCode).toBe(400);
-  });
 
-  it("Should return 400 status if start is string", async () => {
-    const response = await request(app)
-      .get(
-        `/workspaces/${customer_1.id}/projects/${project_1.id}/campaigns?start=1&limit=banana`
-      )
-      .set("authorization", "Bearer customer");
-    expect(response.statusCode).toBe(400);
-  });
-
-  it("Should return 400 status if start is negative", async () => {
-    const response = await request(app)
-      .get(
-        `/workspaces/${customer_1.id}/projects/${project_1.id}/campaigns?start=-1&limit=10`
-      )
-      .set("authorization", "Bearer customer");
-    expect(response.statusCode).toBe(400);
-  });
-
-  it("Should return 400 status if start is negative", async () => {
-    const response = await request(app)
-      .get(
-        `/workspaces/${customer_1.id}/projects/${project_1.id}/campaigns?start=-1&limit=10`
-      )
-      .set("authorization", "Bearer customer");
-    expect(response.statusCode).toBe(400);
+    expect(JSON.stringify(response.body)).toStrictEqual(
+      JSON.stringify({
+        items: [
+          {
+            id: 1,
+            start_date: "2017-07-19T22:00:00.000Z",
+            end_date: "2017-07-19T22:00:00.000Z",
+            close_date: "2017-07-19T22:00:00.000Z",
+            title: "Campagnetta Funzionale Provetta 1",
+            customer_title: "titolo 1",
+            description: "Descrizione della campagnazione 1",
+            status_id: 1,
+            is_public: 0,
+            campaign_type_id: 1,
+            campaign_type_name: "Functional Bug Finding",
+            project_id: 1,
+            project_name: "Projettino unoh",
+            test_type_name: "Experiential",
+          },
+          {
+            id: 2,
+            start_date: "2017-07-19T22:00:00.000Z",
+            end_date: "2017-07-19T22:00:00.000Z",
+            close_date: "2017-07-19T22:00:00.000Z",
+            title: "Campagnetta Funzionale Provetta 2",
+            customer_title: "titolo 2",
+            description: "Descrizione della campagnazione 2",
+            status_id: 1,
+            is_public: 0,
+            campaign_type_id: 1,
+            campaign_type_name: "Functional Bug Finding",
+            project_id: 1,
+            project_name: "Projettino unoh",
+            test_type_name: "Experiential",
+          },
+        ],
+        start: 0,
+        limit: 10,
+        size: 2,
+        total: 2,
+      })
+    );
   });
 });

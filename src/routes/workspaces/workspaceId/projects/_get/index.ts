@@ -83,7 +83,7 @@ export default async (
     projects = await db.query(db.format(projectSql, [workspaceId]));
     const countQuery = `SELECT COUNT(*) FROM wp_appq_project WHERE customer_id = ?`;
     total = await db.query(db.format(countQuery, [workspaceId]));
-    total = await formatCount(total);
+    total = formatCount(total);
   } catch (error) {
     res.status_code = 500;
     throw error;
