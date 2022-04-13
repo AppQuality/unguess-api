@@ -101,12 +101,7 @@ paths:
         - JWT: []
   '/workspaces/{wid}':
     parameters:
-      - schema:
-          type: integer
-        name: wid
-        in: path
-        required: true
-        description: Workspace (company) id
+      - $ref: '#/components/parameters/wid'
     get:
       summary: Your GET endpoint
       tags: []
@@ -123,12 +118,7 @@ paths:
         - JWT: []
   '/workspaces/{wid}/campaigns':
     parameters:
-      - schema:
-          type: integer
-        name: wid
-        in: path
-        required: true
-        description: Workspace (company) id
+      - $ref: '#/components/parameters/wid'
     get:
       summary: Your GET endpoint
       tags: []
@@ -220,12 +210,7 @@ paths:
         - $ref: '#/components/parameters/filterBy'
   '/workspaces/{wid}/projects':
     parameters:
-      - schema:
-          type: integer
-        name: wid
-        in: path
-        required: true
-        description: Workspace (company) id
+      - $ref: '#/components/parameters/wid'
     get:
       summary: Your GET endpoint
       tags: []
@@ -243,18 +228,8 @@ paths:
         - JWT: []
   '/workspaces/{wid}/projects/{pid}':
     parameters:
-      - schema:
-          type: integer
-        name: wid
-        in: path
-        required: true
-        description: Workspace (company) id
-      - schema:
-          type: integer
-        name: pid
-        in: path
-        required: true
-        description: Project id
+      - $ref: '#/components/parameters/wid'
+      - $ref: '#/components/parameters/pid'
     get:
       summary: Your GET endpoint
       tags: []
@@ -270,18 +245,8 @@ paths:
         - JWT: []
   '/workspaces/{wid}/projects/{pid}/campaigns':
     parameters:
-      - schema:
-          type: integer
-        name: wid
-        in: path
-        required: true
-        description: Workspace (company) id
-      - schema:
-          type: integer
-        name: pid
-        in: path
-        required: true
-        description: Project id
+      - $ref: '#/components/parameters/wid'
+      - $ref: '#/components/parameters/pid'
     get:
       summary: Your GET endpoint
       tags: []
@@ -372,7 +337,7 @@ components:
             role: string
             name: Teomondo Scrofalo
             workspaces: []
-            picture: https://pbs.twimg.com/media/Ccp6RXFWIAAQQ2V.jpg
+            picture: 'https://pbs.twimg.com/media/Ccp6RXFWIAAQQ2V.jpg'
     Campaign:
       title: Campaign
       type: object
@@ -440,69 +405,6 @@ components:
       scheme: bearer
       description: ''
   responses:
-    Authentication:
-      description: Authentication data. The token can be used to authenticate the protected requests
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              id:
-                type: number
-              firstName:
-                type: string
-              lastName:
-                type: string
-              token:
-                type: string
-              username:
-                type: string
-          examples:
-            example:
-              value:
-                id: 42
-                firstName: Elon
-                lastName: Musk
-                token: my-jwt-token
-                username: Elon71
-    NotFound:
-      description: An error due to the resource not existing
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              element:
-                type: string
-              id:
-                type: integer
-              message:
-                type: string
-            required:
-              - element
-              - id
-              - message
-          examples:
-            example-1:
-              value:
-                element: campaign
-                id: 1
-                message: No campaign with id 1
-    MissingParameters:
-      description: An error due to missing required parameters
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              message:
-                type: string
-            required:
-              - message
-          examples:
-            example:
-              value:
-                message: Missing parameters
     NotAuthorized:
       description: An error due to insufficient authorization to access the resource
       content:
@@ -517,96 +419,41 @@ components:
               value:
                 message: Not Authorized.
   parameters:
-    campaign:
-      name: campaign
+    wid:
+      name: wid
       in: path
       required: true
       schema:
-        type: string
-      description: A campaign id
-    task:
-      name: task
+        type: number
+      description: 'Workspace (company, customer) id'
+    pid:
+      name: pid
       in: path
       required: true
       schema:
-        type: string
-      description: A task id
-    customer:
-      name: customer
-      in: path
-      required: true
-      schema:
-        type: string
-      description: A customer id
-    project:
-      name: project
-      in: path
-      required: true
-      schema:
-        type: string
-      description: A project id
+        type: number
+      description: Project id
     limit:
       name: limit
       in: query
+      required: false
       schema:
-        type: integer
-      description: Max items to retrieve
+        type: number
+      description: Limit pagination parameter
     start:
       name: start
       in: query
       required: false
       schema:
-        type: integer
-      description: Items to skip for pagination
-    filterBy:
-      name: filterBy
-      in: query
-      required: false
-      schema:
-        type: object
-      description: Key-value Array for item filtering
-    order:
-      name: order
+        type: string
+      description: Start pagination parameter
+    size:
+      name: size
       in: query
       required: false
       schema:
         type: string
-        enum:
-          - ASC
-          - DESC
-        default: DESC
-      description: 'How to order values (ASC, DESC)'
-    locale:
-      name: locale
-      in: query
-      required: false
-      schema:
-        type: string
-        enum:
-          - en
-          - it
-        default: en
-      description: How to localize values
-    searchBy:
-      name: searchBy
-      in: query
-      schema:
-        type: string
-      description: A comma separated list of fields which will be searched
-    search:
-      name: search
-      in: query
-      required: false
-      schema:
-        type: string
-      description: The value to search for
-    orderBy:
-      name: orderBy
-      in: query
-      required: false
-      schema:
-        type: string
-      description: The field used as reference to order the result
+      description: Size pagination parameter
 tags:
   - name: Authentication
   - name: Campaign
