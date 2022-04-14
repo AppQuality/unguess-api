@@ -74,9 +74,20 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Workspace'
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Workspace'
+                  start:
+                    type: integer
+                  limit:
+                    type: integer
+                  size:
+                    type: integer
+                  total:
+                    type: integer
         '400':
           $ref: '#/components/responses/Error'
         '403':
@@ -86,7 +97,9 @@ paths:
         '500':
           $ref: '#/components/responses/Error'
       operationId: get-workspaces
-      parameters: []
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
       security:
         - JWT: []
   '/workspaces/{wid}':
