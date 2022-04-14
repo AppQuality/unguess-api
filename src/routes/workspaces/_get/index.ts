@@ -20,7 +20,6 @@ export default async (
     );
     limit = formattedLimit;
     start = formattedStart;
-
     let userWorkspaces = await getUserWorkspaces(req.user, limit, start);
 
     if (userWorkspaces.workspaces.length) {

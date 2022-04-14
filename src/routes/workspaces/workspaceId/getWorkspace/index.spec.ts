@@ -154,8 +154,8 @@ describe("getWorkspace", () => {
       JSON.stringify({
         id: customer_1.id,
         company: customer_1.company,
-        logo: customer_1.company_logo,
         tokens: customer_1.tokens,
+        logo: customer_1.company_logo,
         csm: {
           id: 20739,
           name: "Gianluca",

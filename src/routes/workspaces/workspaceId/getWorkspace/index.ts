@@ -28,7 +28,7 @@ export default async (
   try {
     // Check parameters
     if (workspaceId == null || workspaceId <= 0) {
-      throw Error("Bad request, workspace id not valid");
+      throw Error("Bad request");
     }
 
     if (user.id == null || user.id < 0) {
@@ -37,9 +37,9 @@ export default async (
 
     // Check if workspace exists
     const customerSql = db.format(
-      `SELECT c.*, p.name as csmName, p.surname as csmSurname, p.email as csmEmail
+      `SELECT c.*, p.name as csmName, p.surname as csmSurname, p.email as csmEmail, p.id as csmProfileId, p.wp_user_id as csmTryberWpUserId 
       FROM wp_appq_customer c
-        LEFT JOIN wp_appq_evd_profile p ON (p.id = c.pm_id)
+      LEFT JOIN wp_appq_evd_profile p ON (p.id = c.pm_id)
       WHERE c.id = ?`,
       [workspaceId]
     );
@@ -73,8 +73,8 @@ export default async (
             name: workspace.csmName + " " + workspace.csmSurname,
             email: workspace.csmEmail,
             role: "admin",
-            profile_id: workspace.profile_id,
-            tryber_wp_user_id: workspace.tryber_wp_user_id,
+            profile_id: workspace.csmProfileId,
+            tryber_wp_user_id: workspace.csmTryberWpUserId,
             workspaces: [],
           }
         : fallBackCsmProfile;
@@ -84,8 +84,8 @@ export default async (
       return {
         id: workspace.id,
         company: workspace.company,
-        logo: workspace.company_logo,
         tokens: workspace.tokens,
+        ...(workspace.company_logo && { logo: workspace.company_logo }),
         csm: csm,
       } as StoplightComponents["schemas"]["Workspace"];
     }
