@@ -518,30 +518,6 @@ components:
         - id
         - name
         - campaigns_count
-    Csm:
-      title: Csm
-      type: object
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-        surname:
-          type: string
-        email:
-          type: string
-        role:
-          type: string
-        tryber_wp_user_id:
-          type: integer
-        profile_id:
-          type: integer
-      required:
-        - id
-        - name
-        - surname
-        - email
-        - role
   securitySchemes:
     JWT:
       type: http
