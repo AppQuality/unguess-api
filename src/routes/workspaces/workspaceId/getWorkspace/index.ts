@@ -28,10 +28,10 @@ export default async (
   try {
     // Check parameters
     if (workspaceId == null || workspaceId <= 0) {
-      throw Error("Bad request");
+      throw Error("Bad request, workspace id not valid");
     }
 
-    if (user.id == null || user.id <= 0) {
+    if (user.id == null || user.id < 0) {
       throw Error("Bad request");
     }
 

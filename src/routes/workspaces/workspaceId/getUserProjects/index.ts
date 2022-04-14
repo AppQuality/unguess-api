@@ -10,7 +10,7 @@ export default async (
       throw Error("Bad request");
     }
 
-    if (user.id == null || user.id <= 0) {
+    if (user.id == null || user.id < 0) {
       throw Error("Bad request");
     }
 
