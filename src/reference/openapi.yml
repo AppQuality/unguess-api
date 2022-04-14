@@ -424,26 +424,11 @@ components:
         - role
         - name
         - workspaces
+        - profile_id
+        - tryber_wp_user_id
     Workspace:
       title: Workspace
       type: object
-      properties:
-        id:
-          type: integer
-        company:
-          type: string
-        tokens:
-          type: number
-        logo:
-          type: string
-        csm:
-          oneOf:
-            - $ref: '#/components/schemas/User'
-      required:
-        - id
-        - company
-        - tokens
-        - csm
       x-examples:
         - id: 0
           company: string
@@ -455,6 +440,23 @@ components:
             name: Teomondo Scrofalo
             workspaces: []
             picture: 'https://pbs.twimg.com/media/Ccp6RXFWIAAQQ2V.jpg'
+      properties:
+        id:
+          type: integer
+        company:
+          type: string
+        tokens:
+          type: number
+        logo:
+          type: string
+        csm:
+          oneOf:
+            - $ref: '#/components/schemas/Csm'
+      required:
+        - id
+        - company
+        - tokens
+        - csm
     Campaign:
       title: Campaign
       type: object
@@ -516,6 +518,30 @@ components:
         - id
         - name
         - campaigns_count
+    Csm:
+      title: Csm
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        surname:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+        tryber_wp_user_id:
+          type: integer
+        profile_id:
+          type: integer
+      required:
+        - id
+        - name
+        - surname
+        - email
+        - role
   securitySchemes:
     JWT:
       type: http
