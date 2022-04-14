@@ -183,28 +183,7 @@ paths:
                   - start
                   - size
                   - limit
-              examples:
-                example-1:
-                  value:
-                    items:
-                      - id: 0
-                        start_date: string
-                        end_date: string
-                        close_date: string
-                        title: string
-                        customer_title: string
-                        description: string
-                        status_id: 0
-                        is_public: 0
-                        campaign_type_id: 0
-                        campaign_type_name: string
-                        test_type_name: string
-                        project_id: 0
-                        project_name: string
-                    total: 0
-                    start: 0
-                    size: 0
-                    limit: 0
+              examples: {}
             application/xml:
               schema:
                 type: object
