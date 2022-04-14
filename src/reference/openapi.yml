@@ -424,8 +424,6 @@ components:
         - role
         - name
         - workspaces
-        - profile_id
-        - tryber_wp_user_id
     Workspace:
       title: Workspace
       type: object
