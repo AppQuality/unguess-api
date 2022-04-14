@@ -450,8 +450,7 @@ components:
         logo:
           type: string
         csm:
-          oneOf:
-            - $ref: '#/components/schemas/User'
+          $ref: '#/components/schemas/User'
       required:
         - id
         - company
