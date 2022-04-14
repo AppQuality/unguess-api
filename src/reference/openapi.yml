@@ -443,6 +443,20 @@ components:
       schema:
         type: number
       description: Size pagination parameter
+    order:
+      name: order
+      in: query
+      required: false
+      schema:
+        type: string
+      description: 'Order value (ASC, DESC)'
+    orderBy:
+      name: orderBy
+      in: query
+      required: false
+      schema:
+        type: string
+      description: Order by accepted field
 tags:
   - name: Authentication
   - name: Campaign
