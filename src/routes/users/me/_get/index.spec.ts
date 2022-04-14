@@ -61,7 +61,6 @@ describe("GET /users/me", () => {
     const response = await request(app)
       .get("/users/me")
       .set("authorization", "Bearer administrator");
-    console.log(response.body);
     expect(response.body.role).toBe("administrator");
     expect(response.body.profile_id).toBe(0);
     expect(response.body.tryber_wp_user_id).toBe(0);

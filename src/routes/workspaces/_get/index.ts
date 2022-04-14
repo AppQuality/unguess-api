@@ -42,6 +42,5 @@ export default async (
     )
       res.status_code = 400;
     else res.status_code = 500;
-    console.error(error);
   }
 };
