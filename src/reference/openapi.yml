@@ -33,25 +33,6 @@ paths:
       operationId: post-authenticate
       tags:
         - Authentication
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                password:
-                  type: string
-              required:
-                - username
-                - password
-            examples:
-              example:
-                value:
-                  username: Elon71
-                  password: my-strong-password
-        description: A JSON containing username and password
       parameters: []
       responses:
         '200':
@@ -62,6 +43,8 @@ paths:
                 $ref: '#/components/schemas/User'
         '500':
           $ref: '#/components/responses/Error'
+      requestBody:
+        $ref: '#/components/requestBodies/Credentials'
   /users/me:
     get:
       summary: Get user data
@@ -517,6 +500,21 @@ components:
       schema:
         type: string
       description: Order by accepted field
+  requestBodies:
+    Credentials:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+              password:
+                type: string
+            required:
+              - username
+              - password
+      description: ''
 tags:
   - name: Authentication
   - name: Campaign
