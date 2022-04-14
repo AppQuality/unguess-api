@@ -21,6 +21,8 @@ paths:
               schema:
                 type: object
                 properties: {}
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-root
       description: Get all routes available for this apis
     parameters: []
@@ -58,6 +60,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+        '500':
+          $ref: '#/components/responses/Error'
   /users/me:
     get:
       summary: Get user data
@@ -70,6 +74,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-users-me
       security:
         - JWT: []
@@ -86,6 +94,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Workspace'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-workspaces
       parameters: []
       security:
@@ -197,6 +213,14 @@ paths:
               schema:
                 type: object
                 properties: {}
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-workspace-campaigns
       security:
         - JWT: []
@@ -221,6 +245,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Project'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-workspace-projects
       security:
         - JWT: []
@@ -243,6 +275,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Project'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-workspace-project
       security:
         - JWT: []
@@ -262,6 +302,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Campaign'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-workspace-project-campaigns
       parameters:
         - $ref: '#/components/parameters/limit'
