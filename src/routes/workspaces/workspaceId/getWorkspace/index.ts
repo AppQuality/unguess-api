@@ -7,6 +7,8 @@ const fallBackCsmProfile = {
   surname: "Peretti",
   email: "gianluca.peretti@unguess.io",
   role: "admin",
+  tryber_wp_user_id: 0,
+  profile_id: 0,
   workspaces: [],
 };
 
@@ -51,7 +53,7 @@ export default async (
         // Check if user has permission to get the customer
         const userToCustomerSql = db.format(
           `SELECT * FROM wp_appq_user_to_customer WHERE wp_user_id = ? AND customer_id = ?`,
-          [user.id || 0, workspaceId]
+          [user.tryber_wp_user_id || 0, workspaceId]
         );
 
         let userToCustomer = await db.query(userToCustomerSql);
@@ -71,6 +73,8 @@ export default async (
             name: workspace.csmName + " " + workspace.csmSurname,
             email: workspace.csmEmail,
             role: "admin",
+            profile_id: workspace.profile_id,
+            tryber_wp_user_id: workspace.tryber_wp_user_id,
             workspaces: [],
           }
         : fallBackCsmProfile;

@@ -57,13 +57,14 @@ describe("GET /users/me", () => {
     expect(response.body.profile_id).toBe(1);
   });
 
-  it("Should not return a profile_id if administrator", async () => {
+  it("Should return a profile_id and tryber_wp_user_id = 0 if administrator", async () => {
     const response = await request(app)
       .get("/users/me")
       .set("authorization", "Bearer administrator");
+    console.log(response.body);
     expect(response.body.role).toBe("administrator");
-    expect(response.body).not.toHaveProperty("profile_id");
-    expect(response.body).not.toHaveProperty("tryber_wp_user_id");
+    expect(response.body.profile_id).toBe(0);
+    expect(response.body.tryber_wp_user_id).toBe(0);
   });
 
   it("Should return a customer name if customer", async () => {
