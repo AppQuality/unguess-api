@@ -80,8 +80,8 @@ export interface components {
       role: string;
       name: string;
       workspaces: components["schemas"]["Workspace"][];
-      profile_id: number;
-      tryber_wp_user_id: number;
+      profile_id?: number;
+      tryber_wp_user_id?: number;
       picture?: string;
     };
     /** Workspace */
@@ -195,25 +195,12 @@ export interface operations {
     };
   };
   "get-workspaces": {
-    parameters: {
-      query: {
-        /** Max items to retrieve */
-        limit?: components["parameters"]["limit"];
-        /** Items to skip for pagination */
-        start?: components["parameters"]["start"];
-      };
-    };
+    parameters: {};
     responses: {
       /** OK */
       200: {
         content: {
-          "application/json": {
-            items: components["schemas"]["Workspace"][];
-            total: number;
-            size: number;
-            start: number;
-            limit: number;
-          };
+          "application/json": components["schemas"]["Workspace"][];
         };
       };
       400: components["responses"]["Error"];
@@ -295,24 +282,12 @@ export interface operations {
         /** Order by accepted field */
         orderBy?: components["parameters"]["orderBy"];
       };
-      query: {
-        /** Max items to retrieve */
-        limit?: components["parameters"]["limit"];
-        /** Items to skip for pagination */
-        start?: components["parameters"]["start"];
-      };
     };
     responses: {
       /** OK */
       200: {
         content: {
-          "application/json": {
-            items: components["schemas"]["Project"][];
-            total: number;
-            size: number;
-            start: number;
-            limit: number;
-          };
+          "application/json": components["schemas"]["Project"][];
         };
       };
       400: components["responses"]["Error"];
@@ -361,24 +336,12 @@ export interface operations {
         /** Order by accepted field */
         orderBy?: components["parameters"]["orderBy"];
       };
-      query: {
-        /** Max items to retrieve */
-        limit?: components["parameters"]["limit"];
-        /** Items to skip for pagination */
-        start?: components["parameters"]["start"];
-      };
     };
     responses: {
       /** OK */
       200: {
         content: {
-          "application/json": {
-            items: components["schemas"]["Campaign"][];
-            total: number;
-            size: number;
-            start: number;
-            limit: number;
-          };
+          "application/json": components["schemas"]["Campaign"][];
         };
       };
       400: components["responses"]["Error"];
