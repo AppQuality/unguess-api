@@ -103,6 +103,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Workspace'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-workspace
       parameters: []
       security:
