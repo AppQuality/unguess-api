@@ -80,8 +80,8 @@ export interface components {
       role: string;
       name: string;
       workspaces: components["schemas"]["Workspace"][];
-      profile_id?: number;
-      tryber_wp_user_id?: number;
+      profile_id: number;
+      tryber_wp_user_id: number;
       picture?: string;
     };
     /** Workspace */
@@ -126,6 +126,22 @@ export interface components {
     Error: {
       content: {
         "application/json": components["schemas"]["Error"];
+      };
+    };
+    /** Paginated response */
+    PaginatedResponse: {
+      content: {
+        "application/json": {
+          items?: (
+            | components["schemas"]["Campaign"]
+            | components["schemas"]["Workspace"]
+            | components["schemas"]["Project"]
+          )[];
+          start?: number;
+          limit?: number;
+          size?: number;
+          total?: number;
+        };
       };
     };
   };
@@ -195,14 +211,16 @@ export interface operations {
     };
   };
   "get-workspaces": {
-    parameters: {};
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Workspace"][];
-        };
+    parameters: {
+      query: {
+        /** Limit pagination parameter */
+        limit?: components["parameters"]["limit"];
+        /** Start pagination parameter */
+        start?: components["parameters"]["start"];
       };
+    };
+    responses: {
+      200: components["responses"]["PaginatedResponse"];
       400: components["responses"]["Error"];
       403: components["responses"]["Error"];
       404: components["responses"]["Error"];
@@ -247,19 +265,7 @@ export interface operations {
       };
     };
     responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/json": {
-            items: components["schemas"]["Campaign"][];
-            total: number;
-            start: number;
-            size: number;
-            limit: number;
-          };
-          "application/xml": { [key: string]: unknown };
-        };
-      };
+      200: components["responses"]["PaginatedResponse"];
       400: components["responses"]["Error"];
       403: components["responses"]["Error"];
       404: components["responses"]["Error"];
@@ -277,19 +283,10 @@ export interface operations {
         limit?: components["parameters"]["limit"];
         /** Start pagination parameter */
         start?: components["parameters"]["start"];
-        /** Order value (ASC, DESC) */
-        order?: components["parameters"]["order"];
-        /** Order by accepted field */
-        orderBy?: components["parameters"]["orderBy"];
       };
     };
     responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Project"][];
-        };
-      };
+      200: components["responses"]["PaginatedResponse"];
       400: components["responses"]["Error"];
       403: components["responses"]["Error"];
       404: components["responses"]["Error"];
@@ -331,19 +328,10 @@ export interface operations {
         limit?: components["parameters"]["limit"];
         /** Start pagination parameter */
         start?: components["parameters"]["start"];
-        /** Order value (ASC, DESC) */
-        order?: components["parameters"]["order"];
-        /** Order by accepted field */
-        orderBy?: components["parameters"]["orderBy"];
       };
     };
     responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Campaign"][];
-        };
-      };
+      200: components["responses"]["PaginatedResponse"];
       400: components["responses"]["Error"];
       403: components["responses"]["Error"];
       404: components["responses"]["Error"];
