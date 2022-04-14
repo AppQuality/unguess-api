@@ -434,14 +434,14 @@ components:
       in: query
       required: false
       schema:
-        type: string
+        type: number
       description: Start pagination parameter
     size:
       name: size
       in: query
       required: false
       schema:
-        type: string
+        type: number
       description: Size pagination parameter
 tags:
   - name: Authentication
