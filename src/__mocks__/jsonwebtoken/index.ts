@@ -15,7 +15,7 @@ export default {
       return {
         ...profiles[1],
         role: "administrator",
-        wp_tryber_user_id: 0,
+        tryber_wp_user_id: 0,
         profile_id: 0,
       };
     }

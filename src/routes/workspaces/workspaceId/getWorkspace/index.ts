@@ -7,8 +7,8 @@ const fallBackCsmProfile = {
   surname: "Peretti",
   email: "gianluca.peretti@unguess.io",
   role: "admin",
-  tryber_wp_user_id: 0,
-  profile_id: 0,
+  tryber_wp_user_id: 20739,
+  profile_id: 21605,
   workspaces: [],
 };
 
