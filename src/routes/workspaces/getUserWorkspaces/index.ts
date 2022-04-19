@@ -15,8 +15,8 @@ const fallBackCsmProfile = {
 
 export default async (
   user: UserType,
-  limit: any,
-  start: any
+  limit: StoplightComponents["parameters"]["limit"],
+  start: StoplightComponents["parameters"]["start"]
 ): Promise<{
   workspaces: StoplightComponents["schemas"]["Workspace"][] | [];
   total: number;

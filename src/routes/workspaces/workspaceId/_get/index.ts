@@ -12,6 +12,7 @@ export default async (
   let error = {
     message: ERROR_MESSAGE,
     code: 0,
+    error: true,
   } as StoplightComponents["schemas"]["Error"];
 
   res.status_code = 200;

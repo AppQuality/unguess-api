@@ -1,5 +1,6 @@
 import getWorkspace from ".";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
+import { ERROR_MESSAGE } from "@src/routes/shared";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
@@ -100,7 +101,7 @@ describe("getWorkspace", () => {
         customer_user_1
       )) as StoplightComponents["schemas"]["Error"];
       expect(response.code).toBe(400);
-      expect(response.message).toBe("Something went wrong");
+      expect(response.message).toBe(ERROR_MESSAGE);
     } catch (error) {
       console.log(error);
     }
@@ -113,7 +114,11 @@ describe("getWorkspace", () => {
         customer_user_2
       )) as StoplightComponents["schemas"]["Error"];
       expect(JSON.stringify(response)).toBe(
-        JSON.stringify({ message: "Something went wrong", code: 403 })
+        JSON.stringify({
+          message: ERROR_MESSAGE,
+          error: true,
+          code: 403,
+        })
       );
     } catch (error) {
       console.log(error);
@@ -134,7 +139,11 @@ describe("getWorkspace", () => {
     try {
       const response = await getWorkspace(9999, customer_user_1);
       expect(JSON.stringify(response)).toBe(
-        JSON.stringify({ message: "Something went wrong", code: 404 })
+        JSON.stringify({
+          message: ERROR_MESSAGE,
+          error: true,
+          code: 404,
+        })
       );
     } catch (error) {
       expect((error as OpenapiError).message).toBe("No workspace found");

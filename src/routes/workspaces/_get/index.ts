@@ -12,21 +12,22 @@ export default async (
   res: OpenapiResponse
 ) => {
   let error = {
+    error: true,
     message: ERROR_MESSAGE,
   } as StoplightComponents["schemas"]["Error"];
 
   try {
-    let limit = c.request.query.limit || 10;
-    let start = c.request.query.start || 0;
+    let limit = (c.request.query.limit as string) || 10;
+    let start = (c.request.query.start as string) || 0;
 
-    const paginationResult = await formatPaginationParams(limit, start);
-    if ("code" in paginationResult) {
-      res.status_code = paginationResult.code;
-      return paginationResult;
-    } else {
-      limit = paginationResult.formattedLimit;
-      start = paginationResult.formattedStart;
+    if (typeof limit === "string") {
+      limit = parseInt(limit) as StoplightComponents["parameters"]["limit"];
     }
+
+    if (typeof start === "string") {
+      start = parseInt(start) as StoplightComponents["parameters"]["start"];
+    }
+
     let userWorkspaces = await getUserWorkspaces(req.user, limit, start);
 
     if (userWorkspaces.workspaces.length) {
@@ -38,6 +39,7 @@ export default async (
         total: userWorkspaces.total,
       });
     }
+
     return await paginateItems({ items: [] });
   } catch (e) {
     res.status_code = 500;

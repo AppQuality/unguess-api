@@ -8,8 +8,8 @@ type PaginationParams = {
         | StoplightComponents["schemas"]["Workspace"]
       >
     | [];
-  limit?: StoplightComponents["parameters"]["limit"];
-  start?: StoplightComponents["parameters"]["start"];
+  limit?: StoplightComponents["parameters"]["limit"] | string;
+  start?: StoplightComponents["parameters"]["start"] | string;
   total?: number | null;
 };
 

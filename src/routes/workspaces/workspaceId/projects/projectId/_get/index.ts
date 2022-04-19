@@ -12,6 +12,7 @@ export default async (
   let user = req.user;
   let error = {
     message: ERROR_MESSAGE,
+    error: true,
   } as StoplightComponents["schemas"]["Error"];
   res.status_code = 200;
 

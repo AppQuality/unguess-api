@@ -1,6 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
+import { ERROR_MESSAGE } from "@src/routes/shared";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
@@ -242,7 +243,7 @@ describe("GET /workspaces/{wid}/projects", () => {
         .get(`/workspaces/9999/projects`)
         .set("authorization", "Bearer customer");
       expect(result.body.code).toBe(404);
-      expect(result.body.message).toBe("Something went wrong");
+      expect(result.body.message).toBe(ERROR_MESSAGE);
     } catch (error) {
       console.log(error);
     }

@@ -17,20 +17,21 @@ export default async (
   let user = req.user;
   let error = {
     message: ERROR_MESSAGE,
+    error: true,
   } as StoplightComponents["schemas"]["Error"];
   res.status_code = 200;
 
   try {
-    let limit = c.request.query.limit || 10;
-    let start = c.request.query.start || 0;
+    let limit = (c.request.query.limit as string) || 10;
+    let start = (c.request.query.start as string) || 0;
 
-    const paginationResult = await formatPaginationParams(limit, start);
-    if ("code" in paginationResult) {
-      res.status_code = paginationResult.code;
-      return paginationResult;
+    if (typeof limit === "string") {
+      limit = parseInt(limit) as StoplightComponents["parameters"]["limit"];
     }
-    limit = paginationResult.formattedLimit;
-    start = paginationResult.formattedStart;
+
+    if (typeof start === "string") {
+      start = parseInt(start) as StoplightComponents["parameters"]["start"];
+    }
 
     let workspaceId;
     if (typeof c.request.params.wid == "string") {

@@ -1,5 +1,6 @@
 import getProject from ".";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
+import { ERROR_MESSAGE } from "@src/routes/shared";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
@@ -95,7 +96,7 @@ describe("getProject", () => {
         0
       )) as StoplightComponents["schemas"]["Error"];
       expect(result.code).toBe(400);
-      expect(result.message).toBe("Something went wrong");
+      expect(result.message).toBe(ERROR_MESSAGE);
     } catch (error) {
       console.error(error);
     }
@@ -108,7 +109,7 @@ describe("getProject", () => {
         customer_1.id
       )) as StoplightComponents["schemas"]["Error"];
       expect(result.code).toBe(404);
-      expect(result.message).toBe("Something went wrong");
+      expect(result.message).toBe(ERROR_MESSAGE);
     } catch (error) {
       console.error(error);
     }

@@ -92,4 +92,36 @@ describe("GET /workspaces", () => {
       })
     );
   });
+
+  it("Should answer with a paginated items of workspaces", async () => {
+    const response = await request(app)
+      .get("/workspaces?limit=1&start=0")
+      .set("authorization", "Bearer customer");
+    expect(JSON.stringify(response.body)).toStrictEqual(
+      JSON.stringify({
+        items: [
+          {
+            id: customer_1.id,
+            company: customer_1.company,
+            logo: customer_1.company_logo,
+            tokens: customer_1.tokens,
+            csm: {
+              id: 20739,
+              name: "Gianluca",
+              surname: "Peretti",
+              email: "gianluca.peretti@unguess.io",
+              role: "admin",
+              tryber_wp_user_id: 21605,
+              profile_id: 20739,
+              workspaces: [],
+            },
+          },
+        ],
+        start: 0,
+        limit: 1,
+        size: 1,
+        total: 1,
+      })
+    );
+  });
 });

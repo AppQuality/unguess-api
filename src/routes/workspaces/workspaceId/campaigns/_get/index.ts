@@ -5,7 +5,6 @@ import getWorkspace from "@src/routes/workspaces/workspaceId/getWorkspace";
 import getUserProjects from "../../getUserProjects";
 import paginateItems, {
   formatCount,
-  formatPaginationParams,
 } from "@src/routes/workspaces/paginateItems";
 import { ERROR_MESSAGE } from "@src/routes/shared";
 
@@ -19,6 +18,7 @@ export default async (
 
   let error = {
     message: ERROR_MESSAGE,
+    error: true,
   } as StoplightComponents["schemas"]["Error"];
 
   try {
@@ -34,17 +34,15 @@ export default async (
       return error;
     }
 
-    let limit = c.request.query.limit || 10;
-    let start = c.request.query.start || 0;
+    let limit = (c.request.query.limit as string) || 10;
+    let start = (c.request.query.start as string) || 0;
 
-    const paginationResult = await formatPaginationParams(limit, start);
-    if ("code" in paginationResult) {
-      res.status_code = paginationResult.code;
-      error.code = paginationResult.code;
-      return error;
-    } else {
-      limit = paginationResult.formattedLimit;
-      start = paginationResult.formattedStart;
+    if (typeof limit === "string") {
+      limit = parseInt(limit) as StoplightComponents["parameters"]["limit"];
+    }
+
+    if (typeof start === "string") {
+      start = parseInt(start) as StoplightComponents["parameters"]["start"];
     }
 
     let order;
@@ -65,6 +63,7 @@ export default async (
       "title",
     ];
     let orderBy;
+
     if (typeof c.request.query.orderBy === "string")
       orderBy = c.request.query
         .orderBy as StoplightOperations["get-workspace-campaigns"]["parameters"]["query"]["orderBy"];

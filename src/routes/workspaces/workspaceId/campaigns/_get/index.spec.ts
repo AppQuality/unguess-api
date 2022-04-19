@@ -1,6 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
+import { ERROR_MESSAGE } from "@src/routes/shared";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
@@ -174,7 +175,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       .get("/workspaces/999898978/campaigns")
       .set("authorization", "Bearer customer");
     expect(response.body.code).toBe(404);
-    expect(response.body.message).toBe("Something went wrong");
+    expect(response.body.message).toBe(ERROR_MESSAGE);
   });
 
   it("Should return an array of 1 elements because of limit = 1", async () => {
@@ -283,7 +284,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       .get("/workspaces/1/campaigns?order=banana")
       .set("authorization", "Bearer customer");
     expect(response.body.code).toBe(400);
-    expect(response.body.message).toBe("Something went wrong");
+    expect(response.body.message).toBe(ERROR_MESSAGE);
   });
 
   it("Should return 400 because the orderBy is missing but the order is valid", async () => {
@@ -291,7 +292,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       .get("/workspaces/1/campaigns?order=DESC")
       .set("authorization", "Bearer customer");
     expect(response.body.code).toBe(400);
-    expect(response.body.message).toBe("Something went wrong");
+    expect(response.body.message).toBe(ERROR_MESSAGE);
   });
 
   it("Should return 400 because the orderBy parameter is wrong", async () => {
@@ -299,7 +300,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       .get("/workspaces/1/campaigns?orderBy=BANANA")
       .set("authorization", "Bearer customer");
     expect(response.body.code).toBe(400);
-    expect(response.body.message).toBe("Something went wrong");
+    expect(response.body.message).toBe(ERROR_MESSAGE);
   });
 
   it("Should return 400 because the order parameter is wrong but the orderBy is valid", async () => {
@@ -307,7 +308,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       .get("/workspaces/1/campaigns?orderBy=start_date")
       .set("authorization", "Bearer customer");
     expect(response.body.code).toBe(400);
-    expect(response.body.message).toBe("Something went wrong");
+    expect(response.body.message).toBe(ERROR_MESSAGE);
   });
 
   it("Should return 400 because the order parameter is wrong but the orderBy is valid", async () => {
@@ -315,7 +316,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       .get("/workspaces/1/campaigns?order=DESC&orderBy=banana")
       .set("authorization", "Bearer customer");
     expect(response.body.code).toBe(400);
-    expect(response.body.message).toBe("Something went wrong");
+    expect(response.body.message).toBe(ERROR_MESSAGE);
   });
 
   it("Should return an array of campaigns with 2 elements in reverse order", async () => {
@@ -376,7 +377,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       .get("/workspaces/1/campaigns?filterBy[banana]=banana")
       .set("authorization", "Bearer customer");
     expect(response.body.code).toBe(400);
-    expect(response.body.message).toBe("Something went wrong");
+    expect(response.body.message).toBe(ERROR_MESSAGE);
   });
 
   it("Should return 200 because the filterBy parameter has the right format", async () => {

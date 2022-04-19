@@ -31,6 +31,7 @@ export default async (
 > => {
   let error = {
     message: ERROR_MESSAGE,
+    error: true,
   } as StoplightComponents["schemas"]["Error"];
   try {
     // Check parameters
