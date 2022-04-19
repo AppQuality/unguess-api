@@ -1,41 +1,36 @@
 import { ERROR_MESSAGE } from "@src/routes/shared";
 
-const getEmptyPage = () => {
-  return {
-    items: [],
-    start: 0,
-    limit: 0,
-    size: 0,
-    total: 0,
-  };
+type PaginationParams = {
+  items: Array<StoplightComponents["responses"]["PaginatedResponse"]> | [];
+  limit?: StoplightComponents["parameters"]["limit"];
+  start?: StoplightComponents["parameters"]["start"];
 };
 
-type Pagination = {
-  items: any[];
-  limit?: any;
-  start?: any;
-  total?: any;
-};
+export default async (data: PaginationParams) => {
+  let { items, limit, start } = data;
 
-export default async (data: Pagination) => {
-  let error = { message: ERROR_MESSAGE, code: 400 };
-  let { items, limit, start, total } = data;
-
-  if (total < 0) return error;
+  // Check if params are valid
+  if (limit && start) {
+    let result = await formatPaginationParams(limit, start);
+    if ("error" in result) {
+      let error = result as StoplightComponents["schemas"]["Error"];
+      return error;
+    }
+  }
 
   return items.length
     ? {
         items,
         start,
         limit,
-        size: items.length,
-        total,
+        total: items.length,
+        size,
       }
-    : getEmptyPage();
+    : emptyResponse();
 };
 
-export const formatPaginationParams = async (limit: any, start: any) => {
-  let error = { message: ERROR_MESSAGE, code: 400 };
+export const formatPaginationParams = async (limit: number, start: number) => {
+  let error = { message: ERROR_MESSAGE, code: 400, error: true };
   if (typeof limit === "string") {
     limit = parseInt(limit) as StoplightComponents["parameters"]["limit"];
   }
@@ -52,4 +47,14 @@ export const formatPaginationParams = async (limit: any, start: any) => {
 
 export const formatCount = (count: any[]): number => {
   return parseInt(count.map((el: any) => el["COUNT(*)"])[0]);
+};
+
+const emptyResponse = () => {
+  return {
+    items: [],
+    start: 0,
+    limit: 0,
+    size: 0,
+    total: 0,
+  };
 };

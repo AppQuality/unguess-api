@@ -117,8 +117,9 @@ export interface components {
     };
     /** Error */
     Error: {
-      message?: string;
-      code?: number;
+      message: string;
+      code: number;
+      error: boolean;
     };
   };
   responses: {
