@@ -1,7 +1,13 @@
 import { ERROR_MESSAGE } from "@src/routes/shared";
 
 type PaginationParams = {
-  items: Array<StoplightComponents["responses"]["PaginatedResponse"]> | [];
+  items:
+    | Array<
+        | StoplightComponents["schemas"]["Campaign"]
+        | StoplightComponents["schemas"]["Project"]
+        | StoplightComponents["schemas"]["Workspace"]
+      >
+    | [];
   limit?: StoplightComponents["parameters"]["limit"];
   start?: StoplightComponents["parameters"]["start"];
 };
@@ -26,7 +32,7 @@ export default async (data: PaginationParams) => {
         total: items.length,
         size,
       }
-    : emptyResponse();
+    : emptyPaginatedResponse();
 };
 
 export const formatPaginationParams = async (limit: number, start: number) => {
@@ -49,7 +55,7 @@ export const formatCount = (count: any[]): number => {
   return parseInt(count.map((el: any) => el["COUNT(*)"])[0]);
 };
 
-const emptyResponse = () => {
+const emptyPaginatedResponse = () => {
   return {
     items: [],
     start: 0,
