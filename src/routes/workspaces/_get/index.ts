@@ -22,8 +22,7 @@ export default async (
     const paginationResult = await formatPaginationParams(limit, start);
     if ("code" in paginationResult) {
       res.status_code = paginationResult.code;
-      error.code = paginationResult.code;
-      return error;
+      return paginationResult;
     } else {
       limit = paginationResult.formattedLimit;
       start = paginationResult.formattedStart;
@@ -39,9 +38,7 @@ export default async (
         total: userWorkspaces.total,
       });
     }
-    res.status_code = 404;
-    error.code = 404;
-    return error;
+    return await paginateItems({ items: [] });
   } catch (e) {
     res.status_code = 500;
     error.code = 500;
