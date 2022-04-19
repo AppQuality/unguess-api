@@ -1,17 +1,26 @@
 import * as db from "@src/features/db";
+import { ERROR_MESSAGE } from "@src/routes/shared";
 
 export default async (
   projectId: number,
   workspaceId: number
-): Promise<StoplightComponents["schemas"]["Project"]> => {
+): Promise<
+  | StoplightComponents["schemas"]["Project"]
+  | Promise<StoplightComponents["schemas"]["Error"]>
+> => {
+  let error = {
+    message: ERROR_MESSAGE,
+  } as StoplightComponents["schemas"]["Error"];
   try {
     // Check parameters
     if (projectId == null || projectId <= 0) {
-      throw Error("Bad request");
+      error.code = 400;
+      return error;
     }
 
     if (workspaceId == null || workspaceId <= 0) {
-      throw Error("Bad request");
+      error.code = 400;
+      return error;
     }
 
     // Get project
@@ -37,8 +46,10 @@ export default async (
       };
     }
 
-    throw Error("No project found");
-  } catch (error) {
-    throw error;
+    error.code = 404;
+    return error;
+  } catch (e) {
+    error.code = 500;
+    return error;
   }
 };

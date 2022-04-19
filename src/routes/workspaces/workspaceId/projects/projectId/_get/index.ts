@@ -2,6 +2,7 @@
 import { Context } from "openapi-backend";
 import getProject from "../getProject";
 import getWorkspace from "../../../getWorkspace";
+import { ERROR_MESSAGE } from "@src/routes/shared";
 
 export default async (
   c: Context,
@@ -9,6 +10,9 @@ export default async (
   res: OpenapiResponse
 ) => {
   let user = req.user;
+  let error = {
+    message: ERROR_MESSAGE,
+  } as StoplightComponents["schemas"]["Error"];
   res.status_code = 200;
 
   let workspaceId;
@@ -25,7 +29,8 @@ export default async (
     workspaceId < 0
   ) {
     res.status_code = 400;
-    return "Workspace id is not valid";
+    error.code = 400;
+    return error;
   }
 
   let projectId;
@@ -38,37 +43,23 @@ export default async (
   // Check if projectId is valid
   if (typeof projectId == "undefined" || projectId == null || projectId < 0) {
     res.status_code = 400;
-    return "Project id is not valid";
+    error.code = 400;
+    return error;
   }
 
-  try {
-    let workspace = (await getWorkspace(
-      workspaceId,
-      user
-    )) as StoplightComponents["schemas"]["Workspace"];
+  let workspaceResult = await getWorkspace(workspaceId, user);
 
-    let returnProject = (await getProject(
-      projectId,
-      workspaceId
-    )) as StoplightComponents["schemas"]["Project"];
-
-    return returnProject;
-  } catch (error) {
-    if ((error as OpenapiError).message == "No workspace found") {
-      res.status_code = 404;
-      return (error as OpenapiError).message;
-    } else if (
-      (error as OpenapiError).message ===
-      "You have no permission to get this workspace"
-    ) {
-      res.status_code = 403;
-      return (error as OpenapiError).message;
-    } else if ((error as OpenapiError).message == "No project found") {
-      res.status_code = 404;
-      return (error as OpenapiError).message;
-    } else {
-      res.status_code = 500;
-      throw error;
-    }
+  if ("code" in workspaceResult) {
+    res.status_code = workspaceResult.code || 500;
+    error.code = workspaceResult.code || 500;
+    return error;
   }
+
+  let projectResult = await getProject(projectId, workspaceId);
+  if ("code" in projectResult) {
+    res.status_code = projectResult.code || 500;
+    error.code = projectResult.code || 500;
+    return error;
+  }
+  return projectResult;
 };
