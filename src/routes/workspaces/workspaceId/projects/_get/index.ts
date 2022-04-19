@@ -6,6 +6,7 @@ import paginateItems, {
   formatCount,
   formatPaginationParams,
 } from "@src/routes/workspaces/paginateItems";
+import { ERROR_MESSAGE } from "@src/routes/shared";
 
 export default async (
   c: Context,
@@ -13,6 +14,9 @@ export default async (
   res: OpenapiResponse
 ) => {
   let user = req.user;
+  let error = {
+    message: ERROR_MESSAGE,
+  } as StoplightComponents["schemas"]["Error"];
 
   res.status_code = 200;
 
@@ -20,17 +24,15 @@ export default async (
   let start = c.request.query.start || 0;
   let total;
 
-  try {
-    const { formattedLimit, formattedStart } = await formatPaginationParams(
-      limit,
-      start
-    );
-    limit = formattedLimit;
-    start = formattedStart;
-  } catch (e) {
-    res.status_code = 400;
-    return (e as OpenapiError).message;
+  const paginationResult = await formatPaginationParams(limit, start);
+
+  if ("code" in paginationResult) {
+    res.status_code = paginationResult.code;
+    error.code = paginationResult.code;
+    return error;
   }
+  limit = paginationResult.formattedLimit;
+  start = paginationResult.formattedStart;
 
   // Get wid path parameter
   let workspaceId;
@@ -47,30 +49,19 @@ export default async (
     workspaceId < 0
   ) {
     res.status_code = 400;
-    return "Workspace id is not valid";
+    error.code = 400;
+    return error;
   }
 
   // Get workspace
   let workspace;
-  try {
-    workspace = (await getWorkspace(
-      workspaceId,
-      user
-    )) as StoplightComponents["schemas"]["Workspace"];
-  } catch (error) {
-    if ((error as OpenapiError).message == "No workspace found") {
-      res.status_code = 404;
-      return (error as OpenapiError).message;
-    } else if (
-      (error as OpenapiError).message ===
-      "You have no permission to get this workspace"
-    ) {
-      res.status_code = 403;
-      return (error as OpenapiError).message;
-    } else {
-      res.status_code = 500;
-      throw error;
-    }
+  workspace = await getWorkspace(workspaceId, user);
+
+  if ("code" in workspace) {
+    console.log(workspace);
+    res.status_code = workspace.code || 500;
+    error.code = workspace.code || 500;
+    return error;
   }
 
   // Get workspace projects
@@ -84,9 +75,10 @@ export default async (
     const countQuery = `SELECT COUNT(*) FROM wp_appq_project WHERE customer_id = ?`;
     total = await db.query(db.format(countQuery, [workspaceId]));
     total = formatCount(total);
-  } catch (error) {
+  } catch (e) {
     res.status_code = 500;
-    throw error;
+    error.code = 500;
+    return error;
   }
 
   let returnProjects: Array<StoplightComponents["schemas"]["Project"]> = [];
@@ -104,9 +96,10 @@ export default async (
         userToProjectRows = await db.query(
           db.format(userToProjectSql, [project.id])
         );
-      } catch (error) {
+      } catch (e) {
         res.status_code = 500;
-        throw error;
+        error.code = 500;
+        return error;
       }
 
       if (userToProjectRows.length) {
@@ -133,9 +126,10 @@ export default async (
         const campaignSql =
           "SELECT COUNT(*) AS count FROM wp_appq_evd_campaign WHERE project_id = ?";
         campaigns = await db.query(db.format(campaignSql, [project.id]));
-      } catch (error) {
+      } catch (e) {
         res.status_code = 500;
-        throw error;
+        error.code = 500;
+        return error;
       }
 
       let item: StoplightComponents["schemas"]["Project"] = {

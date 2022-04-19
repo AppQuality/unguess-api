@@ -236,13 +236,15 @@ describe("GET /workspaces/{wid}/projects", () => {
     expect(response.status).toBe(400);
   });
 
-  it("Should throw an error 'No workspace found' if workspace is not found", async () => {
+  it("Should return 404 if workspace is not found", async () => {
     try {
-      await request(app)
+      const result = await request(app)
         .get(`/workspaces/9999/projects`)
         .set("authorization", "Bearer customer");
+      expect(result.body.code).toBe(404);
+      expect(result.body.message).toBe("Something went wrong");
     } catch (error) {
-      expect((error as OpenapiError).message).toBe("No workspace found");
+      console.log(error);
     }
   });
 
