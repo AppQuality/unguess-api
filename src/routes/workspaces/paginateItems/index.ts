@@ -1,3 +1,5 @@
+import { ERROR_MESSAGE } from "@src/routes/shared";
+
 const getEmptyPage = () => {
   return {
     items: [],
@@ -16,9 +18,10 @@ type Pagination = {
 };
 
 export default async (data: Pagination) => {
+  let error = { message: ERROR_MESSAGE, code: 400 };
   let { items, limit, start, total } = data;
 
-  if (total < 0) throw Error("Bad request, pagination data is not valid");
+  if (total < 0) return error;
 
   return items.length
     ? {
@@ -32,6 +35,7 @@ export default async (data: Pagination) => {
 };
 
 export const formatPaginationParams = async (limit: any, start: any) => {
+  let error = { message: ERROR_MESSAGE, code: 400 };
   if (typeof limit === "string") {
     limit = parseInt(limit) as StoplightComponents["parameters"]["limit"];
   }
@@ -41,7 +45,7 @@ export const formatPaginationParams = async (limit: any, start: any) => {
   }
 
   if (start < 0 || limit < 0) {
-    throw Error("Bad request, pagination data is not valid");
+    return error;
   }
   return { formattedLimit: limit, formattedStart: start };
 };
