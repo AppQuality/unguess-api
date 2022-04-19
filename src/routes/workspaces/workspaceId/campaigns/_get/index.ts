@@ -7,6 +7,7 @@ import paginateItems, {
   formatCount,
   formatPaginationParams,
 } from "@src/routes/workspaces/paginateItems";
+import { ERROR_MESSAGE } from "@src/routes/shared";
 
 export default async (
   c: Context,
@@ -15,6 +16,10 @@ export default async (
 ) => {
   let user = req.user;
   res.status_code = 200;
+
+  let error = {
+    message: ERROR_MESSAGE,
+  } as StoplightComponents["schemas"]["Error"];
 
   try {
     let customer_id;
@@ -25,18 +30,22 @@ export default async (
 
     if (!customer_id || customer_id < 0) {
       res.status_code = 400;
-      return "Customer not valid";
+      error.code = 400;
+      return error;
     }
 
     let limit = c.request.query.limit || 10;
     let start = c.request.query.start || 0;
 
-    const { formattedLimit, formattedStart } = await formatPaginationParams(
-      limit,
-      start
-    );
-    limit = formattedLimit;
-    start = formattedStart;
+    const paginationResult = await formatPaginationParams(limit, start);
+    if ("code" in paginationResult) {
+      res.status_code = paginationResult.code;
+      error.code = paginationResult.code;
+      return error;
+    } else {
+      limit = paginationResult.formattedLimit;
+      start = paginationResult.formattedStart;
+    }
 
     let order;
     if (typeof c.request.query.order === "string")
@@ -45,7 +54,8 @@ export default async (
 
     if (order && order !== "ASC" && order !== "DESC") {
       res.status_code = 400;
-      return "Bad request, order data is not valid";
+      error.code = 400;
+      return error;
     }
 
     const validOrderByFields = [
@@ -61,12 +71,14 @@ export default async (
 
     if (orderBy && !validOrderByFields.includes(orderBy)) {
       res.status_code = 400;
-      return "Bad request, orderBy value not allowed";
+      error.code = 400;
+      return error;
     }
 
     if ((order && !orderBy) || (!order && orderBy)) {
       res.status_code = 400;
-      return "Bad request, ordination data is not valid";
+      error.code = 400;
+      return error;
     }
 
     const validFilterByFields: { [key: string]: string } = {
@@ -88,7 +100,8 @@ export default async (
 
       if (!acceptedFilters.length) {
         res.status_code = 400;
-        return "Bad request, filter value not allowed";
+        error.code = 400;
+        return error;
       } else {
         acceptedFilters = acceptedFilters.map((k) => {
           const v = filterBy[k];
@@ -109,7 +122,12 @@ export default async (
       }
     }
 
-    await getWorkspace(customer_id, user);
+    const workspaceResult = await getWorkspace(customer_id, user);
+    if ("code" in workspaceResult) {
+      res.status_code = workspaceResult.code || 500;
+      error.code = workspaceResult.code;
+      return error;
+    }
 
     let userProjects = await getUserProjects(customer_id, user);
 
@@ -184,9 +202,8 @@ export default async (
       total,
     });
   } catch (e) {
-    const message = (e as OpenapiError).message;
-    if (message === "No workspace found") res.status_code = 404;
-    else res.status_code = 500;
-    return message;
+    res.status_code = 500;
+    error.code = 500;
+    return error;
   }
 };

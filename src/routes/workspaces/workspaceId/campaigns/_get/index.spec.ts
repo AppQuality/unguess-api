@@ -173,7 +173,8 @@ describe("GET /workspaces/{wid}/campaigns", () => {
     const response = await request(app)
       .get("/workspaces/999898978/campaigns")
       .set("authorization", "Bearer customer");
-    expect(response.status).toBe(404);
+    expect(response.body.code).toBe(404);
+    expect(response.body.message).toBe("Something went wrong");
   });
 
   it("Should return an array of 1 elements because of limit = 1", async () => {
@@ -281,35 +282,40 @@ describe("GET /workspaces/{wid}/campaigns", () => {
     const response = await request(app)
       .get("/workspaces/1/campaigns?order=banana")
       .set("authorization", "Bearer customer");
-    expect(response.status).toBe(400);
+    expect(response.body.code).toBe(400);
+    expect(response.body.message).toBe("Something went wrong");
   });
 
   it("Should return 400 because the orderBy is missing but the order is valid", async () => {
     const response = await request(app)
       .get("/workspaces/1/campaigns?order=DESC")
       .set("authorization", "Bearer customer");
-    expect(response.status).toBe(400);
+    expect(response.body.code).toBe(400);
+    expect(response.body.message).toBe("Something went wrong");
   });
 
   it("Should return 400 because the orderBy parameter is wrong", async () => {
     const response = await request(app)
       .get("/workspaces/1/campaigns?orderBy=BANANA")
       .set("authorization", "Bearer customer");
-    expect(response.status).toBe(400);
+    expect(response.body.code).toBe(400);
+    expect(response.body.message).toBe("Something went wrong");
   });
 
   it("Should return 400 because the order parameter is wrong but the orderBy is valid", async () => {
     const response = await request(app)
       .get("/workspaces/1/campaigns?orderBy=start_date")
       .set("authorization", "Bearer customer");
-    expect(response.status).toBe(400);
+    expect(response.body.code).toBe(400);
+    expect(response.body.message).toBe("Something went wrong");
   });
 
   it("Should return 400 because the order parameter is wrong but the orderBy is valid", async () => {
     const response = await request(app)
       .get("/workspaces/1/campaigns?order=DESC&orderBy=banana")
       .set("authorization", "Bearer customer");
-    expect(response.status).toBe(400);
+    expect(response.body.code).toBe(400);
+    expect(response.body.message).toBe("Something went wrong");
   });
 
   it("Should return an array of campaigns with 2 elements in reverse order", async () => {
@@ -365,28 +371,12 @@ describe("GET /workspaces/{wid}/campaigns", () => {
     );
   });
 
-  //TODO: handle getWorkspace error better
-  // it("Should return empty an array of campaigns and page if no campaign are found for that customer", async () => {
-  //   try {
-  //     const response = await request(app)
-  //       .get("/workspaces/43/campaigns")
-  //       .set("authorization", "Bearer customer");
-  //     expect(JSON.stringify(response.body)).toStrictEqual(
-  //       JSON.stringify({
-  //         items: [],
-  //         total: 0,
-  //       })
-  //     );
-  //   } catch (e) {
-  //     console.log(e);
-  //   }
-  // });
-
   it("Should return 400 because the filterBy parameter is not allowed", async () => {
     const response = await request(app)
       .get("/workspaces/1/campaigns?filterBy[banana]=banana")
       .set("authorization", "Bearer customer");
-    expect(response.status).toBe(400);
+    expect(response.body.code).toBe(400);
+    expect(response.body.message).toBe("Something went wrong");
   });
 
   it("Should return 200 because the filterBy parameter has the right format", async () => {

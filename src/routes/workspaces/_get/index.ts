@@ -31,7 +31,6 @@ export default async (
     let userWorkspaces = await getUserWorkspaces(req.user, limit, start);
 
     if (userWorkspaces.workspaces.length) {
-      let result;
       res.status_code = 200;
       return await paginateItems({
         items: userWorkspaces.workspaces,

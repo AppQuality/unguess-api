@@ -158,6 +158,8 @@ export interface components {
     order: string;
     /** @description Order by accepted field */
     orderBy: string;
+    /** @description filterBy[<fieldName>]=<fieldValue> */
+    filterBy: unknown;
   };
   requestBodies: {
     Credentials: {
@@ -262,6 +264,8 @@ export interface operations {
         order?: components["parameters"]["order"];
         /** Order by accepted field */
         orderBy?: components["parameters"]["orderBy"];
+        /** filterBy[<fieldName>]=<fieldValue> */
+        filterBy?: components["parameters"]["filterBy"];
       };
     };
     responses: {
