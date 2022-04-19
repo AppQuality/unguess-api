@@ -85,7 +85,7 @@ describe("GET /workspaces/{wid}", () => {
 
   it("Should answer 404 if no workspaces are found", async () => {
     const response = await request(app)
-      .get("/workspaces/99999291")
+      .get("/workspaces/99999")
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(404);
   });

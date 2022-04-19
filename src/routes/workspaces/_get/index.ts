@@ -33,6 +33,7 @@ export default async (
     }
 
     res.status_code = 404;
+
     return await paginateItems({ items: [] });
   } catch (error) {
     if (

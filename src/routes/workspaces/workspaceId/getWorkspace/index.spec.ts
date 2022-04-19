@@ -93,21 +93,27 @@ describe("getWorkspace", () => {
     });
   });
 
-  it("Should have workspaceId and userId parameters", async () => {
+  it("Should return error because workspace id is 0", async () => {
     try {
-      const response = await getWorkspace(0, customer_user_1);
-      expect(response).toBeInstanceOf(Error);
+      const response = (await getWorkspace(
+        0,
+        customer_user_1
+      )) as StoplightComponents["schemas"]["Error"];
       expect(response.code).toBe(400);
+      expect(response.message).toBe("Something went wrong");
     } catch (error) {
       console.log(error);
     }
   });
 
-  it("Should throw 'You have no permission to get this workspace' error on no permission", async () => {
+  it("Should return error 403 because the use has no permission", async () => {
     try {
-      const response = await getWorkspace(1, customer_user_2);
+      const response = (await getWorkspace(
+        1,
+        customer_user_2
+      )) as StoplightComponents["schemas"]["Error"];
       expect(JSON.stringify(response)).toBe(
-        JSON.stringify({ message: "Something went wrong", code: 400 })
+        JSON.stringify({ message: "Something went wrong", code: 403 })
       );
     } catch (error) {
       console.log(error);
@@ -124,10 +130,12 @@ describe("getWorkspace", () => {
     });
   });
 
-  it("Should throw 'No workspace found' error if the workspace is not found", async () => {
+  it("Should return 404 error if the workspace is not found", async () => {
     try {
-      await getWorkspace(9999, customer_user_1);
-      fail("Should throw error");
+      const response = await getWorkspace(9999, customer_user_1);
+      expect(JSON.stringify(response)).toBe(
+        JSON.stringify({ message: "Something went wrong", code: 404 })
+      );
     } catch (error) {
       expect((error as OpenapiError).message).toBe("No workspace found");
     }

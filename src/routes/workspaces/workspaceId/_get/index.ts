@@ -1,6 +1,7 @@
 /** OPENAPI-ROUTE: get-workspace */
 import { Context } from "openapi-backend";
 import getWorkspace from "../getWorkspace";
+import { ERROR_MESSAGE } from "@src/routes/shared";
 
 export default async (
   c: Context,
@@ -8,8 +9,12 @@ export default async (
   res: OpenapiResponse
 ) => {
   let user = req.user;
+  let error = {
+    message: ERROR_MESSAGE,
+    code: 0,
+  } as StoplightComponents["schemas"]["Error"];
 
-  res.status_code = 200; //TODO SETTARE COMUNQUE STATUS CODE DELLA RESPONSE
+  res.status_code = 200;
 
   try {
     let wid;
@@ -20,29 +25,20 @@ export default async (
 
     if (!wid) {
       res.status_code = 400;
-      throw Error("Bad request");
+      error.code = 400;
+      return error;
     }
 
-    return (await getWorkspace(
-      wid,
-      user
-    )) as StoplightComponents["schemas"]["Workspace"];
-  } catch (e) {
-    if ((e as OpenapiError).message === "No workspace found") {
-      res.status_code = 404;
-      return (e as OpenapiError).message;
-    } else if ((e as OpenapiError).message === "Bad request") {
-      res.status_code = 400;
-      return (e as OpenapiError).message;
-    } else if (
-      (e as OpenapiError).message ===
-      "You have no permission to get this workspace"
-    ) {
-      res.status_code = 403;
-      return (e as OpenapiError).message;
-    } else {
-      res.status_code = 500;
-      throw e;
+    const result = await getWorkspace(wid, user);
+
+    if ("code" in result) {
+      res.status_code = result.code || 500;
+      error.code = result.code;
+      return error;
     }
+    return result as StoplightComponents["schemas"]["Workspace"];
+  } catch (e) {
+    error.code = 500;
+    return error;
   }
 };

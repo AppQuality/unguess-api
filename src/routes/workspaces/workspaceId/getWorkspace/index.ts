@@ -1,5 +1,6 @@
 import * as db from "@src/features/db";
 import { getGravatar } from "@src/routes/users/utils";
+import { ERROR_MESSAGE } from "@src/routes/shared";
 
 const fallBackCsmProfile = {
   id: 20739,
@@ -24,9 +25,13 @@ const loadCsmData = async (
 export default async (
   workspaceId: number,
   user: UserType
-): Promise<Workspace | { message: string; code: number }> => {
-  //TODO usare tipi di stoplight
-  let error = { message: "Something went wrong" };
+): Promise<
+  | StoplightComponents["schemas"]["Workspace"]
+  | Promise<StoplightComponents["schemas"]["Error"]>
+> => {
+  let error = {
+    message: ERROR_MESSAGE,
+  } as StoplightComponents["schemas"]["Error"];
   try {
     // Check parameters
     if (workspaceId == null || workspaceId <= 0) return { ...error, code: 400 };
@@ -89,7 +94,7 @@ export default async (
       } as StoplightComponents["schemas"]["Workspace"];
     }
 
-    return { ...error, code: 500 };
+    return { ...error, code: 404 };
   } catch (e) {
     return { ...error, code: 500 };
   }
