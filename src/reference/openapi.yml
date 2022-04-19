@@ -136,6 +136,7 @@ paths:
         - $ref: '#/components/parameters/start'
         - $ref: '#/components/parameters/order'
         - $ref: '#/components/parameters/orderBy'
+        - $ref: '#/components/parameters/filterBy'
   '/workspaces/{wid}/projects':
     parameters:
       - $ref: '#/components/parameters/wid'
@@ -430,6 +431,12 @@ components:
       schema:
         type: string
       description: Order by accepted field
+    filterBy:
+      name: filterBy
+      in: query
+      required: false
+      schema: {}
+      description: 'filterBy[<fieldName>]=<fieldValue>'
   requestBodies:
     Credentials:
       content:
