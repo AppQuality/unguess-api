@@ -7,6 +7,7 @@ import paginateItems, {
   formatCount,
   formatPaginationParams,
 } from "@src/routes/workspaces/paginateItems";
+import { ERROR_MESSAGE } from "@src/routes/shared";
 
 export default async (
   c: Context,
@@ -14,18 +15,22 @@ export default async (
   res: OpenapiResponse
 ) => {
   let user = req.user;
+  let error = {
+    message: ERROR_MESSAGE,
+  } as StoplightComponents["schemas"]["Error"];
   res.status_code = 200;
 
   try {
     let limit = c.request.query.limit || 10;
     let start = c.request.query.start || 0;
 
-    const { formattedLimit, formattedStart } = await formatPaginationParams(
-      limit,
-      start
-    );
-    limit = formattedLimit;
-    start = formattedStart;
+    const paginationResult = await formatPaginationParams(limit, start);
+    if ("code" in paginationResult) {
+      res.status_code = paginationResult.code;
+      return paginationResult;
+    }
+    limit = paginationResult.formattedLimit;
+    start = paginationResult.formattedStart;
 
     let workspaceId;
     if (typeof c.request.params.wid == "string") {
@@ -41,7 +46,8 @@ export default async (
       workspaceId < 0
     ) {
       res.status_code = 400;
-      return "Workspace id is not valid";
+      error.code = 400;
+      return error;
     }
 
     let projectId;
@@ -54,19 +60,26 @@ export default async (
     // Check if projectId is valid
     if (typeof projectId == "undefined" || projectId == null || projectId < 0) {
       res.status_code = 400;
-      return "Project id is not valid";
+      error.code = 400;
+      return error;
     }
 
-    let workspace = (await getWorkspace(
-      workspaceId,
-      user
-    )) as StoplightComponents["schemas"]["Workspace"];
+    let workspaceResult = await getWorkspace(workspaceId, user);
 
-    let project = (await getProject(
-      projectId,
-      workspaceId
-    )) as StoplightComponents["schemas"]["Project"];
+    if ("code" in workspaceResult) {
+      res.status_code = workspaceResult.code || 500;
+      error.code = workspaceResult.code || 500;
+      return error;
+    }
 
+    let projectResult = await getProject(projectId, workspaceId);
+
+    if ("code" in projectResult) {
+      res.status_code = projectResult.code || 500;
+      error.code = projectResult.code || 500;
+      return error;
+    }
+    projectResult = projectResult as StoplightComponents["schemas"]["Project"];
     // Get project campaigns
     const campaignsSql = `SELECT 
         c.id,  
@@ -95,9 +108,9 @@ export default async (
       JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id 
       WHERE c.project_id = ?`;
 
-    let campaigns = await db.query(db.format(campaignsSql, [project.id]));
-    let total = await db.query(db.format(countQuery, [project.id]));
-    total = await formatCount(total);
+    let campaigns = await db.query(db.format(campaignsSql, [projectResult.id]));
+    let total = await db.query(db.format(countQuery, [projectResult.id]));
+    total = formatCount(total);
 
     let returnCampaigns: Array<StoplightComponents["schemas"]["Campaign"]> = [];
     for (let campaign of campaigns) {
@@ -114,7 +127,7 @@ export default async (
         campaign_type_id: campaign.campaign_type_id,
         campaign_type_name: campaign.campaign_type_name,
         project_id: campaign.project_id,
-        project_name: project.name,
+        project_name: projectResult.name,
         test_type_name:
           campaign.test_type_id === 1 ? "Experiential" : "Functional",
       });

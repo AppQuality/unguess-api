@@ -189,13 +189,15 @@ describe("GET /workspaces/{wid}/projects/{pid}/campaigns", () => {
     expect(response.status).toBe(400);
   });
 
-  it("Should throw an error 'No project found' if project is not found", async () => {
+  it("Should return 404 if project is not found", async () => {
     try {
-      await request(app)
+      const response = await request(app)
         .get(`/workspaces/${customer_1.id}/projects/999/campaigns`)
         .set("authorization", "Bearer customer");
+      expect(response.body.code).toBe(404);
+      expect(response.body.message).toBe("Something went wrong");
     } catch (error) {
-      expect((error as OpenapiError).message).toBe("No project found");
+      console.log(error);
     }
   });
 
