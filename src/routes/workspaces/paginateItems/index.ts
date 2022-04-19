@@ -10,44 +10,72 @@ type PaginationParams = {
     | [];
   limit?: StoplightComponents["parameters"]["limit"];
   start?: StoplightComponents["parameters"]["start"];
+  total?: number | null;
 };
 
 export default async (data: PaginationParams) => {
-  let { items, limit, start } = data;
+  let { items, limit, start, total } = data;
 
   // Check if params are valid
-  if (limit && start) {
-    let result = await formatPaginationParams(limit, start);
-    if ("error" in result) {
-      let error = result as StoplightComponents["schemas"]["Error"];
-      return error;
-    }
+  let formattedParamsResult = await formatPaginationParams(limit, start, total);
+  if ("error" in formattedParamsResult) {
+    let error =
+      formattedParamsResult as StoplightComponents["schemas"]["Error"];
+    return error;
   }
 
   return items.length
     ? {
         items,
-        start,
-        limit,
-        total: items.length,
-        size,
+        start: formattedParamsResult.formattedStart,
+        limit: formattedParamsResult.formattedLimit,
+        size: items.length,
+        total,
       }
     : emptyPaginatedResponse();
 };
 
-export const formatPaginationParams = async (limit: number, start: number) => {
+export const formatPaginationParams = async (
+  limit: PaginationParams["limit"],
+  start: PaginationParams["start"],
+  total: PaginationParams["total"]
+) => {
   let error = { message: ERROR_MESSAGE, code: 400, error: true };
+
+  if (total !== undefined) {
+    if (total !== null) {
+      if (total < 0) {
+        return error;
+      }
+    } else {
+      return error;
+    }
+  }
+
+  if (typeof total === "string") {
+    total = parseInt(total);
+  }
+
   if (typeof limit === "string") {
     limit = parseInt(limit) as StoplightComponents["parameters"]["limit"];
+    if (!Number.isInteger(limit)) {
+      return error;
+    }
   }
 
   if (typeof start === "string") {
     start = parseInt(start) as StoplightComponents["parameters"]["start"];
+    if (!Number.isInteger(start)) {
+      return error;
+    }
   }
 
-  if (start < 0 || limit < 0) {
-    return error;
+  if (limit !== undefined && start !== undefined) {
+    if (start < 0 || limit < 0) {
+      return error;
+    }
   }
+
   return { formattedLimit: limit, formattedStart: start };
 };
 

@@ -26,6 +26,7 @@ describe("paginateItems", () => {
       items: [campaign_1],
       start: -1,
       limit: 10,
+      total: 1,
     });
 
     expect(JSON.stringify(result)).toStrictEqual(
@@ -42,6 +43,7 @@ describe("paginateItems", () => {
       items: [campaign_1],
       start: 0,
       limit: -1,
+      total: 1,
     });
 
     expect(JSON.stringify(result)).toStrictEqual(
@@ -58,6 +60,7 @@ describe("paginateItems", () => {
       items: [campaign_1],
       start: 0,
       limit: 10,
+      total: null,
     });
 
     expect(JSON.stringify(result)).toStrictEqual(
@@ -73,7 +76,8 @@ describe("paginateItems", () => {
     const result = await paginateItems({
       items: [campaign_1],
       start: -1,
-      limit: -12,
+      limit: -1,
+      total: null,
     });
 
     expect(JSON.stringify(result)).toStrictEqual(
