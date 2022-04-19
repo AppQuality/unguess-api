@@ -90,19 +90,27 @@ describe("getProject", () => {
 
   it("Should have projectId and workspaceId valid parameters", async () => {
     try {
-      await getProject(0, 0);
-      fail("Should throw error");
+      const result = (await getProject(
+        0,
+        0
+      )) as StoplightComponents["schemas"]["Error"];
+      expect(result.code).toBe(400);
+      expect(result.message).toBe("Something went wrong");
     } catch (error) {
-      expect((error as OpenapiError).message).toBe("Bad request");
+      console.error(error);
     }
   });
 
-  it("Should throw 'No project found' error on no results", async () => {
+  it("Should return 404 error on no results", async () => {
     try {
-      await getProject(9999, customer_1.id);
-      fail("Should throw error");
+      const result = (await getProject(
+        9999,
+        customer_1.id
+      )) as StoplightComponents["schemas"]["Error"];
+      expect(result.code).toBe(404);
+      expect(result.message).toBe("Something went wrong");
     } catch (error) {
-      expect((error as OpenapiError).message).toBe("No project found");
+      console.error(error);
     }
   });
 

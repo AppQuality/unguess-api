@@ -58,7 +58,6 @@ export default async (
   workspace = await getWorkspace(workspaceId, user);
 
   if ("code" in workspace) {
-    console.log(workspace);
     res.status_code = workspace.code || 500;
     error.code = workspace.code || 500;
     return error;
