@@ -354,6 +354,12 @@ components:
           type: string
         code:
           type: number
+        error:
+          type: boolean
+      required:
+        - message
+        - code
+        - error
   securitySchemes:
     JWT:
       type: http
