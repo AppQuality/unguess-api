@@ -9,7 +9,7 @@ export default async (
 ) => {
   let user = req.user;
 
-  res.status_code = 200;
+  res.status_code = 200; //TODO SETTARE COMUNQUE STATUS CODE DELLA RESPONSE
 
   try {
     let wid;

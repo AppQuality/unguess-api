@@ -24,18 +24,15 @@ const loadCsmData = async (
 export default async (
   workspaceId: number,
   user: UserType
-): Promise<Workspace | {}> => {
+): Promise<Workspace | { message: string; code: number }> => {
+  //TODO usare tipi di stoplight
+  let error = { message: "Something went wrong" };
   try {
     // Check parameters
-    if (workspaceId == null || workspaceId <= 0) {
-      throw Error("Bad request");
-    }
+    if (workspaceId == null || workspaceId <= 0) return { ...error, code: 400 };
 
-    if (user.role !== "administrator") {
-      if (user.id == null || user.id <= 0) {
-        throw Error("Bad request");
-      }
-    }
+    if (user.role !== "administrator")
+      if (user.id == null || user.id <= 0) return { ...error, code: 400 };
 
     // Check if workspace exists
     const customerSql = db.format(
@@ -63,7 +60,7 @@ export default async (
         if (userToCustomer.length) {
           userToCustomer = userToCustomer[0];
         } else {
-          throw Error("You have no permission to get this workspace");
+          return { ...error, code: 403 };
         }
       }
 
@@ -92,8 +89,8 @@ export default async (
       } as StoplightComponents["schemas"]["Workspace"];
     }
 
-    throw Error("No workspace found");
-  } catch (error) {
-    throw error;
+    return { ...error, code: 500 };
+  } catch (e) {
+    return { ...error, code: 500 };
   }
 };
