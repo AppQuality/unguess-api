@@ -134,23 +134,8 @@ export default async (
     }
 
     return paginateItems({ items: returnCampaigns, limit, start, total });
-  } catch (error) {
-    const message = (error as OpenapiError).message;
-    if (message === "No workspace found") {
-      res.status_code = 404;
-      return message;
-    } else if (message === "You have no permission to get this workspace") {
-      res.status_code = 403;
-      return message;
-    } else if (message === "No project found") {
-      res.status_code = 404;
-      return message;
-    } else if (message === "Bad request, pagination data is not valid") {
-      res.status_code = 400;
-      return message;
-    } else {
-      res.status_code = 500;
-      throw error;
-    }
+  } catch (e) {
+    error.code = 500;
+    return error;
   }
 };
