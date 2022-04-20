@@ -1,4 +1,4 @@
-/** OPENAPI-ROUTE: get-workspace-project */
+/** OPENAPI-ROUTE: get-projects-projectId */
 import { Context } from "openapi-backend";
 
 import getyProjectById from "@src/routes/projects/projectId/getProjectById";
@@ -19,8 +19,10 @@ export default async (
   let pid = parseInt(c.request.params.pid as string);
 
   try {
+    console.log("asdasdasd");
     return await getyProjectById(pid, user);
   } catch (e: any) {
+    console.log("something went wrong", e);
     if (e.code) {
       error.code = e.code;
       res.status_code = e.code;

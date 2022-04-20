@@ -1,4 +1,4 @@
-/** OPENAPI-ROUTE: get-workspace-project-campaigns */
+/** OPENAPI-ROUTE: get-projects-projectId-campaigns */
 import { Context } from "openapi-backend";
 import * as db from "@src/features/db";
 import getProjectById from "@src/routes/projects/projectId/getProjectById";

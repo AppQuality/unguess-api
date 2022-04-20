@@ -48,16 +48,14 @@ export default async (c: Context, req: Request, res: OpenapiResponse) => {
     }
 
     const { iat, exp } = tokenData;
-    const responseJson = {
+    const responseJson: StoplightComponents["schemas"]["Authentication"] = {
       id: data.id,
       name: data.user_login,
       email: data.email,
       role: data.role,
-      tryber_wp_user_id: data.tryber_wp_user_id,
-      profile_id: data.profile_id,
       token: token,
-      iat: iat,
-      exp: exp,
+      ...(iat && { iat: iat }),
+      ...(exp && { exp: exp }),
     };
 
     res.status_code = 200;

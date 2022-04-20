@@ -94,6 +94,18 @@ export interface components {
       tryber_wp_user_id: number;
       picture?: string;
     };
+    /** Authentication */
+    Authentication: {
+      id: number;
+      /** Format: email */
+      email: string;
+      role: string;
+      name: string;
+      picture?: string;
+      token: string;
+      iat?: number;
+      exp?: number;
+    };
     /** Workspace */
     Workspace: {
       id: number;
@@ -205,7 +217,7 @@ export interface operations {
       /** OK */
       200: {
         content: {
-          "application/json": components["schemas"]["User"];
+          "application/json": components["schemas"]["Authentication"];
         };
       };
       500: components["responses"]["Error"];

@@ -11,8 +11,6 @@ export default async (
     code: 400,
   } as StoplightComponents["schemas"]["Error"];
 
-  console.log("AAAAA getProjectById", projectId, user);
-
   // Check parameters
   if (!projectId) throw error;
 
@@ -21,7 +19,7 @@ export default async (
     if (!user.id) throw error;
 
     const projectSql = db.format(
-      `SELECT p.* FROM wp_appq_project 
+      `SELECT p.* FROM wp_appq_project p
         JOIN wp_appq_customer c ON (c.id = p.customer_id)
         JOIN wp_appq_user_to_customer uc ON (uc.customer_id = c.id)
       WHERE p.id = ? AND uc.wp_user_id = ?`,
@@ -42,17 +40,22 @@ export default async (
     const userToProject = await db.query(userToProjectSql);
 
     if (userToProject.length) {
-      console.log("userToProject", userToProject);
-      //We have to check if the current user is in the project
+      let isAllowed = false;
+      userToProject.forEach((limit: { wp_user_id: number }) => {
+        if (limit.wp_user_id === user.id) isAllowed = true;
+      });
 
-      return project;
+      if (!isAllowed) throw { ...error, code: 403 };
+
+      return await formatProject(project);
     } else {
-      return project;
+      //No limited users, we can safely return the project
+      return await formatProject(project);
     }
   } else {
     //Get the project
     const projectSql = db.format(
-      `SELECT p.* FROM wp_appq_project WHERE id = ?`,
+      `SELECT p.* FROM wp_appq_project p WHERE p.id = ?`,
       [projectId]
     );
 
@@ -60,6 +63,20 @@ export default async (
 
     if (!project.length) throw error;
 
-    return project[0];
+    return await formatProject(project[0]);
   }
+};
+
+const formatProject = async (project: any) => {
+  const campaignsCountSql =
+    "SELECT COUNT(*) AS count FROM wp_appq_evd_campaign WHERE project_id = ?";
+  let campaignsCount = await db.query(
+    db.format(campaignsCountSql, [project.id])
+  );
+
+  return {
+    id: project.id,
+    name: project.display_name,
+    campaigns_count: campaignsCount[0].count,
+  };
 };
