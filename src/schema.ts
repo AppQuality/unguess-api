@@ -23,8 +23,8 @@ export interface paths {
     get: operations["get-workspace"];
     parameters: {
       path: {
-        /** Workspace (company) id */
-        wid: number;
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
       };
     };
   };
@@ -32,8 +32,8 @@ export interface paths {
     get: operations["get-workspace-campaigns"];
     parameters: {
       path: {
-        /** Workspace (company) id */
-        wid: number;
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
       };
     };
   };
@@ -41,8 +41,8 @@ export interface paths {
     get: operations["get-workspace-projects"];
     parameters: {
       path: {
-        /** Workspace (company) id */
-        wid: number;
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
       };
     };
   };
@@ -50,10 +50,10 @@ export interface paths {
     get: operations["get-workspace-project"];
     parameters: {
       path: {
-        /** Workspace (company) id */
-        wid: number;
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
         /** Project id */
-        pid: number;
+        pid: components["parameters"]["pid"];
       };
     };
   };
@@ -61,10 +61,29 @@ export interface paths {
     get: operations["get-workspace-project-campaigns"];
     parameters: {
       path: {
-        /** Workspace (company) id */
-        wid: number;
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
+        /** Project id */
+        pid: components["parameters"]["pid"];
+      };
+    };
+  };
+  "/projects/{pid}/campaigns": {
+    get: operations["get-project-campaigns"];
+    parameters: {
+      path: {
         /** Project id */
         pid: number;
+      };
+    };
+  };
+  "/projects/{pid}": {
+    /** Retrieve projects details from an ID. */
+    get: operations["get-projects-projectId"];
+    parameters: {
+      path: {
+        /** Project id */
+        pid: components["parameters"]["pid"];
       };
     };
   };
@@ -80,9 +99,21 @@ export interface components {
       role: string;
       name: string;
       workspaces: components["schemas"]["Workspace"][];
-      profile_id?: number;
-      tryber_wp_user_id?: number;
+      profile_id: number;
+      tryber_wp_user_id: number;
       picture?: string;
+    };
+    /** Authentication */
+    Authentication: {
+      id: number;
+      /** Format: email */
+      email: string;
+      role: string;
+      name: string;
+      picture?: string;
+      token: string;
+      iat?: number;
+      exp?: number;
     };
     /** Workspace */
     Workspace: {
@@ -115,72 +146,62 @@ export interface components {
       name: string;
       campaigns_count: number;
     };
+    /** Error */
+    Error: {
+      message: string;
+      code: number;
+      error: boolean;
+    };
   };
   responses: {
-    /** Authentication data. The token can be used to authenticate the protected requests */
-    Authentication: {
+    /** Example response */
+    Error: {
       content: {
-        "application/json": {
-          id?: number;
-          firstName?: string;
-          lastName?: string;
-          token?: string;
-          username?: string;
-        };
+        "application/json": components["schemas"]["Error"];
       };
     };
-    /** An error due to the resource not existing */
-    NotFound: {
+    /** Paginated response */
+    PaginatedResponse: {
       content: {
         "application/json": {
-          element: string;
-          id: number;
-          message: string;
-        };
-      };
-    };
-    /** An error due to missing required parameters */
-    MissingParameters: {
-      content: {
-        "application/json": {
-          message: string;
-        };
-      };
-    };
-    /** An error due to insufficient authorization to access the resource */
-    NotAuthorized: {
-      content: {
-        "application/json": {
-          message?: string;
+          items?: (
+            | components["schemas"]["Campaign"]
+            | components["schemas"]["Workspace"]
+            | components["schemas"]["Project"]
+          )[];
+          start?: number;
+          limit?: number;
+          size?: number;
+          total?: number;
         };
       };
     };
   };
   parameters: {
-    /** @description A campaign id */
-    campaign: string;
-    /** @description A task id */
-    task: string;
-    /** @description A customer id */
-    customer: string;
-    /** @description A project id */
-    project: string;
-    /** @description Max items to retrieve */
+    /** @description Workspace (company, customer) id */
+    wid: number;
+    /** @description Project id */
+    pid: number;
+    /** @description Limit pagination parameter */
     limit: number;
-    /** @description Items to skip for pagination */
+    /** @description Start pagination parameter */
     start: number;
-    /** @description Key-value Array for item filtering */
-    filterBy: { [key: string]: unknown };
-    /** @description How to order values (ASC, DESC) */
-    order: "ASC" | "DESC";
-    /** @description How to localize values */
-    locale: "en" | "it";
-    /** @description A comma separated list of fields which will be searched */
-    searchBy: string;
-    /** @description The value to search for */
-    search: string;
-    /** @description The field used as reference to order the result */
+    /** @description Order value (ASC, DESC) */
+    order: string;
+    /** @description Order by accepted field */
     orderBy: string;
+    /** @description filterBy[<fieldName>]=<fieldValue> */
+    filterBy: unknown;
+  };
+  requestBodies: {
+    Credentials: {
+      content: {
+        "application/json": {
+          username: string;
+          password: string;
+        };
+      };
+    };
   };
 }
 
@@ -195,29 +216,22 @@ export interface operations {
           "application/json": { [key: string]: unknown };
         };
       };
+      500: components["responses"]["Error"];
     };
   };
   /** A request to login with your username and password */
   "post-authenticate": {
     parameters: {};
     responses: {
-      200: components["responses"]["Authentication"];
-      /** Unauthorized */
-      401: {
+      /** OK */
+      200: {
         content: {
-          "application/json": string;
+          "application/json": components["schemas"]["Authentication"];
         };
       };
+      500: components["responses"]["Error"];
     };
-    /** A JSON containing username and password */
-    requestBody: {
-      content: {
-        "application/json": {
-          username: string;
-          password: string;
-        };
-      };
-    };
+    requestBody: components["requestBodies"]["Credentials"];
   };
   "get-users-me": {
     responses: {
@@ -226,26 +240,32 @@ export interface operations {
           "application/json": components["schemas"]["User"];
         };
       };
-      403: components["responses"]["NotAuthorized"];
-      404: components["responses"]["NotFound"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
     };
   };
   "get-workspaces": {
-    parameters: {};
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Workspace"][];
-        };
+    parameters: {
+      query: {
+        /** Limit pagination parameter */
+        limit?: components["parameters"]["limit"];
+        /** Start pagination parameter */
+        start?: components["parameters"]["start"];
       };
+    };
+    responses: {
+      200: components["responses"]["PaginatedResponse"];
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      404: components["responses"]["Error"];
+      500: components["responses"]["Error"];
     };
   };
   "get-workspace": {
     parameters: {
       path: {
-        /** Workspace (company) id */
-        wid: number;
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
       };
     };
     responses: {
@@ -255,66 +275,67 @@ export interface operations {
           "application/json": components["schemas"]["Workspace"];
         };
       };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      404: components["responses"]["Error"];
+      500: components["responses"]["Error"];
     };
   };
   "get-workspace-campaigns": {
     parameters: {
       path: {
-        /** Workspace (company) id */
-        wid: number;
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
       };
       query: {
-        /** Max items to retrieve */
+        /** Limit pagination parameter */
         limit?: components["parameters"]["limit"];
-        /** Items to skip for pagination */
+        /** Start pagination parameter */
         start?: components["parameters"]["start"];
-        /** How to order values (ASC, DESC) */
+        /** Order value (ASC, DESC) */
         order?: components["parameters"]["order"];
-        /** The field used as reference to order the result */
+        /** Order by accepted field */
         orderBy?: components["parameters"]["orderBy"];
-        /** Key-value Array for item filtering */
+        /** filterBy[<fieldName>]=<fieldValue> */
         filterBy?: components["parameters"]["filterBy"];
       };
     };
     responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/json": {
-            items: components["schemas"]["Campaign"][];
-            total: number;
-            start: number;
-            size: number;
-            limit: number;
-          };
-          "application/xml": { [key: string]: unknown };
-        };
-      };
+      200: components["responses"]["PaginatedResponse"];
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      404: components["responses"]["Error"];
+      500: components["responses"]["Error"];
     };
   };
   "get-workspace-projects": {
     parameters: {
       path: {
-        /** Workspace (company) id */
-        wid: number;
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
+      };
+      query: {
+        /** Limit pagination parameter */
+        limit?: components["parameters"]["limit"];
+        /** Start pagination parameter */
+        start?: components["parameters"]["start"];
       };
     };
     responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Project"][];
-        };
-      };
+      200: components["responses"]["PaginatedResponse"];
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      404: components["responses"]["Error"];
+      500: components["responses"]["Error"];
     };
   };
   "get-workspace-project": {
     parameters: {
       path: {
-        /** Workspace (company) id */
-        wid: number;
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
         /** Project id */
-        pid: number;
+        pid: components["parameters"]["pid"];
       };
     };
     responses: {
@@ -324,24 +345,74 @@ export interface operations {
           "application/json": components["schemas"]["Project"];
         };
       };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      404: components["responses"]["Error"];
+      500: components["responses"]["Error"];
     };
   };
   "get-workspace-project-campaigns": {
     parameters: {
       path: {
-        /** Workspace (company) id */
-        wid: number;
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
+        /** Project id */
+        pid: components["parameters"]["pid"];
+      };
+      query: {
+        /** Limit pagination parameter */
+        limit?: components["parameters"]["limit"];
+        /** Start pagination parameter */
+        start?: components["parameters"]["start"];
+      };
+    };
+    responses: {
+      200: components["responses"]["PaginatedResponse"];
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      404: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  "get-project-campaigns": {
+    parameters: {
+      path: {
         /** Project id */
         pid: number;
+      };
+      query: {
+        /** Limit pagination parameter */
+        limit?: components["parameters"]["limit"];
+        /** Start pagination parameter */
+        start?: components["parameters"]["start"];
+      };
+    };
+    responses: {
+      200: components["responses"]["PaginatedResponse"];
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      404: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  /** Retrieve projects details from an ID. */
+  "get-projects-projectId": {
+    parameters: {
+      path: {
+        /** Project id */
+        pid: components["parameters"]["pid"];
       };
     };
     responses: {
       /** OK */
       200: {
         content: {
-          "application/json": components["schemas"]["Campaign"][];
+          "application/json": components["schemas"]["Project"];
         };
       };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
     };
   };
 }

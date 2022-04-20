@@ -3,6 +3,12 @@ import { Context } from "openapi-backend";
 import * as db from "../../../../../features/db";
 import getWorkspace from "@src/routes/workspaces/workspaceId/getWorkspace";
 import getUserProjects from "../../getUserProjects";
+import paginateItems, { formatCount } from "@src/routes/shared/paginateItems";
+import {
+  ERROR_MESSAGE,
+  LIMIT_QUERY_PARAM_DEFAULT,
+  START_QUERY_PARAM_DEFAULT,
+} from "@src/routes/shared";
 
 export default async (
   c: Context,
@@ -12,38 +18,20 @@ export default async (
   let user = req.user;
   res.status_code = 200;
 
+  let error = {
+    message: ERROR_MESSAGE,
+    error: true,
+  } as StoplightComponents["schemas"]["Error"];
+
   try {
-    let customer_id;
-    if (typeof c.request.params.wid === "string")
-      customer_id = parseInt(
-        c.request.params.wid
-      ) as StoplightOperations["get-workspace-campaigns"]["parameters"]["path"]["wid"];
+    let wid = parseInt(c.request.params.wid as string);
 
-    if (!customer_id || customer_id < 0) {
-      res.status_code = 400;
-      return "Customer not valid";
-    }
-
-    let limit = 10;
-    if (typeof c.request.query.limit === "string")
-      limit =
-        (parseInt(
-          c.request.query.limit
-        ) as StoplightOperations["get-workspace-campaigns"]["parameters"]["query"]["limit"]) ||
-        10;
-
-    let start = 0;
-    if (typeof c.request.query.start === "string")
-      start =
-        (parseInt(
-          c.request.query.start
-        ) as StoplightOperations["get-workspace-campaigns"]["parameters"]["query"]["start"]) ||
-        0;
-
-    if (start < 0 || limit < 0) {
-      res.status_code = 400;
-      return "Bad request, pagination data is not valid";
-    }
+    let limit = c.request.query.limit
+      ? parseInt(c.request.query.limit as string)
+      : (LIMIT_QUERY_PARAM_DEFAULT as StoplightComponents["parameters"]["limit"]);
+    let start = c.request.query.start
+      ? parseInt(c.request.query.start as string)
+      : (START_QUERY_PARAM_DEFAULT as StoplightComponents["parameters"]["start"]);
 
     let order;
     if (typeof c.request.query.order === "string")
@@ -52,7 +40,8 @@ export default async (
 
     if (order && order !== "ASC" && order !== "DESC") {
       res.status_code = 400;
-      return "Bad request, order data is not valid";
+      error.code = 400;
+      return error;
     }
 
     const validOrderByFields = [
@@ -62,18 +51,21 @@ export default async (
       "title",
     ];
     let orderBy;
+
     if (typeof c.request.query.orderBy === "string")
       orderBy = c.request.query
         .orderBy as StoplightOperations["get-workspace-campaigns"]["parameters"]["query"]["orderBy"];
 
     if (orderBy && !validOrderByFields.includes(orderBy)) {
       res.status_code = 400;
-      return "Bad request, orderBy value not allowed";
+      error.code = 400;
+      return error;
     }
 
     if ((order && !orderBy) || (!order && orderBy)) {
       res.status_code = 400;
-      return "Bad request, ordination data is not valid";
+      error.code = 400;
+      return error;
     }
 
     const validFilterByFields: { [key: string]: string } = {
@@ -95,7 +87,8 @@ export default async (
 
       if (!acceptedFilters.length) {
         res.status_code = 400;
-        return "Bad request, filter value not allowed";
+        error.code = 400;
+        return error;
       } else {
         acceptedFilters = acceptedFilters.map((k) => {
           const v = filterBy[k];
@@ -116,18 +109,12 @@ export default async (
       }
     }
 
-    await getWorkspace(customer_id, user);
+    await getWorkspace(wid, user);
 
-    let userProjects = await getUserProjects(customer_id, user);
+    let userProjects = await getUserProjects(wid, user);
 
     if (!userProjects.length) {
-      return {
-        items: [],
-        total: 0,
-        limit: 0,
-        start: 0,
-        size: 0,
-      };
+      return await paginateItems({ items: [], total: 0 });
     }
 
     // Return all the user projects ids
@@ -161,17 +148,10 @@ export default async (
     const campaigns = await db.query(query);
 
     const countQuery = `SELECT COUNT(*) FROM wp_appq_evd_campaign c JOIN wp_appq_project p ON c.project_id = p.id WHERE p.id IN (${userProjectsID})`;
-    let totalSize = await db.query(countQuery);
-    totalSize = totalSize.map((el: any) => el["COUNT(*)"])[0];
+    let total = await db.query(countQuery);
+    total = formatCount(total);
 
-    if (!campaigns.length)
-      return {
-        items: [],
-        total: 0,
-        limit: 0,
-        start: 0,
-        size: 0,
-      };
+    if (!campaigns.length) return await paginateItems({ items: [], total: 0 });
 
     let stoplightCampaign = campaigns.map((campaign: any) => {
       return {
@@ -197,21 +177,21 @@ export default async (
         project_name: campaign.display_name,
       };
     });
-
-    return {
+    return await paginateItems({
       items: stoplightCampaign,
       limit,
       start,
-      size: stoplightCampaign.length,
-      total: totalSize,
-    };
-  } catch (e) {
-    const message = (e as OpenapiError).message;
-    if (message === "No workspace found") {
-      res.status_code = 404;
-      return message;
+      total,
+    });
+  } catch (e: any) {
+    if (e.code) {
+      error.code = e.code;
+      res.status_code = e.code;
+    } else {
+      error.code = 500;
+      res.status_code = 500;
     }
-    res.status_code = 500;
-    throw e;
+
+    return error;
   }
 };

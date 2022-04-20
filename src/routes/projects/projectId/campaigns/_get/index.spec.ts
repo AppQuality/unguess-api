@@ -78,9 +78,9 @@ const user_to_project_4 = {
 
 const campaign_1 = {
   id: 1,
-  start_date: "2017-07-20 10:00:00",
-  end_date: "2017-07-20 10:00:00",
-  close_date: "2017-07-20 10:00:00",
+  start_date: "2017-07-20 00:00:00",
+  end_date: "2017-07-20 00:00:00",
+  close_date: "2017-07-20 00:00:00",
   title: "Campagnetta Funzionale Provetta 1",
   customer_title: "titolo 1",
   description: "Descrizione della campagnazione 1",
@@ -92,9 +92,9 @@ const campaign_1 = {
 
 const campaign_2 = {
   id: 2,
-  start_date: "2017-07-20 10:00:00",
-  end_date: "2017-07-20 10:00:00",
-  close_date: "2017-07-20 10:00:00",
+  start_date: "2017-07-20 00:00:00",
+  end_date: "2017-07-20 00:00:00",
+  close_date: "2017-07-20 00:00:00",
   title: "Campagnetta Funzionale Provetta 2",
   customer_title: "titolo 2",
   description: "Descrizione della campagnazione 2",
@@ -106,9 +106,9 @@ const campaign_2 = {
 
 const campaign_3 = {
   id: 3,
-  start_date: "2017-07-20 10:00:00",
-  end_date: "2017-07-20 10:00:00",
-  close_date: "2017-07-20 10:00:00",
+  start_date: "2017-07-20 00:00:00",
+  end_date: "2017-07-20 00:00:00",
+  close_date: "2017-07-20 00:00:00",
   title: "Campagnetta Funzionale Provetta 3",
   customer_title: "titolo 3",
   description: "Descrizione della campagnazione 3",
@@ -124,7 +124,7 @@ const campaign_type_1 = {
   type: 1,
 };
 
-describe("GET /workspaces/{wid}/projects/{pid}/campaigns", () => {
+describe("GET /projects/{pid}/campaigns", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
@@ -223,6 +223,7 @@ describe("GET /workspaces/{wid}/projects/{pid}/campaigns", () => {
     const response = await request(app)
       .get(`/workspaces/${customer_1.id}/projects/${project_1.id}/campaigns`)
       .set("authorization", "Bearer customer");
+
     expect(response.body).toStrictEqual({
       items: [
         {

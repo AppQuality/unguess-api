@@ -1,6 +1,7 @@
-/** OPENAPI-ROUTE: get-workspace */
+/** OPENAPI-ROUTE: get-projects-projectId */
 import { Context } from "openapi-backend";
-import getWorkspace from "../getWorkspace";
+
+import getyProjectById from "@src/routes/projects/projectId/getProjectById";
 import { ERROR_MESSAGE } from "@src/routes/shared";
 
 export default async (
@@ -11,18 +12,14 @@ export default async (
   let user = req.user;
   let error = {
     message: ERROR_MESSAGE,
-    code: 0,
     error: true,
   } as StoplightComponents["schemas"]["Error"];
-
   res.status_code = 200;
 
+  let pid = parseInt(c.request.params.pid as string);
+
   try {
-    let wid = parseInt(c.request.params.wid as string);
-
-    const result = await getWorkspace(wid, user);
-
-    return result as StoplightComponents["schemas"]["Workspace"];
+    return await getyProjectById(pid, user);
   } catch (e: any) {
     if (e.code) {
       error.code = e.code;

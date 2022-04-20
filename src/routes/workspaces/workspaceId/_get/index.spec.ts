@@ -83,11 +83,11 @@ describe("GET /workspaces/{wid}", () => {
     expect(response.status).toBe(200);
   });
 
-  it("Should answer 404 if no workspaces are found", async () => {
+  it("Should answer 403 if no workspaces are found", async () => {
     const response = await request(app)
-      .get("/workspaces/99999291")
+      .get("/workspaces/99999")
       .set("authorization", "Bearer customer");
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(403);
   });
 
   it("Should answer 400 of the requested parameter is wrong", async () => {
@@ -106,8 +106,18 @@ describe("GET /workspaces/{wid}", () => {
       JSON.stringify({
         id: customer_1.id,
         company: customer_1.company,
-        logo: customer_1.company_logo,
         tokens: customer_1.tokens,
+        logo: customer_1.company_logo,
+        csm: {
+          id: 20739,
+          name: "Gianluca",
+          surname: "Peretti",
+          email: "gianluca.peretti@unguess.io",
+          role: "admin",
+          tryber_wp_user_id: 20739,
+          profile_id: 21605,
+          workspaces: [],
+        },
       })
     );
   });

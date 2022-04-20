@@ -16,8 +16,8 @@ export default async (
   //Get User Profile (wp_appq_evd_profile)
   let profileData = await getProfile(user.profile_id);
 
-  let workspaces = await getUserWorkspaces(user);
-  setWorkspaces(user, workspaces);
+  let userWorkspaces = await getUserWorkspaces(user, 1, 1);
+  setWorkspaces(user, userWorkspaces.workspaces);
 
   return formattedUser(user, profileData);
 };
@@ -37,7 +37,6 @@ const getProfile = async (profile_id: number | undefined): Promise<any> => {
 
 const setWorkspaces = (user: UserType, workspaces: Array<object>) => {
   user.workspaces = [];
-
   if (workspaces.length) {
     workspaces.forEach((workspace: any) => {
       user.workspaces.push({
