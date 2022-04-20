@@ -40,7 +40,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/Authentication'
         '500':
           $ref: '#/components/responses/Error'
       requestBody:
@@ -209,6 +209,58 @@ paths:
         - $ref: '#/components/parameters/start'
       security:
         - JWT: []
+  '/projects/{pid}/campaigns':
+    parameters:
+      - name: pid
+        in: path
+        required: true
+        schema:
+          type: number
+        description: Project id
+    get:
+      summary: GET campaigns by Project ID
+      tags: []
+      responses:
+        '200':
+          $ref: '#/components/responses/PaginatedResponse'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-project-campaigns
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
+      security:
+        - JWT: []
+  '/projects/{pid}':
+    parameters:
+      - $ref: '#/components/parameters/pid'
+    get:
+      summary: Get single project by ID
+      tags:
+        - Projects
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-projects-projectId
+      description: Retrieve projects details from an ID.
+      security:
+        - JWT: []
 components:
   schemas:
     User:
@@ -255,6 +307,46 @@ components:
         - workspaces
         - profile_id
         - tryber_wp_user_id
+    Authentication:
+      title: Authentication
+      type: object
+      description: ''
+      x-examples:
+        example-1:
+          value:
+            username: string
+            name: string
+            surname: string
+            email: user@example.com
+            image: 'http://example.com'
+            id: 0
+            wp_user_id: 0
+            role: string
+            is_verified: true
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+        name:
+          type: string
+        picture:
+          type: string
+        token:
+          type: string
+        iat:
+          type: number
+        exp:
+          type: number
+      required:
+        - id
+        - email
+        - role
+        - name
+        - token
     Workspace:
       title: Workspace
       type: object

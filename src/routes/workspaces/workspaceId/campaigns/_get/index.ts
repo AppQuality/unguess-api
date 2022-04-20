@@ -3,9 +3,7 @@ import { Context } from "openapi-backend";
 import * as db from "../../../../../features/db";
 import getWorkspace from "@src/routes/workspaces/workspaceId/getWorkspace";
 import getUserProjects from "../../getUserProjects";
-import paginateItems, {
-  formatCount,
-} from "@src/routes/workspaces/paginateItems";
+import paginateItems, { formatCount } from "@src/routes/shared/paginateItems";
 import {
   ERROR_MESSAGE,
   LIMIT_QUERY_PARAM_DEFAULT,

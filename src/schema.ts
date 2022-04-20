@@ -68,6 +68,25 @@ export interface paths {
       };
     };
   };
+  "/projects/{pid}/campaigns": {
+    get: operations["get-project-campaigns"];
+    parameters: {
+      path: {
+        /** Project id */
+        pid: number;
+      };
+    };
+  };
+  "/projects/{pid}": {
+    /** Retrieve projects details from an ID. */
+    get: operations["get-projects-projectId"];
+    parameters: {
+      path: {
+        /** Project id */
+        pid: components["parameters"]["pid"];
+      };
+    };
+  };
 }
 
 export interface components {
@@ -83,6 +102,18 @@ export interface components {
       profile_id: number;
       tryber_wp_user_id: number;
       picture?: string;
+    };
+    /** Authentication */
+    Authentication: {
+      id: number;
+      /** Format: email */
+      email: string;
+      role: string;
+      name: string;
+      picture?: string;
+      token: string;
+      iat?: number;
+      exp?: number;
     };
     /** Workspace */
     Workspace: {
@@ -195,7 +226,7 @@ export interface operations {
       /** OK */
       200: {
         content: {
-          "application/json": components["schemas"]["User"];
+          "application/json": components["schemas"]["Authentication"];
         };
       };
       500: components["responses"]["Error"];
@@ -340,6 +371,47 @@ export interface operations {
       400: components["responses"]["Error"];
       403: components["responses"]["Error"];
       404: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  "get-project-campaigns": {
+    parameters: {
+      path: {
+        /** Project id */
+        pid: number;
+      };
+      query: {
+        /** Limit pagination parameter */
+        limit?: components["parameters"]["limit"];
+        /** Start pagination parameter */
+        start?: components["parameters"]["start"];
+      };
+    };
+    responses: {
+      200: components["responses"]["PaginatedResponse"];
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      404: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  /** Retrieve projects details from an ID. */
+  "get-projects-projectId": {
+    parameters: {
+      path: {
+        /** Project id */
+        pid: components["parameters"]["pid"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Project"];
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
       500: components["responses"]["Error"];
     };
   };
