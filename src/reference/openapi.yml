@@ -40,7 +40,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/Authentication'
         '500':
           $ref: '#/components/responses/Error'
       requestBody:
@@ -279,6 +279,48 @@ components:
         - workspaces
         - profile_id
         - tryber_wp_user_id
+    Authentication:
+      title: Authentication
+      type: object
+      description: ''
+      x-examples:
+        example-1:
+          value:
+            username: string
+            name: string
+            surname: string
+            email: user@example.com
+            image: 'http://example.com'
+            id: 0
+            wp_user_id: 0
+            role: string
+            is_verified: true
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+        name:
+          type: string
+        picture:
+          type: string
+        token:
+          type: string
+        iat:
+          type: string
+        exp:
+          type: string
+      required:
+        - id
+        - email
+        - role
+        - name
+        - token
+        - iat
+        - exp
     Workspace:
       title: Workspace
       type: object
