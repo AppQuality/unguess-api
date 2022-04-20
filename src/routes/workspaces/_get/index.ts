@@ -1,7 +1,7 @@
 /** OPENAPI-ROUTE: get-workspaces */
 import { Context } from "openapi-backend";
 import getUserWorkspaces from "../getUserWorkspaces";
-import paginateItems from "@src/routes/workspaces/paginateItems";
+import paginateItems from "@src/routes/shared/paginateItems";
 import {
   ERROR_MESSAGE,
   LIMIT_QUERY_PARAM_DEFAULT,

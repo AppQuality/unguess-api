@@ -1,8 +1,8 @@
 /** OPENAPI-ROUTE: get-workspace-project-campaigns */
 import { Context } from "openapi-backend";
-import * as db from "../../../../../../../features/db";
-import getProject from "../../getProject";
-import getWorkspace from "../../../../getWorkspace";
+import * as db from "@src/features/db";
+import getProjectById from "@src/routes/projects/projectId/getProjectById";
+
 import paginateItems, { formatCount } from "@src/routes/shared/paginateItems";
 import {
   ERROR_MESSAGE,
@@ -22,7 +22,6 @@ export default async (
   } as StoplightComponents["schemas"]["Error"];
   res.status_code = 200;
 
-  let wid = parseInt(c.request.params.wid as string);
   let pid = parseInt(c.request.params.pid as string);
 
   let limit = c.request.query.limit
@@ -33,10 +32,9 @@ export default async (
     : (START_QUERY_PARAM_DEFAULT as StoplightComponents["parameters"]["start"]);
 
   try {
-    await getWorkspace(wid, user);
-    let projectResult = (await getProject(
+    let prj = (await getProjectById(
       pid,
-      wid
+      user
     )) as StoplightComponents["schemas"]["Project"];
 
     // Get project campaigns
@@ -67,8 +65,8 @@ export default async (
       JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id 
       WHERE c.project_id = ?`;
 
-    let campaigns = await db.query(db.format(campaignsSql, [projectResult.id]));
-    let total = await db.query(db.format(countQuery, [projectResult.id]));
+    let campaigns = await db.query(db.format(campaignsSql, [prj.id]));
+    let total = await db.query(db.format(countQuery, [prj.id]));
     total = formatCount(total);
 
     let returnCampaigns: Array<StoplightComponents["schemas"]["Campaign"]> = [];
@@ -86,7 +84,7 @@ export default async (
         campaign_type_id: campaign.campaign_type_id,
         campaign_type_name: campaign.campaign_type_name,
         project_id: campaign.project_id,
-        project_name: projectResult.name,
+        project_name: prj.name,
         test_type_name:
           campaign.test_type_id === 1 ? "Experiential" : "Functional",
       });

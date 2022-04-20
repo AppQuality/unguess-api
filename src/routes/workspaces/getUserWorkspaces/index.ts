@@ -1,6 +1,6 @@
 import * as db from "../../../features/db";
 import { getGravatar } from "@src/routes/users/utils";
-import { formatCount } from "@src/routes/workspaces/paginateItems";
+import { formatCount } from "@src/routes/shared/paginateItems";
 
 const fallBackCsmProfile = {
   id: 20739,
