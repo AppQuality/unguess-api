@@ -3,6 +3,7 @@ import { Context } from "openapi-backend";
 import getProject from "../getProject";
 import getWorkspace from "../../../getWorkspace";
 import { ERROR_MESSAGE } from "@src/routes/shared";
+import getUserProjects from "../../../getUserProjects";
 
 export default async (
   c: Context,
@@ -20,10 +21,23 @@ export default async (
   let pid = parseInt(c.request.params.pid as string);
 
   try {
+    // Get customer
     await getWorkspace(wid, user);
 
-    let projectResult = await getProject(pid, wid);
-    return projectResult;
+    // Get all customer's project
+    let customerProjects = await getUserProjects(wid, user);
+
+    // Get all project ids
+    let projectIds = customerProjects.map((project) => project.id);
+
+    // Get requested project
+    let project = await getProject(pid, wid);
+
+    if (projectIds.includes(project.id)) {
+      return project;
+    }
+
+    return { ...error, code: 403 };
   } catch (e: any) {
     if (e.code) {
       error.code = e.code;

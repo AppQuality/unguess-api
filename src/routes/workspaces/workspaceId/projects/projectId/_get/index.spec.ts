@@ -130,9 +130,18 @@ describe("GET /workspaces/{wid}/projects/{pid}", () => {
       .get(`/workspaces/${customer_1.id}/projects/${project_1.id}`)
       .set("authorization", "Bearer customer");
     expect(response.body).toMatchObject({
-      id: 1,
-      name: "Projettino unoh",
+      id: project_1.id,
+      name: project_1.display_name,
       campaigns_count: 1,
     });
+  });
+
+  it("Should answer with 403 if the user has not permission or if project is not found", async () => {
+    const response = await request(app)
+      .get(`/workspaces/${customer_1.id}/projects/3`)
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(403);
+    expect(response.body.code).toBe(403);
+    expect(response.body.message).toBe(ERROR_MESSAGE);
   });
 });
