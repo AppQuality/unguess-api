@@ -78,9 +78,9 @@ const user_to_project_4 = {
 
 const campaign_1 = {
   id: 1,
-  start_date: "2017-07-20 00:00:00",
-  end_date: "2017-07-20 00:00:00",
-  close_date: "2017-07-20 00:00:00",
+  start_date: "2017-07-20 10:00:00",
+  end_date: "2017-07-20 10:00:00",
+  close_date: "2017-07-20 10:00:00",
   title: "Campagnetta Funzionale Provetta 1",
   customer_title: "titolo 1",
   description: "Descrizione della campagnazione 1",
@@ -88,14 +88,13 @@ const campaign_1 = {
   is_public: 0,
   campaign_type_id: 1,
   project_id: 1,
-  customer_id: 2,
 };
 
 const campaign_2 = {
   id: 2,
-  start_date: "2017-07-20 00:00:00",
-  end_date: "2017-07-20 00:00:00",
-  close_date: "2017-07-20 00:00:00",
+  start_date: "2017-07-20 10:00:00",
+  end_date: "2017-07-20 10:00:00",
+  close_date: "2017-07-20 10:00:00",
   title: "Campagnetta Funzionale Provetta 2",
   customer_title: "titolo 2",
   description: "Descrizione della campagnazione 2",
@@ -103,14 +102,13 @@ const campaign_2 = {
   is_public: 0,
   campaign_type_id: 1,
   project_id: 1,
-  customer_id: 2,
 };
 
 const campaign_3 = {
   id: 3,
-  start_date: "2017-07-20 00:00:00",
-  end_date: "2017-07-20 00:00:00",
-  close_date: "2017-07-20 00:00:00",
+  start_date: "2017-07-20 10:00:00",
+  end_date: "2017-07-20 10:00:00",
+  close_date: "2017-07-20 10:00:00",
   title: "Campagnetta Funzionale Provetta 3",
   customer_title: "titolo 3",
   description: "Descrizione della campagnazione 3",
@@ -118,7 +116,6 @@ const campaign_3 = {
   is_public: 0,
   campaign_type_id: 1,
   project_id: 3,
-  customer_id: 2,
 };
 
 const campaign_type_1 = {
@@ -226,48 +223,31 @@ describe("GET /workspaces/{wid}/projects/{pid}/campaigns", () => {
     const response = await request(app)
       .get(`/workspaces/${customer_1.id}/projects/${project_1.id}/campaigns`)
       .set("authorization", "Bearer customer");
-
-    expect(JSON.stringify(response.body)).toStrictEqual(
-      JSON.stringify({
-        items: [
-          {
-            id: 1,
-            start_date: "2017-07-19T22:00:00.000Z",
-            end_date: "2017-07-19T22:00:00.000Z",
-            close_date: "2017-07-19T22:00:00.000Z",
-            title: "Campagnetta Funzionale Provetta 1",
-            customer_title: "titolo 1",
-            description: "Descrizione della campagnazione 1",
-            status_id: 1,
-            is_public: 0,
-            campaign_type_id: 1,
-            campaign_type_name: "Functional Bug Finding",
-            project_id: 1,
-            project_name: "Projettino unoh",
-            test_type_name: "Experiential",
-          },
-          {
-            id: 2,
-            start_date: "2017-07-19T22:00:00.000Z",
-            end_date: "2017-07-19T22:00:00.000Z",
-            close_date: "2017-07-19T22:00:00.000Z",
-            title: "Campagnetta Funzionale Provetta 2",
-            customer_title: "titolo 2",
-            description: "Descrizione della campagnazione 2",
-            status_id: 1,
-            is_public: 0,
-            campaign_type_id: 1,
-            campaign_type_name: "Functional Bug Finding",
-            project_id: 1,
-            project_name: "Projettino unoh",
-            test_type_name: "Experiential",
-          },
-        ],
-        start: 0,
-        limit: 10,
-        size: 2,
-        total: 2,
-      })
-    );
+    expect(response.body).toStrictEqual({
+      items: [
+        {
+          ...campaign_1,
+          project_name: project_1.display_name,
+          campaign_type_name: campaign_type_1.name,
+          start_date: new Date(campaign_1.start_date).toISOString(),
+          end_date: new Date(campaign_1.end_date).toISOString(),
+          close_date: new Date(campaign_1.close_date).toISOString(),
+          test_type_name: "Experiential",
+        },
+        {
+          ...campaign_2,
+          project_name: project_1.display_name,
+          campaign_type_name: campaign_type_1.name,
+          start_date: new Date(campaign_2.start_date).toISOString(),
+          end_date: new Date(campaign_2.end_date).toISOString(),
+          close_date: new Date(campaign_2.close_date).toISOString(),
+          test_type_name: "Experiential",
+        },
+      ],
+      start: 0,
+      limit: 10,
+      size: 2,
+      total: 2,
+    });
   });
 });
