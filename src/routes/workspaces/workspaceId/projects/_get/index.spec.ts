@@ -237,16 +237,12 @@ describe("GET /workspaces/{wid}/projects", () => {
     expect(response.status).toBe(400);
   });
 
-  it("Should return 404 if workspace is not found", async () => {
-    try {
-      const result = await request(app)
-        .get(`/workspaces/9999/projects`)
-        .set("authorization", "Bearer customer");
-      expect(result.body.code).toBe(404);
-      expect(result.body.message).toBe(ERROR_MESSAGE);
-    } catch (error) {
-      console.log(error);
-    }
+  it("Should return 403 if workspace is not found", async () => {
+    const result = await request(app)
+      .get(`/workspaces/9999/projects`)
+      .set("authorization", "Bearer customer");
+    expect(result.body.code).toBe(403);
+    expect(result.body.message).toBe(ERROR_MESSAGE);
   });
 
   it("Should return a list of projects if customer is present and has some projects", async () => {

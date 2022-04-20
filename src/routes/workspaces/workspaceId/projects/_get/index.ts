@@ -4,9 +4,12 @@ import * as db from "../../../../../features/db";
 import getWorkspace from "../../getWorkspace/";
 import paginateItems, {
   formatCount,
-  formatPaginationParams,
 } from "@src/routes/workspaces/paginateItems";
-import { ERROR_MESSAGE } from "@src/routes/shared";
+import {
+  ERROR_MESSAGE,
+  LIMIT_QUERY_PARAM_DEFAULT,
+  START_QUERY_PARAM_DEFAULT,
+} from "@src/routes/shared";
 
 export default async (
   c: Context,
@@ -21,46 +24,18 @@ export default async (
 
   res.status_code = 200;
 
-  let limit = (c.request.query.limit as string) || 10;
-  let start = (c.request.query.start as string) || 0;
+  let wid = parseInt(c.request.params.wid as string);
+
+  let limit = c.request.query.limit
+    ? parseInt(c.request.query.limit as string)
+    : (LIMIT_QUERY_PARAM_DEFAULT as StoplightComponents["parameters"]["limit"]);
+  let start = c.request.query.start
+    ? parseInt(c.request.query.start as string)
+    : (START_QUERY_PARAM_DEFAULT as StoplightComponents["parameters"]["start"]);
   let total;
 
-  if (typeof limit === "string") {
-    limit = parseInt(limit) as StoplightComponents["parameters"]["limit"];
-  }
-
-  if (typeof start === "string") {
-    start = parseInt(start) as StoplightComponents["parameters"]["start"];
-  }
-
-  // Get wid path parameter
-  let workspaceId;
-  if (typeof c.request.params.wid == "string") {
-    workspaceId = parseInt(
-      c.request.params.wid
-    ) as StoplightOperations["get-workspace-projects"]["parameters"]["path"]["wid"];
-  }
-
-  // Check if workspaceId is valid
-  if (
-    typeof workspaceId == "undefined" ||
-    workspaceId == null ||
-    workspaceId < 0
-  ) {
-    res.status_code = 400;
-    error.code = 400;
-    return error;
-  }
-
   // Get workspace
-  let workspace;
-  workspace = await getWorkspace(workspaceId, user);
-
-  if ("code" in workspace) {
-    res.status_code = workspace.code || 500;
-    error.code = workspace.code || 500;
-    return error;
-  }
+  await getWorkspace(wid, user);
 
   // Get workspace projects
   let projects: Array<{
@@ -69,9 +44,9 @@ export default async (
   }> = [];
   try {
     const projectSql = `SELECT id, display_name FROM wp_appq_project WHERE customer_id = ? ORDER BY id LIMIT ${limit} OFFSET ${start}`;
-    projects = await db.query(db.format(projectSql, [workspaceId]));
+    projects = await db.query(db.format(projectSql, [wid]));
     const countQuery = `SELECT COUNT(*) FROM wp_appq_project WHERE customer_id = ?`;
-    total = await db.query(db.format(countQuery, [workspaceId]));
+    total = await db.query(db.format(countQuery, [wid]));
     total = formatCount(total);
   } catch (e) {
     res.status_code = 500;
