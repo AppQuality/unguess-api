@@ -1,7 +1,7 @@
 /** OPENAPI-ROUTE: get-projects-projectId */
 import { Context } from "openapi-backend";
 
-import getyProjectById from "@src/routes/projects/projectId/getProjectById";
+import getProjectById from "@src/routes/projects/projectId/getProjectById";
 import { ERROR_MESSAGE } from "@src/routes/shared";
 
 export default async (
@@ -19,7 +19,7 @@ export default async (
   let pid = parseInt(c.request.params.pid as string);
 
   try {
-    return await getyProjectById(pid, user);
+    return await getProjectById(pid, user);
   } catch (e: any) {
     if (e.code) {
       error.code = e.code;
