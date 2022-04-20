@@ -18,28 +18,20 @@ export default async (
   res.status_code = 200;
 
   try {
-    let wid;
-    if (typeof c.request.params.wid == "string")
-      wid = parseInt(
-        c.request.params.wid
-      ) as StoplightOperations["get-workspace"]["parameters"]["path"]["wid"];
-
-    if (!wid) {
-      res.status_code = 400;
-      error.code = 400;
-      return error;
-    }
+    let wid = parseInt(c.request.params.wid as string);
 
     const result = await getWorkspace(wid, user);
 
-    if ("code" in result) {
-      res.status_code = result.code || 500;
-      error.code = result.code;
-      return error;
-    }
     return result as StoplightComponents["schemas"]["Workspace"];
-  } catch (e) {
-    error.code = 500;
+  } catch (e: any) {
+    if (e.code) {
+      error.code = e.code;
+      res.status_code = e.code;
+    } else {
+      error.code = 500;
+      res.status_code = 500;
+    }
+
     return error;
   }
 };

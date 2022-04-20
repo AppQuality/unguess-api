@@ -124,4 +124,13 @@ describe("GET /workspaces", () => {
       })
     );
   });
+
+  // Should return an error if the limit is not a number
+  it("Should answer with an error if the limit is not a number", async () => {
+    const response = await request(app)
+      .get("/workspaces?limit=banana&start=0")
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(400);
+    expect(response.body.err[0].message).toBe("should be number");
+  });
 });

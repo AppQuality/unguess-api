@@ -1,10 +1,12 @@
 /** OPENAPI-ROUTE: get-workspaces */
 import { Context } from "openapi-backend";
 import getUserWorkspaces from "../getUserWorkspaces";
-import paginateItems, {
-  formatPaginationParams,
-} from "@src/routes/workspaces/paginateItems";
-import { ERROR_MESSAGE } from "@src/routes/shared";
+import paginateItems from "@src/routes/workspaces/paginateItems";
+import {
+  ERROR_MESSAGE,
+  LIMIT_QUERY_PARAM_DEFAULT,
+  START_QUERY_PARAM_DEFAULT,
+} from "@src/routes/shared";
 
 export default async (
   c: Context,
@@ -17,16 +19,12 @@ export default async (
   } as StoplightComponents["schemas"]["Error"];
 
   try {
-    let limit = (c.request.query.limit as string) || 10;
-    let start = (c.request.query.start as string) || 0;
-
-    if (typeof limit === "string") {
-      limit = parseInt(limit) as StoplightComponents["parameters"]["limit"];
-    }
-
-    if (typeof start === "string") {
-      start = parseInt(start) as StoplightComponents["parameters"]["start"];
-    }
+    let limit = c.request.query.limit
+      ? parseInt(c.request.query.limit as string)
+      : (LIMIT_QUERY_PARAM_DEFAULT as StoplightComponents["parameters"]["limit"]);
+    let start = c.request.query.start
+      ? parseInt(c.request.query.start as string)
+      : (START_QUERY_PARAM_DEFAULT as StoplightComponents["parameters"]["start"]);
 
     let userWorkspaces = await getUserWorkspaces(req.user, limit, start);
 

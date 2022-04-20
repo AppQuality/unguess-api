@@ -83,11 +83,11 @@ describe("GET /workspaces/{wid}", () => {
     expect(response.status).toBe(200);
   });
 
-  it("Should answer 404 if no workspaces are found", async () => {
+  it("Should answer 403 if no workspaces are found", async () => {
     const response = await request(app)
       .get("/workspaces/99999")
       .set("authorization", "Bearer customer");
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(403);
   });
 
   it("Should answer 400 of the requested parameter is wrong", async () => {
