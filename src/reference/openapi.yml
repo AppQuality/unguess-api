@@ -209,11 +209,39 @@ paths:
         - $ref: '#/components/parameters/start'
       security:
         - JWT: []
+  '/projects/{pid}/campaigns':
+    parameters:
+      - name: pid
+        in: path
+        required: true
+        schema:
+          type: number
+        description: Project id
+    get:
+      summary: GET campaigns by Project ID
+      tags: []
+      responses:
+        '200':
+          $ref: '#/components/responses/PaginatedResponse'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-project-campaigns
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
+      security:
+        - JWT: []
   '/projects/{pid}':
     parameters:
       - $ref: '#/components/parameters/pid'
     get:
-      summary: getProjectById
+      summary: Get single project by ID
       tags:
         - Projects
       responses:
