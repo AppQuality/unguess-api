@@ -6,7 +6,11 @@ import getUserProjects from "../../getUserProjects";
 import paginateItems, {
   formatCount,
 } from "@src/routes/workspaces/paginateItems";
-import { ERROR_MESSAGE } from "@src/routes/shared";
+import {
+  ERROR_MESSAGE,
+  LIMIT_QUERY_PARAM_DEFAULT,
+  START_QUERY_PARAM_DEFAULT,
+} from "@src/routes/shared";
 
 export default async (
   c: Context,
@@ -22,28 +26,14 @@ export default async (
   } as StoplightComponents["schemas"]["Error"];
 
   try {
-    let customer_id;
-    if (typeof c.request.params.wid === "string")
-      customer_id = parseInt(
-        c.request.params.wid
-      ) as StoplightOperations["get-workspace-campaigns"]["parameters"]["path"]["wid"];
+    let wid = parseInt(c.request.params.wid as string);
 
-    if (!customer_id || customer_id < 0) {
-      res.status_code = 400;
-      error.code = 400;
-      return error;
-    }
-
-    let limit = (c.request.query.limit as string) || 10;
-    let start = (c.request.query.start as string) || 0;
-
-    if (typeof limit === "string") {
-      limit = parseInt(limit) as StoplightComponents["parameters"]["limit"];
-    }
-
-    if (typeof start === "string") {
-      start = parseInt(start) as StoplightComponents["parameters"]["start"];
-    }
+    let limit = c.request.query.limit
+      ? parseInt(c.request.query.limit as string)
+      : (LIMIT_QUERY_PARAM_DEFAULT as StoplightComponents["parameters"]["limit"]);
+    let start = c.request.query.start
+      ? parseInt(c.request.query.start as string)
+      : (START_QUERY_PARAM_DEFAULT as StoplightComponents["parameters"]["start"]);
 
     let order;
     if (typeof c.request.query.order === "string")
@@ -121,17 +111,12 @@ export default async (
       }
     }
 
-    const workspaceResult = await getWorkspace(customer_id, user);
-    if ("code" in workspaceResult) {
-      res.status_code = workspaceResult.code || 500;
-      error.code = workspaceResult.code;
-      return error;
-    }
+    await getWorkspace(wid, user);
 
-    let userProjects = await getUserProjects(customer_id, user);
+    let userProjects = await getUserProjects(wid, user);
 
     if (!userProjects.length) {
-      return await paginateItems({ items: [] });
+      return await paginateItems({ items: [], total: 0 });
     }
 
     // Return all the user projects ids
@@ -168,7 +153,7 @@ export default async (
     let total = await db.query(countQuery);
     total = formatCount(total);
 
-    if (!campaigns.length) return await paginateItems({ items: [] });
+    if (!campaigns.length) return await paginateItems({ items: [], total: 0 });
 
     let stoplightCampaign = campaigns.map((campaign: any) => {
       return {
@@ -200,9 +185,15 @@ export default async (
       start,
       total,
     });
-  } catch (e) {
-    res.status_code = 500;
-    error.code = 500;
+  } catch (e: any) {
+    if (e.code) {
+      error.code = e.code;
+      res.status_code = e.code;
+    } else {
+      error.code = 500;
+      res.status_code = 500;
+    }
+
     return error;
   }
 };

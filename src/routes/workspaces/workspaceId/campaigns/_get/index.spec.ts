@@ -170,11 +170,11 @@ describe("GET /workspaces/{wid}/campaigns", () => {
     expect(response.status).toBe(400);
   });
 
-  it("Should return 404 if the customer is not found", async () => {
+  it("Should return 403 if the customer is not found", async () => {
     const response = await request(app)
       .get("/workspaces/999898978/campaigns")
       .set("authorization", "Bearer customer");
-    expect(response.body.code).toBe(404);
+    expect(response.body.code).toBe(403);
     expect(response.body.message).toBe(ERROR_MESSAGE);
   });
 
@@ -190,6 +190,14 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       .get("/workspaces/2/campaigns?limit=1&start=1")
       .set("authorization", "Bearer customer");
     expect(response.body.items.length).toBe(1);
+  });
+
+  it("Should return an error 400 if the limit is not a number", async () => {
+    const response = await request(app)
+      .get("/workspaces/2/campaigns?limit=asd&start=1")
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(400);
+    expect(response.body.err[0].message).toBe("should be number");
   });
 
   it("Should return an array of campaigns", async () => {

@@ -38,10 +38,16 @@ export default async (
       });
     }
 
-    return await paginateItems({ items: [] });
-  } catch (e) {
-    res.status_code = 500;
-    error.code = 500;
+    return await paginateItems({ items: [], total: 0 });
+  } catch (e: any) {
+    if (e.code) {
+      error.code = e.code;
+      res.status_code = e.code;
+    } else {
+      error.code = 500;
+      res.status_code = 500;
+    }
+
     return error;
   }
 };
