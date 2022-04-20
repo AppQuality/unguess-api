@@ -89,44 +89,23 @@ describe("getProject", () => {
     });
   });
 
-  it("Should have projectId and workspaceId valid parameters", async () => {
+  it("Should throw error 400 if the params are not valid", async () => {
     try {
-      const result = (await getProject(
-        0,
-        0
-      )) as StoplightComponents["schemas"]["Error"];
-      expect(result.code).toBe(400);
-      expect(result.message).toBe(ERROR_MESSAGE);
-    } catch (error) {
-      console.error(error);
-    }
-  });
-
-  it("Should return 404 error on no results", async () => {
-    try {
-      const result = (await getProject(
-        9999,
-        customer_1.id
-      )) as StoplightComponents["schemas"]["Error"];
-      expect(result.code).toBe(404);
-      expect(result.message).toBe(ERROR_MESSAGE);
-    } catch (error) {
-      console.error(error);
+      await getProject(0, 0);
+    } catch (error: any) {
+      expect(error.code).toBe(400);
+      expect(error.message).toBe(ERROR_MESSAGE);
     }
   });
 
   it("Should return a project", async () => {
-    try {
-      let project = await getProject(project_1.id, customer_1.id);
-      expect(JSON.stringify(project)).toBe(
-        JSON.stringify({
-          id: project_1.id,
-          name: project_1.display_name,
-          campaigns_count: 1,
-        })
-      );
-    } catch (error) {
-      console.error(error);
-    }
+    let project = await getProject(project_1.id, customer_1.id);
+    expect(JSON.stringify(project)).toBe(
+      JSON.stringify({
+        id: project_1.id,
+        name: project_1.display_name,
+        campaigns_count: 1,
+      })
+    );
   });
 });

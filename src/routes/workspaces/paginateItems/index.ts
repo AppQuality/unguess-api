@@ -1,5 +1,3 @@
-import { ERROR_MESSAGE } from "@src/routes/shared";
-
 type PaginationParams = {
   items:
     | Array<

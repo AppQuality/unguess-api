@@ -190,16 +190,12 @@ describe("GET /workspaces/{wid}/projects/{pid}/campaigns", () => {
     expect(response.status).toBe(400);
   });
 
-  it("Should return 404 if project is not found", async () => {
-    try {
-      const response = await request(app)
-        .get(`/workspaces/${customer_1.id}/projects/999/campaigns`)
-        .set("authorization", "Bearer customer");
-      expect(response.body.code).toBe(404);
-      expect(response.body.message).toBe(ERROR_MESSAGE);
-    } catch (error) {
-      console.log(error);
-    }
+  it("Should return 403 if project is not found", async () => {
+    const response = await request(app)
+      .get(`/workspaces/${customer_1.id}/projects/999/campaigns`)
+      .set("authorization", "Bearer customer");
+    expect(response.body.code).toBe(403);
+    expect(response.body.message).toBe(ERROR_MESSAGE);
   });
 
   it("Should return a list of campaigns if project is present", async () => {

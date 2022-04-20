@@ -96,32 +96,19 @@ describe("getWorkspace", () => {
 
   it("Should return error because workspace id is 0", async () => {
     try {
-      const response = (await getWorkspace(
-        0,
-        customer_user_1
-      )) as StoplightComponents["schemas"]["Error"];
-      expect(response.code).toBe(400);
-      expect(response.message).toBe(ERROR_MESSAGE);
-    } catch (error) {
-      console.log(error);
+      await getWorkspace(0, customer_user_1);
+    } catch (error: any) {
+      expect(error.code).toBe(400);
+      expect(error.message).toBe(ERROR_MESSAGE);
     }
   });
 
-  it("Should return error 403 because the use has no permission", async () => {
+  it("Should return error 403 because the user has no permission", async () => {
     try {
-      const response = (await getWorkspace(
-        1,
-        customer_user_2
-      )) as StoplightComponents["schemas"]["Error"];
-      expect(JSON.stringify(response)).toBe(
-        JSON.stringify({
-          message: ERROR_MESSAGE,
-          error: true,
-          code: 403,
-        })
-      );
-    } catch (error) {
-      console.log(error);
+      await getWorkspace(1, customer_user_2);
+    } catch (error: any) {
+      expect(error.code).toBe(403);
+      expect(error.message).toBe(ERROR_MESSAGE);
     }
   });
 
@@ -135,18 +122,12 @@ describe("getWorkspace", () => {
     });
   });
 
-  it("Should return 404 error if the workspace is not found", async () => {
+  it("Should return 403 error if the workspace is not found", async () => {
     try {
-      const response = await getWorkspace(9999, customer_user_1);
-      expect(JSON.stringify(response)).toBe(
-        JSON.stringify({
-          message: ERROR_MESSAGE,
-          error: true,
-          code: 404,
-        })
-      );
-    } catch (error) {
-      expect((error as OpenapiError).message).toBe("No workspace found");
+      await getWorkspace(9999, customer_user_1);
+    } catch (error: any) {
+      expect(error.code).toBe(403);
+      expect(error.message).toBe(ERROR_MESSAGE);
     }
   });
 

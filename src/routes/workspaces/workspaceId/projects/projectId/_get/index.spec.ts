@@ -110,11 +110,11 @@ describe("GET /workspaces/{wid}/projects/{pid}", () => {
     expect(response.status).toBe(200);
   });
 
-  it("Should answer 404 if no workspaces are found", async () => {
+  it("Should answer 403 if no workspaces are found", async () => {
     const response = await request(app)
       .get(`/workspaces/${customer_1.id}/projects/999999`)
       .set("authorization", "Bearer customer");
-    expect(response.body.code).toBe(404);
+    expect(response.body.code).toBe(403);
     expect(response.body.message).toBe(ERROR_MESSAGE);
   });
 

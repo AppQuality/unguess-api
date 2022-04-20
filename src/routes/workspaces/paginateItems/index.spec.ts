@@ -1,5 +1,4 @@
 import paginateItems from "@src/routes/workspaces/paginateItems/index";
-import { ERROR_MESSAGE } from "@src/routes/shared";
 
 const campaign_1 = {
   id: 42,
@@ -21,76 +20,19 @@ const campaign_1 = {
 };
 
 describe("paginateItems", () => {
-  it("Should return an error because start is not valid", async () => {
-    const result = await paginateItems({
-      items: [campaign_1],
-      start: -1,
-      limit: 10,
-      total: 1,
-    });
-
+  it("Should return a paginated item", async () => {
+    const result = await paginateItems({ items: [campaign_1], total: 1 });
     expect(JSON.stringify(result)).toStrictEqual(
       JSON.stringify({
-        message: ERROR_MESSAGE,
-        code: 400,
-        error: true,
-      })
-    );
-  });
-
-  it("Should return an error because limit is not valid", async () => {
-    const result = await paginateItems({
-      items: [campaign_1],
-      start: 0,
-      limit: -1,
-      total: 1,
-    });
-
-    expect(JSON.stringify(result)).toStrictEqual(
-      JSON.stringify({
-        message: ERROR_MESSAGE,
-        code: 400,
-        error: true,
-      })
-    );
-  });
-
-  it("Should return an error because total is not valid", async () => {
-    const result = await paginateItems({
-      items: [campaign_1],
-      start: 0,
-      limit: 10,
-      total: null,
-    });
-
-    expect(JSON.stringify(result)).toStrictEqual(
-      JSON.stringify({
-        message: ERROR_MESSAGE,
-        code: 400,
-        error: true,
-      })
-    );
-  });
-
-  it("Should return an error because all data is not valid", async () => {
-    const result = await paginateItems({
-      items: [campaign_1],
-      start: -1,
-      limit: -1,
-      total: null,
-    });
-
-    expect(JSON.stringify(result)).toStrictEqual(
-      JSON.stringify({
-        message: ERROR_MESSAGE,
-        code: 400,
-        error: true,
+        items: [campaign_1],
+        size: 1,
+        total: 1,
       })
     );
   });
 
   it("Should return an empty page because a formatted empty array if an empty list of items is passed", async () => {
-    const result = await paginateItems({ items: [] });
+    const result = await paginateItems({ items: [], total: 0 });
     expect(JSON.stringify(result)).toStrictEqual(
       JSON.stringify({
         items: [],
