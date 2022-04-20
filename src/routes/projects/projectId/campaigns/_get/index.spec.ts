@@ -127,7 +127,7 @@ const campaign_type_1 = {
   type: 1,
 };
 
-describe("GET /workspaces/{wid}/projects/{pid}/campaigns", () => {
+describe("GET /projects/{pid}/campaigns", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
