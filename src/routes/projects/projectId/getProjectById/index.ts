@@ -28,7 +28,7 @@ export default async (
 
     let project = await db.query(projectSql);
 
-    if (!project.length) throw error;
+    if (!project.length) throw { ...error, code: 403 };
 
     project = project[0];
 
@@ -61,7 +61,7 @@ export default async (
 
     let project = await db.query(projectSql);
 
-    if (!project.length) throw error;
+    if (!project.length) throw { ...error, code: 403 };
 
     return await formatProject(project[0]);
   }

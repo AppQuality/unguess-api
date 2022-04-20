@@ -36,7 +36,7 @@ const user_to_project_1 = {
 };
 
 const user_to_project_2 = {
-  wp_user_id: 1,
+  wp_user_id: 123,
   project_id: 2,
 };
 
@@ -125,5 +125,14 @@ describe("GET /projects/{pid}", () => {
       name: "Projettino unoh",
       campaigns_count: 1,
     });
+  });
+
+  //Should answer with an error if the project is limited to a customer
+  it("Should answer with an error if the project exist but is limited to other users of the same company", async () => {
+    const response = await request(app)
+      .get(`/projects/${project_2.id}`)
+      .set("authorization", "Bearer customer");
+    expect(response.body.code).toBe(403);
+    expect(response.body.message).toBe(ERROR_MESSAGE);
   });
 });

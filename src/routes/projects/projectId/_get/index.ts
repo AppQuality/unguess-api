@@ -19,10 +19,8 @@ export default async (
   let pid = parseInt(c.request.params.pid as string);
 
   try {
-    console.log("asdasdasd");
     return await getyProjectById(pid, user);
   } catch (e: any) {
-    console.log("something went wrong", e);
     if (e.code) {
       error.code = e.code;
       res.status_code = e.code;

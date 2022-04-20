@@ -68,6 +68,15 @@ export interface paths {
       };
     };
   };
+  "/projects/{pid}/campaigns": {
+    get: operations["get-project-campaigns"];
+    parameters: {
+      path: {
+        /** Project id */
+        pid: number;
+      };
+    };
+  };
   "/projects/{pid}": {
     /** Retrieve projects details from an ID. */
     get: operations["get-projects-projectId"];
@@ -349,6 +358,27 @@ export interface operations {
         wid: components["parameters"]["wid"];
         /** Project id */
         pid: components["parameters"]["pid"];
+      };
+      query: {
+        /** Limit pagination parameter */
+        limit?: components["parameters"]["limit"];
+        /** Start pagination parameter */
+        start?: components["parameters"]["start"];
+      };
+    };
+    responses: {
+      200: components["responses"]["PaginatedResponse"];
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      404: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  "get-project-campaigns": {
+    parameters: {
+      path: {
+        /** Project id */
+        pid: number;
       };
       query: {
         /** Limit pagination parameter */
