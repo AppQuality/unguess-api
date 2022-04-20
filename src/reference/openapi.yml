@@ -209,13 +209,9 @@ paths:
         - $ref: '#/components/parameters/start'
       security:
         - JWT: []
-  '/projects/{projectId}':
+  '/projects/{pid}':
     parameters:
-      - schema:
-          type: string
-        name: projectId
-        in: path
-        required: true
+      - $ref: '#/components/parameters/pid'
     get:
       summary: getProjectById
       tags:
