@@ -209,6 +209,34 @@ paths:
         - $ref: '#/components/parameters/start'
       security:
         - JWT: []
+  '/projects/{projectId}':
+    parameters:
+      - schema:
+          type: string
+        name: projectId
+        in: path
+        required: true
+    get:
+      summary: getProjectById
+      tags:
+        - Projects
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-projects-projectId
+      description: Retrieve projects details from an ID.
+      security:
+        - JWT: []
 components:
   schemas:
     User:
