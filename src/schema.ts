@@ -68,12 +68,13 @@ export interface paths {
       };
     };
   };
-  "/projects/{projectId}": {
+  "/projects/{pid}": {
     /** Retrieve projects details from an ID. */
     get: operations["get-projects-projectId"];
     parameters: {
       path: {
-        projectId: string;
+        /** Project id */
+        pid: components["parameters"]["pid"];
       };
     };
   };
@@ -356,7 +357,8 @@ export interface operations {
   "get-projects-projectId": {
     parameters: {
       path: {
-        projectId: string;
+        /** Project id */
+        pid: components["parameters"]["pid"];
       };
     };
     responses: {
