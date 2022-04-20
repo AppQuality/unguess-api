@@ -101,7 +101,7 @@ describe("GET /projects/{pid}", () => {
     expect(response.status).toBe(200);
   });
 
-  it("Should answer 403 if no workspaces are found", async () => {
+  it("Should answer 403 if project is not found", async () => {
     const response = await request(app)
       .get(`/projects/999999`)
       .set("authorization", "Bearer customer");

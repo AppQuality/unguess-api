@@ -68,6 +68,15 @@ export interface paths {
       };
     };
   };
+  "/projects/{projectId}": {
+    /** Retrieve projects details from an ID. */
+    get: operations["get-projects-projectId"];
+    parameters: {
+      path: {
+        projectId: string;
+      };
+    };
+  };
 }
 
 export interface components {
@@ -340,6 +349,25 @@ export interface operations {
       400: components["responses"]["Error"];
       403: components["responses"]["Error"];
       404: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  /** Retrieve projects details from an ID. */
+  "get-projects-projectId": {
+    parameters: {
+      path: {
+        projectId: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Project"];
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
       500: components["responses"]["Error"];
     };
   };

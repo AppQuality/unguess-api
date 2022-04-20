@@ -11,7 +11,7 @@ export default async (
     code: 400,
   } as StoplightComponents["schemas"]["Error"];
 
-  console.log("getProjectById", projectId, user);
+  console.log("AAAAA getProjectById", projectId, user);
 
   // Check parameters
   if (!projectId) throw error;
