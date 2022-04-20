@@ -310,17 +310,15 @@ components:
         token:
           type: string
         iat:
-          type: string
+          type: number
         exp:
-          type: string
+          type: number
       required:
         - id
         - email
         - role
         - name
         - token
-        - iat
-        - exp
     Workspace:
       title: Workspace
       type: object
