@@ -699,6 +699,29 @@ components:
         application/json:
           schema:
             type: object
+            properties:
+              title:
+                type: string
+              description:
+                type: string
+              start_date:
+                type: string
+              end_date:
+                type: string
+              close_date:
+                type: string
+              customer_title:
+                type: string
+              status_id:
+                type: integer
+              is_public:
+                type: integer
+              campaign_type_id:
+                type: integer
+              test_type_id:
+                type: integer
+              project_id:
+                type: integer
 tags:
   - name: Authentication
   - name: Campaign
