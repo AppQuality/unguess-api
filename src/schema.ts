@@ -87,6 +87,9 @@ export interface paths {
       };
     };
   };
+  "/campaigns": {
+    post: operations["post-campaigns"];
+  };
 }
 
 export interface components {
@@ -195,6 +198,23 @@ export interface components {
         "application/json": {
           username: string;
           password: string;
+        };
+      };
+    };
+    Campaign: {
+      content: {
+        "application/json": {
+          title?: string;
+          description?: string;
+          start_date?: string;
+          end_date?: string;
+          close_date?: string;
+          customer_title?: string;
+          status_id?: number;
+          is_public?: number;
+          campaign_type_id?: number;
+          test_type_id?: number;
+          project_id?: number;
         };
       };
     };
@@ -477,6 +497,22 @@ export interface operations {
       403: components["responses"]["Error"];
       500: components["responses"]["Error"];
     };
+  };
+  "post-campaigns": {
+    parameters: {};
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Campaign"];
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      404: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+    requestBody: components["requestBodies"]["Campaign"];
   };
 }
 
