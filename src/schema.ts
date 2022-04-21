@@ -160,22 +160,6 @@ export interface components {
         "application/json": components["schemas"]["Error"];
       };
     };
-    /** Paginated response */
-    PaginatedResponse: {
-      content: {
-        "application/json": {
-          items?: (
-            | components["schemas"]["Campaign"]
-            | components["schemas"]["Workspace"]
-            | components["schemas"]["Project"]
-          )[];
-          start?: number;
-          limit?: number;
-          size?: number;
-          total?: number;
-        };
-      };
-    };
   };
   parameters: {
     /** @description Workspace (company, customer) id */
