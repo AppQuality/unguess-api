@@ -70,7 +70,24 @@ paths:
       tags: []
       responses:
         '200':
-          $ref: '#/components/responses/PaginatedResponse'
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Workspace'
+                  start:
+                    type: integer
+                  limit:
+                    type: integer
+                  size:
+                    type: integer
+                  total:
+                    type: integer
         '400':
           $ref: '#/components/responses/Error'
         '403':
@@ -118,7 +135,24 @@ paths:
       tags: []
       responses:
         '200':
-          $ref: '#/components/responses/PaginatedResponse'
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Campaign'
+                  start:
+                    type: integer
+                  limit:
+                    type: integer
+                  size:
+                    type: integer
+                  total:
+                    type: integer
         '400':
           $ref: '#/components/responses/Error'
         '403':
@@ -145,7 +179,24 @@ paths:
       tags: []
       responses:
         '200':
-          $ref: '#/components/responses/PaginatedResponse'
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Project'
+                  start:
+                    type: integer
+                  limit:
+                    type: integer
+                  size:
+                    type: integer
+                  total:
+                    type: integer
         '400':
           $ref: '#/components/responses/Error'
         '403':
@@ -194,7 +245,24 @@ paths:
       tags: []
       responses:
         '200':
-          $ref: '#/components/responses/PaginatedResponse'
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Campaign'
+                  start:
+                    type: integer
+                  limit:
+                    type: integer
+                  size:
+                    type: integer
+                  total:
+                    type: integer
         '400':
           $ref: '#/components/responses/Error'
         '403':
@@ -222,9 +290,45 @@ paths:
       tags: []
       responses:
         '200':
-          $ref: '#/components/responses/PaginatedResponse'
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Campaign'
+                  start:
+                    type: integer
+                  limit:
+                    type: integer
+                  size:
+                    type: integer
+                  total:
+                    type: integer
         '400':
           $ref: '#/components/responses/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Campaign'
+                  start:
+                    type: integer
+                  limit:
+                    type: integer
+                  size:
+                    type: integer
+                  total:
+                    type: integer
         '403':
           $ref: '#/components/responses/Error'
         '404':
