@@ -279,6 +279,23 @@ components:
             wp_user_id: 0
             role: string
             is_verified: true
+      examples:
+        - id: 0
+          email: user@example.com
+          role: string
+          name: string
+          workspaces:
+            - id: 0
+              company: string
+              tokens: 0
+              logo: string
+              csm: {}
+          profile_id: 0
+          tryber_wp_user_id: 0
+          picture: string
+          features:
+            - feature_slug: exploratory-express
+              feature_name: Exploratory Express
       properties:
         id:
           type: integer
@@ -304,9 +321,9 @@ components:
           items:
             type: object
             properties:
-              feature_slug:
+              slug:
                 type: string
-              feature_name:
+              name:
                 type: string
       required:
         - id
@@ -316,23 +333,6 @@ components:
         - workspaces
         - profile_id
         - tryber_wp_user_id
-      examples:
-        - id: 0
-          email: user@example.com
-          role: string
-          name: string
-          workspaces:
-            - id: 0
-              company: string
-              tokens: 0
-              logo: string
-              csm: {}
-          profile_id: 0
-          tryber_wp_user_id: 0
-          picture: string
-          features:
-            - feature_slug: exploratory-express
-              feature_name: Exploratory Express
     Authentication:
       title: Authentication
       type: object
