@@ -131,7 +131,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/wid'
     get:
-      summary: Your GET endpoint
+      summary: GET Workspace campaigns
       tags: []
       responses:
         '200':
@@ -175,7 +175,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/wid'
     get:
-      summary: Your GET endpoint
+      summary: GET Workspace Projects
       tags: []
       responses:
         '200':
@@ -216,7 +216,7 @@ paths:
       - $ref: '#/components/parameters/wid'
       - $ref: '#/components/parameters/pid'
     get:
-      summary: Your GET endpoint
+      summary: GET Workspace single project
       tags: []
       responses:
         '200':
@@ -241,7 +241,7 @@ paths:
       - $ref: '#/components/parameters/wid'
       - $ref: '#/components/parameters/pid'
     get:
-      summary: Your GET endpoint
+      summary: GET Workspace Project campaigns
       tags: []
       responses:
         '200':
@@ -286,7 +286,7 @@ paths:
           type: number
         description: Project id
     get:
-      summary: GET campaigns by Project ID
+      summary: GET Project campaigns
       tags: []
       responses:
         '200':
@@ -379,17 +379,17 @@ components:
             role: string
             name: string
             workspaces:
-                id: 0
-                company: string
-                tokens: 0
-                logo: string
-                csm: {}
+              id: 0
+              company: string
+              tokens: 0
+              logo: string
+              csm: {}
             profile_id: 0
             tryber_wp_user_id: 0
             picture: string
             features:
-                feature_slug: exploratory-express
-                feature_name: Exploratory Express
+              feature_slug: exploratory-express
+              feature_name: Exploratory Express
       properties:
         id:
           type: integer
