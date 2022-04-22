@@ -3,6 +3,7 @@ import { Context } from "openapi-backend";
 import { ERROR_MESSAGE } from "@src/routes/shared";
 import checkCampaignRequest from "../checkCampaignRequest";
 import getProjectById from "@src/routes/projects/projectId/getProjectById";
+import createCampaign from "../createCampaign";
 
 export default async (
   c: Context,
@@ -26,6 +27,11 @@ export default async (
 
     // Try to get the project checking all the permissions
     let project = await getProjectById(validated_request_body.project_id, user);
+
+    // Create the campaign
+    let campaign = await createCampaign(validated_request_body);
+
+    return campaign as StoplightComponents["schemas"]["Campaign"];
   } catch (e: any) {
     if (e.code) {
       error.code = e.code;

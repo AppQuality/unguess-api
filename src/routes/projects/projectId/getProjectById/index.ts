@@ -28,8 +28,6 @@ export default async (
 
     let project = await db.query(projectSql);
 
-    console.log("project", project);
-
     if (!project.length) throw { ...error, code: 403 };
 
     project = project[0];

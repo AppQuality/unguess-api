@@ -63,7 +63,7 @@ const campaign_request_1 = {
 
 const campaign_1 = {
   id: 1,
-  start_date: "2020-01-01",
+  start_date: "2017-07-20 00:00:00",
   end_date: "2017-07-20 00:00:00",
   close_date: "2017-07-20 00:00:00",
   title: "Campaign 1 title",
@@ -161,12 +161,15 @@ describe("POST /campaigns", () => {
     expect(response.status).toBe(403);
   });
 
-  it("Should answer 200 with a campaign object if logged in", async () => {
+  it("Should answer 200 with a campaign object", async () => {
     const response = await request(app)
       .post("/campaigns")
       .set("Authorization", "Bearer customer")
       .send(campaign_request_1);
     expect(response.status).toBe(200);
-    expect(response.body).toBe(JSON.stringify(campaign_request_1));
+    expect(response.body).toMatchObject({
+      ...campaign_1,
+      id: 2,
+    });
   });
 });

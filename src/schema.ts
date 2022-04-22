@@ -212,9 +212,23 @@ export interface components {
           customer_title?: string;
           status_id?: number;
           is_public?: number;
+          /**
+           * @description -1: no bug form
+           * 0: only bug form
+           * 1: bug form with bug parade
+           */
+          bug_form?: number;
           campaign_type_id: number;
           test_type_id: number;
           project_id: number;
+          pm_id: number;
+          platform_id: number;
+          /** @description Da togliere */
+          page_preview_id?: number;
+          /** @description Da togliere */
+          page_manual_id?: number;
+          /** @description Da togliere */
+          customer_id?: number;
         };
       };
     };

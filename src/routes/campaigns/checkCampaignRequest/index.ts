@@ -31,7 +31,12 @@ export default async (
     ...campaign_request,
     customer_title: campaign_request.customer_title || campaign_request.title,
     description: campaign_request.description || "",
-    status_id: campaign_request.status_id || 0,
-    is_public: campaign_request.is_public || 1,
+    status_id: campaign_request.status_id || 1,
+    is_public: campaign_request.is_public || 0,
+    page_preview_id: campaign_request.page_preview_id || 0,
+    page_manual_id: campaign_request.page_manual_id || 0,
+    customer_id: campaign_request.customer_id || 0,
+    pm_id: campaign_request.pm_id,
+    platform_id: campaign_request.platform_id,
   };
 };
