@@ -102,6 +102,10 @@ export interface components {
       profile_id: number;
       tryber_wp_user_id: number;
       picture?: string;
+      features?: {
+        slug?: string;
+        name?: string;
+      }[];
     };
     /** Authentication */
     Authentication: {
