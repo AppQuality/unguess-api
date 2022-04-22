@@ -374,15 +374,22 @@ components:
       x-examples:
         example-1:
           value:
-            username: string
-            name: string
-            surname: string
-            email: user@example.com
-            image: 'http://example.com'
             id: 0
-            wp_user_id: 0
+            email: user@example.com
             role: string
-            is_verified: true
+            name: string
+            workspaces:
+                id: 0
+                company: string
+                tokens: 0
+                logo: string
+                csm: {}
+            profile_id: 0
+            tryber_wp_user_id: 0
+            picture: string
+            features:
+                feature_slug: exploratory-express
+                feature_name: Exploratory Express
       properties:
         id:
           type: integer
@@ -403,6 +410,15 @@ components:
           type: integer
         picture:
           type: string
+        features:
+          type: array
+          items:
+            type: object
+            properties:
+              slug:
+                type: string
+              name:
+                type: string
       required:
         - id
         - email

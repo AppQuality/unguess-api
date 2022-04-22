@@ -1,4 +1,5 @@
 /** OPENAPI-ROUTE: post-authenticate */
+import getUserFeatures from "@src/features/wp/getUserFeatures";
 import jwt from "jsonwebtoken";
 import { Context, Request } from "openapi-backend";
 import hasher from "wordpress-hash-node";
@@ -19,6 +20,8 @@ export default async (c: Context, req: Request, res: OpenapiResponse) => {
 
   try {
     userData = await getUserByName(username);
+
+    let features = await getUserFeatures(userData.ID);
 
     const checked = hasher.CheckPassword(password, userData.user_pass);
 
@@ -56,6 +59,7 @@ export default async (c: Context, req: Request, res: OpenapiResponse) => {
       token: token,
       ...(iat && { iat: iat }),
       ...(exp && { exp: exp }),
+      ...(features && { features: features }),
     };
 
     res.status_code = 200;
