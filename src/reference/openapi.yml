@@ -718,8 +718,18 @@ components:
                 type: integer
               campaign_type_id:
                 type: integer
+              test_type_id:
+                type: integer
               project_id:
                 type: integer
+            required:
+              - title
+              - start_date
+              - end_date
+              - close_date
+              - campaign_type_id
+              - test_type_id
+              - project_id
 tags:
   - name: Authentication
   - name: Campaign
