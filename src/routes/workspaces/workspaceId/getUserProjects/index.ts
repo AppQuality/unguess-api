@@ -24,20 +24,20 @@ export default async (
   if (user.role === "administrator") {
     projectsSql = db.format(
       `
-          SELECT p.*
-          FROM wp_appq_project p
-          WHERE p.customer_id = ?
-        `,
+        SELECT p.*
+        FROM wp_appq_project p
+        WHERE p.customer_id = ?
+      `,
       [workspaceId]
     );
   } else {
     projectsSql = db.format(
       `
-          SELECT p.*, utp.wp_user_id AS limit_user_id
-          FROM wp_appq_project p
-          LEFT JOIN wp_appq_user_to_project utp ON (utp.project_id = p.id)
-          WHERE p.customer_id = ?
-            `,
+        SELECT p.*, utp.wp_user_id AS limit_user_id
+        FROM wp_appq_project p
+        LEFT JOIN wp_appq_user_to_project utp ON (utp.project_id = p.id)
+        WHERE p.customer_id = ?
+      `,
       [workspaceId]
     );
   }

@@ -204,17 +204,17 @@ export interface components {
     Campaign: {
       content: {
         "application/json": {
-          title?: string;
+          title: string;
           description?: string;
-          start_date?: string;
-          end_date?: string;
-          close_date?: string;
+          start_date: string;
+          end_date: string;
+          close_date: string;
           customer_title?: string;
           status_id?: number;
           is_public?: number;
-          campaign_type_id?: number;
-          test_type_id?: number;
-          project_id?: number;
+          campaign_type_id: number;
+          test_type_id: number;
+          project_id: number;
         };
       };
     };

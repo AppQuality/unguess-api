@@ -5,27 +5,36 @@ import { fallBackCsmProfile } from "@src/routes/shared";
 
 export default async (
   user: UserType,
-  limit: StoplightComponents["parameters"]["limit"],
-  start: StoplightComponents["parameters"]["start"]
+  limit?: StoplightComponents["parameters"]["limit"],
+  start?: StoplightComponents["parameters"]["start"]
 ): Promise<{
   workspaces: StoplightComponents["schemas"]["Workspace"][] | [];
   total: number;
 }> => {
-  const LIMIT = `LIMIT ${limit} OFFSET ${start}`;
+  let LIMIT = "";
+  if (limit && start) {
+    let LIMIT = `LIMIT ${limit} OFFSET ${start}`;
+  }
 
   let query = `SELECT c.*, p.name as csmName, p.surname as csmSurname, p.email as csmEmail, p.id as csmProfileId, p.wp_user_id as csmTryberWpUserId 
         FROM wp_appq_customer c 
         JOIN wp_appq_user_to_customer utc ON (c.id = utc.customer_id) 
         LEFT JOIN wp_appq_evd_profile p ON (p.id = c.pm_id)
-        ${user.role !== "administrator" ? `WHERE utc.wp_user_id = ?` : ``}
-        ${LIMIT}`;
+        ${user.role !== "administrator" ? `WHERE utc.wp_user_id = ?` : ``} `;
+
+  if (limit && start) {
+    query += `${LIMIT}`;
+  }
 
   let countQuery = `SELECT COUNT(*) 
         FROM wp_appq_customer c 
         JOIN wp_appq_user_to_customer utc ON (c.id = utc.customer_id) 
         LEFT JOIN wp_appq_evd_profile p ON (p.id = c.pm_id)
-        ${user.role !== "administrator" ? `WHERE utc.wp_user_id = ?` : ``}
-        ${LIMIT}`;
+        ${user.role !== "administrator" ? `WHERE utc.wp_user_id = ?` : ``} `;
+
+  if (limit && start) {
+    countQuery += `${LIMIT}`;
+  }
 
   try {
     if (
