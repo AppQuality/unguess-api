@@ -408,6 +408,8 @@ components:
           type: integer
         tryber_wp_user_id:
           type: integer
+        unguess_wp_user_id:
+          type: integer
         picture:
           type: string
         features:
@@ -427,6 +429,7 @@ components:
         - workspaces
         - profile_id
         - tryber_wp_user_id
+        - unguess_wp_user_id
     Authentication:
       title: Authentication
       type: object
