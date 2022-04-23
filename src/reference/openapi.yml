@@ -365,6 +365,30 @@ paths:
       description: Retrieve projects details from an ID.
       security:
         - JWT: []
+  /campaigns:
+    post:
+      summary: Create campaign
+      operationId: post-campaigns
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campaign'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      parameters: []
+      security:
+        - JWT: []
+      requestBody:
+        $ref: '#/components/requestBodies/Campaign'
 components:
   schemas:
     User:
@@ -594,6 +618,33 @@ components:
         - message
         - code
         - error
+    Platform:
+      title: Platform Object
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        deviceType:
+          type: string
+          enum:
+            - smartphone
+            - tablet
+            - computer
+            - smartwatch
+            - console
+            - tv
+          description: |-
+            0 => smartphone, 
+            1 => tablet 
+            2 => pc 
+            3 => smartwatch 
+            4 => console
+            5 => tv
+      required:
+        - id
+        - name
   securitySchemes:
     JWT:
       type: http
@@ -670,6 +721,64 @@ components:
               - username
               - password
       description: ''
+    Campaign:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              description:
+                type: string
+              start_date:
+                type: string
+              end_date:
+                type: string
+              close_date:
+                type: string
+              customer_title:
+                type: string
+              status_id:
+                type: integer
+              is_public:
+                type: integer
+              bug_form:
+                type: number
+                description: |-
+                  -1: no bug form
+                  0: only bug form
+                  1: bug form with bug parade
+              campaign_type_id:
+                type: integer
+              test_type_id:
+                type: integer
+              project_id:
+                type: integer
+              pm_id:
+                type: integer
+              platforms:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Platform'
+              page_preview_id:
+                type: integer
+                description: Da togliere
+              page_manual_id:
+                type: integer
+                description: Da togliere
+              customer_id:
+                type: integer
+                description: Da togliere
+            required:
+              - title
+              - start_date
+              - end_date
+              - close_date
+              - campaign_type_id
+              - test_type_id
+              - project_id
+              - pm_id
 tags:
   - name: Authentication
   - name: Campaign

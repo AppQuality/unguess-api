@@ -87,6 +87,9 @@ export interface paths {
       };
     };
   };
+  "/campaigns": {
+    post: operations["post-campaigns"];
+  };
 }
 
 export interface components {
@@ -164,6 +167,27 @@ export interface components {
       code: number;
       error: boolean;
     };
+    /** Platform Object */
+    Platform: {
+      id: number;
+      name: string;
+      /**
+       * @description 0 => smartphone,
+       * 1 => tablet
+       * 2 => pc
+       * 3 => smartwatch
+       * 4 => console
+       * 5 => tv
+       * @enum {string}
+       */
+      deviceType?:
+        | "smartphone"
+        | "tablet"
+        | "computer"
+        | "smartwatch"
+        | "console"
+        | "tv";
+    };
   };
   responses: {
     /** Example response */
@@ -195,6 +219,37 @@ export interface components {
         "application/json": {
           username: string;
           password: string;
+        };
+      };
+    };
+    Campaign: {
+      content: {
+        "application/json": {
+          title: string;
+          description?: string;
+          start_date: string;
+          end_date: string;
+          close_date: string;
+          customer_title?: string;
+          status_id?: number;
+          is_public?: number;
+          /**
+           * @description -1: no bug form
+           * 0: only bug form
+           * 1: bug form with bug parade
+           */
+          bug_form?: number;
+          campaign_type_id: number;
+          test_type_id: number;
+          project_id: number;
+          pm_id: number;
+          platforms?: components["schemas"]["Platform"][];
+          /** @description Da togliere */
+          page_preview_id?: number;
+          /** @description Da togliere */
+          page_manual_id?: number;
+          /** @description Da togliere */
+          customer_id?: number;
         };
       };
     };
@@ -477,6 +532,22 @@ export interface operations {
       403: components["responses"]["Error"];
       500: components["responses"]["Error"];
     };
+  };
+  "post-campaigns": {
+    parameters: {};
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Campaign"];
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      404: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+    requestBody: components["requestBodies"]["Campaign"];
   };
 }
 

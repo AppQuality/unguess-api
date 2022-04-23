@@ -5,7 +5,7 @@ const db = sqlite3("tryber");
 export const table = {
   create: async () => {
     await db.createTable("wp_appq_evd_campaign", [
-      "id int(11) PRIMARY KEY",
+      "id INTEGER PRIMARY KEY AUTOINCREMENT",
       "start_date datetime",
       "end_date datetime",
       "close_date datetime",
@@ -17,6 +17,11 @@ export const table = {
       "campaign_type_id int(11)",
       "project_id int(11)",
       "customer_id int(11)",
+      "campaign_type int(1)",
+      "pm_id int(11)",
+      "platform_id int(11)",
+      "page_preview_id int(11)",
+      "page_manual_id int(11)",
     ]);
   },
   drop: async () => {
