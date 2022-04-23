@@ -494,7 +494,26 @@ components:
         logo:
           type: string
         csm:
-          $ref: '#/components/schemas/User'
+          required:
+            - id
+            - email
+            - name
+            - profile_id
+            - tryber_wp_user_id
+          type: object
+          properties:
+            id:
+              type: integer
+            email:
+              type: string
+            name:
+              type: string
+            profile_id:
+              type: integer
+            tryber_wp_user_id:
+              type: integer
+            picture:
+              type: string
       required:
         - id
         - company
