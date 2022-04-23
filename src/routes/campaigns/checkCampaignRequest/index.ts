@@ -26,6 +26,9 @@ export default async (
     throw { ...error, code: 400 };
   }
 
+  //Check Platforms
+  // await checkPlatforms(campaign_request.platforms);
+
   // Return validated request and set default values
   return {
     ...campaign_request,

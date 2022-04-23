@@ -243,7 +243,7 @@ export interface components {
           test_type_id: number;
           project_id: number;
           pm_id: number;
-          platforms: components["schemas"]["Platform"][];
+          platforms?: components["schemas"]["Platform"][];
           /** @description Da togliere */
           page_preview_id?: number;
           /** @description Da togliere */
