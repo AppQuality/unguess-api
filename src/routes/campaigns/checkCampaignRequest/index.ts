@@ -1,4 +1,4 @@
-import { ERROR_MESSAGE } from "@src/routes/shared";
+import { ERROR_MESSAGE, fallBackCsmProfile } from "@src/routes/shared";
 
 export default async (
   campaign_request: StoplightComponents["requestBodies"]["Campaign"]["content"]["application/json"]
@@ -36,7 +36,6 @@ export default async (
     page_preview_id: campaign_request.page_preview_id || 0,
     page_manual_id: campaign_request.page_manual_id || 0,
     customer_id: campaign_request.customer_id || 0,
-    pm_id: campaign_request.pm_id,
-    platform_id: campaign_request.platform_id,
+    pm_id: campaign_request.pm_id || fallBackCsmProfile.id,
   };
 };

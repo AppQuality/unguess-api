@@ -1,5 +1,7 @@
 import * as db from "@src/features/db";
 
+const DEFAULT_PLATFORM_ID = 0;
+
 export default async (
   campaign_request: StoplightComponents["requestBodies"]["Campaign"]["content"]["application/json"]
 ): Promise<StoplightComponents["schemas"]["Campaign"]> => {
@@ -15,11 +17,11 @@ export default async (
     "is_public",
     "campaign_type_id",
     "project_id",
-    "platform_id",
     "page_preview_id",
     "page_manual_id",
     "customer_id",
     "pm_id",
+    "platform_id", //Required for db, but useless.
   ];
 
   // Define values from request body
@@ -34,11 +36,11 @@ export default async (
     campaign_request.is_public as number,
     campaign_request.campaign_type_id as number,
     campaign_request.project_id as number,
-    campaign_request.platform_id as number,
     campaign_request.page_preview_id as number,
     campaign_request.page_manual_id as number,
     campaign_request.customer_id as number,
     campaign_request.pm_id as number,
+    DEFAULT_PLATFORM_ID,
   ];
 
   let insert_sql =

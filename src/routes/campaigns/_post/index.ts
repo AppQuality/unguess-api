@@ -25,8 +25,6 @@ export default async (
     // Check request
     let validated_request_body = await checkCampaignRequest(request_body);
 
-    console.log("Request validated");
-
     // Try to get the project checking all the permissions
     await getProjectById(validated_request_body.project_id, user);
 

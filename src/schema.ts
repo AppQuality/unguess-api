@@ -167,6 +167,27 @@ export interface components {
       code: number;
       error: boolean;
     };
+    /** Platform Object */
+    Platform: {
+      id: number;
+      name: string;
+      /**
+       * @description 0 => smartphone,
+       * 1 => tablet
+       * 2 => pc
+       * 3 => smartwatch
+       * 4 => console
+       * 5 => tv
+       * @enum {string}
+       */
+      deviceType?:
+        | "smartphone"
+        | "tablet"
+        | "computer"
+        | "smartwatch"
+        | "console"
+        | "tv";
+    };
   };
   responses: {
     /** Example response */
@@ -222,7 +243,7 @@ export interface components {
           test_type_id: number;
           project_id: number;
           pm_id: number;
-          platform_id: number;
+          platforms: components["schemas"]["Platform"][];
           /** @description Da togliere */
           page_preview_id?: number;
           /** @description Da togliere */
