@@ -66,7 +66,7 @@ paths:
         - JWT: []
   /workspaces:
     get:
-      summary: Your GET endpoint
+      summary: Get User Workspaces
       tags: []
       responses:
         '200':
@@ -106,7 +106,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/wid'
     get:
-      summary: Your GET endpoint
+      summary: GET single Workspace
       tags: []
       responses:
         '200':
