@@ -779,7 +779,6 @@ components:
               - test_type_id
               - project_id
               - pm_id
-              - platforms
 tags:
   - name: Authentication
   - name: Campaign
