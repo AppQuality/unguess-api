@@ -618,6 +618,33 @@ components:
         - message
         - code
         - error
+    Platform:
+      title: Platform Object
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        deviceType:
+          type: string
+          enum:
+            - smartphone
+            - tablet
+            - computer
+            - smartwatch
+            - console
+            - tv
+          description: |-
+            0 => smartphone, 
+            1 => tablet 
+            2 => pc 
+            3 => smartwatch 
+            4 => console
+            5 => tv
+      required:
+        - id
+        - name
   securitySchemes:
     JWT:
       type: http
@@ -730,6 +757,10 @@ components:
                 type: integer
               pm_id:
                 type: integer
+              platforms:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Platform'
               page_preview_id:
                 type: integer
                 description: Da togliere
@@ -748,6 +779,7 @@ components:
               - test_type_id
               - project_id
               - pm_id
+              - platforms
 tags:
   - name: Authentication
   - name: Campaign
