@@ -61,5 +61,6 @@ const formattedUser = async (user: any, profile: any): Promise<any> => {
     name: profile.name + " " + profile.surname,
     workspaces: user.workspaces,
     ...(picUrl && { picture: picUrl }),
+    ...(user.features && { features: user.features }),
   };
 };
