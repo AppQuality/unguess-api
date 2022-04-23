@@ -1,18 +1,10 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { ERROR_MESSAGE } from "@src/routes/shared";
-import * as db from "@src/features/db";
+import { fallBackCsmProfile } from "@src/routes/shared";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
-
-const customer_user_1 = {
-  ID: 1,
-  user_login: "customer@unguess.io",
-  user_pass: "password",
-  user_email: "customer@unguess.io",
-};
 
 const customer_1 = {
   id: 1,
@@ -49,16 +41,18 @@ const user_to_project_2 = {
 };
 
 const campaign_request_1 = {
-  description: "",
+  title: "Campaign 1 title",
   start_date: "2017-07-20 00:00:00",
   end_date: "2017-07-20 00:00:00",
   close_date: "2017-07-20 00:00:00",
-  title: "Campaign 1 title",
   customer_title: "Campaign 1 customer title",
+  description: "",
   is_public: 1,
   campaign_type_id: 1,
   test_type_id: 1,
   project_id: 1,
+  platform_id: 1,
+  pm_id: fallBackCsmProfile.id,
 };
 
 const campaign_1 = {
@@ -69,7 +63,7 @@ const campaign_1 = {
   title: "Campaign 1 title",
   customer_title: "Campaign 1 customer title",
   description: "",
-  status_id: 0,
+  status_id: 1,
   is_public: 1,
   campaign_type_id: 1,
   project_id: 1,
