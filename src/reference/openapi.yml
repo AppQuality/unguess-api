@@ -730,8 +730,6 @@ components:
                 type: integer
               pm_id:
                 type: integer
-              platform_id:
-                type: integer
               page_preview_id:
                 type: integer
                 description: Da togliere
@@ -750,7 +748,6 @@ components:
               - test_type_id
               - project_id
               - pm_id
-              - platform_id
 tags:
   - name: Authentication
   - name: Campaign
