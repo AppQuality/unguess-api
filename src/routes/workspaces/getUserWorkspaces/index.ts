@@ -1,17 +1,7 @@
 import * as db from "../../../features/db";
 import { getGravatar } from "@src/routes/users/utils";
 import { formatCount } from "@src/routes/shared/paginateItems";
-
-const fallBackCsmProfile = {
-  id: 20739,
-  name: "Gianluca",
-  surname: "Peretti",
-  email: "gianluca.peretti@unguess.io",
-  role: "admin",
-  tryber_wp_user_id: 21605,
-  profile_id: 20739,
-  workspaces: [],
-};
+import { fallBackCsmProfile } from "@src/routes/shared";
 
 export default async (
   user: UserType,

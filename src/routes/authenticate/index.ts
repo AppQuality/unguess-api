@@ -37,8 +37,8 @@ export default async (c: Context, req: Request, res: OpenapiResponse) => {
       email: data.email,
       role: data.role,
       tryber_wp_user_id: data.tryber_wp_user_id,
+      unguess_wp_user_id: data.unguess_wp_user_id,
       profile_id: data.profile_id,
-      ...(features && { features: features }),
     };
 
     const token = jwt.sign(user, config.jwt.secret, {

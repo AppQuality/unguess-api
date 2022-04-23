@@ -6,13 +6,6 @@ import { ERROR_MESSAGE } from "@src/routes/shared";
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
 
-const customer_user_1 = {
-  ID: 1,
-  user_login: "customer@unguess.io",
-  user_pass: "password",
-  user_email: "customer@unguess.io",
-};
-
 const customer_profile_1 = {
   id: 1,
   wp_user_id: 1,

@@ -1,6 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
+import { fallBackCsmProfile } from "@src/routes/shared";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
@@ -73,16 +74,7 @@ describe("GET /workspaces", () => {
             company: customer_1.company,
             logo: customer_1.company_logo,
             tokens: customer_1.tokens,
-            csm: {
-              id: 20739,
-              name: "Gianluca",
-              surname: "Peretti",
-              email: "gianluca.peretti@unguess.io",
-              role: "admin",
-              tryber_wp_user_id: 21605,
-              profile_id: 20739,
-              workspaces: [],
-            },
+            csm: fallBackCsmProfile,
           },
         ],
         start: 0,
@@ -105,16 +97,7 @@ describe("GET /workspaces", () => {
             company: customer_1.company,
             logo: customer_1.company_logo,
             tokens: customer_1.tokens,
-            csm: {
-              id: 20739,
-              name: "Gianluca",
-              surname: "Peretti",
-              email: "gianluca.peretti@unguess.io",
-              role: "admin",
-              tryber_wp_user_id: 21605,
-              profile_id: 20739,
-              workspaces: [],
-            },
+            csm: fallBackCsmProfile,
           },
         ],
         start: 0,

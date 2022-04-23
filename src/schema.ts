@@ -101,6 +101,7 @@ export interface components {
       workspaces: components["schemas"]["Workspace"][];
       profile_id: number;
       tryber_wp_user_id: number;
+      unguess_wp_user_id: number;
       picture?: string;
       features?: {
         slug?: string;
@@ -125,7 +126,14 @@ export interface components {
       company: string;
       tokens: number;
       logo?: string;
-      csm: components["schemas"]["User"];
+      csm: {
+        id: number;
+        email: string;
+        name: string;
+        profile_id: number;
+        tryber_wp_user_id: number;
+        picture?: string;
+      };
     };
     /** Campaign */
     Campaign: {

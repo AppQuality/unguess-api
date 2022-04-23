@@ -12,6 +12,7 @@ export default async (userData: {
     id: 0,
     workspaces: [],
     tryber_wp_user_id: 0,
+    unguess_wp_user_id: 0,
     profile_id: 0,
   };
 
@@ -34,6 +35,7 @@ export default async (userData: {
     if (adminInfo) {
       user.id = 0;
       user.email = adminInfo[0].user_email;
+      user.unguess_wp_user_id = userData.ID;
 
       return user;
     }
@@ -54,6 +56,7 @@ export default async (userData: {
     user.tryber_wp_user_id = result.tryber_wp_user_id;
     user.profile_id = result.profile_id;
     user.id = result.tryber_wp_user_id; // user id is the same as tryber_wp_user_id
+    user.unguess_wp_user_id = result.unguess_wp_user_id;
     user.email = result.user_email;
   }
 

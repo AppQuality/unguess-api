@@ -1,6 +1,6 @@
 import getWorkspace from ".";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { ERROR_MESSAGE } from "@src/routes/shared";
+import { ERROR_MESSAGE, fallBackCsmProfile } from "@src/routes/shared";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
@@ -12,6 +12,7 @@ const admin_user_1 = {
   email: "admin@unguess.io",
   role: "administrator",
   tryber_wp_user_id: 0,
+  unguess_wp_user_id: 12,
   profile_id: 0,
   workspaces: {},
 };
@@ -23,6 +24,7 @@ const customer_user_1 = {
   email: "customer1@unguess.io",
   role: "customer",
   tryber_wp_user_id: 1,
+  unguess_wp_user_id: 1,
   profile_id: 1,
   workspaces: {},
 };
@@ -34,6 +36,7 @@ const customer_user_2 = {
   email: "customer2@unguess.io",
   role: "customer",
   tryber_wp_user_id: 2,
+  unguess_wp_user_id: 12,
   profile_id: 2,
   workspaces: {},
 };
@@ -155,16 +158,7 @@ describe("getWorkspace", () => {
         company: customer_1.company,
         tokens: customer_1.tokens,
         logo: customer_1.company_logo,
-        csm: {
-          id: 20739,
-          name: "Gianluca",
-          surname: "Peretti",
-          email: "gianluca.peretti@unguess.io",
-          role: "admin",
-          tryber_wp_user_id: 20739,
-          profile_id: 21605,
-          workspaces: [],
-        },
+        csm: fallBackCsmProfile,
       })
     );
   });

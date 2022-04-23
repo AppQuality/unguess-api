@@ -7,3 +7,12 @@ export interface ResponseError {
   code: number;
   error: boolean;
 }
+
+export const fallBackCsmProfile: StoplightComponents["schemas"]["Workspace"]["csm"] =
+  {
+    id: 20739,
+    name: "Gianluca Peretti",
+    email: "gianluca.peretti@unguess.io",
+    tryber_wp_user_id: 21605,
+    profile_id: 20739,
+  };

@@ -1,23 +1,10 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
+import { fallBackCsmProfile } from "@src/routes/shared";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
-
-const customer_user_1 = {
-  ID: 1,
-  user_login: "customer@unguess.io",
-  user_pass: "password",
-  user_email: "customer@unguess.io",
-};
-
-const admin_user_1 = {
-  ID: 2,
-  user_login: "admin@unguess.io",
-  user_pass: "password",
-  user_email: "admin@unguess.io",
-};
 
 const customer_profile_1 = {
   id: 1,
@@ -108,16 +95,7 @@ describe("GET /workspaces/{wid}", () => {
         company: customer_1.company,
         tokens: customer_1.tokens,
         logo: customer_1.company_logo,
-        csm: {
-          id: 20739,
-          name: "Gianluca",
-          surname: "Peretti",
-          email: "gianluca.peretti@unguess.io",
-          role: "admin",
-          tryber_wp_user_id: 20739,
-          profile_id: 21605,
-          workspaces: [],
-        },
+        csm: fallBackCsmProfile,
       })
     );
   });

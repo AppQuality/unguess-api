@@ -1,17 +1,6 @@
 import * as db from "@src/features/db";
 import { getGravatar } from "@src/routes/users/utils";
-import { ERROR_MESSAGE } from "@src/routes/shared";
-
-const fallBackCsmProfile = {
-  id: 20739,
-  name: "Gianluca",
-  surname: "Peretti",
-  email: "gianluca.peretti@unguess.io",
-  role: "admin",
-  tryber_wp_user_id: 20739,
-  profile_id: 21605,
-  workspaces: [],
-};
+import { ERROR_MESSAGE, fallBackCsmProfile } from "@src/routes/shared";
 
 const loadCsmData = async (
   csm: StoplightComponents["schemas"]["Workspace"]["csm"]
@@ -49,7 +38,7 @@ export default async (
   let workspace = await db.query(customerSql);
 
   if (workspace.length) {
-    workspace = workspace[0];
+    workspace = workspace[0] as StoplightComponents["schemas"]["Workspace"];
 
     if (user.role !== "administrator") {
       // Check if user has permission to get the customer
@@ -74,10 +63,8 @@ export default async (
           id: workspace.pm_id,
           name: workspace.csmName + " " + workspace.csmSurname,
           email: workspace.csmEmail,
-          role: "admin",
           profile_id: workspace.csmProfileId,
           tryber_wp_user_id: workspace.csmTryberWpUserId,
-          workspaces: [],
         }
       : fallBackCsmProfile;
 
