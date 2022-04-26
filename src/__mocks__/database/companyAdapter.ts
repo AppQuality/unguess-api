@@ -18,6 +18,13 @@ import {
   data as userToCustomerData,
 } from "./user_to_customer";
 
+import { table as featuresTable, data as featuresData } from "./features";
+
+import {
+  table as userToFeaturesTable,
+  data as userToFeaturesData,
+} from "./userToFeatures";
+
 interface dataObject {
   profiles?: Array<any>;
   companies?: Array<any>;
@@ -41,6 +48,10 @@ export const adapter = {
     await userToProjectTable.create();
     await userTable.create();
     await customerTable.create();
+
+    //Features Table
+    await featuresTable.create();
+    await userToFeaturesTable.create();
   },
   drop: async () => {
     await profileTable.drop();
@@ -52,6 +63,10 @@ export const adapter = {
     await userToProjectTable.drop();
     await userTable.drop();
     await customerTable.drop();
+
+    //Features Table
+    await featuresTable.drop();
+    await userToFeaturesTable.drop();
   },
   add: async ({
     profiles = [],
@@ -61,8 +76,6 @@ export const adapter = {
     campaignTypes = [],
     userToProjects = [],
     userToCustomers = [],
-    users = [],
-    customers = [],
   }: dataObject) => {
     profiles.length &&
       profiles.forEach(async (profile) => {

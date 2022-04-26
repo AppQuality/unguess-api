@@ -2,6 +2,8 @@
 import { Context } from "openapi-backend";
 import getProject from "../getProject";
 import getWorkspace from "../../../getWorkspace";
+import { ERROR_MESSAGE } from "@src/routes/shared";
+import getUserProjects from "../../../getUserProjects";
 
 export default async (
   c: Context,
@@ -9,66 +11,42 @@ export default async (
   res: OpenapiResponse
 ) => {
   let user = req.user;
+  let error = {
+    message: ERROR_MESSAGE,
+    error: true,
+  } as StoplightComponents["schemas"]["Error"];
   res.status_code = 200;
 
-  let workspaceId;
-  if (typeof c.request.params.wid == "string") {
-    workspaceId = parseInt(
-      c.request.params.wid
-    ) as StoplightOperations["get-workspace-project-campaigns"]["parameters"]["path"]["wid"];
-  }
-
-  // Check if workspaceId is valid
-  if (
-    typeof workspaceId == "undefined" ||
-    workspaceId == null ||
-    workspaceId < 0
-  ) {
-    res.status_code = 400;
-    return "Workspace id is not valid";
-  }
-
-  let projectId;
-  if (typeof c.request.params.pid == "string") {
-    projectId = parseInt(
-      c.request.params.pid
-    ) as StoplightOperations["get-workspace-project-campaigns"]["parameters"]["path"]["pid"];
-  }
-
-  // Check if projectId is valid
-  if (typeof projectId == "undefined" || projectId == null || projectId < 0) {
-    res.status_code = 400;
-    return "Project id is not valid";
-  }
+  let wid = parseInt(c.request.params.wid as string);
+  let pid = parseInt(c.request.params.pid as string);
 
   try {
-    let workspace = (await getWorkspace(
-      workspaceId,
-      user
-    )) as StoplightComponents["schemas"]["Workspace"];
+    // Get customer
+    await getWorkspace(wid, user);
 
-    let returnProject = (await getProject(
-      projectId,
-      workspaceId
-    )) as StoplightComponents["schemas"]["Project"];
+    // Get all customer's project
+    let customerProjects = await getUserProjects(wid, user);
 
-    return returnProject;
-  } catch (error) {
-    if ((error as OpenapiError).message == "No workspace found") {
-      res.status_code = 404;
-      return (error as OpenapiError).message;
-    } else if (
-      (error as OpenapiError).message ===
-      "You have no permission to get this workspace"
-    ) {
-      res.status_code = 403;
-      return (error as OpenapiError).message;
-    } else if ((error as OpenapiError).message == "No project found") {
-      res.status_code = 404;
-      return (error as OpenapiError).message;
-    } else {
-      res.status_code = 500;
-      throw error;
+    // Get all project ids
+    let projectIds = customerProjects.map((project) => project.id);
+
+    // Get requested project
+    let project = await getProject(pid, wid);
+
+    if (projectIds.includes(project.id)) {
+      return project;
     }
+
+    return { ...error, code: 403 };
+  } catch (e: any) {
+    if (e.code) {
+      error.code = e.code;
+      res.status_code = e.code;
+    } else {
+      error.code = 500;
+      res.status_code = 500;
+    }
+
+    return error;
   }
 };

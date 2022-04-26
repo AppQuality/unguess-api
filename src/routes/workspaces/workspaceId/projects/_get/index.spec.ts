@@ -1,16 +1,10 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
+import { ERROR_MESSAGE } from "@src/routes/shared";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
-
-const customer_user_1 = {
-  ID: 1,
-  user_login: "customer@unguess.io",
-  user_pass: "password",
-  user_email: "customer@unguess.io",
-};
 
 const customer_profile_1 = {
   id: 1,
@@ -186,18 +180,47 @@ describe("GET /workspaces/{wid}/projects", () => {
     const response = await request(app)
       .get(`/workspaces/${customer_1.id}/projects`)
       .set("authorization", "Bearer customer");
-    expect(response.body).toMatchObject([
-      {
-        id: project_1.id,
-        name: project_1.display_name,
-        campaigns_count: 2,
-      },
-      {
-        id: project_3.id,
-        name: project_3.display_name,
-        campaigns_count: 1,
-      },
-    ]);
+    expect(JSON.stringify(response.body)).toStrictEqual(
+      JSON.stringify({
+        items: [
+          {
+            id: project_1.id,
+            name: project_1.display_name,
+            campaigns_count: 2,
+          },
+          {
+            id: project_3.id,
+            name: project_3.display_name,
+            campaigns_count: 1,
+          },
+        ],
+        start: 0,
+        limit: 10,
+        size: 2,
+        total: 2,
+      })
+    );
+  });
+
+  it("Should answer with only one visible project because of limit 1", async () => {
+    const response = await request(app)
+      .get(`/workspaces/${customer_1.id}/projects?start=0&limit=1`)
+      .set("authorization", "Bearer customer");
+    expect(JSON.stringify(response.body)).toStrictEqual(
+      JSON.stringify({
+        items: [
+          {
+            id: project_1.id,
+            name: project_1.display_name,
+            campaigns_count: 2,
+          },
+        ],
+        start: 0,
+        limit: 1,
+        size: 1,
+        total: 2,
+      })
+    );
   });
 
   it("Should answer 400 if wid is a string", async () => {
@@ -207,14 +230,12 @@ describe("GET /workspaces/{wid}/projects", () => {
     expect(response.status).toBe(400);
   });
 
-  it("Should throw an error 'No workspace found' if workspace is not found", async () => {
-    try {
-      await request(app)
-        .get(`/workspaces/9999/projects`)
-        .set("authorization", "Bearer customer");
-    } catch (error) {
-      expect((error as OpenapiError).message).toBe("No workspace found");
-    }
+  it("Should return 403 if workspace is not found", async () => {
+    const result = await request(app)
+      .get(`/workspaces/9999/projects`)
+      .set("authorization", "Bearer customer");
+    expect(result.body.code).toBe(403);
+    expect(result.body.message).toBe(ERROR_MESSAGE);
   });
 
   it("Should return a list of projects if customer is present and has some projects", async () => {
@@ -222,10 +243,9 @@ describe("GET /workspaces/{wid}/projects", () => {
       .get(`/workspaces/${customer_1.id}/projects`)
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
-
-    expect(Array.isArray(response.body)).toBe(true);
-    expect(response.body.length).toBeGreaterThan(0);
-    response.body.forEach((project: Object) => {
+    expect(Array.isArray(response.body.items)).toBe(true);
+    expect(response.body.items.length).toBeGreaterThan(0);
+    response.body.items.forEach((project: Object) => {
       expect(project).toHaveProperty("id");
       expect(project).toHaveProperty("name");
       expect(project).toHaveProperty("campaigns_count");
@@ -237,18 +257,26 @@ describe("GET /workspaces/{wid}/projects", () => {
       .get(`/workspaces/${customer_1.id}/projects`)
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
-    expect(response.body).toMatchObject([
-      {
-        id: project_1.id,
-        name: project_1.display_name,
-        campaigns_count: 2,
-      },
-      {
-        id: project_3.id,
-        name: project_3.display_name,
-        campaigns_count: 1,
-      },
-    ]);
+    expect(JSON.stringify(response.body)).toStrictEqual(
+      JSON.stringify({
+        items: [
+          {
+            id: project_1.id,
+            name: project_1.display_name,
+            campaigns_count: 2,
+          },
+          {
+            id: project_3.id,
+            name: project_3.display_name,
+            campaigns_count: 1,
+          },
+        ],
+        start: 0,
+        limit: 10,
+        size: 2,
+        total: 2,
+      })
+    );
   });
 
   it("Should return only the projects that the user can see with the correct campaigns count", async () => {
@@ -256,17 +284,25 @@ describe("GET /workspaces/{wid}/projects", () => {
       .get(`/workspaces/${customer_1.id}/projects`)
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
-    expect(response.body).toMatchObject([
-      {
-        id: project_1.id,
-        name: project_1.display_name,
-        campaigns_count: 2,
-      },
-      {
-        id: project_3.id,
-        name: project_3.display_name,
-        campaigns_count: 1,
-      },
-    ]);
+    expect(JSON.stringify(response.body)).toStrictEqual(
+      JSON.stringify({
+        items: [
+          {
+            id: project_1.id,
+            name: project_1.display_name,
+            campaigns_count: 2,
+          },
+          {
+            id: project_3.id,
+            name: project_3.display_name,
+            campaigns_count: 1,
+          },
+        ],
+        start: 0,
+        limit: 10,
+        size: 2,
+        total: 2,
+      })
+    );
   });
 });

@@ -22,8 +22,9 @@ declare global {
     user_pass: string;
     email: string;
     role: string;
-    tryber_wp_user_id?: number;
-    profile_id?: number;
+    tryber_wp_user_id: number;
+    unguess_wp_user_id: number;
+    profile_id: number;
     workspaces: Array;
   };
 

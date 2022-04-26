@@ -7,6 +7,7 @@ export default {
         ...profiles[0],
         role: "customer",
         tryber_wp_user_id: profiles[0].wp_user_id,
+        unguess_wp_user_id: profiles[0].wp_user_id,
         profile_id: profiles[0].id,
       };
     }
@@ -15,6 +16,9 @@ export default {
       return {
         ...profiles[1],
         role: "administrator",
+        tryber_wp_user_id: 0,
+        unguess_wp_user_id: 0,
+        profile_id: 0,
       };
     }
 
@@ -23,6 +27,7 @@ export default {
         ...profiles[2],
         role: "customer",
         tryber_wp_user_id: profiles[2].wp_user_id,
+        unguess_wp_user_id: profiles[2].wp_user_id,
         profile_id: profiles[2].id,
       };
     }

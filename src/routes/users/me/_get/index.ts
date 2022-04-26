@@ -3,6 +3,7 @@ import { Context } from "openapi-backend";
 import * as db from "../../../../features/db";
 import { getGravatar } from "../../utils";
 import getUserWorkspaces from "@src/routes/workspaces/getUserWorkspaces";
+import getUserFeatures from "@src/features/wp/getUserFeatures";
 
 export default async (
   c: Context,
@@ -16,8 +17,8 @@ export default async (
   //Get User Profile (wp_appq_evd_profile)
   let profileData = await getProfile(user.profile_id);
 
-  let workspaces = await getUserWorkspaces(user);
-  setWorkspaces(user, workspaces);
+  let userWorkspaces = await getUserWorkspaces(user, 1, 1);
+  setWorkspaces(user, userWorkspaces.workspaces);
 
   return formattedUser(user, profileData);
 };
@@ -37,7 +38,6 @@ const getProfile = async (profile_id: number | undefined): Promise<any> => {
 
 const setWorkspaces = (user: UserType, workspaces: Array<object>) => {
   user.workspaces = [];
-
   if (workspaces.length) {
     workspaces.forEach((workspace: any) => {
       user.workspaces.push({
@@ -53,14 +53,17 @@ const setWorkspaces = (user: UserType, workspaces: Array<object>) => {
 
 const formattedUser = async (user: any, profile: any): Promise<any> => {
   const picUrl = await getGravatar(user.email);
+  const features = await getUserFeatures(user.unguess_wp_user_id);
   return {
     id: user.id,
     email: user.email,
     role: user.role,
     profile_id: user.profile_id,
     tryber_wp_user_id: user.tryber_wp_user_id,
+    unguess_wp_user_id: user.unguess_wp_user_id,
     name: profile.name + " " + profile.surname,
     workspaces: user.workspaces,
     ...(picUrl && { picture: picUrl }),
+    ...(features && { features: features }),
   };
 };

@@ -1,57 +1,62 @@
 import * as db from "../../../features/db";
 import { getGravatar } from "@src/routes/users/utils";
-
-const fallBackCsmProfile = {
-  id: 20739,
-  name: "Gianluca",
-  surname: "Peretti",
-  email: "gianluca.peretti@unguess.io",
-  role: "admin",
-  workspaces: [],
-};
+import { formatCount } from "@src/routes/shared/paginateItems";
+import { fallBackCsmProfile } from "@src/routes/shared";
 
 export default async (
-  user: UserType
-): Promise<StoplightComponents["schemas"]["Workspace"][] | []> => {
-  const baseCustomerSql =
-    "SELECT c.*, p.name as csmName, p.surname as csmSurname, p.email as csmEmail FROM wp_appq_customer c JOIN wp_appq_user_to_customer utc ON (c.id = utc.customer_id) LEFT JOIN wp_appq_evd_profile p ON (p.id = c.pm_id)";
+  user: UserType,
+  limit?: StoplightComponents["parameters"]["limit"],
+  start?: StoplightComponents["parameters"]["start"]
+): Promise<{
+  workspaces: StoplightComponents["schemas"]["Workspace"][] | [];
+  total: number;
+}> => {
+  let LIMIT = "";
+  if (limit && start) {
+    let LIMIT = `LIMIT ${limit} OFFSET ${start}`;
+  }
 
-  if (user.role !== "administrator") {
-    if (!user.profile_id || !user.tryber_wp_user_id) {
-      return [];
-    }
+  let query = `SELECT c.*, p.name as csmName, p.surname as csmSurname, p.email as csmEmail, p.id as csmProfileId, p.wp_user_id as csmTryberWpUserId 
+        FROM wp_appq_customer c 
+        JOIN wp_appq_user_to_customer utc ON (c.id = utc.customer_id) 
+        LEFT JOIN wp_appq_evd_profile p ON (p.id = c.pm_id)
+        ${user.role !== "administrator" ? `WHERE utc.wp_user_id = ?` : ``} `;
 
-    try {
-      // Get customer name
-      const customerSql = baseCustomerSql + " WHERE utc.wp_user_id = ?";
-      let customers = await db.query(
-        db.format(customerSql, [user.tryber_wp_user_id]),
-        "tryber"
-      );
+  if (limit && start) {
+    query += `${LIMIT}`;
+  }
 
-      if (customers.length) {
-        return await prepareResponse(customers);
-      }
+  let countQuery = `SELECT COUNT(*) 
+        FROM wp_appq_customer c 
+        JOIN wp_appq_user_to_customer utc ON (c.id = utc.customer_id) 
+        LEFT JOIN wp_appq_evd_profile p ON (p.id = c.pm_id)
+        ${user.role !== "administrator" ? `WHERE utc.wp_user_id = ?` : ``} `;
 
-      return [];
-    } catch (error) {
-      console.error(error);
-      return [];
-    }
-  } else {
-    try {
-      // Get customer name
-      let customers = await db.query(baseCustomerSql, "tryber");
+  if (limit && start) {
+    countQuery += `${LIMIT}`;
+  }
 
-      if (customers.length) {
-        return await prepareResponse(customers);
-      }
+  try {
+    if (
+      user.role !== "administrator" &&
+      (!user.profile_id || !user.tryber_wp_user_id)
+    )
+      return { workspaces: [], total: 0 };
 
-      return [];
-    } catch (error) {
-      console.error(error);
-      return [];
-    }
+    query = db.format(query, [user.tryber_wp_user_id || 0]);
+    countQuery = db.format(countQuery, [user.tryber_wp_user_id || 0]);
+    const result = await db.query(query, "tryber");
+    const countResult = await db.query(countQuery, "tryber");
+
+    if (result.length)
+      return {
+        workspaces: await prepareResponse(result),
+        total: formatCount(countResult),
+      };
+
+    return { workspaces: [], total: 0 };
+  } catch (e) {
+    return { workspaces: [], total: 0 };
   }
 };
 
@@ -83,6 +88,8 @@ const prepareResponse = async (
           name: customer.csmName + " " + customer.csmSurname,
           email: customer.csmEmail,
           role: "admin",
+          profile_id: customer.csmProfileId,
+          tryber_wp_user_id: customer.csmTryberWpUserId,
           workspaces: [],
         }
       : fallBackCsmProfile;
@@ -94,7 +101,7 @@ const prepareResponse = async (
       company: customer.company,
       logo: customer.company_logo || "",
       tokens: customer.tokens,
-      csm: csm,
+      csm,
     });
   }
 

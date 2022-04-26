@@ -23,8 +23,8 @@ export interface paths {
     get: operations["get-workspace"];
     parameters: {
       path: {
-        /** Workspace (company) id */
-        wid: number;
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
       };
     };
   };
@@ -32,8 +32,8 @@ export interface paths {
     get: operations["get-workspace-campaigns"];
     parameters: {
       path: {
-        /** Workspace (company) id */
-        wid: number;
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
       };
     };
   };
@@ -41,8 +41,8 @@ export interface paths {
     get: operations["get-workspace-projects"];
     parameters: {
       path: {
-        /** Workspace (company) id */
-        wid: number;
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
       };
     };
   };
@@ -50,10 +50,10 @@ export interface paths {
     get: operations["get-workspace-project"];
     parameters: {
       path: {
-        /** Workspace (company) id */
-        wid: number;
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
         /** Project id */
-        pid: number;
+        pid: components["parameters"]["pid"];
       };
     };
   };
@@ -61,12 +61,34 @@ export interface paths {
     get: operations["get-workspace-project-campaigns"];
     parameters: {
       path: {
-        /** Workspace (company) id */
-        wid: number;
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
+        /** Project id */
+        pid: components["parameters"]["pid"];
+      };
+    };
+  };
+  "/projects/{pid}/campaigns": {
+    get: operations["get-project-campaigns"];
+    parameters: {
+      path: {
         /** Project id */
         pid: number;
       };
     };
+  };
+  "/projects/{pid}": {
+    /** Retrieve projects details from an ID. */
+    get: operations["get-projects-projectId"];
+    parameters: {
+      path: {
+        /** Project id */
+        pid: components["parameters"]["pid"];
+      };
+    };
+  };
+  "/campaigns": {
+    post: operations["post-campaigns"];
   };
 }
 
@@ -80,9 +102,26 @@ export interface components {
       role: string;
       name: string;
       workspaces: components["schemas"]["Workspace"][];
-      profile_id?: number;
-      tryber_wp_user_id?: number;
+      profile_id: number;
+      tryber_wp_user_id: number;
+      unguess_wp_user_id: number;
       picture?: string;
+      features?: {
+        slug?: string;
+        name?: string;
+      }[];
+    };
+    /** Authentication */
+    Authentication: {
+      id: number;
+      /** Format: email */
+      email: string;
+      role: string;
+      name: string;
+      picture?: string;
+      token: string;
+      iat?: number;
+      exp?: number;
     };
     /** Workspace */
     Workspace: {
@@ -90,7 +129,14 @@ export interface components {
       company: string;
       tokens: number;
       logo?: string;
-      csm: components["schemas"]["User"];
+      csm: {
+        id: number;
+        email: string;
+        name: string;
+        profile_id: number;
+        tryber_wp_user_id: number;
+        picture?: string;
+      };
     };
     /** Campaign */
     Campaign: {
@@ -115,72 +161,98 @@ export interface components {
       name: string;
       campaigns_count: number;
     };
+    /** Error */
+    Error: {
+      message: string;
+      code: number;
+      error: boolean;
+    };
+    /** Platform Object */
+    Platform: {
+      id: number;
+      name: string;
+      /**
+       * @description 0 => smartphone,
+       * 1 => tablet
+       * 2 => pc
+       * 3 => smartwatch
+       * 4 => console
+       * 5 => tv
+       * @enum {string}
+       */
+      deviceType?:
+        | "smartphone"
+        | "tablet"
+        | "computer"
+        | "smartwatch"
+        | "console"
+        | "tv";
+    };
   };
   responses: {
-    /** Authentication data. The token can be used to authenticate the protected requests */
-    Authentication: {
+    /** Example response */
+    Error: {
       content: {
-        "application/json": {
-          id?: number;
-          firstName?: string;
-          lastName?: string;
-          token?: string;
-          username?: string;
-        };
-      };
-    };
-    /** An error due to the resource not existing */
-    NotFound: {
-      content: {
-        "application/json": {
-          element: string;
-          id: number;
-          message: string;
-        };
-      };
-    };
-    /** An error due to missing required parameters */
-    MissingParameters: {
-      content: {
-        "application/json": {
-          message: string;
-        };
-      };
-    };
-    /** An error due to insufficient authorization to access the resource */
-    NotAuthorized: {
-      content: {
-        "application/json": {
-          message?: string;
-        };
+        "application/json": components["schemas"]["Error"];
       };
     };
   };
   parameters: {
-    /** @description A campaign id */
-    campaign: string;
-    /** @description A task id */
-    task: string;
-    /** @description A customer id */
-    customer: string;
-    /** @description A project id */
-    project: string;
-    /** @description Max items to retrieve */
+    /** @description Workspace (company, customer) id */
+    wid: number;
+    /** @description Project id */
+    pid: number;
+    /** @description Limit pagination parameter */
     limit: number;
-    /** @description Items to skip for pagination */
+    /** @description Start pagination parameter */
     start: number;
-    /** @description Key-value Array for item filtering */
-    filterBy: { [key: string]: unknown };
-    /** @description How to order values (ASC, DESC) */
-    order: "ASC" | "DESC";
-    /** @description How to localize values */
-    locale: "en" | "it";
-    /** @description A comma separated list of fields which will be searched */
-    searchBy: string;
-    /** @description The value to search for */
-    search: string;
-    /** @description The field used as reference to order the result */
+    /** @description Order value (ASC, DESC) */
+    order: string;
+    /** @description Order by accepted field */
     orderBy: string;
+    /** @description filterBy[<fieldName>]=<fieldValue> */
+    filterBy: unknown;
+  };
+  requestBodies: {
+    Credentials: {
+      content: {
+        "application/json": {
+          username: string;
+          password: string;
+        };
+      };
+    };
+    Campaign: {
+      content: {
+        "application/json": {
+          title: string;
+          description?: string;
+          start_date: string;
+          end_date: string;
+          close_date: string;
+          customer_title?: string;
+          status_id?: number;
+          is_public?: number;
+          /**
+           * @description -1: no bug form
+           * 0: only bug form
+           * 1: bug form with bug parade
+           */
+          bug_form?: number;
+          campaign_type_id: number;
+          test_type_id: number;
+          project_id: number;
+          pm_id: number;
+          platforms?: components["schemas"]["Platform"][];
+          /** @description Da togliere */
+          page_preview_id?: number;
+          /** @description Da togliere */
+          page_manual_id?: number;
+          /** @description Da togliere */
+          customer_id?: number;
+        };
+      };
+    };
   };
 }
 
@@ -195,29 +267,22 @@ export interface operations {
           "application/json": { [key: string]: unknown };
         };
       };
+      500: components["responses"]["Error"];
     };
   };
   /** A request to login with your username and password */
   "post-authenticate": {
     parameters: {};
     responses: {
-      200: components["responses"]["Authentication"];
-      /** Unauthorized */
-      401: {
+      /** OK */
+      200: {
         content: {
-          "application/json": string;
+          "application/json": components["schemas"]["Authentication"];
         };
       };
+      500: components["responses"]["Error"];
     };
-    /** A JSON containing username and password */
-    requestBody: {
-      content: {
-        "application/json": {
-          username: string;
-          password: string;
-        };
-      };
-    };
+    requestBody: components["requestBodies"]["Credentials"];
   };
   "get-users-me": {
     responses: {
@@ -226,26 +291,43 @@ export interface operations {
           "application/json": components["schemas"]["User"];
         };
       };
-      403: components["responses"]["NotAuthorized"];
-      404: components["responses"]["NotFound"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
     };
   };
   "get-workspaces": {
-    parameters: {};
+    parameters: {
+      query: {
+        /** Limit pagination parameter */
+        limit?: components["parameters"]["limit"];
+        /** Start pagination parameter */
+        start?: components["parameters"]["start"];
+      };
+    };
     responses: {
       /** OK */
       200: {
         content: {
-          "application/json": components["schemas"]["Workspace"][];
+          "application/json": {
+            items?: components["schemas"]["Workspace"][];
+            start?: number;
+            limit?: number;
+            size?: number;
+            total?: number;
+          };
         };
       };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      404: components["responses"]["Error"];
+      500: components["responses"]["Error"];
     };
   };
   "get-workspace": {
     parameters: {
       path: {
-        /** Workspace (company) id */
-        wid: number;
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
       };
     };
     responses: {
@@ -255,24 +337,28 @@ export interface operations {
           "application/json": components["schemas"]["Workspace"];
         };
       };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      404: components["responses"]["Error"];
+      500: components["responses"]["Error"];
     };
   };
   "get-workspace-campaigns": {
     parameters: {
       path: {
-        /** Workspace (company) id */
-        wid: number;
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
       };
       query: {
-        /** Max items to retrieve */
+        /** Limit pagination parameter */
         limit?: components["parameters"]["limit"];
-        /** Items to skip for pagination */
+        /** Start pagination parameter */
         start?: components["parameters"]["start"];
-        /** How to order values (ASC, DESC) */
+        /** Order value (ASC, DESC) */
         order?: components["parameters"]["order"];
-        /** The field used as reference to order the result */
+        /** Order by accepted field */
         orderBy?: components["parameters"]["orderBy"];
-        /** Key-value Array for item filtering */
+        /** filterBy[<fieldName>]=<fieldValue> */
         filterBy?: components["parameters"]["filterBy"];
       };
     };
@@ -281,40 +367,59 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            items: components["schemas"]["Campaign"][];
-            total: number;
-            start: number;
-            size: number;
-            limit: number;
+            items?: components["schemas"]["Campaign"][];
+            start?: number;
+            limit?: number;
+            size?: number;
+            total?: number;
           };
-          "application/xml": { [key: string]: unknown };
         };
       };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      404: components["responses"]["Error"];
+      500: components["responses"]["Error"];
     };
   };
   "get-workspace-projects": {
     parameters: {
       path: {
-        /** Workspace (company) id */
-        wid: number;
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
+      };
+      query: {
+        /** Limit pagination parameter */
+        limit?: components["parameters"]["limit"];
+        /** Start pagination parameter */
+        start?: components["parameters"]["start"];
       };
     };
     responses: {
       /** OK */
       200: {
         content: {
-          "application/json": components["schemas"]["Project"][];
+          "application/json": {
+            items?: components["schemas"]["Project"][];
+            start?: number;
+            limit?: number;
+            size?: number;
+            total?: number;
+          };
         };
       };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      404: components["responses"]["Error"];
+      500: components["responses"]["Error"];
     };
   };
   "get-workspace-project": {
     parameters: {
       path: {
-        /** Workspace (company) id */
-        wid: number;
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
         /** Project id */
-        pid: number;
+        pid: components["parameters"]["pid"];
       };
     };
     responses: {
@@ -324,25 +429,125 @@ export interface operations {
           "application/json": components["schemas"]["Project"];
         };
       };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      404: components["responses"]["Error"];
+      500: components["responses"]["Error"];
     };
   };
   "get-workspace-project-campaigns": {
     parameters: {
       path: {
-        /** Workspace (company) id */
-        wid: number;
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
         /** Project id */
-        pid: number;
+        pid: components["parameters"]["pid"];
+      };
+      query: {
+        /** Limit pagination parameter */
+        limit?: components["parameters"]["limit"];
+        /** Start pagination parameter */
+        start?: components["parameters"]["start"];
       };
     };
     responses: {
       /** OK */
       200: {
         content: {
-          "application/json": components["schemas"]["Campaign"][];
+          "application/json": {
+            items?: components["schemas"]["Campaign"][];
+            start?: number;
+            limit?: number;
+            size?: number;
+            total?: number;
+          };
         };
       };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      404: components["responses"]["Error"];
+      500: components["responses"]["Error"];
     };
+  };
+  "get-project-campaigns": {
+    parameters: {
+      path: {
+        /** Project id */
+        pid: number;
+      };
+      query: {
+        /** Limit pagination parameter */
+        limit?: components["parameters"]["limit"];
+        /** Start pagination parameter */
+        start?: components["parameters"]["start"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            items?: components["schemas"]["Campaign"][];
+            start?: number;
+            limit?: number;
+            size?: number;
+            total?: number;
+          };
+        };
+      };
+      400: components["responses"]["Error"];
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json": {
+            items?: components["schemas"]["Campaign"][];
+            start?: number;
+            limit?: number;
+            size?: number;
+            total?: number;
+          };
+        };
+      };
+      403: components["responses"]["Error"];
+      404: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  /** Retrieve projects details from an ID. */
+  "get-projects-projectId": {
+    parameters: {
+      path: {
+        /** Project id */
+        pid: components["parameters"]["pid"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Project"];
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  "post-campaigns": {
+    parameters: {};
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Campaign"];
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      404: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+    requestBody: components["requestBodies"]["Campaign"];
   };
 }
 

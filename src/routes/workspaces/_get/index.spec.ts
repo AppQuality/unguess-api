@@ -1,6 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
+import { fallBackCsmProfile } from "@src/routes/shared";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
@@ -65,13 +66,54 @@ describe("GET /workspaces", () => {
     const response = await request(app)
       .get("/workspaces")
       .set("authorization", "Bearer customer");
-    expect(response.body).toMatchObject(
-      Array({
-        id: customer_1.id,
-        company: customer_1.company,
-        logo: customer_1.company_logo,
-        tokens: customer_1.tokens,
+    expect(JSON.stringify(response.body)).toStrictEqual(
+      JSON.stringify({
+        items: [
+          {
+            id: customer_1.id,
+            company: customer_1.company,
+            logo: customer_1.company_logo,
+            tokens: customer_1.tokens,
+            csm: fallBackCsmProfile,
+          },
+        ],
+        start: 0,
+        limit: 10,
+        size: 1,
+        total: 1,
       })
     );
+  });
+
+  it("Should answer with a paginated items of workspaces", async () => {
+    const response = await request(app)
+      .get("/workspaces?limit=1&start=0")
+      .set("authorization", "Bearer customer");
+    expect(JSON.stringify(response.body)).toStrictEqual(
+      JSON.stringify({
+        items: [
+          {
+            id: customer_1.id,
+            company: customer_1.company,
+            logo: customer_1.company_logo,
+            tokens: customer_1.tokens,
+            csm: fallBackCsmProfile,
+          },
+        ],
+        start: 0,
+        limit: 1,
+        size: 1,
+        total: 1,
+      })
+    );
+  });
+
+  // Should return an error if the limit is not a number
+  it("Should answer with an error if the limit is not a number", async () => {
+    const response = await request(app)
+      .get("/workspaces?limit=banana&start=0")
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(400);
+    expect(response.body.err[0].message).toBe("should be number");
   });
 });

@@ -1,5 +1,6 @@
 import getProject from ".";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
+import { ERROR_MESSAGE } from "@src/routes/shared";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
@@ -88,36 +89,23 @@ describe("getProject", () => {
     });
   });
 
-  it("Should have projectId and workspaceId valid parameters", async () => {
+  it("Should throw error 400 if the params are not valid", async () => {
     try {
       await getProject(0, 0);
-      fail("Should throw error");
-    } catch (error) {
-      expect((error as OpenapiError).message).toBe("Bad request");
-    }
-  });
-
-  it("Should throw 'No project found' error on no results", async () => {
-    try {
-      await getProject(9999, customer_1.id);
-      fail("Should throw error");
-    } catch (error) {
-      expect((error as OpenapiError).message).toBe("No project found");
+    } catch (error: any) {
+      expect(error.code).toBe(400);
+      expect(error.message).toBe(ERROR_MESSAGE);
     }
   });
 
   it("Should return a project", async () => {
-    try {
-      let project = await getProject(project_1.id, customer_1.id);
-      expect(JSON.stringify(project)).toBe(
-        JSON.stringify({
-          id: project_1.id,
-          name: project_1.display_name,
-          campaigns_count: 1,
-        })
-      );
-    } catch (error) {
-      console.error(error);
-    }
+    let project = await getProject(project_1.id, customer_1.id);
+    expect(JSON.stringify(project)).toBe(
+      JSON.stringify({
+        id: project_1.id,
+        name: project_1.display_name,
+        campaigns_count: 1,
+      })
+    );
   });
 });

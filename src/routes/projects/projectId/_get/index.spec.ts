@@ -36,7 +36,7 @@ const user_to_project_1 = {
 };
 
 const user_to_project_2 = {
-  wp_user_id: 1,
+  wp_user_id: 123,
   project_id: 2,
 };
 
@@ -55,7 +55,7 @@ const campaign_1 = {
   customer_id: 1,
 };
 
-describe("GET /workspaces/{wid}/projects/{pid}", () => {
+describe("GET /projects/{pid}", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
@@ -90,22 +90,20 @@ describe("GET /workspaces/{wid}/projects/{pid}", () => {
   });
 
   it("Should answer 403 if not logged in", async () => {
-    const response = await request(app).get(
-      `/workspaces/${customer_1.id}/projects/${project_1.id}`
-    );
+    const response = await request(app).get(`/projects/${project_1.id}`);
     expect(response.status).toBe(403);
   });
 
   it("Should answer 200 if logged in", async () => {
     const response = await request(app)
-      .get(`/workspaces/${customer_1.id}/projects/${project_1.id}`)
+      .get(`/projects/${project_1.id}`)
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
   });
 
-  it("Should answer 403 if no workspaces are found", async () => {
+  it("Should answer 403 if project is not found", async () => {
     const response = await request(app)
-      .get(`/workspaces/${customer_1.id}/projects/999999`)
+      .get(`/projects/999999`)
       .set("authorization", "Bearer customer");
     expect(response.body.code).toBe(403);
     expect(response.body.message).toBe(ERROR_MESSAGE);
@@ -113,27 +111,27 @@ describe("GET /workspaces/{wid}/projects/{pid}", () => {
 
   it("Should answer 400 of the requested parameter is wrong", async () => {
     const response = await request(app)
-      .get(`/workspaces/${customer_1.id}/projects/a`)
+      .get(`/projects/a`)
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(400);
   });
 
   it("Should answer with a project object", async () => {
     const response = await request(app)
-      .get(`/workspaces/${customer_1.id}/projects/${project_1.id}`)
+      .get(`/projects/${project_1.id}`)
       .set("authorization", "Bearer customer");
     expect(response.body).toMatchObject({
-      id: project_1.id,
-      name: project_1.display_name,
+      id: 1,
+      name: "Projettino unoh",
       campaigns_count: 1,
     });
   });
 
-  it("Should answer with 403 if the user has not permission or if project is not found", async () => {
+  //Should answer with an error if the project is limited to a customer
+  it("Should answer with an error if the project exist but is limited to other users of the same company", async () => {
     const response = await request(app)
-      .get(`/workspaces/${customer_1.id}/projects/3`)
+      .get(`/projects/${project_2.id}`)
       .set("authorization", "Bearer customer");
-    expect(response.status).toBe(403);
     expect(response.body.code).toBe(403);
     expect(response.body.message).toBe(ERROR_MESSAGE);
   });

@@ -1,23 +1,10 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
+import { fallBackCsmProfile } from "@src/routes/shared";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
-
-const customer_user_1 = {
-  ID: 1,
-  user_login: "customer@unguess.io",
-  user_pass: "password",
-  user_email: "customer@unguess.io",
-};
-
-const admin_user_1 = {
-  ID: 2,
-  user_login: "admin@unguess.io",
-  user_pass: "password",
-  user_email: "admin@unguess.io",
-};
 
 const customer_profile_1 = {
   id: 1,
@@ -83,11 +70,11 @@ describe("GET /workspaces/{wid}", () => {
     expect(response.status).toBe(200);
   });
 
-  it("Should answer 404 if no workspaces are found", async () => {
+  it("Should answer 403 if no workspaces are found", async () => {
     const response = await request(app)
-      .get("/workspaces/99999291")
+      .get("/workspaces/99999")
       .set("authorization", "Bearer customer");
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(403);
   });
 
   it("Should answer 400 of the requested parameter is wrong", async () => {
@@ -106,8 +93,9 @@ describe("GET /workspaces/{wid}", () => {
       JSON.stringify({
         id: customer_1.id,
         company: customer_1.company,
-        logo: customer_1.company_logo,
         tokens: customer_1.tokens,
+        logo: customer_1.company_logo,
+        csm: fallBackCsmProfile,
       })
     );
   });
