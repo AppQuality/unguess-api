@@ -8,32 +8,20 @@ export default async (
   project_request: StoplightComponents["requestBodies"]["Project"]["content"]["application/json"]
 ): Promise<StoplightComponents["schemas"]["Project"]> => {
   // Define fields to be updated
-  let project_fields = [
-    "display_name",
-    "customer_id",
-    "edited_by",
-    "last_edit",
-    "created_on",
-  ];
+  let project_fields = ["display_name", "customer_id", "edited_by"];
 
   // Define values from request body
   let project_values = [
     project_request.name as string,
     project_request.customer_id as number,
     project_request.customer_id as number,
-    "NOW()" as string,
-    "NOW()" as string,
   ];
 
   let insert_sql =
     `INSERT INTO wp_appq_project (` +
     project_fields.join(",") +
     `) VALUES (${project_values.map((value) =>
-      typeof value === "string"
-        ? value.includes("()")
-          ? value
-          : "'" + value + "'"
-        : value
+      typeof value === "string" ? "'" + value + "'" : value
     )})`;
   let insert_result = await db.query(insert_sql);
 
