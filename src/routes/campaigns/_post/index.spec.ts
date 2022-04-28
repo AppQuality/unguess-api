@@ -174,7 +174,6 @@ describe("POST /campaigns", () => {
         ...campaign_request_1,
         platforms: [AndroidPhone, WindowsPC],
       });
-    console.log(">>>> response body", response.body);
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({
       ...campaign_1,
