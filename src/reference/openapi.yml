@@ -810,7 +810,7 @@ components:
             properties:
               name:
                 type: string
-              workspace_id:
+              customer_id:
                 type: integer
 tags:
   - name: Authentication
