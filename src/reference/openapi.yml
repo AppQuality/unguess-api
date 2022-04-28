@@ -812,6 +812,9 @@ components:
                 type: string
               customer_id:
                 type: integer
+            required:
+              - name
+              - customer_id
 tags:
   - name: Authentication
   - name: Campaign
