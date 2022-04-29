@@ -586,6 +586,7 @@ components:
         - customer_title
         - description
         - status_id
+        - status_name
         - is_public
         - campaign_type_id
         - campaign_type_name
