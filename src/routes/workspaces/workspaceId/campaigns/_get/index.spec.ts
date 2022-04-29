@@ -2,6 +2,7 @@ import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { ERROR_MESSAGE } from "@src/routes/shared";
+import { getCampaignStatus } from "@src/routes/shared/getCampaignStatus";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
@@ -68,7 +69,7 @@ const campaign_2 = {
   title: "Campagnetta Provetta ",
   customer_title: "titolo",
   description: "Descrizione della campagnazione",
-  status_id: 1,
+  status_id: 2,
   is_public: 0,
   campaign_type_id: 1,
   project_id: 2,
@@ -216,6 +217,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
             customer_title: campaign_1.customer_title,
             description: campaign_1.description,
             status_id: campaign_1.status_id,
+            status_name: "running",
             is_public: campaign_1.is_public,
             campaign_type_id: campaign_type_1.id,
             campaign_type_name: campaign_type_1.name,
@@ -251,6 +253,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
             customer_title: campaign_2.customer_title,
             description: campaign_2.description,
             status_id: campaign_2.status_id,
+            status_name: "completed",
             is_public: campaign_2.is_public,
             campaign_type_id: campaign_type_1.id,
             campaign_type_name: campaign_type_1.name,
@@ -269,6 +272,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
             customer_title: campaign_3.customer_title,
             description: campaign_3.description,
             status_id: campaign_3.status_id,
+            status_name: "running",
             is_public: campaign_3.is_public,
             campaign_type_id: campaign_type_2.id,
             campaign_type_name: campaign_type_2.name,
@@ -344,6 +348,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
             customer_title: campaign_3.customer_title,
             description: campaign_3.description,
             status_id: campaign_3.status_id,
+            status_name: "running",
             is_public: campaign_3.is_public,
             campaign_type_id: campaign_type_2.id,
             campaign_type_name: campaign_type_2.name,
@@ -362,6 +367,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
             customer_title: campaign_2.customer_title,
             description: campaign_2.description,
             status_id: campaign_2.status_id,
+            status_name: "completed",
             is_public: campaign_2.is_public,
             campaign_type_id: campaign_type_1.id,
             campaign_type_name: campaign_type_1.name,
