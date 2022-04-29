@@ -228,6 +228,7 @@ describe("GET /projects/{pid}/campaigns", () => {
       items: [
         {
           ...campaign_1,
+          status_name: "running",
           project_name: project_1.display_name,
           campaign_type_name: campaign_type_1.name,
           start_date: new Date(campaign_1.start_date).toISOString(),
@@ -237,6 +238,7 @@ describe("GET /projects/{pid}/campaigns", () => {
         },
         {
           ...campaign_2,
+          status_name: "running",
           project_name: project_1.display_name,
           campaign_type_name: campaign_type_1.name,
           start_date: new Date(campaign_2.start_date).toISOString(),

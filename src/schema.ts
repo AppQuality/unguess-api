@@ -148,6 +148,7 @@ export interface components {
       customer_title: string;
       description: string;
       status_id: number;
+      status_name: string;
       is_public: number;
       campaign_type_id: number;
       campaign_type_name: string;

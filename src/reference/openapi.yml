@@ -563,6 +563,8 @@ components:
           type: string
         status_id:
           type: number
+        status_name:
+          type: string
         is_public:
           type: number
         campaign_type_id:
@@ -584,6 +586,7 @@ components:
         - customer_title
         - description
         - status_id
+        - status_name
         - is_public
         - campaign_type_id
         - campaign_type_name
