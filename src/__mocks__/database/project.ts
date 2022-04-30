@@ -5,10 +5,12 @@ const db = sqlite3("tryber");
 export const table = {
   create: async () => {
     await db.createTable("wp_appq_project", [
-      "id int(11) PRIMARY KEY",
+      "id INTEGER PRIMARY KEY AUTOINCREMENT",
       "display_name varchar(64)",
       "customer_id int(11)",
       "last_edit timestamp",
+      "created_on timestamp",
+      "edited_by int(11)",
     ]);
   },
   drop: async () => {

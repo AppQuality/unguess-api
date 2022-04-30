@@ -389,6 +389,29 @@ paths:
         - JWT: []
       requestBody:
         $ref: '#/components/requestBodies/Campaign'
+  /projects:
+    post:
+      summary: ''
+      operationId: post-projects
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      security:
+        - JWT: []
+      requestBody:
+        $ref: '#/components/requestBodies/Project'
 components:
   schemas:
     User:
@@ -782,6 +805,19 @@ components:
               - test_type_id
               - project_id
               - pm_id
+    Project:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              customer_id:
+                type: integer
+            required:
+              - name
+              - customer_id
 tags:
   - name: Authentication
   - name: Campaign
