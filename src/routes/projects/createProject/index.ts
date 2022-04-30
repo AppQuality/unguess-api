@@ -5,7 +5,8 @@ interface Sql {
 }
 
 export default async (
-  project_request: StoplightComponents["requestBodies"]["Project"]["content"]["application/json"]
+  project_request: StoplightComponents["requestBodies"]["Project"]["content"]["application/json"],
+  user: UserType
 ): Promise<StoplightComponents["schemas"]["Project"]> => {
   // Define fields to be updated
   let project_fields = ["display_name", "customer_id", "edited_by"];
@@ -14,7 +15,7 @@ export default async (
   let project_values = [
     project_request.name as string,
     project_request.customer_id as number,
-    project_request.customer_id as number,
+    user.profile_id as number,
   ];
 
   let insert_sql =

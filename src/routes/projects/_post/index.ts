@@ -29,7 +29,7 @@ export default async (
     await getUserWorkspaces(user, request_body.customer_id);
 
     // Create the project
-    let project = await createProject(request_body);
+    let project = await createProject(request_body, user);
 
     return project as StoplightComponents["schemas"]["Project"];
   } catch (e: any) {
