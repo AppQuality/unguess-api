@@ -6,6 +6,7 @@ import getProjectById from "@src/routes/projects/projectId/getProjectById";
 import paginateItems, { formatCount } from "@src/routes/shared/paginateItems";
 import {
   ERROR_MESSAGE,
+  getCampaignStatus,
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
 } from "@src/routes/shared";
@@ -80,6 +81,7 @@ export default async (
         customer_title: campaign.customer_title,
         description: campaign.description,
         status_id: campaign.status_id,
+        status_name: getCampaignStatus(campaign),
         is_public: campaign.is_public,
         campaign_type_id: campaign.campaign_type_id,
         campaign_type_name: campaign.campaign_type_name,

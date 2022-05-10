@@ -90,6 +90,9 @@ export interface paths {
   "/campaigns": {
     post: operations["post-campaigns"];
   };
+  "/projects": {
+    post: operations["post-projects"];
+  };
 }
 
 export interface components {
@@ -148,6 +151,7 @@ export interface components {
       customer_title: string;
       description: string;
       status_id: number;
+      status_name: string;
       is_public: number;
       campaign_type_id: number;
       campaign_type_name: string;
@@ -250,6 +254,14 @@ export interface components {
           page_manual_id?: number;
           /** @description Da togliere */
           customer_id?: number;
+        };
+      };
+    };
+    Project: {
+      content: {
+        "application/json": {
+          name: string;
+          customer_id: number;
         };
       };
     };
@@ -548,6 +560,21 @@ export interface operations {
       500: components["responses"]["Error"];
     };
     requestBody: components["requestBodies"]["Campaign"];
+  };
+  "post-projects": {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Project"];
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      404: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+    requestBody: components["requestBodies"]["Project"];
   };
 }
 

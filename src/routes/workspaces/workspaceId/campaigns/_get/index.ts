@@ -3,7 +3,11 @@ import { Context } from "openapi-backend";
 import * as db from "../../../../../features/db";
 import getWorkspace from "@src/routes/workspaces/workspaceId/getWorkspace";
 import getUserProjects from "../../getUserProjects";
-import paginateItems, { formatCount } from "@src/routes/shared/paginateItems";
+import {
+  paginateItems,
+  formatCount,
+  getCampaignStatus,
+} from "@src/routes/shared";
 import {
   ERROR_MESSAGE,
   LIMIT_QUERY_PARAM_DEFAULT,
@@ -163,6 +167,7 @@ export default async (
         customer_title: campaign.customer_title,
         description: campaign.description,
         status_id: campaign.status_id,
+        status_name: getCampaignStatus(campaign),
         is_public: campaign.is_public,
         campaign_type_id: campaign.campaign_type_id,
         campaign_type_name: campaign.campaign_type_name

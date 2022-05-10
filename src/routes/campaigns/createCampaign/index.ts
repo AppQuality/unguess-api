@@ -1,4 +1,5 @@
 import * as db from "@src/features/db";
+import { getCampaignStatus } from "@src/routes/shared";
 
 const DEFAULT_PLATFORM_ID = 0;
 
@@ -97,6 +98,7 @@ export default async (
     customer_title: campaign.customer_title,
     description: campaign.description,
     status_id: campaign.status_id,
+    status_name: getCampaignStatus(campaign),
     is_public: campaign.is_public,
     campaign_type_id: campaign.campaign_type_id,
     campaign_type_name: campaign.campaign_type_name,
