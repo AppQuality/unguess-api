@@ -9,6 +9,7 @@ const campaign_1 = {
   customer_title: "titolo",
   description: "Descrizione della campagnazione",
   status_id: 1,
+  status_name: "In Progress",
   is_public: 0,
   campaign_type_id: 1,
   campaign_type_name: "Campaign Type 1",
