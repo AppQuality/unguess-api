@@ -752,8 +752,6 @@ components:
             properties:
               title:
                 type: string
-              description:
-                type: string
               start_date:
                 type: string
               end_date:
