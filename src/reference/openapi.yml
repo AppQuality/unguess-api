@@ -582,8 +582,6 @@ components:
           type: string
         customer_title:
           type: string
-        description:
-          type: string
         status_id:
           type: number
         status_name:
@@ -607,7 +605,6 @@ components:
         - close_date
         - title
         - customer_title
-        - description
         - status_id
         - status_name
         - is_public
