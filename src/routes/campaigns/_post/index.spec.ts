@@ -56,7 +56,6 @@ const campaign_request_1 = {
   end_date: "2017-07-20 00:00:00",
   close_date: "2017-07-20 00:00:00",
   customer_title: "Campaign 1 customer title",
-  description: "",
   is_public: 1,
   campaign_type_id: 1,
   test_type_id: 1,
@@ -71,7 +70,6 @@ const campaign_1 = {
   close_date: "2017-07-20 00:00:00",
   title: "Campaign 1 title",
   customer_title: "Campaign 1 customer title",
-  description: "",
   status_id: 1,
   is_public: 1,
   campaign_type_id: 1,
@@ -132,7 +130,6 @@ describe("POST /campaigns", () => {
       .post("/campaigns")
       .set("Authorization", "Bearer customer")
       .send({
-        description: "Campaign 1 description",
         start_date: "2020-01-01",
         end_date: "2020-01-01",
         close_date: "2020-01-01",

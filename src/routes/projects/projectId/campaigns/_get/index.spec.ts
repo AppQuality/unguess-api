@@ -83,7 +83,6 @@ const campaign_1 = {
   close_date: "2017-07-20 00:00:00",
   title: "Campagnetta Funzionale Provetta 1",
   customer_title: "titolo 1",
-  description: "Descrizione della campagnazione 1",
   status_id: 1,
   is_public: 0,
   campaign_type_id: 1,
@@ -97,7 +96,6 @@ const campaign_2 = {
   close_date: "2017-07-20 00:00:00",
   title: "Campagnetta Funzionale Provetta 2",
   customer_title: "titolo 2",
-  description: "Descrizione della campagnazione 2",
   status_id: 1,
   is_public: 0,
   campaign_type_id: 1,
@@ -111,7 +109,6 @@ const campaign_3 = {
   close_date: "2017-07-20 00:00:00",
   title: "Campagnetta Funzionale Provetta 3",
   customer_title: "titolo 3",
-  description: "Descrizione della campagnazione 3",
   status_id: 1,
   is_public: 0,
   campaign_type_id: 1,
@@ -209,7 +206,6 @@ describe("GET /projects/{pid}/campaigns", () => {
       expect(project).toHaveProperty("close_date");
       expect(project).toHaveProperty("title");
       expect(project).toHaveProperty("customer_title");
-      expect(project).toHaveProperty("description");
       expect(project).toHaveProperty("status_id");
       expect(project).toHaveProperty("is_public");
       expect(project).toHaveProperty("campaign_type_id");
