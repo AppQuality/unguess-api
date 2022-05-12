@@ -22,10 +22,10 @@ export default async (
         LEFT JOIN wp_appq_evd_profile p ON (p.id = c.pm_id)
         ${
           user.role !== "administrator" ? `WHERE utc.wp_user_id = ?` : ``
-        } GROUP BY c.id `;
+        } GROUP BY c.id`;
 
   if (limit && start) {
-    query += `${LIMIT}`;
+    query += ` ${LIMIT}`;
   }
 
   let countQuery = `SELECT COUNT(*) 
@@ -34,7 +34,7 @@ export default async (
         LEFT JOIN wp_appq_evd_profile p ON (p.id = c.pm_id)
         ${
           user.role !== "administrator" ? `WHERE utc.wp_user_id = ?` : ``
-        } GROUP BY c.id `;
+        } GROUP BY c.id`;
 
   if (limit && start) {
     countQuery += `${LIMIT}`;
