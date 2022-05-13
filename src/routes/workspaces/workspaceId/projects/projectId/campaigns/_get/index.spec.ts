@@ -1,7 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { ERROR_MESSAGE } from "@src/routes/shared";
+import { ERROR_MESSAGE, LIMIT_QUERY_PARAM_DEFAULT } from "@src/routes/shared";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
@@ -244,7 +244,7 @@ describe("GET /workspaces/{wid}/projects/{pid}/campaigns", () => {
         },
       ],
       start: 0,
-      limit: 10,
+      limit: LIMIT_QUERY_PARAM_DEFAULT,
       size: 2,
       total: 2,
     });

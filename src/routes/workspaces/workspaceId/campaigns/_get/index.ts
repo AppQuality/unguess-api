@@ -66,12 +66,6 @@ export default async (
       return error;
     }
 
-    if ((order && !orderBy) || (!order && orderBy)) {
-      res.status_code = 400;
-      error.code = 400;
-      return error;
-    }
-
     const validFilterByFields: { [key: string]: string } = {
       customer_title: "c.customer_title",
       title: "c.title",

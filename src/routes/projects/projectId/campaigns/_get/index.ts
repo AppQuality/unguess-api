@@ -39,7 +39,7 @@ export default async (
     )) as StoplightComponents["schemas"]["Project"];
 
     // Get project campaigns
-    const campaignsSql = `SELECT 
+    let campaignsSql = `SELECT 
         c.id,  
         c.start_date,  
         c.end_date,
@@ -57,7 +57,11 @@ export default async (
       FROM wp_appq_evd_campaign c 
       JOIN wp_appq_project p ON c.project_id = p.id 
       JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id 
-      WHERE c.project_id = ? LIMIT ${limit} OFFSET ${start}`;
+      WHERE c.project_id = ?`;
+
+    if (limit) {
+      campaignsSql += ` LIMIT ${limit} OFFSET ${start}`;
+    }
 
     const countQuery = `SELECT COUNT(*)  
       FROM wp_appq_evd_campaign c 
@@ -66,6 +70,7 @@ export default async (
       WHERE c.project_id = ?`;
 
     let campaigns = await db.query(db.format(campaignsSql, [prj.id]));
+
     let total = await db.query(db.format(countQuery, [prj.id]));
     total = formatCount(total);
 
