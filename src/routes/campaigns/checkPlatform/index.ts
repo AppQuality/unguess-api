@@ -1,14 +1,8 @@
 import * as db from "@src/features/db";
-import { ERROR_MESSAGE } from "@src/routes/shared";
 
 export default async (
   platforms: StoplightComponents["requestBodies"]["Campaign"]["content"]["application/json"]["platforms"]
 ): Promise<boolean> => {
-  let error = {
-    message: ERROR_MESSAGE,
-    error: true,
-  } as StoplightComponents["schemas"]["Error"];
-
   // Check request
   if (!Array.isArray(platforms)) return false;
 
@@ -29,6 +23,7 @@ export default async (
     let platformResult = await db.query(platformSql);
 
     if (!platformResult.length) {
+      console.debug("Platform not found");
       platformExists = false;
       break;
     }

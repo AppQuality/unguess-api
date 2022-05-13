@@ -30,7 +30,7 @@ export default async (
   //Check Platforms
   let platforms_result = await checkPlatforms(campaign_request.platforms);
 
-  if (!platforms_result) throw { ...error, code: 403 };
+  if (!platforms_result) throw { ...error, code: 400 };
 
   // Return validated request and set default values
   return {
