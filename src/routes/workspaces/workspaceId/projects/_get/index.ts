@@ -43,7 +43,12 @@ export default async (
     }> = [];
 
     // Get customer's projects
-    const projectSql = `SELECT id, display_name FROM wp_appq_project WHERE customer_id = ? ORDER BY id LIMIT ${limit} OFFSET ${start}`;
+    let projectSql = `SELECT id, display_name FROM wp_appq_project WHERE customer_id = ? ORDER BY id`;
+
+    if (limit) {
+      projectSql += ` LIMIT ${limit} OFFSET ${start}`;
+    }
+
     projects = await db.query(db.format(projectSql, [wid]));
 
     // Count projects

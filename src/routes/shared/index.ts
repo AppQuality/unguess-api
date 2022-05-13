@@ -2,7 +2,7 @@ import { getCampaignStatus } from "./getCampaignStatus";
 import paginateItems, { formatCount } from "./paginateItems";
 
 export const ERROR_MESSAGE = "Something went wrong";
-export const LIMIT_QUERY_PARAM_DEFAULT = 10;
+export const LIMIT_QUERY_PARAM_DEFAULT = 0;
 export const START_QUERY_PARAM_DEFAULT = 0;
 export const DT_SMARTPHONE = 0;
 export const DT_TABLET = 1;
