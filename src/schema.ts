@@ -149,7 +149,6 @@ export interface components {
       close_date: string;
       title: string;
       customer_title: string;
-      description: string;
       status_id: number;
       status_name: string;
       is_public: number;
@@ -225,7 +224,6 @@ export interface components {
       content: {
         "application/json": {
           title: string;
-          description?: string;
           start_date: string;
           end_date: string;
           close_date: string;

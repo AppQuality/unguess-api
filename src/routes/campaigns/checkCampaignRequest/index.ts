@@ -36,7 +36,6 @@ export default async (
   return {
     ...campaign_request,
     customer_title: campaign_request.customer_title || campaign_request.title,
-    description: campaign_request.description || "",
     status_id: campaign_request.status_id || 1,
     is_public: campaign_request.is_public || 0,
     page_preview_id: campaign_request.page_preview_id || 0,
