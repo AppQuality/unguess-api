@@ -649,19 +649,13 @@ components:
       type: object
       properties:
         id:
-          type: number
-        name:
-          type: string
+          type: integer
+          description: os
         deviceType:
-          type: string
-          enum:
-            - smartphone
-            - tablet
-            - computer
-            - smartwatch
-            - console
-            - tv
+          type: integer
           description: |-
+            form_factor
+
             0 => smartphone, 
             1 => tablet 
             2 => pc 
@@ -670,7 +664,7 @@ components:
             5 => tv
       required:
         - id
-        - name
+        - deviceType
   securitySchemes:
     JWT:
       type: http

@@ -173,24 +173,19 @@ export interface components {
     };
     /** Platform Object */
     Platform: {
+      /** @description os */
       id: number;
-      name: string;
       /**
-       * @description 0 => smartphone,
+       * @description form_factor
+       *
+       * 0 => smartphone,
        * 1 => tablet
        * 2 => pc
        * 3 => smartwatch
        * 4 => console
        * 5 => tv
-       * @enum {string}
        */
-      deviceType?:
-        | "smartphone"
-        | "tablet"
-        | "computer"
-        | "smartwatch"
-        | "console"
-        | "tv";
+      deviceType: number;
     };
   };
   responses: {

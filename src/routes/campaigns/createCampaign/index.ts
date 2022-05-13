@@ -23,7 +23,18 @@ export default async (
     "customer_id",
     "pm_id",
     "platform_id", //Required for db, but useless.
+    "form_factor",
+    "os",
   ];
+
+  // Get request platforms form_factor and os
+  let platforms = campaign_request.platforms;
+  let form_factor_list = Array<Number>();
+  let os_list = Array<Number>();
+  if (platforms) {
+    form_factor_list = platforms.map((platform) => platform.deviceType);
+    os_list = platforms.map((platform) => platform.id);
+  }
 
   // Define values from request body
   let campaign_values = [
@@ -41,7 +52,9 @@ export default async (
     campaign_request.page_manual_id as number,
     campaign_request.customer_id as number,
     campaign_request.pm_id as number,
-    DEFAULT_PLATFORM_ID,
+    DEFAULT_PLATFORM_ID as number,
+    form_factor_list.join(",") as string,
+    os_list.join(",") as string,
   ];
 
   let insert_sql =

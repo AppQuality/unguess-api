@@ -1,4 +1,5 @@
 import { ERROR_MESSAGE, fallBackCsmProfile } from "@src/routes/shared";
+import checkPlatforms from "@src/routes/campaigns/checkPlatform";
 
 export default async (
   campaign_request: StoplightComponents["requestBodies"]["Campaign"]["content"]["application/json"]
@@ -27,7 +28,9 @@ export default async (
   }
 
   //Check Platforms
-  // await checkPlatforms(campaign_request.platforms);
+  let platforms_result = await checkPlatforms(campaign_request.platforms);
+
+  if (!platforms_result) throw { ...error, code: 400 };
 
   // Return validated request and set default values
   return {
@@ -40,5 +43,6 @@ export default async (
     page_manual_id: campaign_request.page_manual_id || 0,
     customer_id: campaign_request.customer_id || 0,
     pm_id: campaign_request.pm_id || fallBackCsmProfile.id,
+    platforms: campaign_request.platforms || [],
   };
 };
