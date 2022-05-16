@@ -766,8 +766,6 @@ components:
                   1: bug form with bug parade
               campaign_type_id:
                 type: integer
-              test_type_id:
-                type: integer
               project_id:
                 type: integer
               pm_id:
@@ -791,7 +789,6 @@ components:
               - end_date
               - close_date
               - campaign_type_id
-              - test_type_id
               - project_id
               - pm_id
     Project:
