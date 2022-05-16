@@ -760,12 +760,8 @@ components:
                 type: integer
               is_public:
                 type: integer
-              bug_form:
-                type: number
-                description: |-
-                  -1: no bug form
-                  0: only bug form
-                  1: bug form with bug parade
+                minimum: 0
+                maximum: 1
               campaign_type_id:
                 type: integer
               project_id:
@@ -785,6 +781,15 @@ components:
               customer_id:
                 type: integer
                 description: Da togliere
+              has_bug_form:
+                type: integer
+                minimum: 0
+                maximum: 1
+              has_bug_parade:
+                type: integer
+                minimum: 0
+                maximum: 1
+                description: if has_bug_form is 0 this has to be 0
             required:
               - title
               - start_date
