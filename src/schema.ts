@@ -231,12 +231,6 @@ export interface components {
           customer_title?: string;
           status_id?: number;
           is_public?: number;
-          /**
-           * @description -1: no bug form
-           * 0: only bug form
-           * 1: bug form with bug parade
-           */
-          bug_form?: number;
           campaign_type_id: number;
           project_id: number;
           pm_id: number;
@@ -247,6 +241,9 @@ export interface components {
           page_manual_id?: number;
           /** @description Da togliere */
           customer_id?: number;
+          has_bug_form?: number;
+          /** @description if has_bug_form is 0 this has to be 0 */
+          has_bug_parade?: number;
         };
       };
     };

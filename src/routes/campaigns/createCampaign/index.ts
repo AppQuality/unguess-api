@@ -1,5 +1,6 @@
 import * as db from "@src/features/db";
 import { getCampaignStatus } from "@src/routes/shared";
+import getCampaignType from "../getCampaignType";
 
 const DEFAULT_PLATFORM_ID = 0;
 
@@ -19,12 +20,26 @@ export default async (
     "project_id",
     "page_preview_id",
     "page_manual_id",
+    "campaign_type",
     "customer_id",
     "pm_id",
     "platform_id", //Required for db, but useless.
     "form_factor",
     "os",
   ];
+
+  // Get bug form
+  let bug_form = -1;
+  if (
+    typeof campaign_request.has_bug_form !== undefined &&
+    typeof campaign_request.has_bug_parade !== undefined
+  ) {
+    let bug_form_result = await getCampaignType(
+      campaign_request.has_bug_form,
+      campaign_request.has_bug_parade
+    );
+    if (bug_form_result !== false) bug_form = bug_form_result;
+  }
 
   // Get request platforms form_factor and os
   let platforms = campaign_request.platforms;
@@ -48,6 +63,7 @@ export default async (
     campaign_request.project_id as number,
     campaign_request.page_preview_id as number,
     campaign_request.page_manual_id as number,
+    bug_form as number,
     campaign_request.customer_id as number,
     campaign_request.pm_id as number,
     DEFAULT_PLATFORM_ID as number,
