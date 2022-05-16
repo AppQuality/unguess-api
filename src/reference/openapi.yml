@@ -592,7 +592,9 @@ components:
           type: integer
         campaign_type_name:
           type: string
-        test_type_name:
+        campaign_family_id:
+          type: integer
+        campaign_family_name:
           type: string
         project_id:
           type: integer
@@ -610,7 +612,7 @@ components:
         - is_public
         - campaign_type_id
         - campaign_type_name
-        - test_type_name
+        - campaign_family_name
         - project_id
         - project_name
     Project:
