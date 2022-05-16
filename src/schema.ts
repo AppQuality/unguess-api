@@ -158,6 +158,12 @@ export interface components {
       campaign_family_name: string;
       project_id: number;
       project_name: string;
+      /**
+       * @description -1: no bug form;
+       * 0: only bug form;
+       * 1: bug form with bug parade';
+       */
+      bug_form?: number;
     };
     /** Project */
     Project: {

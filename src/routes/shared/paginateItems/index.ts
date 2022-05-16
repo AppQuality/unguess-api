@@ -1,11 +1,5 @@
 type PaginationParams = {
-  items:
-    | Array<
-        | StoplightComponents["schemas"]["Campaign"]
-        | StoplightComponents["schemas"]["Project"]
-        | StoplightComponents["schemas"]["Workspace"]
-      >
-    | [];
+  items: Array<any>;
   limit?: StoplightComponents["parameters"]["limit"] | string;
   start?: StoplightComponents["parameters"]["start"] | string;
   total: number;

@@ -56,6 +56,7 @@ export default async (
         c.campaign_type_id,
         c.project_id,
         c.customer_id,
+        c.campaign_type AS bug_form,
         ct.name AS campaign_type_name,
         ct.type AS campaign_family_id,
         p.display_name 
@@ -107,6 +108,7 @@ export default async (
         project_name: projectResult.name,
         campaign_family_id: campaign.campaign_family_id,
         campaign_family_name: campaign_family,
+        bug_form: campaign.bug_form,
       });
     }
 
