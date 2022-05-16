@@ -21,7 +21,6 @@ export default async (
     !campaign_request.end_date ||
     !campaign_request.close_date ||
     !campaign_request.campaign_type_id ||
-    !campaign_request.test_type_id ||
     !campaign_request.project_id
   ) {
     throw { ...error, code: 400 };

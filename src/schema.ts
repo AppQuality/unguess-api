@@ -154,7 +154,8 @@ export interface components {
       is_public: number;
       campaign_type_id: number;
       campaign_type_name: string;
-      test_type_name: string;
+      campaign_family_id?: number;
+      campaign_family_name: string;
       project_id: number;
       project_name: string;
     };
@@ -237,7 +238,6 @@ export interface components {
            */
           bug_form?: number;
           campaign_type_id: number;
-          test_type_id: number;
           project_id: number;
           pm_id: number;
           platforms?: components["schemas"]["Platform"][];
