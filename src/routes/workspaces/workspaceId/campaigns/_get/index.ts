@@ -131,15 +131,15 @@ export default async (
         c.project_id,
         c.customer_id,
         ct.name AS campaign_type_name,
-        ct.type AS test_type_id,
+        ct.type AS campaign_family_id,
         p.display_name 
       FROM wp_appq_evd_campaign c 
       JOIN wp_appq_project p ON c.project_id = p.id 
       LEFT JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id 
       WHERE p.id IN (${userProjectsID})
       ${AND}
-      ${order && orderBy ? `ORDER BY ${orderBy} ${order}` : ``}
-      ${limit && (start || start === 0) ? `LIMIT ${limit} OFFSET ${start}` : ``}
+      ${order && orderBy ? ` ORDER BY ${orderBy} ${order}` : ``}
+      ${limit ? ` LIMIT ${limit} OFFSET ${start}` : ``}
     `;
 
     const campaigns = await db.query(query);
@@ -151,6 +151,17 @@ export default async (
     if (!campaigns.length) return await paginateItems({ items: [], total: 0 });
 
     let stoplightCampaign = campaigns.map((campaign: any) => {
+      // Get campaign family
+      let campaign_family = "";
+      switch (campaign.campaign_family_id) {
+        case 0:
+          campaign_family = "Experiential";
+          break;
+        case 1:
+          campaign_family = "Functional";
+          break;
+      }
+
       return {
         id: campaign.id,
         start_date: campaign.start_date.toString(),
@@ -162,13 +173,9 @@ export default async (
         status_name: getCampaignStatus(campaign),
         is_public: campaign.is_public,
         campaign_type_id: campaign.campaign_type_id,
-        campaign_type_name: campaign.campaign_type_name
-          ? campaign.campaign_type_name
-          : "Crowd Test",
-        test_type_name:
-          campaign.test_type_id && campaign.test_type_id === 1
-            ? "Experiential"
-            : "Functional",
+        campaign_type_name: campaign.campaign_type_name || "Crowd Test",
+        campaign_family_id: campaign.campaign_family_id,
+        campaign_family_name: campaign_family,
         project_id: campaign.project_id,
         customer_id: campaign.customer_id,
         project_name: campaign.display_name,

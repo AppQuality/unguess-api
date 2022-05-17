@@ -1,7 +1,10 @@
 import * as db from "../../../features/db";
 import { getGravatar } from "@src/routes/users/utils";
 import { formatCount } from "@src/routes/shared/paginateItems";
-import { fallBackCsmProfile } from "@src/routes/shared";
+import {
+  fallBackCsmProfile,
+  START_QUERY_PARAM_DEFAULT,
+} from "@src/routes/shared";
 
 export default async (
   user: UserType,
@@ -20,7 +23,7 @@ export default async (
         } GROUP BY c.id`;
 
   if (limit) {
-    query += ` LIMIT ${limit} OFFSET ${start}`;
+    query += ` LIMIT ${limit} OFFSET ${start || START_QUERY_PARAM_DEFAULT}`;
   }
 
   let countQuery = `SELECT COUNT(*) 

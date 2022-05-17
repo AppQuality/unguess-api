@@ -154,9 +154,16 @@ export interface components {
       is_public: number;
       campaign_type_id: number;
       campaign_type_name: string;
-      test_type_name: string;
+      campaign_family_id?: number;
+      campaign_family_name: string;
       project_id: number;
       project_name: string;
+      /**
+       * @description -1: no bug form;
+       * 0: only bug form;
+       * 1: bug form with bug parade';
+       */
+      bug_form?: number;
     };
     /** Project */
     Project: {
@@ -230,14 +237,7 @@ export interface components {
           customer_title?: string;
           status_id?: number;
           is_public?: number;
-          /**
-           * @description -1: no bug form
-           * 0: only bug form
-           * 1: bug form with bug parade
-           */
-          bug_form?: number;
           campaign_type_id: number;
-          test_type_id: number;
           project_id: number;
           pm_id: number;
           platforms?: components["schemas"]["Platform"][];
@@ -247,6 +247,9 @@ export interface components {
           page_manual_id?: number;
           /** @description Da togliere */
           customer_id?: number;
+          has_bug_form?: number;
+          /** @description if has_bug_form is 0 this has to be 0 */
+          has_bug_parade?: number;
         };
       };
     };

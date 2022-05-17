@@ -1,5 +1,6 @@
 import { ERROR_MESSAGE, fallBackCsmProfile } from "@src/routes/shared";
 import checkPlatforms from "@src/routes/campaigns/checkPlatform";
+import getCampaignType from "../getCampaignType";
 
 export default async (
   campaign_request: StoplightComponents["requestBodies"]["Campaign"]["content"]["application/json"]
@@ -21,7 +22,6 @@ export default async (
     !campaign_request.end_date ||
     !campaign_request.close_date ||
     !campaign_request.campaign_type_id ||
-    !campaign_request.test_type_id ||
     !campaign_request.project_id
   ) {
     throw { ...error, code: 400 };
@@ -31,6 +31,18 @@ export default async (
   let platforms_result = await checkPlatforms(campaign_request.platforms);
 
   if (!platforms_result) throw { ...error, code: 400 };
+
+  // Check bug form
+  if (
+    typeof campaign_request.has_bug_form !== undefined &&
+    typeof campaign_request.has_bug_parade !== undefined
+  ) {
+    let bug_form_result = await getCampaignType(
+      campaign_request.has_bug_form,
+      campaign_request.has_bug_parade
+    );
+    if (bug_form_result === false) throw { ...error, code: 400 };
+  }
 
   // Return validated request and set default values
   return {

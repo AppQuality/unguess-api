@@ -56,8 +56,9 @@ export default async (
         c.campaign_type_id,
         c.project_id,
         c.customer_id,
+        c.campaign_type AS bug_form,
         ct.name AS campaign_type_name,
-        ct.type AS test_type_id,
+        ct.type AS campaign_family_id,
         p.display_name 
       FROM wp_appq_evd_campaign c 
       JOIN wp_appq_project p ON c.project_id = p.id 
@@ -80,6 +81,17 @@ export default async (
 
     let returnCampaigns: Array<StoplightComponents["schemas"]["Campaign"]> = [];
     for (let campaign of campaigns) {
+      // Get campaign family
+      let campaign_family = "";
+      switch (campaign.campaign_family_id) {
+        case 0:
+          campaign_family = "Experiential";
+          break;
+        case 1:
+          campaign_family = "Functional";
+          break;
+      }
+
       returnCampaigns.push({
         id: campaign.id,
         start_date: new Date(campaign.start_date).toISOString(),
@@ -94,8 +106,9 @@ export default async (
         campaign_type_name: campaign.campaign_type_name,
         project_id: campaign.project_id,
         project_name: projectResult.name,
-        test_type_name:
-          campaign.test_type_id === 1 ? "Experiential" : "Functional",
+        campaign_family_id: campaign.campaign_family_id,
+        campaign_family_name: campaign_family,
+        bug_form: campaign.bug_form,
       });
     }
 

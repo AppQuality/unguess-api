@@ -1,5 +1,6 @@
 import * as db from "@src/features/db";
 import { getCampaignStatus } from "@src/routes/shared";
+import getCampaignType from "../getCampaignType";
 
 const DEFAULT_PLATFORM_ID = 0;
 
@@ -19,12 +20,26 @@ export default async (
     "project_id",
     "page_preview_id",
     "page_manual_id",
+    "campaign_type",
     "customer_id",
     "pm_id",
     "platform_id", //Required for db, but useless.
     "form_factor",
     "os",
   ];
+
+  // Get bug form
+  let bug_form = -1;
+  if (
+    typeof campaign_request.has_bug_form !== undefined &&
+    typeof campaign_request.has_bug_parade !== undefined
+  ) {
+    let bug_form_result = await getCampaignType(
+      campaign_request.has_bug_form,
+      campaign_request.has_bug_parade
+    );
+    if (bug_form_result !== false) bug_form = bug_form_result;
+  }
 
   // Get request platforms form_factor and os
   let platforms = campaign_request.platforms;
@@ -48,6 +63,7 @@ export default async (
     campaign_request.project_id as number,
     campaign_request.page_preview_id as number,
     campaign_request.page_manual_id as number,
+    bug_form as number,
     campaign_request.customer_id as number,
     campaign_request.pm_id as number,
     DEFAULT_PLATFORM_ID as number,
@@ -86,8 +102,9 @@ export default async (
             c.campaign_type_id,
             c.project_id,
             c.customer_id,
+            c.campaign_type AS bug_form,
             ct.name AS campaign_type_name,
-            ct.type AS test_type_id,
+            ct.type AS campaign_family_id,
             p.display_name 
             FROM wp_appq_evd_campaign c 
             JOIN wp_appq_project p ON c.project_id = p.id 
@@ -98,6 +115,17 @@ export default async (
   );
 
   campaign = campaign[0];
+
+  // Get campaign family
+  let campaign_family = "";
+  switch (campaign.campaign_family_id) {
+    case 0:
+      campaign_family = "Experiential";
+      break;
+    case 1:
+      campaign_family = "Functional";
+      break;
+  }
 
   return {
     id: campaign.id,
@@ -111,8 +139,10 @@ export default async (
     is_public: campaign.is_public,
     campaign_type_id: campaign.campaign_type_id,
     campaign_type_name: campaign.campaign_type_name,
-    test_type_name: campaign.test_type_id === 1 ? "Functional" : "Experiential",
+    campaign_family_id: campaign.campaign_family_id,
+    campaign_family_name: campaign_family,
     project_id: campaign.project_id,
     project_name: campaign.display_name,
+    bug_form: campaign.bug_form,
   };
 };

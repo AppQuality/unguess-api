@@ -80,7 +80,6 @@ const campaign_request_1 = {
   customer_title: "Campaign 1 customer title",
   is_public: 1,
   campaign_type_id: 1,
-  test_type_id: 1,
   project_id: 1,
   pm_id: fallBackCsmProfile.id,
 };
