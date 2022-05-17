@@ -138,8 +138,8 @@ export default async (
       LEFT JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id 
       WHERE p.id IN (${userProjectsID})
       ${AND}
-      ${order && orderBy ? `ORDER BY ${orderBy} ${order}` : ``}
-      ${limit && (start || start === 0) ? `LIMIT ${limit} OFFSET ${start}` : ``}
+      ${order && orderBy ? ` ORDER BY ${orderBy} ${order}` : ``}
+      ${limit ? ` LIMIT ${limit} OFFSET ${start}` : ``}
     `;
 
     const campaigns = await db.query(query);
