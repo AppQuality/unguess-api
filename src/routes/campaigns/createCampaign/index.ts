@@ -46,7 +46,9 @@ export default async (
   let form_factor_list = Array<Number>();
   let os_list = Array<Number>();
   if (platforms) {
-    form_factor_list = platforms.map((platform) => platform.deviceType);
+    form_factor_list = [
+      ...new Set(platforms.map((platform) => platform.deviceType)),
+    ];
     os_list = platforms.map((platform) => platform.id);
   }
 

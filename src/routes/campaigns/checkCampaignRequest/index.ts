@@ -41,6 +41,7 @@ export default async (
       campaign_request.has_bug_form,
       campaign_request.has_bug_parade
     );
+
     if (bug_form_result === false) throw { ...error, code: 400 };
   }
 
