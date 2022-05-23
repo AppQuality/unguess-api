@@ -1,7 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { ERROR_MESSAGE } from "@src/routes/shared";
+import { ERROR_MESSAGE, LIMIT_QUERY_PARAM_DEFAULT } from "@src/routes/shared";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
@@ -83,7 +83,6 @@ const campaign_1 = {
   close_date: "2017-07-20 10:00:00",
   title: "Campagnetta Funzionale Provetta 1",
   customer_title: "titolo 1",
-  description: "Descrizione della campagnazione 1",
   status_id: 1,
   is_public: 0,
   campaign_type_id: 1,
@@ -97,7 +96,6 @@ const campaign_2 = {
   close_date: "2017-07-20 10:00:00",
   title: "Campagnetta Funzionale Provetta 2",
   customer_title: "titolo 2",
-  description: "Descrizione della campagnazione 2",
   status_id: 1,
   is_public: 0,
   campaign_type_id: 1,
@@ -209,7 +207,6 @@ describe("GET /workspaces/{wid}/projects/{pid}/campaigns", () => {
       expect(project).toHaveProperty("close_date");
       expect(project).toHaveProperty("title");
       expect(project).toHaveProperty("customer_title");
-      expect(project).toHaveProperty("description");
       expect(project).toHaveProperty("status_id");
       expect(project).toHaveProperty("is_public");
       expect(project).toHaveProperty("campaign_type_id");
@@ -233,7 +230,9 @@ describe("GET /workspaces/{wid}/projects/{pid}/campaigns", () => {
           start_date: new Date(campaign_1.start_date).toISOString(),
           end_date: new Date(campaign_1.end_date).toISOString(),
           close_date: new Date(campaign_1.close_date).toISOString(),
-          test_type_name: "Experiential",
+          campaign_family_id: campaign_type_1.type,
+          campaign_family_name: "Functional",
+          bug_form: 0,
         },
         {
           ...campaign_2,
@@ -243,11 +242,13 @@ describe("GET /workspaces/{wid}/projects/{pid}/campaigns", () => {
           start_date: new Date(campaign_2.start_date).toISOString(),
           end_date: new Date(campaign_2.end_date).toISOString(),
           close_date: new Date(campaign_2.close_date).toISOString(),
-          test_type_name: "Experiential",
+          campaign_family_id: campaign_type_1.type,
+          campaign_family_name: "Functional",
+          bug_form: 0,
         },
       ],
       start: 0,
-      limit: 10,
+      limit: LIMIT_QUERY_PARAM_DEFAULT,
       size: 2,
       total: 2,
     });

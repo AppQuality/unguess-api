@@ -1,7 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { ERROR_MESSAGE } from "@src/routes/shared";
+import { ERROR_MESSAGE, LIMIT_QUERY_PARAM_DEFAULT } from "@src/routes/shared";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
@@ -83,7 +83,6 @@ const campaign_1 = {
   close_date: "2017-07-20 00:00:00",
   title: "Campagnetta Funzionale Provetta 1",
   customer_title: "titolo 1",
-  description: "Descrizione della campagnazione 1",
   status_id: 1,
   is_public: 0,
   campaign_type_id: 1,
@@ -97,7 +96,6 @@ const campaign_2 = {
   close_date: "2017-07-20 00:00:00",
   title: "Campagnetta Funzionale Provetta 2",
   customer_title: "titolo 2",
-  description: "Descrizione della campagnazione 2",
   status_id: 1,
   is_public: 0,
   campaign_type_id: 1,
@@ -111,7 +109,6 @@ const campaign_3 = {
   close_date: "2017-07-20 00:00:00",
   title: "Campagnetta Funzionale Provetta 3",
   customer_title: "titolo 3",
-  description: "Descrizione della campagnazione 3",
   status_id: 1,
   is_public: 0,
   campaign_type_id: 1,
@@ -197,7 +194,7 @@ describe("GET /projects/{pid}/campaigns", () => {
 
   it("Should return a list of campaigns if project is present", async () => {
     const response = await request(app)
-      .get(`/workspaces/${customer_1.id}/projects/${project_1.id}/campaigns`)
+      .get(`/projects/${project_1.id}/campaigns`)
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
     expect(Array.isArray(response.body.items)).toBe(true);
@@ -209,7 +206,6 @@ describe("GET /projects/{pid}/campaigns", () => {
       expect(project).toHaveProperty("close_date");
       expect(project).toHaveProperty("title");
       expect(project).toHaveProperty("customer_title");
-      expect(project).toHaveProperty("description");
       expect(project).toHaveProperty("status_id");
       expect(project).toHaveProperty("is_public");
       expect(project).toHaveProperty("campaign_type_id");
@@ -221,7 +217,7 @@ describe("GET /projects/{pid}/campaigns", () => {
 
   it("Should return a list formatted for pagination", async () => {
     const response = await request(app)
-      .get(`/workspaces/${customer_1.id}/projects/${project_1.id}/campaigns`)
+      .get(`/projects/${project_1.id}/campaigns`)
       .set("authorization", "Bearer customer");
 
     expect(response.body).toStrictEqual({
@@ -234,7 +230,9 @@ describe("GET /projects/{pid}/campaigns", () => {
           start_date: new Date(campaign_1.start_date).toISOString(),
           end_date: new Date(campaign_1.end_date).toISOString(),
           close_date: new Date(campaign_1.close_date).toISOString(),
-          test_type_name: "Experiential",
+          campaign_family_id: campaign_type_1.type,
+          campaign_family_name: "Functional",
+          bug_form: 0,
         },
         {
           ...campaign_2,
@@ -244,13 +242,49 @@ describe("GET /projects/{pid}/campaigns", () => {
           start_date: new Date(campaign_2.start_date).toISOString(),
           end_date: new Date(campaign_2.end_date).toISOString(),
           close_date: new Date(campaign_2.close_date).toISOString(),
-          test_type_name: "Experiential",
+          campaign_family_id: campaign_type_1.type,
+          campaign_family_name: "Functional",
+          bug_form: 0,
         },
       ],
       start: 0,
-      limit: 10,
+      limit: LIMIT_QUERY_PARAM_DEFAULT,
       size: 2,
       total: 2,
+    });
+  });
+
+  //Should return just a campaign if limit is 1
+  it("Should return a campaign if limit is 1", async () => {
+    const response = await request(app)
+      .get(`/projects/${project_1.id}/campaigns?limit=1`)
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(200);
+    expect(Array.isArray(response.body.items)).toBe(true);
+    expect(response.body.items.length).toBe(1);
+  });
+
+  //Should return all campaigns if no limit is specified
+  it("Should return a list of campaigns if no limit is specified", async () => {
+    const response = await request(app)
+      .get(`/projects/${project_1.id}/campaigns`)
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(200);
+    expect(Array.isArray(response.body.items)).toBe(true);
+    expect(response.body.items.length).toBe(2); //campaign_1 and campaign_2
+    response.body.items.forEach((project: Object) => {
+      expect(project).toHaveProperty("id");
+      expect(project).toHaveProperty("start_date");
+      expect(project).toHaveProperty("end_date");
+      expect(project).toHaveProperty("close_date");
+      expect(project).toHaveProperty("title");
+      expect(project).toHaveProperty("customer_title");
+      expect(project).toHaveProperty("status_id");
+      expect(project).toHaveProperty("is_public");
+      expect(project).toHaveProperty("campaign_type_id");
+      expect(project).toHaveProperty("campaign_type_name");
+      expect(project).toHaveProperty("project_id");
+      expect(project).toHaveProperty("project_name");
     });
   });
 });

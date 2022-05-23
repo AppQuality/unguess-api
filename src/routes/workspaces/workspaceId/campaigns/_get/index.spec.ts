@@ -1,8 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { ERROR_MESSAGE } from "@src/routes/shared";
-import { getCampaignStatus } from "@src/routes/shared/getCampaignStatus";
+import { ERROR_MESSAGE, LIMIT_QUERY_PARAM_DEFAULT } from "@src/routes/shared";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
@@ -215,21 +214,20 @@ describe("GET /workspaces/{wid}/campaigns", () => {
             close_date: campaign_1.close_date,
             title: campaign_1.title,
             customer_title: campaign_1.customer_title,
-            description: campaign_1.description,
             status_id: campaign_1.status_id,
             status_name: "running",
             is_public: campaign_1.is_public,
             campaign_type_id: campaign_type_1.id,
             campaign_type_name: campaign_type_1.name,
-            test_type_name:
-              campaign_type_1.type === 1 ? "Experiential" : "Functional",
+            campaign_family_id: campaign_type_1.type,
+            campaign_family_name: "Functional",
             project_id: campaign_1.project_id,
             customer_id: campaign_1.customer_id,
             project_name: project_1.display_name,
           },
         ],
         start: 0,
-        limit: 10,
+        limit: LIMIT_QUERY_PARAM_DEFAULT,
         size: 1,
         total: 1,
       })
@@ -251,14 +249,13 @@ describe("GET /workspaces/{wid}/campaigns", () => {
             close_date: campaign_2.close_date,
             title: campaign_2.title,
             customer_title: campaign_2.customer_title,
-            description: campaign_2.description,
             status_id: campaign_2.status_id,
             status_name: "completed",
             is_public: campaign_2.is_public,
             campaign_type_id: campaign_type_1.id,
             campaign_type_name: campaign_type_1.name,
-            test_type_name:
-              campaign_type_1.type === 1 ? "Experiential" : "Functional",
+            campaign_family_id: campaign_type_1.type,
+            campaign_family_name: "Functional",
             project_id: campaign_2.project_id,
             customer_id: campaign_2.customer_id,
             project_name: project_1.display_name,
@@ -270,21 +267,20 @@ describe("GET /workspaces/{wid}/campaigns", () => {
             close_date: campaign_3.close_date,
             title: campaign_3.title,
             customer_title: campaign_3.customer_title,
-            description: campaign_3.description,
             status_id: campaign_3.status_id,
             status_name: "running",
             is_public: campaign_3.is_public,
             campaign_type_id: campaign_type_2.id,
             campaign_type_name: campaign_type_2.name,
-            test_type_name:
-              campaign_type_1.type === 1 ? "Experiential" : "Functional",
+            campaign_family_id: campaign_type_2.type,
+            campaign_family_name: "Functional",
             project_id: campaign_3.project_id,
             customer_id: campaign_3.customer_id,
             project_name: project_1.display_name,
           },
         ],
         start: 0,
-        limit: 10,
+        limit: LIMIT_QUERY_PARAM_DEFAULT,
         size: 2,
         total: 2,
       })
@@ -299,25 +295,9 @@ describe("GET /workspaces/{wid}/campaigns", () => {
     expect(response.body.message).toBe(ERROR_MESSAGE);
   });
 
-  it("Should return 400 because the orderBy is missing but the order is valid", async () => {
-    const response = await request(app)
-      .get("/workspaces/1/campaigns?order=DESC")
-      .set("authorization", "Bearer customer");
-    expect(response.body.code).toBe(400);
-    expect(response.body.message).toBe(ERROR_MESSAGE);
-  });
-
   it("Should return 400 because the orderBy parameter is wrong", async () => {
     const response = await request(app)
       .get("/workspaces/1/campaigns?orderBy=BANANA")
-      .set("authorization", "Bearer customer");
-    expect(response.body.code).toBe(400);
-    expect(response.body.message).toBe(ERROR_MESSAGE);
-  });
-
-  it("Should return 400 because the order parameter is wrong but the orderBy is valid", async () => {
-    const response = await request(app)
-      .get("/workspaces/1/campaigns?orderBy=start_date")
       .set("authorization", "Bearer customer");
     expect(response.body.code).toBe(400);
     expect(response.body.message).toBe(ERROR_MESSAGE);
@@ -346,14 +326,13 @@ describe("GET /workspaces/{wid}/campaigns", () => {
             close_date: campaign_3.close_date,
             title: campaign_3.title,
             customer_title: campaign_3.customer_title,
-            description: campaign_3.description,
             status_id: campaign_3.status_id,
             status_name: "running",
             is_public: campaign_3.is_public,
             campaign_type_id: campaign_type_2.id,
             campaign_type_name: campaign_type_2.name,
-            test_type_name:
-              campaign_type_1.type === 1 ? "Experiential" : "Functional",
+            campaign_family_id: campaign_type_2.type,
+            campaign_family_name: "Functional",
             project_id: campaign_3.project_id,
             customer_id: campaign_3.customer_id,
             project_name: project_1.display_name,
@@ -365,21 +344,20 @@ describe("GET /workspaces/{wid}/campaigns", () => {
             close_date: campaign_2.close_date,
             title: campaign_2.title,
             customer_title: campaign_2.customer_title,
-            description: campaign_2.description,
             status_id: campaign_2.status_id,
             status_name: "completed",
             is_public: campaign_2.is_public,
             campaign_type_id: campaign_type_1.id,
             campaign_type_name: campaign_type_1.name,
-            test_type_name:
-              campaign_type_1.type === 1 ? "Experiential" : "Functional",
+            campaign_family_id: campaign_type_1.type,
+            campaign_family_name: "Functional",
             project_id: campaign_2.project_id,
             customer_id: campaign_2.customer_id,
             project_name: project_1.display_name,
           },
         ],
         start: 0,
-        limit: 10,
+        limit: LIMIT_QUERY_PARAM_DEFAULT,
         size: 2,
         total: 2,
       })
