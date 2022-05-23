@@ -110,8 +110,8 @@ export interface components {
       unguess_wp_user_id: number;
       picture?: string;
       features?: {
-        slug?: string;
-        name?: string;
+        slug: string;
+        name: string;
       }[];
     };
     /** Authentication */
