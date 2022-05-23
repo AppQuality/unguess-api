@@ -468,6 +468,9 @@ components:
                 type: string
               name:
                 type: string
+            required:
+              - slug
+              - name
       required:
         - id
         - email
