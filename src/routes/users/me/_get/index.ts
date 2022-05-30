@@ -18,7 +18,7 @@ export default async (
   let profileData = await getProfile(user.profile_id);
 
   let userWorkspaces = await getUserWorkspaces(user, {
-    orderBy: "c.id",
+    orderBy: "c.company",
   });
   setWorkspaces(user, userWorkspaces.workspaces);
 

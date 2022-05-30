@@ -31,7 +31,7 @@ export default async (
         } GROUP BY c.id`;
 
   if (orderBy) {
-    query += ` ORDER BY ${orderBy} ${order || "DESC"}`;
+    query += ` ORDER BY ${orderBy} ${order || "ASC"}`;
   }
 
   if (limit) {
