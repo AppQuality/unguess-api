@@ -25,9 +25,6 @@ export default async (
     // Check if workspace exists
     await getWorkspace(request_body.customer_id, user);
 
-    // Check if user can see the workspace
-    await getUserWorkspaces(user, request_body.customer_id);
-
     // Create the project
     let project = await createProject(request_body, user);
 
