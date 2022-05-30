@@ -6,14 +6,22 @@ import {
   START_QUERY_PARAM_DEFAULT,
 } from "@src/routes/shared";
 
+interface GetWorkspacesArgs {
+  limit?: StoplightComponents["parameters"]["limit"];
+  start?: StoplightComponents["parameters"]["start"];
+  orderBy?: "c.id" | "c.company" | "c.tokens";
+  order?: "ASC" | "DESC";
+}
+
 export default async (
   user: UserType,
-  limit?: StoplightComponents["parameters"]["limit"],
-  start?: StoplightComponents["parameters"]["start"]
+  args: GetWorkspacesArgs = {}
 ): Promise<{
   workspaces: StoplightComponents["schemas"]["Workspace"][] | [];
   total: number;
 }> => {
+  const { limit, start, order, orderBy } = args;
+
   let query = `SELECT c.*, p.name as csmName, p.surname as csmSurname, p.email as csmEmail, p.id as csmProfileId, p.wp_user_id as csmTryberWpUserId 
         FROM wp_appq_customer c 
         JOIN wp_appq_user_to_customer utc ON (c.id = utc.customer_id) 
@@ -21,6 +29,10 @@ export default async (
         ${
           user.role !== "administrator" ? `WHERE utc.wp_user_id = ?` : ``
         } GROUP BY c.id`;
+
+  if (orderBy) {
+    query += ` ORDER BY ${orderBy} ${order || "DESC"}`;
+  }
 
   if (limit) {
     query += ` LIMIT ${limit} OFFSET ${start || START_QUERY_PARAM_DEFAULT}`;

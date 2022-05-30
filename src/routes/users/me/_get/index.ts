@@ -17,7 +17,9 @@ export default async (
   //Get User Profile (wp_appq_evd_profile)
   let profileData = await getProfile(user.profile_id);
 
-  let userWorkspaces = await getUserWorkspaces(user);
+  let userWorkspaces = await getUserWorkspaces(user, {
+    orderBy: "c.id",
+  });
   setWorkspaces(user, userWorkspaces.workspaces);
 
   return formattedUser(user, profileData);
