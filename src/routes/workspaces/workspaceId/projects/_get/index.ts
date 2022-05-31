@@ -43,7 +43,12 @@ export default async (
     }> = [];
 
     // Get customer's projects
-    const projectSql = `SELECT id, display_name FROM wp_appq_project WHERE customer_id = ? ORDER BY id LIMIT ${limit} OFFSET ${start}`;
+    let projectSql = `SELECT id, display_name FROM wp_appq_project WHERE customer_id = ? ORDER BY id`;
+
+    if (limit) {
+      projectSql += ` LIMIT ${limit} OFFSET ${start}`;
+    }
+
     projects = await db.query(db.format(projectSql, [wid]));
 
     // Count projects
@@ -54,31 +59,33 @@ export default async (
     let returnProjects: Array<StoplightComponents["schemas"]["Project"]> = [];
     if (projects) {
       for (const project of projects) {
-        // Check if user can see this project
-        let hasPermission = false;
-        const userToProjectSql =
-          "SELECT * FROM wp_appq_user_to_project WHERE project_id = ?";
-        let userToProjectRows: Array<{
-          wp_user_id: number;
-          project_id: number;
-        }> = await db.query(db.format(userToProjectSql, [project.id]));
+        if (user.role !== "administrator") {
+          // Check if user can see this project
+          let hasPermission = false;
+          const userToProjectSql =
+            "SELECT * FROM wp_appq_user_to_project WHERE project_id = ?";
+          let userToProjectRows: Array<{
+            wp_user_id: number;
+            project_id: number;
+          }> = await db.query(db.format(userToProjectSql, [project.id]));
 
-        if (userToProjectRows.length) {
-          // Check if the wp_user_id is in the userToProjectRows array
-          for (const userToProjectRow of userToProjectRows) {
-            if (userToProjectRow.wp_user_id == user.id) {
-              // The user has permission to see this project
-              hasPermission = true;
-              break;
+          if (userToProjectRows.length) {
+            // Check if the wp_user_id is in the userToProjectRows array
+            for (const userToProjectRow of userToProjectRows) {
+              if (userToProjectRow.wp_user_id == user.id) {
+                // The user has permission to see this project
+                hasPermission = true;
+                break;
+              }
             }
+          } else {
+            // The project has no permission limits
+            hasPermission = true;
           }
-        } else {
-          // The project has no permission limits
-          hasPermission = true;
-        }
 
-        if (!hasPermission) {
-          continue;
+          if (!hasPermission) {
+            continue;
+          }
         }
 
         // Get campaigns count

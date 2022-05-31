@@ -462,12 +462,7 @@ components:
         features:
           type: array
           items:
-            type: object
-            properties:
-              slug:
-                type: string
-              name:
-                type: string
+            $ref: '#/components/schemas/Feature'
       required:
         - id
         - email
@@ -582,8 +577,6 @@ components:
           type: string
         customer_title:
           type: string
-        description:
-          type: string
         status_id:
           type: number
         status_name:
@@ -594,12 +587,22 @@ components:
           type: integer
         campaign_type_name:
           type: string
-        test_type_name:
+        campaign_family_id:
+          type: integer
+        campaign_family_name:
           type: string
         project_id:
           type: integer
         project_name:
           type: string
+        bug_form:
+          type: number
+          minimum: -1
+          maximum: 1
+          description: |-
+            -1: no bug form;
+            0: only bug form;
+            1: bug form with bug parade';
       required:
         - id
         - start_date
@@ -607,13 +610,12 @@ components:
         - close_date
         - title
         - customer_title
-        - description
         - status_id
         - status_name
         - is_public
         - campaign_type_id
         - campaign_type_name
-        - test_type_name
+        - campaign_family_name
         - project_id
         - project_name
     Project:
@@ -649,19 +651,13 @@ components:
       type: object
       properties:
         id:
-          type: number
-        name:
-          type: string
+          type: integer
+          description: os
         deviceType:
-          type: string
-          enum:
-            - smartphone
-            - tablet
-            - computer
-            - smartwatch
-            - console
-            - tv
+          type: integer
           description: |-
+            form_factor
+
             0 => smartphone, 
             1 => tablet 
             2 => pc 
@@ -670,7 +666,18 @@ components:
             5 => tv
       required:
         - id
-        - name
+        - deviceType
+    Feature:
+      title: Feature
+      x-stoplight:
+        id: qd9ae2twk93pr
+      type: object
+      properties:
+        slug:
+          type: string
+        name:
+          type: string
+      description: Flags used to enable functionality to some users
   securitySchemes:
     JWT:
       type: http
@@ -755,8 +762,6 @@ components:
             properties:
               title:
                 type: string
-              description:
-                type: string
               start_date:
                 type: string
               end_date:
@@ -769,15 +774,9 @@ components:
                 type: integer
               is_public:
                 type: integer
-              bug_form:
-                type: number
-                description: |-
-                  -1: no bug form
-                  0: only bug form
-                  1: bug form with bug parade
+                minimum: 0
+                maximum: 1
               campaign_type_id:
-                type: integer
-              test_type_id:
                 type: integer
               project_id:
                 type: integer
@@ -796,13 +795,21 @@ components:
               customer_id:
                 type: integer
                 description: Da togliere
+              has_bug_form:
+                type: integer
+                minimum: 0
+                maximum: 1
+              has_bug_parade:
+                type: integer
+                minimum: 0
+                maximum: 1
+                description: if has_bug_form is 0 this has to be 0
             required:
               - title
               - start_date
               - end_date
               - close_date
               - campaign_type_id
-              - test_type_id
               - project_id
               - pm_id
     Project:

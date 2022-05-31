@@ -1,7 +1,15 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { fallBackCsmProfile } from "@src/routes/shared";
+import {
+  table as platformTable,
+  data as platformData,
+} from "@src/__mocks__/database/platforms";
+import {
+  DT_DESKTOP,
+  DT_SMARTPHONE,
+  fallBackCsmProfile,
+} from "@src/routes/shared";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
@@ -16,11 +24,25 @@ const customer_1 = {
 const AndroidPhone = {
   id: 1,
   name: "Android",
+  form_factor: DT_SMARTPHONE,
+};
+
+const AndroidPhoneBody = {
+  id: 1,
+  name: "Android",
+  deviceType: DT_SMARTPHONE,
 };
 
 const WindowsPC = {
   id: 8,
   name: "Windows",
+  form_factor: DT_DESKTOP,
+};
+
+const WindowsPCBody = {
+  id: 8,
+  name: "Windows",
+  deviceType: DT_DESKTOP,
 };
 
 const user_to_customer_1 = {
@@ -56,10 +78,8 @@ const campaign_request_1 = {
   end_date: "2017-07-20 00:00:00",
   close_date: "2017-07-20 00:00:00",
   customer_title: "Campaign 1 customer title",
-  description: "",
   is_public: 1,
   campaign_type_id: 1,
-  test_type_id: 1,
   project_id: 1,
   pm_id: fallBackCsmProfile.id,
 };
@@ -71,7 +91,6 @@ const campaign_1 = {
   close_date: "2017-07-20 00:00:00",
   title: "Campaign 1 title",
   customer_title: "Campaign 1 customer title",
-  description: "",
   status_id: 1,
   is_public: 1,
   campaign_type_id: 1,
@@ -89,6 +108,7 @@ describe("POST /campaigns", () => {
     return new Promise(async (resolve, reject) => {
       try {
         await dbAdapter.create();
+        await platformTable.create();
 
         await dbAdapter.add({
           companies: [customer_1],
@@ -98,6 +118,9 @@ describe("POST /campaigns", () => {
           campaigns: [campaign_1],
           campaignTypes: [campaign_type_1],
         });
+
+        await platformData.addItem(AndroidPhone);
+        await platformData.addItem(WindowsPC);
       } catch (error) {
         console.error(error);
         reject(error);
@@ -111,6 +134,7 @@ describe("POST /campaigns", () => {
     return new Promise(async (resolve, reject) => {
       try {
         await dbAdapter.drop();
+        await platformTable.drop();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -132,7 +156,6 @@ describe("POST /campaigns", () => {
       .post("/campaigns")
       .set("Authorization", "Bearer customer")
       .send({
-        description: "Campaign 1 description",
         start_date: "2020-01-01",
         end_date: "2020-01-01",
         close_date: "2020-01-01",
@@ -149,7 +172,7 @@ describe("POST /campaigns", () => {
       .send({
         ...campaign_request_1,
         project_id: 2,
-        platforms: [AndroidPhone, WindowsPC],
+        platforms: [AndroidPhoneBody, WindowsPCBody],
       });
     expect(response.status).toBe(403);
   });
@@ -161,7 +184,7 @@ describe("POST /campaigns", () => {
       .send({
         ...campaign_request_1,
         project_id: 3,
-        platforms: [AndroidPhone, WindowsPC],
+        platforms: [AndroidPhoneBody, WindowsPCBody],
       });
     expect(response.status).toBe(403);
   });
@@ -172,7 +195,7 @@ describe("POST /campaigns", () => {
       .set("Authorization", "Bearer customer")
       .send({
         ...campaign_request_1,
-        platforms: [AndroidPhone, WindowsPC],
+        platforms: [AndroidPhoneBody, WindowsPCBody],
       });
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({

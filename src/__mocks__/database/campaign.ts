@@ -17,9 +17,11 @@ export const table = {
       "campaign_type_id int(11)",
       "project_id int(11)",
       "customer_id int(11)",
-      "campaign_type int(1)",
+      "campaign_type int(1) default 0",
       "pm_id int(11)",
       "platform_id int(11)",
+      "os varchar(256) default '0'",
+      "form_factor varchar(256) default '0'",
       "page_preview_id int(11)",
       "page_manual_id int(11)",
     ]);

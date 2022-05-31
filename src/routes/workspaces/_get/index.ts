@@ -26,7 +26,10 @@ export default async (
       ? parseInt(c.request.query.start as string)
       : (START_QUERY_PARAM_DEFAULT as StoplightComponents["parameters"]["start"]);
 
-    let userWorkspaces = await getUserWorkspaces(req.user, limit, start);
+    let userWorkspaces = await getUserWorkspaces(req.user, {
+      limit,
+      start,
+    });
 
     if (userWorkspaces.workspaces.length) {
       res.status_code = 200;

@@ -109,10 +109,7 @@ export interface components {
       tryber_wp_user_id: number;
       unguess_wp_user_id: number;
       picture?: string;
-      features?: {
-        slug?: string;
-        name?: string;
-      }[];
+      features?: components["schemas"]["Feature"][];
     };
     /** Authentication */
     Authentication: {
@@ -149,15 +146,21 @@ export interface components {
       close_date: string;
       title: string;
       customer_title: string;
-      description: string;
       status_id: number;
       status_name: string;
       is_public: number;
       campaign_type_id: number;
       campaign_type_name: string;
-      test_type_name: string;
+      campaign_family_id?: number;
+      campaign_family_name: string;
       project_id: number;
       project_name: string;
+      /**
+       * @description -1: no bug form;
+       * 0: only bug form;
+       * 1: bug form with bug parade';
+       */
+      bug_form?: number;
     };
     /** Project */
     Project: {
@@ -173,24 +176,27 @@ export interface components {
     };
     /** Platform Object */
     Platform: {
+      /** @description os */
       id: number;
-      name: string;
       /**
-       * @description 0 => smartphone,
+       * @description form_factor
+       *
+       * 0 => smartphone,
        * 1 => tablet
        * 2 => pc
        * 3 => smartwatch
        * 4 => console
        * 5 => tv
-       * @enum {string}
        */
-      deviceType?:
-        | "smartphone"
-        | "tablet"
-        | "computer"
-        | "smartwatch"
-        | "console"
-        | "tv";
+      deviceType: number;
+    };
+    /**
+     * Feature
+     * @description Flags used to enable functionality to some users
+     */
+    Feature: {
+      slug?: string;
+      name?: string;
     };
   };
   responses: {
@@ -230,21 +236,13 @@ export interface components {
       content: {
         "application/json": {
           title: string;
-          description?: string;
           start_date: string;
           end_date: string;
           close_date: string;
           customer_title?: string;
           status_id?: number;
           is_public?: number;
-          /**
-           * @description -1: no bug form
-           * 0: only bug form
-           * 1: bug form with bug parade
-           */
-          bug_form?: number;
           campaign_type_id: number;
-          test_type_id: number;
           project_id: number;
           pm_id: number;
           platforms?: components["schemas"]["Platform"][];
@@ -254,6 +252,9 @@ export interface components {
           page_manual_id?: number;
           /** @description Da togliere */
           customer_id?: number;
+          has_bug_form?: number;
+          /** @description if has_bug_form is 0 this has to be 0 */
+          has_bug_parade?: number;
         };
       };
     };

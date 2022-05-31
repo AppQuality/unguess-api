@@ -1,40 +1,50 @@
 import * as db from "../../../features/db";
 import { getGravatar } from "@src/routes/users/utils";
 import { formatCount } from "@src/routes/shared/paginateItems";
-import { fallBackCsmProfile } from "@src/routes/shared";
+import {
+  fallBackCsmProfile,
+  START_QUERY_PARAM_DEFAULT,
+} from "@src/routes/shared";
+
+interface GetWorkspacesArgs {
+  limit?: StoplightComponents["parameters"]["limit"];
+  start?: StoplightComponents["parameters"]["start"];
+  orderBy?: "c.id" | "c.company" | "c.tokens";
+  order?: "ASC" | "DESC";
+}
 
 export default async (
   user: UserType,
-  limit?: StoplightComponents["parameters"]["limit"],
-  start?: StoplightComponents["parameters"]["start"]
+  args: GetWorkspacesArgs = {}
 ): Promise<{
   workspaces: StoplightComponents["schemas"]["Workspace"][] | [];
   total: number;
 }> => {
-  let LIMIT = "";
-  if (limit && start) {
-    let LIMIT = `LIMIT ${limit} OFFSET ${start}`;
-  }
+  const { limit, start, order, orderBy } = args;
 
   let query = `SELECT c.*, p.name as csmName, p.surname as csmSurname, p.email as csmEmail, p.id as csmProfileId, p.wp_user_id as csmTryberWpUserId 
         FROM wp_appq_customer c 
         JOIN wp_appq_user_to_customer utc ON (c.id = utc.customer_id) 
         LEFT JOIN wp_appq_evd_profile p ON (p.id = c.pm_id)
-        ${user.role !== "administrator" ? `WHERE utc.wp_user_id = ?` : ``} `;
+        ${
+          user.role !== "administrator" ? `WHERE utc.wp_user_id = ?` : ``
+        } GROUP BY c.id`;
 
-  if (limit && start) {
-    query += `${LIMIT}`;
+  if (orderBy) {
+    query += ` ORDER BY ${orderBy} ${order || "ASC"}`;
+  }
+
+  if (limit) {
+    query += ` LIMIT ${limit} OFFSET ${start || START_QUERY_PARAM_DEFAULT}`;
   }
 
   let countQuery = `SELECT COUNT(*) 
         FROM wp_appq_customer c 
         JOIN wp_appq_user_to_customer utc ON (c.id = utc.customer_id) 
         LEFT JOIN wp_appq_evd_profile p ON (p.id = c.pm_id)
-        ${user.role !== "administrator" ? `WHERE utc.wp_user_id = ?` : ``} `;
-
-  if (limit && start) {
-    countQuery += `${LIMIT}`;
-  }
+        ${
+          user.role !== "administrator" ? `WHERE utc.wp_user_id = ?` : ``
+        } GROUP BY c.id`;
 
   try {
     if (
