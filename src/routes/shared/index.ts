@@ -10,6 +10,8 @@ export const DT_DESKTOP = 2;
 export const DT_SMARTWATCH = 3;
 export const DT_CONSOLE = 4;
 export const DT_TV = 5;
+export const FUNCTIONAL_CAMPAIGN_TYPE_ID = 0;
+export const EXPERIENTIAL_CAMPAIGN_TYPE_ID = 1;
 
 export interface ResponseError {
   message: string;

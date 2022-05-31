@@ -1,5 +1,9 @@
 import * as db from "@src/features/db";
-import { getCampaignStatus } from "@src/routes/shared";
+import {
+  EXPERIENTIAL_CAMPAIGN_TYPE_ID,
+  FUNCTIONAL_CAMPAIGN_TYPE_ID,
+  getCampaignStatus,
+} from "@src/routes/shared";
 import getCampaignType from "../getCampaignType";
 
 const DEFAULT_PLATFORM_ID = 0;
@@ -121,10 +125,10 @@ export default async (
   // Get campaign family
   let campaign_family = "";
   switch (campaign.campaign_family_id) {
-    case 0:
+    case EXPERIENTIAL_CAMPAIGN_TYPE_ID:
       campaign_family = "Experiential";
       break;
-    case 1:
+    case FUNCTIONAL_CAMPAIGN_TYPE_ID:
       campaign_family = "Functional";
       break;
   }
