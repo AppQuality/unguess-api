@@ -7,6 +7,8 @@ import {
   paginateItems,
   formatCount,
   getCampaignStatus,
+  EXPERIENTIAL_CAMPAIGN_TYPE_ID,
+  FUNCTIONAL_CAMPAIGN_TYPE_ID,
 } from "@src/routes/shared";
 import {
   ERROR_MESSAGE,
@@ -154,10 +156,10 @@ export default async (
       // Get campaign family
       let campaign_family = "";
       switch (campaign.campaign_family_id) {
-        case 0:
+        case EXPERIENTIAL_CAMPAIGN_TYPE_ID:
           campaign_family = "Experiential";
           break;
-        case 1:
+        case FUNCTIONAL_CAMPAIGN_TYPE_ID:
           campaign_family = "Functional";
           break;
       }

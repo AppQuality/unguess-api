@@ -6,6 +6,8 @@ import getProjectById from "@src/routes/projects/projectId/getProjectById";
 import paginateItems, { formatCount } from "@src/routes/shared/paginateItems";
 import {
   ERROR_MESSAGE,
+  EXPERIENTIAL_CAMPAIGN_TYPE_ID,
+  FUNCTIONAL_CAMPAIGN_TYPE_ID,
   getCampaignStatus,
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
@@ -80,10 +82,10 @@ export default async (
       // Get campaign family
       let campaign_family = "";
       switch (campaign.campaign_family_id) {
-        case 0:
+        case EXPERIENTIAL_CAMPAIGN_TYPE_ID:
           campaign_family = "Experiential";
           break;
-        case 1:
+        case FUNCTIONAL_CAMPAIGN_TYPE_ID:
           campaign_family = "Functional";
           break;
       }
