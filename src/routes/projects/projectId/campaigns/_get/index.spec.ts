@@ -231,7 +231,7 @@ describe("GET /projects/{pid}/campaigns", () => {
           end_date: new Date(campaign_1.end_date).toISOString(),
           close_date: new Date(campaign_1.close_date).toISOString(),
           campaign_family_id: campaign_type_1.type,
-          campaign_family_name: "Functional",
+          campaign_family_name: "Experiential",
           bug_form: 0,
         },
         {
@@ -243,7 +243,7 @@ describe("GET /projects/{pid}/campaigns", () => {
           end_date: new Date(campaign_2.end_date).toISOString(),
           close_date: new Date(campaign_2.close_date).toISOString(),
           campaign_family_id: campaign_type_1.type,
-          campaign_family_name: "Functional",
+          campaign_family_name: "Experiential",
           bug_form: 0,
         },
       ],
