@@ -2,9 +2,6 @@ import { getProject } from "@src/utils/getProject";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { ERROR_MESSAGE } from "@src/utils/consts";
 
-jest.mock("@src/features/db");
-jest.mock("@appquality/wp-auth");
-
 const customer_1 = {
   id: 1,
   company: "Company",

@@ -10,6 +10,7 @@ import routes from "./routes";
 
 const opts: Options = {
   definition: __dirname + "/reference/openapi.yml",
+  quick: true,
 };
 
 let referencePath = "/reference/";
