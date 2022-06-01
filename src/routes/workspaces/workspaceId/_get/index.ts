@@ -1,6 +1,6 @@
 /** OPENAPI-ROUTE: get-workspace */
 import { Context } from "openapi-backend";
-import getWorkspace from "@src/utils/getWorkspace";
+import { getWorkspace } from "@src/utils/getWorkspace";
 import { ERROR_MESSAGE } from "@src/utils/consts";
 
 export default async (

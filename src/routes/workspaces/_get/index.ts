@@ -1,6 +1,6 @@
 /** OPENAPI-ROUTE: get-workspaces */
 import { Context } from "openapi-backend";
-import getUserWorkspaces from "@src/utils/getUserWorkspaces";
+import { getUserWorkspaces } from "@src/utils/getUserWorkspaces";
 import { paginateItems } from "@src/utils/paginateItems";
 import {
   ERROR_MESSAGE,

@@ -13,7 +13,7 @@ interface GetWorkspacesArgs {
   order?: "ASC" | "DESC";
 }
 
-export default async (
+export const getUserWorkspaces = async (
   user: UserType,
   args: GetWorkspacesArgs = {}
 ): Promise<{

@@ -1,7 +1,7 @@
 import * as db from "@src/features/db";
 import { ERROR_MESSAGE } from "@src/utils/consts";
 
-export default async (
+export const getProjectById = async (
   projectId: number,
   user: UserType
 ): Promise<StoplightComponents["schemas"]["Project"]> => {

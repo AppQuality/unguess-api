@@ -1,8 +1,8 @@
 import { ERROR_MESSAGE, fallBackCsmProfile } from "@src/utils/consts";
-import checkPlatforms from "@src/utils/checkPlatform";
-import getCampaignType from "@src/utils/getCampaignType";
+import { checkPlatforms } from "@src/utils/checkPlatforms";
+import { getCampaignType } from "@src/utils/getCampaignType";
 
-export default async (
+export const checkCampaignRequest = async (
   campaign_request: StoplightComponents["requestBodies"]["Campaign"]["content"]["application/json"]
 ): Promise<
   StoplightComponents["requestBodies"]["Campaign"]["content"]["application/json"]

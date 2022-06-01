@@ -1,7 +1,7 @@
 /** OPENAPI-ROUTE: get-workspace-projects */
 import { Context } from "openapi-backend";
 import * as db from "@src/features/db";
-import getWorkspace from "@src/utils/getWorkspace";
+import { getWorkspace } from "@src/utils/getWorkspace";
 import { paginateItems, formatCount } from "@src/utils/paginateItems";
 import {
   ERROR_MESSAGE,

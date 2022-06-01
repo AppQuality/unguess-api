@@ -1,8 +1,8 @@
 /** OPENAPI-ROUTE: get-workspace-campaigns */
 import { Context } from "openapi-backend";
 import * as db from "@src/features/db";
-import getWorkspace from "@src/utils/getWorkspace";
-import getUserProjects from "@src/utils/getUserProjects";
+import { getWorkspace } from "@src/utils/getWorkspace";
+import { getUserProjects } from "@src/utils/getUserProjects";
 import {
   ERROR_MESSAGE,
   LIMIT_QUERY_PARAM_DEFAULT,

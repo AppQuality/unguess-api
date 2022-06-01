@@ -1,8 +1,8 @@
 /** OPENAPI-ROUTE: post-projects */
 import { Context } from "openapi-backend";
 import { ERROR_MESSAGE } from "@src/utils/consts";
-import getWorkspace from "@src/utils/getWorkspace";
-import createProject from "@src/utils/createProject";
+import { getWorkspace } from "@src/utils/getWorkspace";
+import { createProject } from "@src/utils/createProject";
 
 export default async (
   c: Context,

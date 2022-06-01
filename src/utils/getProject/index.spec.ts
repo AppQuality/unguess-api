@@ -1,4 +1,4 @@
-import getProject from "@src/utils/getProject";
+import { getProject } from "@src/utils/getProject";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { ERROR_MESSAGE } from "@src/utils/consts";
 

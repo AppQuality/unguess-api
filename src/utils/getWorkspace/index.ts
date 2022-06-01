@@ -11,7 +11,7 @@ const loadCsmData = async (
   return csm;
 };
 
-export default async (
+export const getWorkspace = async (
   workspaceId: number,
   user: UserType
 ): Promise<StoplightComponents["schemas"]["Workspace"]> => {

@@ -1,4 +1,4 @@
-import getWorkspace from "@src/utils/getWorkspace";
+import { getWorkspace } from "@src/utils/getWorkspace";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { ERROR_MESSAGE, fallBackCsmProfile } from "@src/utils/consts";
 

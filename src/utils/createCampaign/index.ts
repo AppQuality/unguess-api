@@ -3,12 +3,12 @@ import {
   EXPERIENTIAL_CAMPAIGN_TYPE_ID,
   FUNCTIONAL_CAMPAIGN_TYPE_ID,
 } from "@src/utils/consts";
-import getCampaignType from "@src/utils/getCampaignType";
+import { getCampaignType } from "@src/utils/getCampaignType";
 import { getCampaignStatus } from "@src/utils/getCampaignStatus";
 
 const DEFAULT_PLATFORM_ID = 0;
 
-export default async (
+export const createCampaign = async (
   campaign_request: StoplightComponents["requestBodies"]["Campaign"]["content"]["application/json"]
 ): Promise<StoplightComponents["schemas"]["Campaign"]> => {
   // Define fields to be updated
