@@ -2,9 +2,6 @@ import { getWorkspace } from "@src/utils/getWorkspace";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { ERROR_MESSAGE, fallBackCsmProfile } from "@src/utils/consts";
 
-jest.mock("@src/features/db");
-jest.mock("@appquality/wp-auth");
-
 const admin_user_1 = {
   id: 3,
   user_login: "admin@unguess.io",

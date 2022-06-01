@@ -2,9 +2,6 @@ import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 
-jest.mock("@src/features/db");
-jest.mock("@appquality/wp-auth");
-
 const customer_1 = {
   id: 1,
   company: "Company 1",

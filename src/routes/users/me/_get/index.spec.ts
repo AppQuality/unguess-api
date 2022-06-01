@@ -4,9 +4,6 @@ import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import companyBasic from "@src/__mocks__/database/companyBasic";
 
-jest.mock("@src/features/db");
-jest.mock("@appquality/wp-auth");
-
 describe("GET /users/me", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {

@@ -11,9 +11,6 @@ import {
   fallBackCsmProfile,
 } from "@src/utils/consts";
 
-jest.mock("@src/features/db");
-jest.mock("@appquality/wp-auth");
-
 const customer_1 = {
   id: 1,
   company: "Company 1",

@@ -3,9 +3,6 @@ import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { ERROR_MESSAGE, LIMIT_QUERY_PARAM_DEFAULT } from "@src/utils/consts";
 
-jest.mock("@src/features/db");
-jest.mock("@appquality/wp-auth");
-
 const customer_profile_1 = {
   id: 1,
   wp_user_id: 1,
