@@ -39,6 +39,8 @@ export default async (
 
     return { ...error, code: 403 };
   } catch (e: any) {
+    console.error(e);
+
     if (e.code) {
       error.code = e.code;
       res.status_code = e.code;

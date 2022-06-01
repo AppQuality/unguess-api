@@ -690,8 +690,6 @@ components:
         - deviceType
     Feature:
       title: Feature
-      x-stoplight:
-        id: qd9ae2twk93pr
       type: object
       properties:
         slug:

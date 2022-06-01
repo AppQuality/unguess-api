@@ -1,6 +1,9 @@
-export const getCampaignStatus = (
-  campaign: StoplightComponents["schemas"]["Campaign"]
-): string => {
+interface CampaignStatusArgs {
+  status_id: number;
+  start_date: string;
+}
+
+export const getCampaignStatus = (campaign: CampaignStatusArgs): string => {
   const now = new Date().getTime();
 
   if (campaign.status_id === 2) {

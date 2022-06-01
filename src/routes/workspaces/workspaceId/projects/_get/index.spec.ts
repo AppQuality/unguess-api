@@ -141,7 +141,7 @@ describe("GET /workspaces/{wid}/projects", () => {
           ],
         });
       } catch (error) {
-        console.log(error);
+        console.error(error);
         reject(error);
       }
 
@@ -154,7 +154,7 @@ describe("GET /workspaces/{wid}/projects", () => {
       try {
         await dbAdapter.drop();
       } catch (error) {
-        console.log(error);
+        console.error(error);
         reject(error);
       }
 

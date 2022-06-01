@@ -140,15 +140,23 @@ export const createCampaign = async (
     close_date: campaign.close_date.toString(),
     title: campaign.title,
     customer_title: campaign.customer_title,
-    status_id: campaign.status_id,
-    status_name: getCampaignStatus(campaign),
     is_public: campaign.is_public,
-    campaign_type_id: campaign.campaign_type_id,
-    campaign_type_name: campaign.campaign_type_name,
-    campaign_family_id: campaign.campaign_family_id,
-    campaign_family_name: campaign_family,
-    project_id: campaign.project_id,
-    project_name: campaign.display_name,
     bug_form: campaign.bug_form,
+    type: {
+      id: campaign.campaign_type_id,
+      name: campaign.campaign_type_name,
+    },
+    status: {
+      id: campaign.status_id,
+      name: getCampaignStatus(campaign),
+    },
+    family: {
+      id: campaign.campaign_family_id,
+      name: campaign_family,
+    },
+    project: {
+      id: campaign.project_id,
+      name: campaign.display_name,
+    },
   };
 };
