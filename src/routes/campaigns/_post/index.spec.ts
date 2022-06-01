@@ -96,7 +96,6 @@ const campaign_1 = {
   campaign_type_id: 1,
   campaign_type: -1,
   project_id: 1,
-  platforms: [AndroidPhoneBody, WindowsPCBody],
 };
 
 const campaign_type_1 = {
@@ -173,6 +172,7 @@ describe("POST /campaigns", () => {
       .set("Authorization", "Bearer customer")
       .send({
         ...campaign_request_1,
+        platforms: [AndroidPhoneBody, WindowsPCBody],
         project_id: 2,
       });
     expect(response.status).toBe(403);
@@ -184,6 +184,7 @@ describe("POST /campaigns", () => {
       .set("Authorization", "Bearer customer")
       .send({
         ...campaign_request_1,
+        platforms: [AndroidPhoneBody, WindowsPCBody],
         project_id: 3,
       });
     expect(response.status).toBe(403);
@@ -195,6 +196,7 @@ describe("POST /campaigns", () => {
       .set("Authorization", "Bearer customer")
       .send({
         ...campaign_request_1,
+        platforms: [AndroidPhoneBody, WindowsPCBody],
       });
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({
