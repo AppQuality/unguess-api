@@ -3,11 +3,10 @@ import getUserFeatures from "@src/features/wp/getUserFeatures";
 import jwt from "jsonwebtoken";
 import { Context, Request } from "openapi-backend";
 import hasher from "wordpress-hash-node";
-
-import config from "../../config";
-import authenticate from "../../features/wp/authenticate";
-import getUserByName from "../../features/wp/getUserByName";
-import { ERROR_MESSAGE } from "../shared";
+import config from "@src/config";
+import authenticate from "@src/features/wp/authenticate";
+import getUserByName from "@src/features/wp/getUserByName";
+import { ERROR_MESSAGE } from "@src/utils/consts";
 
 export default async (c: Context, req: Request, res: OpenapiResponse) => {
   const { username, password } = req.body;

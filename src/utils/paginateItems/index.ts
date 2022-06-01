@@ -5,7 +5,7 @@ type PaginationParams = {
   total: number;
 };
 
-export default async (data: PaginationParams) => {
+export const paginateItems = async (data: PaginationParams) => {
   let { items, limit, start, total } = data;
 
   if (typeof total === "string") {

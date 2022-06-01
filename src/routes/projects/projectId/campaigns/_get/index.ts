@@ -1,17 +1,17 @@
 /** OPENAPI-ROUTE: get-project-campaigns */
 import { Context } from "openapi-backend";
 import * as db from "@src/features/db";
-import getProjectById from "@src/routes/projects/projectId/getProjectById";
+import getProjectById from "@src/utils/getProjectById";
 
-import paginateItems, { formatCount } from "@src/routes/shared/paginateItems";
+import { paginateItems, formatCount } from "@src/utils/paginateItems";
 import {
   ERROR_MESSAGE,
   EXPERIENTIAL_CAMPAIGN_TYPE_ID,
   FUNCTIONAL_CAMPAIGN_TYPE_ID,
-  getCampaignStatus,
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
-} from "@src/routes/shared";
+} from "@src/utils/consts";
+import { getCampaignStatus } from "@src/utils/getCampaignStatus";
 
 export default async (
   c: Context,

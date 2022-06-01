@@ -1,4 +1,4 @@
-import * as db from '../../db';
+import * as db from "@src/features/db";
 
 export default async (userId: number) => {
   const sql = `SELECT u.ID, u.user_login, u.user_pass, u.user_email

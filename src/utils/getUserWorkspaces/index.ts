@@ -1,10 +1,10 @@
-import * as db from "../../../features/db";
-import { getGravatar } from "@src/routes/users/utils";
-import { formatCount } from "@src/routes/shared/paginateItems";
+import * as db from "@src/features/db";
+import { getGravatar } from "@src/utils/getGravatar";
+import { formatCount } from "@src/utils/paginateItems";
 import {
   fallBackCsmProfile,
   START_QUERY_PARAM_DEFAULT,
-} from "@src/routes/shared";
+} from "@src/utils/consts";
 
 interface GetWorkspacesArgs {
   limit?: StoplightComponents["parameters"]["limit"];

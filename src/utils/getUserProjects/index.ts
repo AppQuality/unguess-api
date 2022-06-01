@@ -1,5 +1,5 @@
 import * as db from "@src/features/db";
-import { ERROR_MESSAGE } from "@src/routes/shared";
+import { ERROR_MESSAGE } from "@src/utils/consts";
 
 export default async (
   workspaceId: number,

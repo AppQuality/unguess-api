@@ -1,4 +1,4 @@
-import paginateItems from "@src/routes/shared/paginateItems/index";
+import { paginateItems } from "@src/utils/paginateItems";
 
 const campaign_1 = {
   id: 42,

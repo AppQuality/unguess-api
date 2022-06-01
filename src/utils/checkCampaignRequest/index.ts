@@ -1,6 +1,6 @@
-import { ERROR_MESSAGE, fallBackCsmProfile } from "@src/routes/shared";
-import checkPlatforms from "@src/routes/campaigns/checkPlatform";
-import getCampaignType from "../getCampaignType";
+import { ERROR_MESSAGE, fallBackCsmProfile } from "@src/utils/consts";
+import checkPlatforms from "@src/utils/checkPlatform";
+import getCampaignType from "@src/utils/getCampaignType";
 
 export default async (
   campaign_request: StoplightComponents["requestBodies"]["Campaign"]["content"]["application/json"]

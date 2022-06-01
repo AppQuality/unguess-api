@@ -1,8 +1,8 @@
 /** OPENAPI-ROUTE: get-users-me */
 import { Context } from "openapi-backend";
-import * as db from "../../../../features/db";
-import { getGravatar } from "../../utils";
-import getUserWorkspaces from "@src/routes/workspaces/getUserWorkspaces";
+import * as db from "@src/features/db";
+import { getGravatar } from "@src/utils/getGravatar";
+import getUserWorkspaces from "@src/utils/getUserWorkspaces";
 import getUserFeatures from "@src/features/wp/getUserFeatures";
 
 export default async (
