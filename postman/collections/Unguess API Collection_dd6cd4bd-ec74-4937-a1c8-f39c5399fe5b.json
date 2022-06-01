@@ -1,0 +1,3326 @@
+{
+	"info": {
+		"_postman_id": "ce2d263e-32dd-4e4e-bb26-680e4c52747c",
+		"name": "Unguess API Collection",
+		"description": "An API to get all data for your bugfinding and ux research needs!\n\nContact Support:\n Name: Developers\n Email: it@unguess.io",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "workspaces",
+			"item": [
+				{
+					"name": "{wid}",
+					"item": [
+						{
+							"name": "projects",
+							"item": [
+								{
+									"name": "{pid}",
+									"item": [
+										{
+											"name": "GET Workspace single project",
+											"id": "8db58962-93ff-4a83-b762-a75c8a2e6542",
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "<Bearer Token>",
+															"type": "string"
+														}
+													]
+												},
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/workspaces/:wid/projects/:pid",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"workspaces",
+														":wid",
+														"projects",
+														":pid"
+													],
+													"variable": [
+														{
+															"id": "d0388424-2547-4623-9f3b-c3ad04c5b4e1",
+															"key": "wid",
+															"value": "-48919095.28856031",
+															"description": "(Required) Workspace (company, customer) id"
+														},
+														{
+															"id": "62aa0b52-08ca-4504-b13a-0e456d4606f7",
+															"key": "pid",
+															"value": "-48919095.28856031",
+															"description": "(Required) Project id"
+														}
+													]
+												}
+											},
+											"response": [
+												{
+													"id": "09bbe57f-4e30-4663-be86-afb3868ef13f",
+													"name": "OK",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"description": "Added as a part of security scheme: bearer",
+																"key": "Authorization",
+																"value": "Bearer <token>"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/workspaces/:wid/projects/:pid",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"workspaces",
+																":wid",
+																"projects",
+																":pid"
+															],
+															"variable": [
+																{
+																	"key": "wid",
+																	"value": "-48919095.28856031",
+																	"description": "(Required) Workspace (company, customer) id"
+																},
+																{
+																	"key": "pid",
+																	"value": "-48919095.28856031",
+																	"description": "(Required) Project id"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"responseTime": null,
+													"body": "{\n  \"id\": 64805475,\n  \"name\": \"dolore enim\",\n  \"campaigns_count\": 31681151\n}"
+												},
+												{
+													"id": "9b00634f-3769-43de-9556-8dd3525debd6",
+													"name": "Example response",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"description": "Added as a part of security scheme: bearer",
+																"key": "Authorization",
+																"value": "Bearer <token>"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/workspaces/:wid/projects/:pid",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"workspaces",
+																":wid",
+																"projects",
+																":pid"
+															],
+															"variable": [
+																{
+																	"key": "wid",
+																	"value": "-48919095.28856031",
+																	"description": "(Required) Workspace (company, customer) id"
+																},
+																{
+																	"key": "pid",
+																	"value": "-48919095.28856031",
+																	"description": "(Required) Project id"
+																}
+															]
+														}
+													},
+													"status": "Bad Request",
+													"code": 400,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"responseTime": null,
+													"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+												},
+												{
+													"id": "5088bbab-ba0c-46c7-8b59-f1a043d3c1e5",
+													"name": "Example response",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"description": "Added as a part of security scheme: bearer",
+																"key": "Authorization",
+																"value": "Bearer <token>"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/workspaces/:wid/projects/:pid",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"workspaces",
+																":wid",
+																"projects",
+																":pid"
+															],
+															"variable": [
+																{
+																	"key": "wid",
+																	"value": "-48919095.28856031",
+																	"description": "(Required) Workspace (company, customer) id"
+																},
+																{
+																	"key": "pid",
+																	"value": "-48919095.28856031",
+																	"description": "(Required) Project id"
+																}
+															]
+														}
+													},
+													"status": "Forbidden",
+													"code": 403,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"responseTime": null,
+													"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+												},
+												{
+													"id": "f5b0dc73-c5a8-4cce-8c7b-4a27bf78b3b3",
+													"name": "Example response",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"description": "Added as a part of security scheme: bearer",
+																"key": "Authorization",
+																"value": "Bearer <token>"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/workspaces/:wid/projects/:pid",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"workspaces",
+																":wid",
+																"projects",
+																":pid"
+															],
+															"variable": [
+																{
+																	"key": "wid",
+																	"value": "-48919095.28856031",
+																	"description": "(Required) Workspace (company, customer) id"
+																},
+																{
+																	"key": "pid",
+																	"value": "-48919095.28856031",
+																	"description": "(Required) Project id"
+																}
+															]
+														}
+													},
+													"status": "Not Found",
+													"code": 404,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"responseTime": null,
+													"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+												},
+												{
+													"id": "be1d3c80-7246-4d82-86a6-0e7db06b715a",
+													"name": "Example response",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"description": "Added as a part of security scheme: bearer",
+																"key": "Authorization",
+																"value": "Bearer <token>"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/workspaces/:wid/projects/:pid",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"workspaces",
+																":wid",
+																"projects",
+																":pid"
+															],
+															"variable": [
+																{
+																	"key": "wid",
+																	"value": "-48919095.28856031",
+																	"description": "(Required) Workspace (company, customer) id"
+																},
+																{
+																	"key": "pid",
+																	"value": "-48919095.28856031",
+																	"description": "(Required) Project id"
+																}
+															]
+														}
+													},
+													"status": "Internal Server Error",
+													"code": 500,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"responseTime": null,
+													"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+												}
+											]
+										},
+										{
+											"name": "GET Workspace Project campaigns",
+											"id": "5dc13f49-402d-4aef-bcda-8e1aebf4049e",
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "<Bearer Token>",
+															"type": "string"
+														}
+													]
+												},
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/workspaces/:wid/projects/:pid/campaigns?limit=-48919095.28856031&start=-48919095.28856031",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"workspaces",
+														":wid",
+														"projects",
+														":pid",
+														"campaigns"
+													],
+													"query": [
+														{
+															"key": "limit",
+															"value": "-48919095.28856031",
+															"description": "Limit pagination parameter"
+														},
+														{
+															"key": "start",
+															"value": "-48919095.28856031",
+															"description": "Start pagination parameter"
+														}
+													],
+													"variable": [
+														{
+															"id": "6e87c24d-2f0a-4a7c-a9af-e74b31852bb2",
+															"key": "wid",
+															"value": "-48919095.28856031",
+															"description": "(Required) Workspace (company, customer) id"
+														},
+														{
+															"id": "01633b5b-5363-47c8-a617-1a9e4752fb68",
+															"key": "pid",
+															"value": "-48919095.28856031",
+															"description": "(Required) Project id"
+														}
+													]
+												}
+											},
+											"response": [
+												{
+													"id": "0368570a-c9ac-44d8-92ea-ee4ab4cb0636",
+													"name": "OK",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"description": "Added as a part of security scheme: bearer",
+																"key": "Authorization",
+																"value": "Bearer <token>"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/workspaces/:wid/projects/:pid/campaigns?limit=-48919095.28856031&start=-48919095.28856031",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"workspaces",
+																":wid",
+																"projects",
+																":pid",
+																"campaigns"
+															],
+															"query": [
+																{
+																	"key": "limit",
+																	"value": "-48919095.28856031"
+																},
+																{
+																	"key": "start",
+																	"value": "-48919095.28856031"
+																}
+															],
+															"variable": [
+																{
+																	"key": "wid",
+																	"value": "-48919095.28856031",
+																	"description": "(Required) Workspace (company, customer) id"
+																},
+																{
+																	"key": "pid",
+																	"value": "-48919095.28856031",
+																	"description": "(Required) Project id"
+																}
+															]
+														}
+													},
+													"status": "OK",
+													"code": 200,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"responseTime": null,
+													"body": "{\n  \"items\": [\n    {\n      \"id\": -17734046,\n      \"start_date\": \"Excepteur quis\",\n      \"end_date\": \"eu pariatur deserunt\",\n      \"close_date\": \"tempor culpa\",\n      \"title\": \"incididunt dolor dolor eu amet\",\n      \"customer_title\": \"ad\",\n      \"status_id\": 1783382.251391068,\n      \"status_name\": \"proident ullamco\",\n      \"is_public\": 59633045.76036072,\n      \"campaign_type_id\": -50451804,\n      \"campaign_type_name\": \"do fugiat enim eiusmod\",\n      \"campaign_family_name\": \"Duis tempor magna\",\n      \"project_id\": -64218324,\n      \"project_name\": \"amet minim qui\",\n      \"campaign_family_id\": 39739920,\n      \"bug_form\": -0.9576918518556572\n    },\n    {\n      \"id\": 69330005,\n      \"start_date\": \"Excep\",\n      \"end_date\": \"eu ut amet cupidatat enim\",\n      \"close_date\": \"enim quis amet deserunt cupidatat\",\n      \"title\": \"tempor veniam do\",\n      \"customer_title\": \"magna in in\",\n      \"status_id\": -18901875.712692767,\n      \"status_name\": \"cillum et enim\",\n      \"is_public\": -78904280.31672138,\n      \"campaign_type_id\": 31982767,\n      \"campaign_type_name\": \"Ut in cillum\",\n      \"campaign_family_name\": \"id sed et\",\n      \"project_id\": -40005134,\n      \"project_name\": \"culpa aliqua dolore elit\",\n      \"campaign_family_id\": -1517244,\n      \"bug_form\": -0.5280593203145663\n    }\n  ],\n  \"start\": -70709039,\n  \"limit\": 69325569,\n  \"size\": -42006452,\n  \"total\": 66975822\n}"
+												},
+												{
+													"id": "b6d52c35-1538-4102-869c-821f35b03355",
+													"name": "Example response",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"description": "Added as a part of security scheme: bearer",
+																"key": "Authorization",
+																"value": "Bearer <token>"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/workspaces/:wid/projects/:pid/campaigns?limit=-48919095.28856031&start=-48919095.28856031",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"workspaces",
+																":wid",
+																"projects",
+																":pid",
+																"campaigns"
+															],
+															"query": [
+																{
+																	"key": "limit",
+																	"value": "-48919095.28856031"
+																},
+																{
+																	"key": "start",
+																	"value": "-48919095.28856031"
+																}
+															],
+															"variable": [
+																{
+																	"key": "wid",
+																	"value": "-48919095.28856031",
+																	"description": "(Required) Workspace (company, customer) id"
+																},
+																{
+																	"key": "pid",
+																	"value": "-48919095.28856031",
+																	"description": "(Required) Project id"
+																}
+															]
+														}
+													},
+													"status": "Bad Request",
+													"code": 400,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"responseTime": null,
+													"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+												},
+												{
+													"id": "220869de-1fe5-4f0d-876a-d85969fc2f73",
+													"name": "Example response",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"description": "Added as a part of security scheme: bearer",
+																"key": "Authorization",
+																"value": "Bearer <token>"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/workspaces/:wid/projects/:pid/campaigns?limit=-48919095.28856031&start=-48919095.28856031",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"workspaces",
+																":wid",
+																"projects",
+																":pid",
+																"campaigns"
+															],
+															"query": [
+																{
+																	"key": "limit",
+																	"value": "-48919095.28856031"
+																},
+																{
+																	"key": "start",
+																	"value": "-48919095.28856031"
+																}
+															],
+															"variable": [
+																{
+																	"key": "wid",
+																	"value": "-48919095.28856031",
+																	"description": "(Required) Workspace (company, customer) id"
+																},
+																{
+																	"key": "pid",
+																	"value": "-48919095.28856031",
+																	"description": "(Required) Project id"
+																}
+															]
+														}
+													},
+													"status": "Forbidden",
+													"code": 403,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"responseTime": null,
+													"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+												},
+												{
+													"id": "8d8d2f30-a23f-4597-9200-275f8f965582",
+													"name": "Example response",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"description": "Added as a part of security scheme: bearer",
+																"key": "Authorization",
+																"value": "Bearer <token>"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/workspaces/:wid/projects/:pid/campaigns?limit=-48919095.28856031&start=-48919095.28856031",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"workspaces",
+																":wid",
+																"projects",
+																":pid",
+																"campaigns"
+															],
+															"query": [
+																{
+																	"key": "limit",
+																	"value": "-48919095.28856031"
+																},
+																{
+																	"key": "start",
+																	"value": "-48919095.28856031"
+																}
+															],
+															"variable": [
+																{
+																	"key": "wid",
+																	"value": "-48919095.28856031",
+																	"description": "(Required) Workspace (company, customer) id"
+																},
+																{
+																	"key": "pid",
+																	"value": "-48919095.28856031",
+																	"description": "(Required) Project id"
+																}
+															]
+														}
+													},
+													"status": "Not Found",
+													"code": 404,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"responseTime": null,
+													"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+												},
+												{
+													"id": "b55bc4be-df7c-4ea4-9a91-82efd57f9745",
+													"name": "Example response",
+													"originalRequest": {
+														"method": "GET",
+														"header": [
+															{
+																"description": "Added as a part of security scheme: bearer",
+																"key": "Authorization",
+																"value": "Bearer <token>"
+															}
+														],
+														"url": {
+															"raw": "{{baseUrl}}/workspaces/:wid/projects/:pid/campaigns?limit=-48919095.28856031&start=-48919095.28856031",
+															"host": [
+																"{{baseUrl}}"
+															],
+															"path": [
+																"workspaces",
+																":wid",
+																"projects",
+																":pid",
+																"campaigns"
+															],
+															"query": [
+																{
+																	"key": "limit",
+																	"value": "-48919095.28856031"
+																},
+																{
+																	"key": "start",
+																	"value": "-48919095.28856031"
+																}
+															],
+															"variable": [
+																{
+																	"key": "wid",
+																	"value": "-48919095.28856031",
+																	"description": "(Required) Workspace (company, customer) id"
+																},
+																{
+																	"key": "pid",
+																	"value": "-48919095.28856031",
+																	"description": "(Required) Project id"
+																}
+															]
+														}
+													},
+													"status": "Internal Server Error",
+													"code": 500,
+													"_postman_previewlanguage": "json",
+													"header": [
+														{
+															"key": "Content-Type",
+															"value": "application/json"
+														}
+													],
+													"cookie": [],
+													"responseTime": null,
+													"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+												}
+											]
+										}
+									],
+									"id": "b646eb71-0a9e-42b3-b0f6-ec64cae2682f"
+								},
+								{
+									"name": "GET Workspace Projects",
+									"id": "f425838b-955c-4d0a-96ac-a6a48b5fc650",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "<Bearer Token>",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/workspaces/:wid/projects?limit=-48919095.28856031&start=-48919095.28856031",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"workspaces",
+												":wid",
+												"projects"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "-48919095.28856031",
+													"description": "Limit pagination parameter"
+												},
+												{
+													"key": "start",
+													"value": "-48919095.28856031",
+													"description": "Start pagination parameter"
+												}
+											],
+											"variable": [
+												{
+													"id": "7c3d153a-16ad-487e-9d8d-2c56db790621",
+													"key": "wid",
+													"value": "-48919095.28856031",
+													"description": "(Required) Workspace (company, customer) id"
+												}
+											]
+										}
+									},
+									"response": [
+										{
+											"id": "1aab629c-23c2-403f-ba92-51dc704bdd43",
+											"name": "OK",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"description": "Added as a part of security scheme: bearer",
+														"key": "Authorization",
+														"value": "Bearer <token>"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/workspaces/:wid/projects?limit=-48919095.28856031&start=-48919095.28856031",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"workspaces",
+														":wid",
+														"projects"
+													],
+													"query": [
+														{
+															"key": "limit",
+															"value": "-48919095.28856031"
+														},
+														{
+															"key": "start",
+															"value": "-48919095.28856031"
+														}
+													],
+													"variable": [
+														{
+															"key": "wid",
+															"value": "-48919095.28856031",
+															"description": "(Required) Workspace (company, customer) id"
+														}
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"responseTime": null,
+											"body": "{\n  \"items\": [\n    {\n      \"id\": 90266544,\n      \"name\": \"Duis aliquip irur\",\n      \"campaigns_count\": 72603071\n    },\n    {\n      \"id\": 55456411,\n      \"name\": \"ex quis mollit pariatur\",\n      \"campaigns_count\": -59379903\n    }\n  ],\n  \"start\": 6369658,\n  \"limit\": 75272616,\n  \"size\": 77722546,\n  \"total\": -4131600\n}"
+										},
+										{
+											"id": "cd61d7be-e98f-4ae2-bb6f-7f6228165f52",
+											"name": "Example response",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"description": "Added as a part of security scheme: bearer",
+														"key": "Authorization",
+														"value": "Bearer <token>"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/workspaces/:wid/projects?limit=-48919095.28856031&start=-48919095.28856031",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"workspaces",
+														":wid",
+														"projects"
+													],
+													"query": [
+														{
+															"key": "limit",
+															"value": "-48919095.28856031"
+														},
+														{
+															"key": "start",
+															"value": "-48919095.28856031"
+														}
+													],
+													"variable": [
+														{
+															"key": "wid",
+															"value": "-48919095.28856031",
+															"description": "(Required) Workspace (company, customer) id"
+														}
+													]
+												}
+											},
+											"status": "Bad Request",
+											"code": 400,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"responseTime": null,
+											"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+										},
+										{
+											"id": "6caebf82-677b-47e6-be90-d171add56fb4",
+											"name": "Example response",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"description": "Added as a part of security scheme: bearer",
+														"key": "Authorization",
+														"value": "Bearer <token>"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/workspaces/:wid/projects?limit=-48919095.28856031&start=-48919095.28856031",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"workspaces",
+														":wid",
+														"projects"
+													],
+													"query": [
+														{
+															"key": "limit",
+															"value": "-48919095.28856031"
+														},
+														{
+															"key": "start",
+															"value": "-48919095.28856031"
+														}
+													],
+													"variable": [
+														{
+															"key": "wid",
+															"value": "-48919095.28856031",
+															"description": "(Required) Workspace (company, customer) id"
+														}
+													]
+												}
+											},
+											"status": "Forbidden",
+											"code": 403,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"responseTime": null,
+											"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+										},
+										{
+											"id": "fbe55fc7-837f-4234-aa02-6efac1ad123a",
+											"name": "Example response",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"description": "Added as a part of security scheme: bearer",
+														"key": "Authorization",
+														"value": "Bearer <token>"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/workspaces/:wid/projects?limit=-48919095.28856031&start=-48919095.28856031",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"workspaces",
+														":wid",
+														"projects"
+													],
+													"query": [
+														{
+															"key": "limit",
+															"value": "-48919095.28856031"
+														},
+														{
+															"key": "start",
+															"value": "-48919095.28856031"
+														}
+													],
+													"variable": [
+														{
+															"key": "wid",
+															"value": "-48919095.28856031",
+															"description": "(Required) Workspace (company, customer) id"
+														}
+													]
+												}
+											},
+											"status": "Not Found",
+											"code": 404,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"responseTime": null,
+											"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+										},
+										{
+											"id": "a6e790b6-ed4d-40ea-b23c-dabd6c352eaa",
+											"name": "Example response",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"description": "Added as a part of security scheme: bearer",
+														"key": "Authorization",
+														"value": "Bearer <token>"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}/workspaces/:wid/projects?limit=-48919095.28856031&start=-48919095.28856031",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"workspaces",
+														":wid",
+														"projects"
+													],
+													"query": [
+														{
+															"key": "limit",
+															"value": "-48919095.28856031"
+														},
+														{
+															"key": "start",
+															"value": "-48919095.28856031"
+														}
+													],
+													"variable": [
+														{
+															"key": "wid",
+															"value": "-48919095.28856031",
+															"description": "(Required) Workspace (company, customer) id"
+														}
+													]
+												}
+											},
+											"status": "Internal Server Error",
+											"code": 500,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"responseTime": null,
+											"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+										}
+									]
+								}
+							],
+							"id": "d81b5327-d468-4f48-8af9-03a13a4dea0a"
+						},
+						{
+							"name": "GET single Workspace",
+							"id": "06eff147-a08c-471a-ab90-13c18ce45dc5",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "<Bearer Token>",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/workspaces/:wid",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"workspaces",
+										":wid"
+									],
+									"variable": [
+										{
+											"id": "27376e22-c28e-4675-b3ae-746751548522",
+											"key": "wid",
+											"value": "-48919095.28856031",
+											"description": "(Required) Workspace (company, customer) id"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"id": "39848d3d-7afc-4b0c-9c14-7ca5f54f4538",
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"description": "Added as a part of security scheme: bearer",
+												"key": "Authorization",
+												"value": "Bearer <token>"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/workspaces/:wid",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"workspaces",
+												":wid"
+											],
+											"variable": [
+												{
+													"key": "wid",
+													"value": "-48919095.28856031",
+													"description": "(Required) Workspace (company, customer) id"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"responseTime": null,
+									"body": "{\n  \"id\": 16825981,\n  \"company\": \"dolor sit labore\",\n  \"tokens\": -10512967.84977755,\n  \"csm\": {\n    \"id\": 6848744,\n    \"email\": \"tempor deserunt\",\n    \"name\": \"enim officia sed\",\n    \"profile_id\": 29101319,\n    \"tryber_wp_user_id\": 76893017,\n    \"picture\": \"qui velit est sunt\"\n  },\n  \"logo\": \"irure\"\n}"
+								},
+								{
+									"id": "48db6c80-d2c3-4551-8e0f-064fc57e18d3",
+									"name": "Example response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"description": "Added as a part of security scheme: bearer",
+												"key": "Authorization",
+												"value": "Bearer <token>"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/workspaces/:wid",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"workspaces",
+												":wid"
+											],
+											"variable": [
+												{
+													"key": "wid",
+													"value": "-48919095.28856031",
+													"description": "(Required) Workspace (company, customer) id"
+												}
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"responseTime": null,
+									"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+								},
+								{
+									"id": "bec6abb9-bc4d-4611-bd8f-caeeb340202b",
+									"name": "Example response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"description": "Added as a part of security scheme: bearer",
+												"key": "Authorization",
+												"value": "Bearer <token>"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/workspaces/:wid",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"workspaces",
+												":wid"
+											],
+											"variable": [
+												{
+													"key": "wid",
+													"value": "-48919095.28856031",
+													"description": "(Required) Workspace (company, customer) id"
+												}
+											]
+										}
+									},
+									"status": "Forbidden",
+									"code": 403,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"responseTime": null,
+									"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+								},
+								{
+									"id": "47bb0854-bfc9-44ba-b5d2-58c23341d329",
+									"name": "Example response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"description": "Added as a part of security scheme: bearer",
+												"key": "Authorization",
+												"value": "Bearer <token>"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/workspaces/:wid",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"workspaces",
+												":wid"
+											],
+											"variable": [
+												{
+													"key": "wid",
+													"value": "-48919095.28856031",
+													"description": "(Required) Workspace (company, customer) id"
+												}
+											]
+										}
+									},
+									"status": "Not Found",
+									"code": 404,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"responseTime": null,
+									"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+								},
+								{
+									"id": "62308c6f-ca65-4f09-aaa1-ecd21f6fdaff",
+									"name": "Example response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"description": "Added as a part of security scheme: bearer",
+												"key": "Authorization",
+												"value": "Bearer <token>"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/workspaces/:wid",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"workspaces",
+												":wid"
+											],
+											"variable": [
+												{
+													"key": "wid",
+													"value": "-48919095.28856031",
+													"description": "(Required) Workspace (company, customer) id"
+												}
+											]
+										}
+									},
+									"status": "Internal Server Error",
+									"code": 500,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"responseTime": null,
+									"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+								}
+							]
+						},
+						{
+							"name": "GET Workspace campaigns",
+							"id": "39247921-46be-42e7-88fe-8c59c0bceba5",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "<Bearer Token>",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/workspaces/:wid/campaigns?limit=-48919095.28856031&start=-48919095.28856031&order=id&orderBy=id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"workspaces",
+										":wid",
+										"campaigns"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "-48919095.28856031",
+											"description": "Limit pagination parameter"
+										},
+										{
+											"key": "start",
+											"value": "-48919095.28856031",
+											"description": "Start pagination parameter"
+										},
+										{
+											"key": "order",
+											"value": "id",
+											"description": "Order value (ASC, DESC)"
+										},
+										{
+											"key": "orderBy",
+											"value": "id",
+											"description": "Order by accepted field"
+										}
+									],
+									"variable": [
+										{
+											"id": "994a1abb-c320-4e28-986f-01e677d0e454",
+											"key": "wid",
+											"value": "-48919095.28856031",
+											"description": "(Required) Workspace (company, customer) id"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"id": "3d9e7d0c-969d-4fdc-9a9d-5ad7610bd791",
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"description": "Added as a part of security scheme: bearer",
+												"key": "Authorization",
+												"value": "Bearer <token>"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/workspaces/:wid/campaigns?limit=-48919095.28856031&start=-48919095.28856031&order=id&orderBy=id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"workspaces",
+												":wid",
+												"campaigns"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "-48919095.28856031"
+												},
+												{
+													"key": "start",
+													"value": "-48919095.28856031"
+												},
+												{
+													"key": "order",
+													"value": "id"
+												},
+												{
+													"key": "orderBy",
+													"value": "id"
+												}
+											],
+											"variable": [
+												{
+													"key": "wid",
+													"value": "-48919095.28856031",
+													"description": "(Required) Workspace (company, customer) id"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"responseTime": null,
+									"body": "{\n  \"items\": [\n    {\n      \"id\": -17734046,\n      \"start_date\": \"Excepteur quis\",\n      \"end_date\": \"eu pariatur deserunt\",\n      \"close_date\": \"tempor culpa\",\n      \"title\": \"incididunt dolor dolor eu amet\",\n      \"customer_title\": \"ad\",\n      \"status_id\": 1783382.251391068,\n      \"status_name\": \"proident ullamco\",\n      \"is_public\": 59633045.76036072,\n      \"campaign_type_id\": -50451804,\n      \"campaign_type_name\": \"do fugiat enim eiusmod\",\n      \"campaign_family_name\": \"Duis tempor magna\",\n      \"project_id\": -64218324,\n      \"project_name\": \"amet minim qui\",\n      \"campaign_family_id\": 39739920,\n      \"bug_form\": -0.9576918518556572\n    },\n    {\n      \"id\": 69330005,\n      \"start_date\": \"Excep\",\n      \"end_date\": \"eu ut amet cupidatat enim\",\n      \"close_date\": \"enim quis amet deserunt cupidatat\",\n      \"title\": \"tempor veniam do\",\n      \"customer_title\": \"magna in in\",\n      \"status_id\": -18901875.712692767,\n      \"status_name\": \"cillum et enim\",\n      \"is_public\": -78904280.31672138,\n      \"campaign_type_id\": 31982767,\n      \"campaign_type_name\": \"Ut in cillum\",\n      \"campaign_family_name\": \"id sed et\",\n      \"project_id\": -40005134,\n      \"project_name\": \"culpa aliqua dolore elit\",\n      \"campaign_family_id\": -1517244,\n      \"bug_form\": -0.5280593203145663\n    }\n  ],\n  \"start\": -70709039,\n  \"limit\": 69325569,\n  \"size\": -42006452,\n  \"total\": 66975822\n}"
+								},
+								{
+									"id": "df375e45-a058-4b72-80b9-b0e899a11597",
+									"name": "Example response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"description": "Added as a part of security scheme: bearer",
+												"key": "Authorization",
+												"value": "Bearer <token>"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/workspaces/:wid/campaigns?limit=-48919095.28856031&start=-48919095.28856031&order=id&orderBy=id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"workspaces",
+												":wid",
+												"campaigns"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "-48919095.28856031"
+												},
+												{
+													"key": "start",
+													"value": "-48919095.28856031"
+												},
+												{
+													"key": "order",
+													"value": "id"
+												},
+												{
+													"key": "orderBy",
+													"value": "id"
+												}
+											],
+											"variable": [
+												{
+													"key": "wid",
+													"value": "-48919095.28856031",
+													"description": "(Required) Workspace (company, customer) id"
+												}
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"responseTime": null,
+									"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+								},
+								{
+									"id": "2208b5c5-7ccc-4bb3-94f2-0cef934666f5",
+									"name": "Example response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"description": "Added as a part of security scheme: bearer",
+												"key": "Authorization",
+												"value": "Bearer <token>"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/workspaces/:wid/campaigns?limit=-48919095.28856031&start=-48919095.28856031&order=id&orderBy=id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"workspaces",
+												":wid",
+												"campaigns"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "-48919095.28856031"
+												},
+												{
+													"key": "start",
+													"value": "-48919095.28856031"
+												},
+												{
+													"key": "order",
+													"value": "id"
+												},
+												{
+													"key": "orderBy",
+													"value": "id"
+												}
+											],
+											"variable": [
+												{
+													"key": "wid",
+													"value": "-48919095.28856031",
+													"description": "(Required) Workspace (company, customer) id"
+												}
+											]
+										}
+									},
+									"status": "Forbidden",
+									"code": 403,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"responseTime": null,
+									"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+								},
+								{
+									"id": "eddf84d6-c1d7-439f-8834-461ab9ac7e31",
+									"name": "Example response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"description": "Added as a part of security scheme: bearer",
+												"key": "Authorization",
+												"value": "Bearer <token>"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/workspaces/:wid/campaigns?limit=-48919095.28856031&start=-48919095.28856031&order=id&orderBy=id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"workspaces",
+												":wid",
+												"campaigns"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "-48919095.28856031"
+												},
+												{
+													"key": "start",
+													"value": "-48919095.28856031"
+												},
+												{
+													"key": "order",
+													"value": "id"
+												},
+												{
+													"key": "orderBy",
+													"value": "id"
+												}
+											],
+											"variable": [
+												{
+													"key": "wid",
+													"value": "-48919095.28856031",
+													"description": "(Required) Workspace (company, customer) id"
+												}
+											]
+										}
+									},
+									"status": "Not Found",
+									"code": 404,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"responseTime": null,
+									"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+								},
+								{
+									"id": "64d25f20-e954-4b14-9fc1-d4c47a721bd2",
+									"name": "Example response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"description": "Added as a part of security scheme: bearer",
+												"key": "Authorization",
+												"value": "Bearer <token>"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/workspaces/:wid/campaigns?limit=-48919095.28856031&start=-48919095.28856031&order=id&orderBy=id",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"workspaces",
+												":wid",
+												"campaigns"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "-48919095.28856031"
+												},
+												{
+													"key": "start",
+													"value": "-48919095.28856031"
+												},
+												{
+													"key": "order",
+													"value": "id"
+												},
+												{
+													"key": "orderBy",
+													"value": "id"
+												}
+											],
+											"variable": [
+												{
+													"key": "wid",
+													"value": "-48919095.28856031",
+													"description": "(Required) Workspace (company, customer) id"
+												}
+											]
+										}
+									},
+									"status": "Internal Server Error",
+									"code": 500,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"responseTime": null,
+									"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+								}
+							]
+						}
+					],
+					"id": "7ca5207f-d2b9-4614-b7be-3688382294a1"
+				},
+				{
+					"name": "Get User Workspaces",
+					"id": "d94f9a4b-7a15-4779-bf19-30beef1ce024",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "<Bearer Token>",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/workspaces?limit=-48919095.28856031&start=-48919095.28856031",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"workspaces"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "-48919095.28856031",
+									"description": "Limit pagination parameter"
+								},
+								{
+									"key": "start",
+									"value": "-48919095.28856031",
+									"description": "Start pagination parameter"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"id": "e00ffba2-2d42-4983-bf7e-a21037c1e827",
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"description": "Added as a part of security scheme: bearer",
+										"key": "Authorization",
+										"value": "Bearer <token>"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/workspaces?limit=-48919095.28856031&start=-48919095.28856031",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"workspaces"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "-48919095.28856031"
+										},
+										{
+											"key": "start",
+											"value": "-48919095.28856031"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"responseTime": null,
+							"body": "{\n  \"items\": [\n    {\n      \"id\": 10602321,\n      \"company\": \"dolor ut\",\n      \"tokens\": -75005729.1139731,\n      \"csm\": {\n        \"id\": 98544179,\n        \"email\": \"ipsum sunt irure magna\",\n        \"name\": \"ex labore\",\n        \"profile_id\": 51579031,\n        \"tryber_wp_user_id\": -29556783,\n        \"picture\": \"sed id esse\"\n      },\n      \"logo\": \"sit occaecat\"\n    },\n    {\n      \"id\": -16523838,\n      \"company\": \"exercitation dolore do reprehenderit\",\n      \"tokens\": 50072366.77310777,\n      \"csm\": {\n        \"id\": 61863132,\n        \"email\": \"dolor Duis sunt amet anim\",\n        \"name\": \"et ex incididunt nisi\",\n        \"profile_id\": -78542336,\n        \"tryber_wp_user_id\": 11498053,\n        \"picture\": \"elit\"\n      },\n      \"logo\": \"in nulla enim\"\n    }\n  ],\n  \"start\": -49817497,\n  \"limit\": 97623650,\n  \"size\": 73991674,\n  \"total\": -13351644\n}"
+						},
+						{
+							"id": "49a96eb4-930a-49c1-b1fc-a2925afa5d5e",
+							"name": "Example response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"description": "Added as a part of security scheme: bearer",
+										"key": "Authorization",
+										"value": "Bearer <token>"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/workspaces?limit=-48919095.28856031&start=-48919095.28856031",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"workspaces"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "-48919095.28856031"
+										},
+										{
+											"key": "start",
+											"value": "-48919095.28856031"
+										}
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"responseTime": null,
+							"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+						},
+						{
+							"id": "51f05fff-2713-455a-bfe2-334f6a3db8ee",
+							"name": "Example response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"description": "Added as a part of security scheme: bearer",
+										"key": "Authorization",
+										"value": "Bearer <token>"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/workspaces?limit=-48919095.28856031&start=-48919095.28856031",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"workspaces"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "-48919095.28856031"
+										},
+										{
+											"key": "start",
+											"value": "-48919095.28856031"
+										}
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"responseTime": null,
+							"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+						},
+						{
+							"id": "2d2c75de-7eab-4db9-a400-8287cb2f344a",
+							"name": "Example response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"description": "Added as a part of security scheme: bearer",
+										"key": "Authorization",
+										"value": "Bearer <token>"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/workspaces?limit=-48919095.28856031&start=-48919095.28856031",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"workspaces"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "-48919095.28856031"
+										},
+										{
+											"key": "start",
+											"value": "-48919095.28856031"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"responseTime": null,
+							"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+						},
+						{
+							"id": "8a3544c1-157c-4a44-9611-ed9e1c3d3d74",
+							"name": "Example response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"description": "Added as a part of security scheme: bearer",
+										"key": "Authorization",
+										"value": "Bearer <token>"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/workspaces?limit=-48919095.28856031&start=-48919095.28856031",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"workspaces"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "-48919095.28856031"
+										},
+										{
+											"key": "start",
+											"value": "-48919095.28856031"
+										}
+									]
+								}
+							},
+							"status": "Internal Server Error",
+							"code": 500,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"responseTime": null,
+							"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+						}
+					]
+				}
+			],
+			"id": "f31684be-ea9b-4feb-ba27-0140574822d8"
+		},
+		{
+			"name": "projects",
+			"item": [
+				{
+					"name": "{pid}",
+					"item": [
+						{
+							"name": "Get single project by ID",
+							"id": "f3fa0ace-4118-4a7d-80b2-8505a4ade619",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "<Bearer Token>",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/projects/:pid",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"projects",
+										":pid"
+									],
+									"variable": [
+										{
+											"id": "aa11a677-4da9-454c-b298-3a5bbeccfa36",
+											"key": "pid",
+											"value": "-48919095.28856031",
+											"description": "(Required) Project id"
+										}
+									]
+								},
+								"description": "Retrieve projects details from an ID."
+							},
+							"response": [
+								{
+									"id": "f2ee5cfd-e445-41b5-a514-08b899459354",
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"description": "Added as a part of security scheme: bearer",
+												"key": "Authorization",
+												"value": "Bearer <token>"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/projects/:pid",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												":pid"
+											],
+											"variable": [
+												{
+													"key": "pid",
+													"value": "-48919095.28856031",
+													"description": "(Required) Project id"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"responseTime": null,
+									"body": "{\n  \"id\": 64805475,\n  \"name\": \"dolore enim\",\n  \"campaigns_count\": 31681151\n}"
+								},
+								{
+									"id": "d086338b-82b8-4af7-a5c9-dd8964ea93a6",
+									"name": "Example response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"description": "Added as a part of security scheme: bearer",
+												"key": "Authorization",
+												"value": "Bearer <token>"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/projects/:pid",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												":pid"
+											],
+											"variable": [
+												{
+													"key": "pid",
+													"value": "-48919095.28856031",
+													"description": "(Required) Project id"
+												}
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"responseTime": null,
+									"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+								},
+								{
+									"id": "7c85b8e6-d3b4-4752-ab29-b2e3c71a9e65",
+									"name": "Example response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"description": "Added as a part of security scheme: bearer",
+												"key": "Authorization",
+												"value": "Bearer <token>"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/projects/:pid",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												":pid"
+											],
+											"variable": [
+												{
+													"key": "pid",
+													"value": "-48919095.28856031",
+													"description": "(Required) Project id"
+												}
+											]
+										}
+									},
+									"status": "Forbidden",
+									"code": 403,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"responseTime": null,
+									"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+								},
+								{
+									"id": "6d8962d3-afdb-42b9-9b28-5c4dc575d6db",
+									"name": "Example response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"description": "Added as a part of security scheme: bearer",
+												"key": "Authorization",
+												"value": "Bearer <token>"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/projects/:pid",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												":pid"
+											],
+											"variable": [
+												{
+													"key": "pid",
+													"value": "-48919095.28856031",
+													"description": "(Required) Project id"
+												}
+											]
+										}
+									},
+									"status": "Internal Server Error",
+									"code": 500,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"responseTime": null,
+									"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+								}
+							]
+						},
+						{
+							"name": "GET Project campaigns",
+							"id": "fe5fc6fd-adbc-4dda-92bc-c42d76e61b04",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "<Bearer Token>",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/projects/:pid/campaigns?limit=-48919095.28856031&start=-48919095.28856031",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"projects",
+										":pid",
+										"campaigns"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "-48919095.28856031",
+											"description": "Limit pagination parameter"
+										},
+										{
+											"key": "start",
+											"value": "-48919095.28856031",
+											"description": "Start pagination parameter"
+										}
+									],
+									"variable": [
+										{
+											"id": "8535df96-0e19-4540-9036-037769ca3213",
+											"key": "pid",
+											"value": "-48919095.28856031",
+											"description": "(Required) Project id"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"id": "0eb1ed25-c254-496b-9b1e-7649039ddd2c",
+									"name": "OK",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"description": "Added as a part of security scheme: bearer",
+												"key": "Authorization",
+												"value": "Bearer <token>"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/projects/:pid/campaigns?limit=-48919095.28856031&start=-48919095.28856031",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												":pid",
+												"campaigns"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "-48919095.28856031"
+												},
+												{
+													"key": "start",
+													"value": "-48919095.28856031"
+												}
+											],
+											"variable": [
+												{
+													"key": "pid",
+													"value": "-48919095.28856031",
+													"description": "(Required) Project id"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"responseTime": null,
+									"body": "{\n  \"items\": [\n    {\n      \"id\": -17734046,\n      \"start_date\": \"Excepteur quis\",\n      \"end_date\": \"eu pariatur deserunt\",\n      \"close_date\": \"tempor culpa\",\n      \"title\": \"incididunt dolor dolor eu amet\",\n      \"customer_title\": \"ad\",\n      \"status_id\": 1783382.251391068,\n      \"status_name\": \"proident ullamco\",\n      \"is_public\": 59633045.76036072,\n      \"campaign_type_id\": -50451804,\n      \"campaign_type_name\": \"do fugiat enim eiusmod\",\n      \"campaign_family_name\": \"Duis tempor magna\",\n      \"project_id\": -64218324,\n      \"project_name\": \"amet minim qui\",\n      \"campaign_family_id\": 39739920,\n      \"bug_form\": -0.9576918518556572\n    },\n    {\n      \"id\": 69330005,\n      \"start_date\": \"Excep\",\n      \"end_date\": \"eu ut amet cupidatat enim\",\n      \"close_date\": \"enim quis amet deserunt cupidatat\",\n      \"title\": \"tempor veniam do\",\n      \"customer_title\": \"magna in in\",\n      \"status_id\": -18901875.712692767,\n      \"status_name\": \"cillum et enim\",\n      \"is_public\": -78904280.31672138,\n      \"campaign_type_id\": 31982767,\n      \"campaign_type_name\": \"Ut in cillum\",\n      \"campaign_family_name\": \"id sed et\",\n      \"project_id\": -40005134,\n      \"project_name\": \"culpa aliqua dolore elit\",\n      \"campaign_family_id\": -1517244,\n      \"bug_form\": -0.5280593203145663\n    }\n  ],\n  \"start\": -70709039,\n  \"limit\": 69325569,\n  \"size\": -42006452,\n  \"total\": 66975822\n}"
+								},
+								{
+									"id": "7c328d9c-e69a-47d1-863f-d6724adc68a3",
+									"name": "Example response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"description": "Added as a part of security scheme: bearer",
+												"key": "Authorization",
+												"value": "Bearer <token>"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/projects/:pid/campaigns?limit=-48919095.28856031&start=-48919095.28856031",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												":pid",
+												"campaigns"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "-48919095.28856031"
+												},
+												{
+													"key": "start",
+													"value": "-48919095.28856031"
+												}
+											],
+											"variable": [
+												{
+													"key": "pid",
+													"value": "-48919095.28856031",
+													"description": "(Required) Project id"
+												}
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"responseTime": null,
+									"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+								},
+								{
+									"id": "3c9dd9a0-2a9d-4d0a-93c4-b8554561fb60",
+									"name": "Unauthorized",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"description": "Added as a part of security scheme: bearer",
+												"key": "Authorization",
+												"value": "Bearer <token>"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/projects/:pid/campaigns?limit=-48919095.28856031&start=-48919095.28856031",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												":pid",
+												"campaigns"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "-48919095.28856031"
+												},
+												{
+													"key": "start",
+													"value": "-48919095.28856031"
+												}
+											],
+											"variable": [
+												{
+													"key": "pid",
+													"value": "-48919095.28856031",
+													"description": "(Required) Project id"
+												}
+											]
+										}
+									},
+									"status": "Unauthorized",
+									"code": 401,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"responseTime": null,
+									"body": "{\n  \"items\": [\n    {\n      \"id\": -17734046,\n      \"start_date\": \"Excepteur quis\",\n      \"end_date\": \"eu pariatur deserunt\",\n      \"close_date\": \"tempor culpa\",\n      \"title\": \"incididunt dolor dolor eu amet\",\n      \"customer_title\": \"ad\",\n      \"status_id\": 1783382.251391068,\n      \"status_name\": \"proident ullamco\",\n      \"is_public\": 59633045.76036072,\n      \"campaign_type_id\": -50451804,\n      \"campaign_type_name\": \"do fugiat enim eiusmod\",\n      \"campaign_family_name\": \"Duis tempor magna\",\n      \"project_id\": -64218324,\n      \"project_name\": \"amet minim qui\",\n      \"campaign_family_id\": 39739920,\n      \"bug_form\": -0.9576918518556572\n    },\n    {\n      \"id\": 69330005,\n      \"start_date\": \"Excep\",\n      \"end_date\": \"eu ut amet cupidatat enim\",\n      \"close_date\": \"enim quis amet deserunt cupidatat\",\n      \"title\": \"tempor veniam do\",\n      \"customer_title\": \"magna in in\",\n      \"status_id\": -18901875.712692767,\n      \"status_name\": \"cillum et enim\",\n      \"is_public\": -78904280.31672138,\n      \"campaign_type_id\": 31982767,\n      \"campaign_type_name\": \"Ut in cillum\",\n      \"campaign_family_name\": \"id sed et\",\n      \"project_id\": -40005134,\n      \"project_name\": \"culpa aliqua dolore elit\",\n      \"campaign_family_id\": -1517244,\n      \"bug_form\": -0.5280593203145663\n    }\n  ],\n  \"start\": -70709039,\n  \"limit\": 69325569,\n  \"size\": -42006452,\n  \"total\": 66975822\n}"
+								},
+								{
+									"id": "70b01504-10b4-4e0b-a04b-db44ccae0e20",
+									"name": "Example response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"description": "Added as a part of security scheme: bearer",
+												"key": "Authorization",
+												"value": "Bearer <token>"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/projects/:pid/campaigns?limit=-48919095.28856031&start=-48919095.28856031",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												":pid",
+												"campaigns"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "-48919095.28856031"
+												},
+												{
+													"key": "start",
+													"value": "-48919095.28856031"
+												}
+											],
+											"variable": [
+												{
+													"key": "pid",
+													"value": "-48919095.28856031",
+													"description": "(Required) Project id"
+												}
+											]
+										}
+									},
+									"status": "Forbidden",
+									"code": 403,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"responseTime": null,
+									"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+								},
+								{
+									"id": "05879fe8-3e8e-495b-96ea-44aefe8511f9",
+									"name": "Example response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"description": "Added as a part of security scheme: bearer",
+												"key": "Authorization",
+												"value": "Bearer <token>"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/projects/:pid/campaigns?limit=-48919095.28856031&start=-48919095.28856031",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												":pid",
+												"campaigns"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "-48919095.28856031"
+												},
+												{
+													"key": "start",
+													"value": "-48919095.28856031"
+												}
+											],
+											"variable": [
+												{
+													"key": "pid",
+													"value": "-48919095.28856031",
+													"description": "(Required) Project id"
+												}
+											]
+										}
+									},
+									"status": "Not Found",
+									"code": 404,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"responseTime": null,
+									"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+								},
+								{
+									"id": "e971aa13-7345-4c53-ba12-13c119d6b18e",
+									"name": "Example response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"description": "Added as a part of security scheme: bearer",
+												"key": "Authorization",
+												"value": "Bearer <token>"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/projects/:pid/campaigns?limit=-48919095.28856031&start=-48919095.28856031",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												":pid",
+												"campaigns"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "-48919095.28856031"
+												},
+												{
+													"key": "start",
+													"value": "-48919095.28856031"
+												}
+											],
+											"variable": [
+												{
+													"key": "pid",
+													"value": "-48919095.28856031",
+													"description": "(Required) Project id"
+												}
+											]
+										}
+									},
+									"status": "Internal Server Error",
+									"code": 500,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										}
+									],
+									"cookie": [],
+									"responseTime": null,
+									"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+								}
+							]
+						}
+					],
+					"id": "a9cd68b2-0a82-4938-bbf8-92176f0817ea"
+				},
+				{
+					"name": "post-projects",
+					"id": "2513727c-c706-449e-a91d-eb2d13590bb8",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "<Bearer Token>",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Excepteur voluptate\",\n  \"customer_id\": -56839944\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/projects",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"projects"
+							]
+						}
+					},
+					"response": [
+						{
+							"id": "104e0f4e-bb11-48af-b1ac-b01b9b092026",
+							"name": "OK",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"description": "Added as a part of security scheme: bearer",
+										"key": "Authorization",
+										"value": "Bearer <token>"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/projects",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"projects"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"responseTime": null,
+							"body": "{\n  \"id\": 64805475,\n  \"name\": \"dolore enim\",\n  \"campaigns_count\": 31681151\n}"
+						},
+						{
+							"id": "259741e0-217a-4203-a86d-3f589d7ac48c",
+							"name": "Example response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"description": "Added as a part of security scheme: bearer",
+										"key": "Authorization",
+										"value": "Bearer <token>"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/projects",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"projects"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"responseTime": null,
+							"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+						},
+						{
+							"id": "e055662c-4550-4061-907c-0f1462b4ddeb",
+							"name": "Example response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"description": "Added as a part of security scheme: bearer",
+										"key": "Authorization",
+										"value": "Bearer <token>"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/projects",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"projects"
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"responseTime": null,
+							"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+						},
+						{
+							"id": "a01eb9b3-b9c8-4e25-8d27-3d030def97e0",
+							"name": "Example response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"description": "Added as a part of security scheme: bearer",
+										"key": "Authorization",
+										"value": "Bearer <token>"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/projects",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"projects"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"responseTime": null,
+							"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+						},
+						{
+							"id": "fc57ac54-c560-4c07-bece-ad68d37b913d",
+							"name": "Example response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"description": "Added as a part of security scheme: bearer",
+										"key": "Authorization",
+										"value": "Bearer <token>"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/projects",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"projects"
+									]
+								}
+							},
+							"status": "Internal Server Error",
+							"code": 500,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"responseTime": null,
+							"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+						}
+					]
+				}
+			],
+			"id": "5327989b-6ab6-4b70-ba66-9bdfb0a057a2"
+		},
+		{
+			"name": "Get API description",
+			"id": "287cb0c9-d9c7-4cb4-95bb-e26275294da9",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						""
+					]
+				},
+				"description": "Get all routes available for this apis"
+			},
+			"response": [
+				{
+					"id": "dc61dc2e-a80b-4271-b53a-d2068d2dfedf",
+					"name": "OK",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"responseTime": null,
+					"body": "{}"
+				},
+				{
+					"id": "8342c354-e508-4267-8e5e-1c3629b1e86b",
+					"name": "Example response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"status": "Internal Server Error",
+					"code": 500,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"responseTime": null,
+					"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+				}
+			]
+		},
+		{
+			"name": "Authenticate to the API",
+			"id": "c141a809-1948-4ee6-9710-4ce0884c58d6",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"eu veniam in sunt cillum\",\n  \"password\": \"adipisicing nostrud est amet\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/authenticate",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"authenticate"
+					]
+				},
+				"description": "A request to login with your username and password"
+			},
+			"response": [
+				{
+					"id": "2c240b5d-4175-4d60-b096-088bc8df18b6",
+					"name": "OK",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/authenticate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"authenticate"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"responseTime": null,
+					"body": "{\n  \"id\": 97745281,\n  \"email\": \"oYNnMC@aLffCpgRLOMsPFoCi.bpt\",\n  \"role\": \"ullamco do\",\n  \"name\": \"labore nisi dolore\",\n  \"token\": \"minim ipsum fugiat\",\n  \"picture\": \"cupidatat in minim exercitation\",\n  \"iat\": -24957587.536061436,\n  \"exp\": -33009072.81011507\n}"
+				},
+				{
+					"id": "6cda9b34-4cad-4931-96c3-bc474c5462a7",
+					"name": "Example response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/authenticate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"authenticate"
+							]
+						}
+					},
+					"status": "Internal Server Error",
+					"code": 500,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"responseTime": null,
+					"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+				}
+			]
+		},
+		{
+			"name": "Get user data",
+			"id": "338ecfc2-e7d4-4247-8db8-2d2a3b1cdf59",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "<Bearer Token>",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/users/me",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users",
+						"me"
+					]
+				}
+			},
+			"response": [
+				{
+					"id": "5928b4b3-3de5-4b8c-80a7-d5f2ab9abbc8",
+					"name": "response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"description": "Added as a part of security scheme: bearer",
+								"key": "Authorization",
+								"value": "Bearer <token>"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/users/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"me"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"responseTime": null,
+					"body": "{\n  \"id\": -83619659,\n  \"email\": \"IJhUJSsp0A@P.hk\",\n  \"role\": \"anim nostrud in labore et\",\n  \"name\": \"quis dolor\",\n  \"workspaces\": [\n    {\n      \"id\": 70575516,\n      \"company\": \"exercitation ea\",\n      \"tokens\": -98447777.09272932,\n      \"csm\": {\n        \"id\": 76905801,\n        \"email\": \"laboris cillum\",\n        \"name\": \"ut in anim do esse\",\n        \"profile_id\": -16680869,\n        \"tryber_wp_user_id\": -41559528,\n        \"picture\": \"eiusmod id pariatur laborum occaecat\"\n      },\n      \"logo\": \"nulla ex quis velit\"\n    },\n    {\n      \"id\": 11529654,\n      \"company\": \"dolore elit laboris sunt\",\n      \"tokens\": 63074029.88472104,\n      \"csm\": {\n        \"id\": 6683644,\n        \"email\": \"cupidatat occaecat amet labore ut\",\n        \"name\": \"tempor nostru\",\n        \"profile_id\": 92672448,\n        \"tryber_wp_user_id\": -67992616,\n        \"picture\": \"dolor occaecat pariatur irure Duis\"\n      },\n      \"logo\": \"nisi consectetur voluptate dolor\"\n    }\n  ],\n  \"profile_id\": 22476608,\n  \"tryber_wp_user_id\": 61836229,\n  \"unguess_wp_user_id\": 67102461,\n  \"picture\": \"irure cillum\",\n  \"features\": [\n    {\n      \"slug\": \"laboris esse commodo adipisicing ex\",\n      \"name\": \"commodo Duis cillum est\"\n    },\n    {\n      \"slug\": \"laborum magna\",\n      \"name\": \"adipisicing pariatur culpa anim\"\n    }\n  ]\n}"
+				},
+				{
+					"id": "e7e05f8b-2f22-4545-90c0-8240fdb3a662",
+					"name": "Example response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"description": "Added as a part of security scheme: bearer",
+								"key": "Authorization",
+								"value": "Bearer <token>"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/users/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"me"
+							]
+						}
+					},
+					"status": "Forbidden",
+					"code": 403,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"responseTime": null,
+					"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+				},
+				{
+					"id": "55681509-c3d8-43a4-82fb-f15b485309cf",
+					"name": "Example response",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"description": "Added as a part of security scheme: bearer",
+								"key": "Authorization",
+								"value": "Bearer <token>"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/users/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"me"
+							]
+						}
+					},
+					"status": "Internal Server Error",
+					"code": 500,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"responseTime": null,
+					"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+				}
+			]
+		},
+		{
+			"name": "Create campaign",
+			"id": "9c68e3e6-5a80-4210-9c9d-81642e41e383",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "<Bearer Token>",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"title\": \"incididunt\",\n  \"start_date\": \"eiusmod sint ut repreh\",\n  \"end_date\": \"cupidatat enim incididunt dolore ex\",\n  \"close_date\": \"fugiat culpa\",\n  \"campaign_type_id\": 82655285,\n  \"project_id\": 62078455,\n  \"pm_id\": 36752218,\n  \"customer_title\": \"cillum Duis magna ad ipsum\",\n  \"status_id\": 71333563,\n  \"is_public\": 0,\n  \"platforms\": [\n    {\n      \"id\": 33317528,\n      \"deviceType\": -19741687\n    },\n    {\n      \"id\": -77513451,\n      \"deviceType\": 69492380\n    }\n  ],\n  \"page_preview_id\": 32675778,\n  \"page_manual_id\": -85336582,\n  \"customer_id\": 76573896,\n  \"has_bug_form\": 0,\n  \"has_bug_parade\": 0\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/campaigns",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"campaigns"
+					]
+				}
+			},
+			"response": [
+				{
+					"id": "816e20ee-16b2-45a9-bff3-543718cdfc28",
+					"name": "OK",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"description": "Added as a part of security scheme: bearer",
+								"key": "Authorization",
+								"value": "Bearer <token>"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/campaigns",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"campaigns"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"responseTime": null,
+					"body": "{\n  \"id\": 82517008,\n  \"start_date\": \"aute id\",\n  \"end_date\": \"mollit sed nulla\",\n  \"close_date\": \"anim pariatur sit in qui\",\n  \"title\": \"qui occaecat est officia\",\n  \"customer_title\": \"ullamco id\",\n  \"status_id\": -52542334.56548927,\n  \"status_name\": \"nulla nisi Duis\",\n  \"is_public\": -92964139.7099521,\n  \"campaign_type_id\": 10027799,\n  \"campaign_type_name\": \"ut labore Ut\",\n  \"campaign_family_name\": \"ipsum\",\n  \"project_id\": -45432511,\n  \"project_name\": \"enim Lorem\",\n  \"campaign_family_id\": -85375454,\n  \"bug_form\": -0.4625650001354469\n}"
+				},
+				{
+					"id": "ce75a53a-6e80-4b6e-b65e-ce7734a9ddde",
+					"name": "Example response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"description": "Added as a part of security scheme: bearer",
+								"key": "Authorization",
+								"value": "Bearer <token>"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/campaigns",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"campaigns"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"responseTime": null,
+					"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+				},
+				{
+					"id": "1ff38d0f-4656-446c-9022-1450193c54f4",
+					"name": "Example response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"description": "Added as a part of security scheme: bearer",
+								"key": "Authorization",
+								"value": "Bearer <token>"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/campaigns",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"campaigns"
+							]
+						}
+					},
+					"status": "Forbidden",
+					"code": 403,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"responseTime": null,
+					"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+				},
+				{
+					"id": "cad1789d-06f5-45db-aea5-b09a5ee225e8",
+					"name": "Example response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"description": "Added as a part of security scheme: bearer",
+								"key": "Authorization",
+								"value": "Bearer <token>"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/campaigns",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"campaigns"
+							]
+						}
+					},
+					"status": "Not Found",
+					"code": 404,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"responseTime": null,
+					"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+				},
+				{
+					"id": "04149f28-b74f-4f85-b21e-44808ce67c95",
+					"name": "Example response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"description": "Added as a part of security scheme: bearer",
+								"key": "Authorization",
+								"value": "Bearer <token>"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/campaigns",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"campaigns"
+							]
+						}
+					},
+					"status": "Internal Server Error",
+					"code": 500,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"responseTime": null,
+					"body": "{\n  \"message\": \"ex consequat\",\n  \"code\": -83582412.93869147,\n  \"error\": false\n}"
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"id": "c98b9fe1-1db0-4c54-86c4-aa2ec9072a65",
+			"key": "baseUrl",
+			"value": "https://api.unguess.io",
+			"type": "string"
+		}
+	]
+}
