@@ -5,7 +5,7 @@ type PaginationParams = {
   total: number;
 };
 
-export default async (data: PaginationParams) => {
+export const paginateItems = async (data: PaginationParams) => {
   let { items, limit, start, total } = data;
 
   if (typeof total === "string") {
@@ -27,7 +27,7 @@ export const formatCount = (count: any[]): number => {
   return parseInt(count.map((el: any) => el["COUNT(*)"])[0]);
 };
 
-const emptyPaginatedResponse = () => {
+export const emptyPaginatedResponse = () => {
   return {
     items: [],
     start: 0,

@@ -1,4 +1,4 @@
-import profiles from "../database/seed/profiles.json";
+import profiles from "@src/__mocks__/database/seed/profiles.json";
 
 export default {
   verify: (token: string, secret: string) => {

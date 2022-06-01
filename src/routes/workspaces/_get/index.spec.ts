@@ -4,7 +4,7 @@ import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import {
   fallBackCsmProfile,
   LIMIT_QUERY_PARAM_DEFAULT,
-} from "@src/routes/shared";
+} from "@src/utils/consts";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");

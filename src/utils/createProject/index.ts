@@ -4,7 +4,7 @@ interface Sql {
   type: string;
 }
 
-export default async (
+export const createProject = async (
   project_request: StoplightComponents["requestBodies"]["Project"]["content"]["application/json"],
   user: UserType
 ): Promise<StoplightComponents["schemas"]["Project"]> => {

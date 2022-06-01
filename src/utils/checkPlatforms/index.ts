@@ -1,6 +1,6 @@
 import * as db from "@src/features/db";
 
-export default async (
+export const checkPlatforms = async (
   platforms: StoplightComponents["requestBodies"]["Campaign"]["content"]["application/json"]["platforms"]
 ): Promise<boolean> => {
   // Check request

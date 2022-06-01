@@ -1,7 +1,7 @@
 import * as db from "@src/features/db";
-import { ERROR_MESSAGE } from "@src/routes/shared";
+import { ERROR_MESSAGE } from "@src/utils/consts";
 
-export default async (
+export const getUserProjects = async (
   workspaceId: number,
   user: UserType
 ): Promise<Array<Project> | []> => {

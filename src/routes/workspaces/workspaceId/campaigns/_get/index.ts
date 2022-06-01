@@ -1,20 +1,17 @@
 /** OPENAPI-ROUTE: get-workspace-campaigns */
 import { Context } from "openapi-backend";
-import * as db from "../../../../../features/db";
-import getWorkspace from "@src/routes/workspaces/workspaceId/getWorkspace";
-import getUserProjects from "../../getUserProjects";
-import {
-  paginateItems,
-  formatCount,
-  getCampaignStatus,
-  EXPERIENTIAL_CAMPAIGN_TYPE_ID,
-  FUNCTIONAL_CAMPAIGN_TYPE_ID,
-} from "@src/routes/shared";
+import * as db from "@src/features/db";
+import { getWorkspace } from "@src/utils/getWorkspace";
+import { getUserProjects } from "@src/utils/getUserProjects";
 import {
   ERROR_MESSAGE,
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
-} from "@src/routes/shared";
+  EXPERIENTIAL_CAMPAIGN_TYPE_ID,
+  FUNCTIONAL_CAMPAIGN_TYPE_ID,
+} from "@src/utils/consts";
+import { getCampaignStatus } from "@src/utils/getCampaignStatus";
+import { paginateItems, formatCount } from "@src/utils/paginateItems";
 
 export default async (
   c: Context,
