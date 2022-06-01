@@ -4,17 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "coverage": "npm run build && jest  ./dist --coverage --runInBand",
-    "test": "npm run build && jest ./dist --runInBand",
-    "test:watch": "nodemon --exec \"npm test --\" ",
+    "coverage": "npm run test -- --coverage --runInBand",
+    "test": "tsnd -T node_modules/jest/bin/jest.js --runInBand",
+    "test:ls": "npm run test -- --json",
+    "test:watch": "npm run test -- --watch --maxWorkers=50%",
     "clean": "rimraf dist",
-    "transpile": "babel ./src --out-dir dist --extensions \".ts,.js\" --copy-files",
+    "transpile": "tsc --noEmit false && tscpaths -p tsconfig.json -s ./src -o ./dist",
     "copy-reference": "copyfiles -f src/reference/* dist/reference/",
     "build": "npm-run-all clean transpile copy-reference",
-    "dev": "NODE_ENV=development npm-run-all build server",
-    "server": "tsc && node --enable-source-maps ./dist/index.js",
-    "watch:dev": "nodemon",
-    "start": "npm run watch:dev",
+    "start": "tsnd --respawn -r tsconfig-paths/register  --transpile-only  ./src/index.ts",
     "prepare": "npx husky install",
     "types": "npx openapi-typescript src/reference/openapi.yml --output src/schema.ts"
   },
@@ -35,34 +33,15 @@
     "php-unserialize": "^0.0.1",
     "wordpress-hash-node": "^1.0.0"
   },
-  "nodemonConfig": {
-    "exec": "npm run dev",
-    "watch": [
-      "src/*"
-    ],
-    "ext": "ts,json",
-    "ignore": [
-      "**/__tests__/**",
-      "*.test.js",
-      "*.spec.js"
-    ]
-  },
-  "jest": {
-    "modulePathIgnorePatterns": [
-      "<rootDir>/src"
-    ],
-    "moduleNameMapper": {
-      "jsonwebtoken": "<rootDir>/dist/__mocks__/jsonwebtoken",
-      "@appquality/wp-auth": "<rootDir>/dist/__mocks__/@appquality-wp-auth"
-    },
-    "testTimeout": 15000
-  },
   "devDependencies": {
-    "@babel/cli": "^7.16.0",
-    "@babel/core": "^7.16.0",
-    "@babel/plugin-transform-runtime": "^7.17.0",
-    "@babel/preset-env": "^7.16.4",
-    "@babel/preset-typescript": "^7.16.7",
+    "@swc/core": "^1.2.196",
+    "@swc/jest": "^0.2.21",
+    "ts-jest": "^28.0.2",
+    "ts-node": "^10.7.0",
+    "ts-node-dev": "^2.0.0",
+    "tsconfig-paths": "^3.14.1",
+    "tscpaths": "^0.0.9",
+    "typescript": "^4.6.3",
     "@types/cors": "^2.8.12",
     "@types/express": "^4.17.13",
     "@types/jest": "^27.4.0",
@@ -72,20 +51,15 @@
     "@types/wordpress-hash-node": "^1.0.0",
     "@typescript-eslint/eslint-plugin": "^5.9.1",
     "@typescript-eslint/parser": "^5.9.1",
-    "babel-plugin-module-resolver": "^4.1.0",
     "better-sqlite3": "^7.5.0",
     "commitizen": "^4.2.4",
     "copyfiles": "^2.4.1",
     "cz-conventional-changelog": "3.3.0",
-    "jest": "^24.9.0",
-    "jest-cli": "^24.7.1",
-    "nodemon": "^2.0.15",
-    "npm-run-all": "^4.1.5",
+    "jest": "^27.4.7",
+    "jest-cli": "^27.4.7",
     "openapi-typescript": "^5.1.1",
     "rimraf": "^3.0.2",
-    "supertest": "^6.1.6",
-    "webpack": "^4.30.0",
-    "webpack-dev-middleware": "^3.6.2"
+    "supertest": "^6.1.6"
   },
   "config": {
     "commitizen": {
