@@ -98,21 +98,34 @@ export default async (
         close_date: new Date(campaign.close_date).toISOString(),
         title: campaign.title,
         customer_title: campaign.customer_title,
-        status_id: campaign.status_id,
-        status_name: getCampaignStatus(campaign),
         is_public: campaign.is_public,
-        campaign_type_id: campaign.campaign_type_id,
-        campaign_type_name: campaign.campaign_type_name,
-        project_id: campaign.project_id,
-        project_name: projectResult.name,
-        campaign_family_id: campaign.campaign_family_id,
-        campaign_family_name: campaign_family,
         bug_form: campaign.bug_form,
+        status: {
+          id: campaign.status_id,
+          name: getCampaignStatus({
+            status_id: campaign.status_id,
+            start_date: campaign.start_date,
+          }),
+        },
+        type: {
+          id: campaign.campaign_type_id,
+          name: campaign.campaign_type_name,
+        },
+        project: {
+          id: campaign.project_id,
+          name: projectResult.name,
+        },
+        family: {
+          id: campaign.campaign_family_id,
+          name: campaign_family,
+        },
       });
     }
 
     return paginateItems({ items: returnCampaigns, limit, start, total });
   } catch (e: any) {
+    console.error(e);
+
     if (e.code) {
       error.code = e.code;
       res.status_code = e.code;

@@ -74,9 +74,9 @@ const user_to_project_2 = {
 
 const campaign_request_1 = {
   title: "Campaign 1 title",
-  start_date: "2017-07-20 00:00:00",
-  end_date: "2017-07-20 00:00:00",
-  close_date: "2017-07-20 00:00:00",
+  start_date: "2017-07-20 10:00:00",
+  end_date: "2017-07-20 10:00:00",
+  close_date: "2017-07-20 10:00:00",
   customer_title: "Campaign 1 customer title",
   is_public: 1,
   campaign_type_id: 1,
@@ -86,14 +86,15 @@ const campaign_request_1 = {
 
 const campaign_1 = {
   id: 1,
-  start_date: "2017-07-20 00:00:00",
-  end_date: "2017-07-20 00:00:00",
-  close_date: "2017-07-20 00:00:00",
+  start_date: "2017-07-20 10:00:00",
+  end_date: "2017-07-20 10:00:00",
+  close_date: "2017-07-20 10:00:00",
   title: "Campaign 1 title",
   customer_title: "Campaign 1 customer title",
   status_id: 1,
   is_public: 1,
   campaign_type_id: 1,
+  campaign_type: -1,
   project_id: 1,
 };
 
@@ -171,8 +172,8 @@ describe("POST /campaigns", () => {
       .set("Authorization", "Bearer customer")
       .send({
         ...campaign_request_1,
-        project_id: 2,
         platforms: [AndroidPhoneBody, WindowsPCBody],
+        project_id: 2,
       });
     expect(response.status).toBe(403);
   });
@@ -183,8 +184,8 @@ describe("POST /campaigns", () => {
       .set("Authorization", "Bearer customer")
       .send({
         ...campaign_request_1,
-        project_id: 3,
         platforms: [AndroidPhoneBody, WindowsPCBody],
+        project_id: 3,
       });
     expect(response.status).toBe(403);
   });
@@ -199,8 +200,30 @@ describe("POST /campaigns", () => {
       });
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({
-      ...campaign_1,
       id: 2,
+      title: campaign_1.title,
+      customer_title: campaign_1.customer_title,
+      is_public: campaign_1.is_public,
+      start_date: campaign_1.start_date,
+      end_date: campaign_1.end_date,
+      close_date: campaign_1.close_date,
+      bug_form: campaign_1.campaign_type,
+      status: {
+        id: campaign_1.status_id,
+        name: "running",
+      },
+      type: {
+        id: campaign_1.campaign_type_id,
+        name: campaign_type_1.name,
+      },
+      family: {
+        id: campaign_type_1.type,
+        name: "Functional",
+      },
+      project: {
+        id: project_1.id,
+        name: project_1.display_name,
+      },
     });
   });
 });

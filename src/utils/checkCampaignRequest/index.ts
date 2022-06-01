@@ -27,7 +27,7 @@ export const checkCampaignRequest = async (
     throw { ...error, code: 400 };
   }
 
-  //Check Platforms
+  // Check Platforms
   let platforms_result = await checkPlatforms(campaign_request.platforms);
 
   if (!platforms_result) throw { ...error, code: 400 };

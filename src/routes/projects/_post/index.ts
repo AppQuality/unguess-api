@@ -29,6 +29,8 @@ export default async (
 
     return project as StoplightComponents["schemas"]["Project"];
   } catch (e: any) {
+    console.error(e);
+
     if (e.code) {
       error.code = e.code;
       res.status_code = e.code;

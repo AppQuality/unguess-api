@@ -32,7 +32,7 @@ describe("GET /workspaces", () => {
           userToCustomers: [user_to_customer_1],
         });
       } catch (error) {
-        console.log(error);
+        console.error(error);
         reject(error);
       }
 
@@ -45,7 +45,7 @@ describe("GET /workspaces", () => {
       try {
         await dbAdapter.drop();
       } catch (error) {
-        console.log(error);
+        console.error(error);
         reject(error);
       }
 

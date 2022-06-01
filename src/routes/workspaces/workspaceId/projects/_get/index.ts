@@ -95,6 +95,8 @@ export default async (
             "SELECT COUNT(*) AS count FROM wp_appq_evd_campaign WHERE project_id = ?";
           campaigns = await db.query(db.format(campaignSql, [project.id]));
         } catch (e) {
+          console.error(e);
+
           res.status_code = 500;
           error.code = 500;
           return error;
@@ -112,6 +114,8 @@ export default async (
 
     return paginateItems({ items: returnProjects, start, limit, total });
   } catch (e: any) {
+    console.error(e);
+
     if (e.code) {
       error.code = e.code;
       res.status_code = e.code;
