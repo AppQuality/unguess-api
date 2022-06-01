@@ -833,6 +833,7 @@ components:
               - campaign_type_id
               - project_id
               - pm_id
+              - platforms
     Project:
       content:
         application/json:
