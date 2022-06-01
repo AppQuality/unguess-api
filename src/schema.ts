@@ -146,21 +146,29 @@ export interface components {
       close_date: string;
       title: string;
       customer_title: string;
-      status_id: number;
-      status_name: string;
       is_public: number;
-      campaign_type_id: number;
-      campaign_type_name: string;
-      campaign_family_id?: number;
-      campaign_family_name: string;
-      project_id: number;
-      project_name: string;
       /**
        * @description -1: no bug form;
        * 0: only bug form;
        * 1: bug form with bug parade';
        */
       bug_form?: number;
+      type: {
+        id: number;
+        name: string;
+      };
+      family: {
+        id: number;
+        name: string;
+      };
+      status: {
+        id: number;
+        name: string;
+      };
+      project: {
+        id: number;
+        name: string;
+      };
     };
     /** Project */
     Project: {
