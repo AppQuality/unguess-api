@@ -1,7 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { ERROR_MESSAGE, LIMIT_QUERY_PARAM_DEFAULT } from "@src/routes/shared";
+import { ERROR_MESSAGE, LIMIT_QUERY_PARAM_DEFAULT } from "@src/utils/consts";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
@@ -231,7 +231,8 @@ describe("GET /projects/{pid}/campaigns", () => {
           end_date: new Date(campaign_1.end_date).toISOString(),
           close_date: new Date(campaign_1.close_date).toISOString(),
           campaign_family_id: campaign_type_1.type,
-          campaign_family_name: "Functional",
+          campaign_family_name: "Experiential",
+          bug_form: 0,
         },
         {
           ...campaign_2,
@@ -242,7 +243,8 @@ describe("GET /projects/{pid}/campaigns", () => {
           end_date: new Date(campaign_2.end_date).toISOString(),
           close_date: new Date(campaign_2.close_date).toISOString(),
           campaign_family_id: campaign_type_1.type,
-          campaign_family_name: "Functional",
+          campaign_family_name: "Experiential",
+          bug_form: 0,
         },
       ],
       start: 0,

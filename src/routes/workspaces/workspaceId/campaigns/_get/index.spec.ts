@@ -1,7 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { ERROR_MESSAGE, LIMIT_QUERY_PARAM_DEFAULT } from "@src/routes/shared";
+import { ERROR_MESSAGE, LIMIT_QUERY_PARAM_DEFAULT } from "@src/utils/consts";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");
@@ -220,7 +220,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
             campaign_type_id: campaign_type_1.id,
             campaign_type_name: campaign_type_1.name,
             campaign_family_id: campaign_type_1.type,
-            campaign_family_name: "Functional",
+            campaign_family_name: "Experiential",
             project_id: campaign_1.project_id,
             customer_id: campaign_1.customer_id,
             project_name: project_1.display_name,
@@ -255,7 +255,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
             campaign_type_id: campaign_type_1.id,
             campaign_type_name: campaign_type_1.name,
             campaign_family_id: campaign_type_1.type,
-            campaign_family_name: "Functional",
+            campaign_family_name: "Experiential",
             project_id: campaign_2.project_id,
             customer_id: campaign_2.customer_id,
             project_name: project_1.display_name,
@@ -273,7 +273,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
             campaign_type_id: campaign_type_2.id,
             campaign_type_name: campaign_type_2.name,
             campaign_family_id: campaign_type_2.type,
-            campaign_family_name: "Functional",
+            campaign_family_name: "Experiential",
             project_id: campaign_3.project_id,
             customer_id: campaign_3.customer_id,
             project_name: project_1.display_name,
@@ -332,7 +332,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
             campaign_type_id: campaign_type_2.id,
             campaign_type_name: campaign_type_2.name,
             campaign_family_id: campaign_type_2.type,
-            campaign_family_name: "Functional",
+            campaign_family_name: "Experiential",
             project_id: campaign_3.project_id,
             customer_id: campaign_3.customer_id,
             project_name: project_1.display_name,
@@ -350,7 +350,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
             campaign_type_id: campaign_type_1.id,
             campaign_type_name: campaign_type_1.name,
             campaign_family_id: campaign_type_1.type,
-            campaign_family_name: "Functional",
+            campaign_family_name: "Experiential",
             project_id: campaign_2.project_id,
             customer_id: campaign_2.customer_id,
             project_name: project_1.display_name,

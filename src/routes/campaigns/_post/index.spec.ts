@@ -9,7 +9,7 @@ import {
   DT_DESKTOP,
   DT_SMARTPHONE,
   fallBackCsmProfile,
-} from "@src/routes/shared";
+} from "@src/utils/consts";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");

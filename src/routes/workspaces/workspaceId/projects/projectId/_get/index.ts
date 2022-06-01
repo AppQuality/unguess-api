@@ -1,9 +1,9 @@
 /** OPENAPI-ROUTE: get-workspace-project */
 import { Context } from "openapi-backend";
-import getProject from "../getProject";
-import getWorkspace from "../../../getWorkspace";
-import { ERROR_MESSAGE } from "@src/routes/shared";
-import getUserProjects from "../../../getUserProjects";
+import { getProject } from "@src/utils/getProject";
+import { getWorkspace } from "@src/utils/getWorkspace";
+import { ERROR_MESSAGE } from "@src/utils/consts";
+import { getUserProjects } from "@src/utils/getUserProjects";
 
 export default async (
   c: Context,

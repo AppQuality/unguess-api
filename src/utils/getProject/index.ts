@@ -1,7 +1,7 @@
 import * as db from "@src/features/db";
-import { ERROR_MESSAGE } from "@src/routes/shared";
+import { ERROR_MESSAGE } from "@src/utils/consts";
 
-export default async (
+export const getProject = async (
   projectId: number,
   workspaceId: number
 ): Promise<StoplightComponents["schemas"]["Project"]> => {

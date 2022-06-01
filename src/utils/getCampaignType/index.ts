@@ -1,4 +1,4 @@
-export default async (
+export const getCampaignType = async (
   has_bug_form: StoplightComponents["requestBodies"]["Campaign"]["content"]["application/json"]["has_bug_form"],
   has_bug_parade: StoplightComponents["requestBodies"]["Campaign"]["content"]["application/json"]["has_bug_parade"]
 ): Promise<false | number> => {

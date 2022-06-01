@@ -1,6 +1,5 @@
 import crypto from "crypto";
 import axios from "axios";
-const GRAVATAR_WIDTH = 300;
 
 //Return Gravatar Picture or boolean if 404
 export const getGravatar = async (email: string) => {
@@ -11,7 +10,7 @@ export const getGravatar = async (email: string) => {
   // Make a request for a user with a given ID
   try {
     const { status } = await axios.get(
-      `https://www.gravatar.com/avatar/${hash}?d=404&s=${GRAVATAR_WIDTH}`,
+      `https://www.gravatar.com/avatar/${hash}?d=404`,
       {
         headers: {
           Accept: "application/json",
@@ -19,9 +18,7 @@ export const getGravatar = async (email: string) => {
       }
     );
 
-    return status === 200
-      ? `https://www.gravatar.com/avatar/${hash}?s=${GRAVATAR_WIDTH}`
-      : false;
+    return status === 200 ? `https://www.gravatar.com/avatar/${hash}` : false;
   } catch (error) {
     return false;
   }

@@ -462,12 +462,7 @@ components:
         features:
           type: array
           items:
-            type: object
-            properties:
-              slug:
-                type: string
-              name:
-                type: string
+            $ref: '#/components/schemas/Feature'
       required:
         - id
         - email
@@ -693,6 +688,17 @@ components:
       required:
         - id
         - deviceType
+    Feature:
+      title: Feature
+      x-stoplight:
+        id: qd9ae2twk93pr
+      type: object
+      properties:
+        slug:
+          type: string
+        name:
+          type: string
+      description: Flags used to enable functionality to some users
   securitySchemes:
     JWT:
       type: http

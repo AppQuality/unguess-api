@@ -1,18 +1,17 @@
 /** OPENAPI-ROUTE: get-workspace-campaigns */
 import { Context } from "openapi-backend";
-import * as db from "../../../../../features/db";
-import getWorkspace from "@src/routes/workspaces/workspaceId/getWorkspace";
-import getUserProjects from "../../getUserProjects";
-import {
-  paginateItems,
-  formatCount,
-  getCampaignStatus,
-} from "@src/routes/shared";
+import * as db from "@src/features/db";
+import { getWorkspace } from "@src/utils/getWorkspace";
+import { getUserProjects } from "@src/utils/getUserProjects";
 import {
   ERROR_MESSAGE,
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
-} from "@src/routes/shared";
+  EXPERIENTIAL_CAMPAIGN_TYPE_ID,
+  FUNCTIONAL_CAMPAIGN_TYPE_ID,
+} from "@src/utils/consts";
+import { getCampaignStatus } from "@src/utils/getCampaignStatus";
+import { paginateItems, formatCount } from "@src/utils/paginateItems";
 
 export default async (
   c: Context,
@@ -138,8 +137,8 @@ export default async (
       LEFT JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id 
       WHERE p.id IN (${userProjectsID})
       ${AND}
-      ${order && orderBy ? `ORDER BY ${orderBy} ${order}` : ``}
-      ${limit && (start || start === 0) ? `LIMIT ${limit} OFFSET ${start}` : ``}
+      ${order && orderBy ? ` ORDER BY ${orderBy} ${order}` : ``}
+      ${limit ? ` LIMIT ${limit} OFFSET ${start}` : ``}
     `;
 
     const campaigns = await db.query(query);
@@ -154,10 +153,10 @@ export default async (
       // Get campaign family
       let campaign_family = "";
       switch (campaign.campaign_family_id) {
-        case 0:
+        case EXPERIENTIAL_CAMPAIGN_TYPE_ID:
           campaign_family = "Experiential";
           break;
-        case 1:
+        case FUNCTIONAL_CAMPAIGN_TYPE_ID:
           campaign_family = "Functional";
           break;
       }

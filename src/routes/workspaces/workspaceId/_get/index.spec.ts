@@ -1,7 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { fallBackCsmProfile } from "@src/routes/shared";
+import { fallBackCsmProfile } from "@src/utils/consts";
 
 jest.mock("@src/features/db");
 jest.mock("@appquality/wp-auth");

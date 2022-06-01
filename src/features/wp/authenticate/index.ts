@@ -1,4 +1,4 @@
-import * as db from "../../db";
+import * as db from "@src/features/db";
 
 export default async (userData: {
   ID: number;

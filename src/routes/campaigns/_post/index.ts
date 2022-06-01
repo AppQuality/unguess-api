@@ -1,9 +1,9 @@
 /** OPENAPI-ROUTE: post-campaigns */
 import { Context } from "openapi-backend";
-import { ERROR_MESSAGE } from "@src/routes/shared";
-import checkCampaignRequest from "../checkCampaignRequest";
-import getProjectById from "@src/routes/projects/projectId/getProjectById";
-import createCampaign from "../createCampaign";
+import { ERROR_MESSAGE } from "@src/utils/consts";
+import { checkCampaignRequest } from "@src/utils/checkCampaignRequest";
+import { getProjectById } from "@src/utils/getProjectById";
+import { createCampaign } from "@src/utils/createCampaign";
 
 export default async (
   c: Context,

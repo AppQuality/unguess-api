@@ -1,6 +1,6 @@
 import * as db from "@src/features/db";
-import { getGravatar } from "@src/routes/users/utils";
-import { ERROR_MESSAGE, fallBackCsmProfile } from "@src/routes/shared";
+import { getGravatar } from "@src/utils/getGravatar";
+import { ERROR_MESSAGE, fallBackCsmProfile } from "@src/utils/consts";
 
 const loadCsmData = async (
   csm: StoplightComponents["schemas"]["Workspace"]["csm"]
@@ -11,7 +11,7 @@ const loadCsmData = async (
   return csm;
 };
 
-export default async (
+export const getWorkspace = async (
   workspaceId: number,
   user: UserType
 ): Promise<StoplightComponents["schemas"]["Workspace"]> => {

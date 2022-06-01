@@ -109,10 +109,7 @@ export interface components {
       tryber_wp_user_id: number;
       unguess_wp_user_id: number;
       picture?: string;
-      features?: {
-        slug?: string;
-        name?: string;
-      }[];
+      features?: components["schemas"]["Feature"][];
     };
     /** Authentication */
     Authentication: {
@@ -192,6 +189,14 @@ export interface components {
        * 5 => tv
        */
       deviceType: number;
+    };
+    /**
+     * Feature
+     * @description Flags used to enable functionality to some users
+     */
+    Feature: {
+      slug?: string;
+      name?: string;
     };
   };
   responses: {

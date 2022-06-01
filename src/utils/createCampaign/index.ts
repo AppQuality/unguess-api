@@ -1,10 +1,14 @@
 import * as db from "@src/features/db";
-import { getCampaignStatus } from "@src/routes/shared";
-import getCampaignType from "../getCampaignType";
+import {
+  EXPERIENTIAL_CAMPAIGN_TYPE_ID,
+  FUNCTIONAL_CAMPAIGN_TYPE_ID,
+} from "@src/utils/consts";
+import { getCampaignType } from "@src/utils/getCampaignType";
+import { getCampaignStatus } from "@src/utils/getCampaignStatus";
 
 const DEFAULT_PLATFORM_ID = 0;
 
-export default async (
+export const createCampaign = async (
   campaign_request: StoplightComponents["requestBodies"]["Campaign"]["content"]["application/json"]
 ): Promise<StoplightComponents["schemas"]["Campaign"]> => {
   // Define fields to be updated
@@ -46,7 +50,9 @@ export default async (
   let form_factor_list = Array<Number>();
   let os_list = Array<Number>();
   if (platforms) {
-    form_factor_list = platforms.map((platform) => platform.deviceType);
+    form_factor_list = [
+      ...new Set(platforms.map((platform) => platform.deviceType)),
+    ];
     os_list = platforms.map((platform) => platform.id);
   }
 
@@ -119,10 +125,10 @@ export default async (
   // Get campaign family
   let campaign_family = "";
   switch (campaign.campaign_family_id) {
-    case 0:
+    case EXPERIENTIAL_CAMPAIGN_TYPE_ID:
       campaign_family = "Experiential";
       break;
-    case 1:
+    case FUNCTIONAL_CAMPAIGN_TYPE_ID:
       campaign_family = "Functional";
       break;
   }

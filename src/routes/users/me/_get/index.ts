@@ -1,8 +1,8 @@
 /** OPENAPI-ROUTE: get-users-me */
 import { Context } from "openapi-backend";
-import * as db from "../../../../features/db";
-import { getGravatar } from "../../utils";
-import getUserWorkspaces from "@src/routes/workspaces/getUserWorkspaces";
+import * as db from "@src/features/db";
+import { getGravatar } from "@src/utils/getGravatar";
+import { getUserWorkspaces } from "@src/utils/getUserWorkspaces";
 import getUserFeatures from "@src/features/wp/getUserFeatures";
 
 export default async (
@@ -17,7 +17,9 @@ export default async (
   //Get User Profile (wp_appq_evd_profile)
   let profileData = await getProfile(user.profile_id);
 
-  let userWorkspaces = await getUserWorkspaces(user);
+  let userWorkspaces = await getUserWorkspaces(user, {
+    orderBy: "c.company",
+  });
   setWorkspaces(user, userWorkspaces.workspaces);
 
   return formattedUser(user, profileData);
