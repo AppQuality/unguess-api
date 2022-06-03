@@ -1,7 +1,12 @@
-export const getCampaignType = async (
-  has_bug_form: StoplightComponents["requestBodies"]["Campaign"]["content"]["application/json"]["has_bug_form"],
-  has_bug_parade: StoplightComponents["requestBodies"]["Campaign"]["content"]["application/json"]["has_bug_parade"]
-): Promise<false | number> => {
+interface CampaignTypeArgs {
+  has_bug_form?: StoplightComponents["requestBodies"]["Campaign"]["content"]["application/json"]["has_bug_form"];
+  has_bug_parade?: StoplightComponents["requestBodies"]["Campaign"]["content"]["application/json"]["has_bug_parade"];
+}
+
+export const getCampaignType = async ({
+  has_bug_form,
+  has_bug_parade,
+}: CampaignTypeArgs): Promise<false | number> => {
   // Check request
   if (!has_bug_form && has_bug_parade) return false;
 

@@ -38,10 +38,10 @@ export const createCampaign = async (
     typeof campaign_request.has_bug_form !== undefined &&
     typeof campaign_request.has_bug_parade !== undefined
   ) {
-    let bug_form_result = await getCampaignType(
-      campaign_request.has_bug_form,
-      campaign_request.has_bug_parade
-    );
+    let bug_form_result = await getCampaignType({
+      has_bug_form: campaign_request.has_bug_form,
+      has_bug_parade: campaign_request.has_bug_parade,
+    });
     if (bug_form_result !== false) bug_form = bug_form_result;
   }
 
