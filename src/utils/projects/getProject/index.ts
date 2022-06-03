@@ -1,10 +1,15 @@
 import * as db from "@src/features/db";
 import { ERROR_MESSAGE } from "@src/utils/constants";
 
-export const getProject = async (
-  projectId: number,
-  workspaceId: number
-): Promise<StoplightComponents["schemas"]["Project"]> => {
+interface getProjectArgs {
+  workspaceId: number;
+  projectId: number;
+}
+
+export const getProject = async ({
+  projectId,
+  workspaceId,
+}: getProjectArgs): Promise<StoplightComponents["schemas"]["Project"]> => {
   let error = {
     message: ERROR_MESSAGE,
     error: true,

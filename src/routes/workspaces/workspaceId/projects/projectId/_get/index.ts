@@ -30,7 +30,10 @@ export default async (
     let projectIds = customerProjects.map((project) => project.id);
 
     // Get requested project
-    let project = await getProject(pid, wid);
+    let project = await getProject({
+      workspaceId: wid,
+      projectId: pid,
+    });
 
     if (projectIds.includes(project.id)) {
       return project;

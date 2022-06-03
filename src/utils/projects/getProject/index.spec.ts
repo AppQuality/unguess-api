@@ -88,15 +88,33 @@ describe("getProject", () => {
 
   it("Should throw error 400 if the params are not valid", async () => {
     try {
-      await getProject(0, 0);
+      await getProject({
+        workspaceId: 0,
+        projectId: 1234,
+      });
     } catch (error: any) {
       expect(error.code).toBe(400);
       expect(error.message).toBe(ERROR_MESSAGE);
     }
   });
 
+  it("Should throw error 403 if the project doesn't exists", async () => {
+    try {
+      await getProject({
+        workspaceId: 1234,
+        projectId: 456,
+      });
+    } catch (error: any) {
+      expect(error.code).toBe(403);
+      expect(error.message).toBe(ERROR_MESSAGE);
+    }
+  });
+
   it("Should return a project", async () => {
-    let project = await getProject(project_1.id, customer_1.id);
+    let project = await getProject({
+      workspaceId: customer_1.id,
+      projectId: project_1.id,
+    });
     expect(JSON.stringify(project)).toBe(
       JSON.stringify({
         id: project_1.id,

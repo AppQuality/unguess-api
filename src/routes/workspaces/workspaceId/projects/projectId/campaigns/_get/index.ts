@@ -37,10 +37,10 @@ export default async (
 
   try {
     await getWorkspace(wid, user);
-    let projectResult = (await getProject(
-      pid,
-      wid
-    )) as StoplightComponents["schemas"]["Project"];
+    let projectResult = (await getProject({
+      workspaceId: wid,
+      projectId: pid,
+    })) as StoplightComponents["schemas"]["Project"];
 
     // Get project campaigns
     let campaignsSql = `SELECT 
