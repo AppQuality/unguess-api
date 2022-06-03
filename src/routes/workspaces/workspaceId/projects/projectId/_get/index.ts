@@ -21,10 +21,16 @@ export default async (
 
   try {
     // Get customer
-    await getWorkspace(wid, user);
+    await getWorkspace({
+      workspaceId: wid,
+      user: user,
+    });
 
     // Get all customer's project
-    let customerProjects = await getUserProjects(wid, user);
+    let customerProjects = await getUserProjects({
+      user: user,
+      workspaceId: wid,
+    });
 
     // Get all project ids
     let projectIds = customerProjects.map((project) => project.id);

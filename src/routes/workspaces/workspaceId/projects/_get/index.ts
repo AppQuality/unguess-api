@@ -34,7 +34,10 @@ export default async (
 
   try {
     // Get workspace
-    await getWorkspace(wid, user);
+    await getWorkspace({
+      workspaceId: wid,
+      user: user,
+    });
 
     // Get workspace projects
     let projects: Array<{

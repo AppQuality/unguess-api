@@ -96,7 +96,10 @@ describe("getWorkspace", () => {
 
   it("Should return error because workspace id is 0", async () => {
     try {
-      await getWorkspace(0, customer_user_1);
+      await getWorkspace({
+        workspaceId: 0,
+        user: customer_user_1,
+      });
     } catch (error: any) {
       expect(error.code).toBe(400);
       expect(error.message).toBe(ERROR_MESSAGE);
@@ -105,7 +108,10 @@ describe("getWorkspace", () => {
 
   it("Should return error 403 because the user has no permission", async () => {
     try {
-      await getWorkspace(1, customer_user_2);
+      await getWorkspace({
+        workspaceId: 1,
+        user: customer_user_2,
+      });
     } catch (error: any) {
       expect(error.code).toBe(403);
       expect(error.message).toBe(ERROR_MESSAGE);
@@ -113,7 +119,10 @@ describe("getWorkspace", () => {
   });
 
   it("Should return any workspace if user is administrator", async () => {
-    let workspace = await getWorkspace(1, admin_user_1);
+    let workspace = await getWorkspace({
+      workspaceId: 1,
+      user: admin_user_1,
+    });
     expect(workspace).toMatchObject({
       id: customer_1.id,
       company: customer_1.company,
@@ -124,7 +133,10 @@ describe("getWorkspace", () => {
 
   it("Should return 403 error if the workspace is not found", async () => {
     try {
-      await getWorkspace(9999, customer_user_1);
+      await getWorkspace({
+        workspaceId: 999,
+        user: customer_user_1,
+      });
     } catch (error: any) {
       expect(error.code).toBe(403);
       expect(error.message).toBe(ERROR_MESSAGE);
@@ -132,14 +144,20 @@ describe("getWorkspace", () => {
   });
 
   it("Should have all the required fields", async () => {
-    const workspace = (await getWorkspace(1, customer_user_1)) as Workspace;
+    const workspace = (await getWorkspace({
+      workspaceId: 1,
+      user: customer_user_1,
+    })) as Workspace;
     expect(workspace).toHaveProperty("company");
     expect(workspace).toHaveProperty("id");
     expect(workspace).toHaveProperty("tokens");
   });
 
   it("Should have all the types matching the requirements", async () => {
-    const workspace = (await getWorkspace(1, customer_user_1)) as Workspace;
+    const workspace = (await getWorkspace({
+      workspaceId: 1,
+      user: customer_user_1,
+    })) as Workspace;
     const { company, id, tokens, logo } = workspace;
     expect(typeof company).toBe("string");
     expect(typeof tokens).toBe("number");
@@ -148,7 +166,10 @@ describe("getWorkspace", () => {
   });
 
   it("Should return a workspace", async () => {
-    let workspace = await getWorkspace(1, customer_user_1);
+    let workspace = await getWorkspace({
+      workspaceId: 1,
+      user: customer_user_1,
+    });
     expect(JSON.stringify(workspace)).toBe(
       JSON.stringify({
         id: customer_1.id,

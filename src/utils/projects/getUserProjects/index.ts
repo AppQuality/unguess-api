@@ -1,10 +1,15 @@
 import * as db from "@src/features/db";
 import { ERROR_MESSAGE } from "@src/utils/constants";
 
-export const getUserProjects = async (
-  workspaceId: number,
-  user: UserType
-): Promise<Array<Project> | []> => {
+interface getUserProjectsArgs {
+  user: UserType;
+  workspaceId: number;
+}
+
+export const getUserProjects = async ({
+  workspaceId,
+  user,
+}: getUserProjectsArgs): Promise<Array<Project> | []> => {
   let error = {
     message: ERROR_MESSAGE,
     error: true,

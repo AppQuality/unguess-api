@@ -22,7 +22,10 @@ export default async (
 
   try {
     // Check if workspace exists
-    await getWorkspace(request_body.customer_id, user);
+    await getWorkspace({
+      workspaceId: request_body.customer_id,
+      user: user,
+    });
 
     // Create the project
     let project = await createProject(request_body, user);

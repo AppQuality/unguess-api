@@ -20,7 +20,10 @@ export default async (
   try {
     let wid = parseInt(c.request.params.wid as string);
 
-    const result = await getWorkspace(wid, user);
+    const result = await getWorkspace({
+      workspaceId: wid,
+      user: user,
+    });
 
     return result as StoplightComponents["schemas"]["Workspace"];
   } catch (e: any) {

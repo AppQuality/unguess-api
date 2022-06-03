@@ -11,10 +11,15 @@ const loadCsmData = async (
   return csm;
 };
 
-export const getWorkspace = async (
-  workspaceId: number,
-  user: UserType
-): Promise<StoplightComponents["schemas"]["Workspace"]> => {
+interface GetWorkspacesArgs {
+  user: UserType;
+  workspaceId?: number;
+}
+
+export const getWorkspace = async ({
+  workspaceId,
+  user,
+}: GetWorkspacesArgs): Promise<StoplightComponents["schemas"]["Workspace"]> => {
   let error = {
     message: ERROR_MESSAGE,
     error: true,

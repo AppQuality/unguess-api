@@ -106,9 +106,15 @@ export default async (
       }
     }
 
-    await getWorkspace(wid, user);
+    await getWorkspace({
+      workspaceId: wid,
+      user: user,
+    });
 
-    let userProjects = await getUserProjects(wid, user);
+    let userProjects = await getUserProjects({
+      workspaceId: wid,
+      user: user,
+    });
 
     if (!userProjects.length) {
       return await paginateItems({ items: [], total: 0 });
