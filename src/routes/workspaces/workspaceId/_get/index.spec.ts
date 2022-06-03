@@ -1,7 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { fallBackCsmProfile } from "@src/utils/consts";
+import { fallBackCsmProfile } from "@src/utils/constants";
 
 const customer_profile_1 = {
   id: 1,

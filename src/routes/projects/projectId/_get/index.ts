@@ -1,7 +1,7 @@
 /** OPENAPI-ROUTE: get-projects-projectId */
 import { Context } from "openapi-backend";
-import { getProjectById } from "@src/utils/getProjectById";
-import { ERROR_MESSAGE } from "@src/utils/consts";
+import { getProjectById } from "@src/utils/projects";
+import { ERROR_MESSAGE } from "@src/utils/constants";
 
 export default async (
   c: Context,
@@ -18,7 +18,10 @@ export default async (
   let pid = parseInt(c.request.params.pid as string);
 
   try {
-    return await getProjectById(pid, user);
+    return await getProjectById({
+      user: user,
+      projectId: pid,
+    });
   } catch (e: any) {
     console.error(e);
 

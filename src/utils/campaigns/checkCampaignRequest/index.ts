@@ -1,6 +1,6 @@
-import { ERROR_MESSAGE, fallBackCsmProfile } from "@src/utils/consts";
-import { checkPlatforms } from "@src/utils/checkPlatforms";
-import { getCampaignType } from "@src/utils/getCampaignType";
+import { ERROR_MESSAGE, fallBackCsmProfile } from "@src/utils/constants";
+import { checkPlatforms } from "../checkPlatforms";
+import { getCampaignType } from "../getCampaignType";
 
 export const checkCampaignRequest = async (
   campaign_request: StoplightComponents["requestBodies"]["Campaign"]["content"]["application/json"]
@@ -37,10 +37,10 @@ export const checkCampaignRequest = async (
     typeof campaign_request.has_bug_form !== undefined &&
     typeof campaign_request.has_bug_parade !== undefined
   ) {
-    let bug_form_result = await getCampaignType(
-      campaign_request.has_bug_form,
-      campaign_request.has_bug_parade
-    );
+    let bug_form_result = await getCampaignType({
+      has_bug_form: campaign_request.has_bug_form,
+      has_bug_parade: campaign_request.has_bug_parade,
+    });
 
     if (bug_form_result === false) throw { ...error, code: 400 };
   }

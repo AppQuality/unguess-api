@@ -1,12 +1,12 @@
 /** OPENAPI-ROUTE: get-workspaces */
 import { Context } from "openapi-backend";
-import { getUserWorkspaces } from "@src/utils/getUserWorkspaces";
-import { paginateItems } from "@src/utils/paginateItems";
+import { getUserWorkspaces } from "@src/utils/workspaces";
+import { paginateItems } from "@src/utils/paginations";
 import {
   ERROR_MESSAGE,
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
-} from "@src/utils/consts";
+} from "@src/utils/constants";
 
 export default async (
   c: Context,

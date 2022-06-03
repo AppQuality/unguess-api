@@ -1,8 +1,8 @@
 /** OPENAPI-ROUTE: post-projects */
 import { Context } from "openapi-backend";
-import { ERROR_MESSAGE } from "@src/utils/consts";
-import { getWorkspace } from "@src/utils/getWorkspace";
-import { createProject } from "@src/utils/createProject";
+import { ERROR_MESSAGE } from "@src/utils/constants";
+import { getWorkspace } from "@src/utils/workspaces";
+import { createProject } from "@src/utils/projects";
 
 export default async (
   c: Context,
@@ -22,7 +22,10 @@ export default async (
 
   try {
     // Check if workspace exists
-    await getWorkspace(request_body.customer_id, user);
+    await getWorkspace({
+      workspaceId: request_body.customer_id,
+      user: user,
+    });
 
     // Create the project
     let project = await createProject(request_body, user);

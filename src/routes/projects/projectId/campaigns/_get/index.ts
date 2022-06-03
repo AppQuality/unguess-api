@@ -1,17 +1,16 @@
 /** OPENAPI-ROUTE: get-project-campaigns */
 import { Context } from "openapi-backend";
 import * as db from "@src/features/db";
-import { getProjectById } from "@src/utils/getProjectById";
-
-import { paginateItems, formatCount } from "@src/utils/paginateItems";
+import { getProjectById } from "@src/utils/projects";
+import { paginateItems, formatCount } from "@src/utils/paginations";
+import { getCampaignStatus } from "@src/utils/campaigns";
 import {
   ERROR_MESSAGE,
   EXPERIENTIAL_CAMPAIGN_TYPE_ID,
   FUNCTIONAL_CAMPAIGN_TYPE_ID,
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
-} from "@src/utils/consts";
-import { getCampaignStatus } from "@src/utils/getCampaignStatus";
+} from "@src/utils/constants";
 
 export default async (
   c: Context,
@@ -35,10 +34,10 @@ export default async (
     : (START_QUERY_PARAM_DEFAULT as StoplightComponents["parameters"]["start"]);
 
   try {
-    let prj = (await getProjectById(
-      pid,
-      user
-    )) as StoplightComponents["schemas"]["Project"];
+    let prj = (await getProjectById({
+      projectId: pid,
+      user: user,
+    })) as StoplightComponents["schemas"]["Project"];
 
     // Get project campaigns
     let campaignsSql = `SELECT 

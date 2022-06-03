@@ -1,17 +1,17 @@
 /** OPENAPI-ROUTE: get-workspace-project-campaigns */
 import { Context } from "openapi-backend";
 import * as db from "@src/features/db";
-import { getProject } from "@src/utils/getProject";
-import { getWorkspace } from "@src/utils/getWorkspace";
+import { getProject } from "@src/utils/projects";
+import { getWorkspace } from "@src/utils/workspaces";
+import { getCampaignStatus } from "@src/utils/campaigns";
+import { paginateItems, formatCount } from "@src/utils/paginations";
 import {
   ERROR_MESSAGE,
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
   EXPERIENTIAL_CAMPAIGN_TYPE_ID,
   FUNCTIONAL_CAMPAIGN_TYPE_ID,
-} from "@src/utils/consts";
-import { getCampaignStatus } from "@src/utils/getCampaignStatus";
-import { paginateItems, formatCount } from "@src/utils/paginateItems";
+} from "@src/utils/constants";
 
 export default async (
   c: Context,
@@ -36,11 +36,14 @@ export default async (
     : (START_QUERY_PARAM_DEFAULT as StoplightComponents["parameters"]["start"]);
 
   try {
-    await getWorkspace(wid, user);
-    let projectResult = (await getProject(
-      pid,
-      wid
-    )) as StoplightComponents["schemas"]["Project"];
+    await getWorkspace({
+      workspaceId: wid,
+      user: user,
+    });
+    let projectResult = (await getProject({
+      workspaceId: wid,
+      projectId: pid,
+    })) as StoplightComponents["schemas"]["Project"];
 
     // Get project campaigns
     let campaignsSql = `SELECT 

@@ -1,9 +1,8 @@
 /** OPENAPI-ROUTE: post-campaigns */
 import { Context } from "openapi-backend";
-import { ERROR_MESSAGE } from "@src/utils/consts";
-import { checkCampaignRequest } from "@src/utils/checkCampaignRequest";
-import { getProjectById } from "@src/utils/getProjectById";
-import { createCampaign } from "@src/utils/createCampaign";
+import { ERROR_MESSAGE } from "@src/utils/constants";
+import { checkCampaignRequest, createCampaign } from "@src/utils/campaigns";
+import { getProjectById } from "@src/utils/projects";
 
 export default async (
   c: Context,
@@ -26,7 +25,10 @@ export default async (
     let validated_request_body = await checkCampaignRequest(request_body);
 
     // Try to get the project checking all the permissions
-    await getProjectById(validated_request_body.project_id, user);
+    await getProjectById({
+      user: user,
+      projectId: validated_request_body.project_id,
+    });
 
     // Create the campaign
     let campaign = await createCampaign(validated_request_body);

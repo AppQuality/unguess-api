@@ -1,7 +1,7 @@
 /** OPENAPI-ROUTE: get-workspace */
 import { Context } from "openapi-backend";
-import { getWorkspace } from "@src/utils/getWorkspace";
-import { ERROR_MESSAGE } from "@src/utils/consts";
+import { getWorkspace } from "@src/utils/workspaces";
+import { ERROR_MESSAGE } from "@src/utils/constants";
 
 export default async (
   c: Context,
@@ -20,7 +20,10 @@ export default async (
   try {
     let wid = parseInt(c.request.params.wid as string);
 
-    const result = await getWorkspace(wid, user);
+    const result = await getWorkspace({
+      workspaceId: wid,
+      user: user,
+    });
 
     return result as StoplightComponents["schemas"]["Workspace"];
   } catch (e: any) {
