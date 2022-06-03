@@ -1,4 +1,4 @@
-import { paginateItems } from "@src/utils/paginateItems";
+import { paginateItems } from "@src/utils/paginations";
 
 const campaign_1 = {
   id: 42,

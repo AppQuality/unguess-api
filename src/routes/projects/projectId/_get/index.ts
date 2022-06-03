@@ -1,7 +1,7 @@
 /** OPENAPI-ROUTE: get-projects-projectId */
 import { Context } from "openapi-backend";
-import { getProjectById } from "@src/utils/getProjectById";
-import { ERROR_MESSAGE } from "@src/utils/consts";
+import { getProjectById } from "@src/utils/projects";
+import { ERROR_MESSAGE } from "@src/utils/constants";
 
 export default async (
   c: Context,

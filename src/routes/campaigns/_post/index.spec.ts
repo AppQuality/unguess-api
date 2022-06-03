@@ -9,7 +9,7 @@ import {
   DT_DESKTOP,
   DT_SMARTPHONE,
   fallBackCsmProfile,
-} from "@src/utils/consts";
+} from "@src/utils/constants";
 
 const customer_1 = {
   id: 1,

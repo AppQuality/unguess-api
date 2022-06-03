@@ -6,7 +6,7 @@ import hasher from "wordpress-hash-node";
 import config from "@src/config";
 import authenticate from "@src/features/wp/authenticate";
 import getUserByName from "@src/features/wp/getUserByName";
-import { ERROR_MESSAGE } from "@src/utils/consts";
+import { ERROR_MESSAGE } from "@src/utils/constants";
 
 export default async (c: Context, req: Request, res: OpenapiResponse) => {
   const { username, password } = req.body;

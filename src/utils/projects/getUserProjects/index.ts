@@ -1,5 +1,5 @@
 import * as db from "@src/features/db";
-import { ERROR_MESSAGE } from "@src/utils/consts";
+import { ERROR_MESSAGE } from "@src/utils/constants";
 
 export const getUserProjects = async (
   workspaceId: number,

@@ -1,6 +1,6 @@
-import { getWorkspace } from "@src/utils/getWorkspace";
+import { getWorkspace } from "@src/utils/workspaces";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { ERROR_MESSAGE, fallBackCsmProfile } from "@src/utils/consts";
+import { ERROR_MESSAGE, fallBackCsmProfile } from "@src/utils/constants";
 
 const admin_user_1 = {
   id: 3,

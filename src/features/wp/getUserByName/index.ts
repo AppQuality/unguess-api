@@ -1,4 +1,4 @@
-import { ERROR_MESSAGE } from "@src/utils/consts";
+import { ERROR_MESSAGE } from "@src/utils/constants";
 import * as db from "@src/features/db";
 
 export default async (userName: string) => {

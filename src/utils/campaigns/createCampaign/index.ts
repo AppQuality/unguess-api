@@ -2,9 +2,9 @@ import * as db from "@src/features/db";
 import {
   EXPERIENTIAL_CAMPAIGN_TYPE_ID,
   FUNCTIONAL_CAMPAIGN_TYPE_ID,
-} from "@src/utils/consts";
-import { getCampaignType } from "@src/utils/getCampaignType";
-import { getCampaignStatus } from "@src/utils/getCampaignStatus";
+} from "@src/utils/constants";
+import { getCampaignType } from "../getCampaignType";
+import { getCampaignStatus } from "../getCampaignStatus";
 
 const DEFAULT_PLATFORM_ID = 0;
 
