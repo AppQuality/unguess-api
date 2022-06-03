@@ -18,7 +18,10 @@ export default async (
   let pid = parseInt(c.request.params.pid as string);
 
   try {
-    return await getProjectById(pid, user);
+    return await getProjectById({
+      user: user,
+      projectId: pid,
+    });
   } catch (e: any) {
     console.error(e);
 

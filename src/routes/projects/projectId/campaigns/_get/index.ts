@@ -34,10 +34,10 @@ export default async (
     : (START_QUERY_PARAM_DEFAULT as StoplightComponents["parameters"]["start"]);
 
   try {
-    let prj = (await getProjectById(
-      pid,
-      user
-    )) as StoplightComponents["schemas"]["Project"];
+    let prj = (await getProjectById({
+      projectId: pid,
+      user: user,
+    })) as StoplightComponents["schemas"]["Project"];
 
     // Get project campaigns
     let campaignsSql = `SELECT 

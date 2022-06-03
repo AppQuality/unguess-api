@@ -25,7 +25,10 @@ export default async (
     let validated_request_body = await checkCampaignRequest(request_body);
 
     // Try to get the project checking all the permissions
-    await getProjectById(validated_request_body.project_id, user);
+    await getProjectById({
+      user: user,
+      projectId: validated_request_body.project_id,
+    });
 
     // Create the campaign
     let campaign = await createCampaign(validated_request_body);
