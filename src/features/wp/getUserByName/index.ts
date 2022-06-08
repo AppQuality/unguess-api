@@ -1,5 +1,5 @@
-import { ERROR_MESSAGE } from "@src/routes/shared";
-import * as db from "../../db";
+import { ERROR_MESSAGE } from "@src/utils/constants";
+import * as db from "@src/features/db";
 
 export default async (userName: string) => {
   let error = {

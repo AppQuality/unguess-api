@@ -1,20 +1,17 @@
 /** OPENAPI-ROUTE: get-workspace-project-campaigns */
 import { Context } from "openapi-backend";
-import * as db from "../../../../../../../features/db";
-import getProject from "../../getProject";
-import getWorkspace from "../../../../getWorkspace";
-import {
-  paginateItems,
-  formatCount,
-  getCampaignStatus,
-  EXPERIENTIAL_CAMPAIGN_TYPE_ID,
-  FUNCTIONAL_CAMPAIGN_TYPE_ID,
-} from "@src/routes/shared";
+import * as db from "@src/features/db";
+import { getProject } from "@src/utils/projects";
+import { getWorkspace } from "@src/utils/workspaces";
+import { getCampaignStatus } from "@src/utils/campaigns";
+import { paginateItems, formatCount } from "@src/utils/paginations";
 import {
   ERROR_MESSAGE,
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
-} from "@src/routes/shared";
+  EXPERIENTIAL_CAMPAIGN_TYPE_ID,
+  FUNCTIONAL_CAMPAIGN_TYPE_ID,
+} from "@src/utils/constants";
 
 export default async (
   c: Context,
@@ -39,11 +36,14 @@ export default async (
     : (START_QUERY_PARAM_DEFAULT as StoplightComponents["parameters"]["start"]);
 
   try {
-    await getWorkspace(wid, user);
-    let projectResult = (await getProject(
-      pid,
-      wid
-    )) as StoplightComponents["schemas"]["Project"];
+    await getWorkspace({
+      workspaceId: wid,
+      user: user,
+    });
+    let projectResult = (await getProject({
+      workspaceId: wid,
+      projectId: pid,
+    })) as StoplightComponents["schemas"]["Project"];
 
     // Get project campaigns
     let campaignsSql = `SELECT 
@@ -101,21 +101,34 @@ export default async (
         close_date: new Date(campaign.close_date).toISOString(),
         title: campaign.title,
         customer_title: campaign.customer_title,
-        status_id: campaign.status_id,
-        status_name: getCampaignStatus(campaign),
         is_public: campaign.is_public,
-        campaign_type_id: campaign.campaign_type_id,
-        campaign_type_name: campaign.campaign_type_name,
-        project_id: campaign.project_id,
-        project_name: projectResult.name,
-        campaign_family_id: campaign.campaign_family_id,
-        campaign_family_name: campaign_family,
         bug_form: campaign.bug_form,
+        status: {
+          id: campaign.status_id,
+          name: getCampaignStatus({
+            status_id: campaign.status_id,
+            start_date: campaign.start_date,
+          }),
+        },
+        type: {
+          id: campaign.campaign_type_id,
+          name: campaign.campaign_type_name,
+        },
+        project: {
+          id: campaign.project_id,
+          name: projectResult.name,
+        },
+        family: {
+          id: campaign.campaign_family_id,
+          name: campaign_family,
+        },
       });
     }
 
     return paginateItems({ items: returnCampaigns, limit, start, total });
   } catch (e: any) {
+    console.error(e);
+
     if (e.code) {
       error.code = e.code;
       res.status_code = e.code;

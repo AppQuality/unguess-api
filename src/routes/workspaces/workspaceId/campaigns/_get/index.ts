@@ -1,20 +1,17 @@
 /** OPENAPI-ROUTE: get-workspace-campaigns */
 import { Context } from "openapi-backend";
-import * as db from "../../../../../features/db";
-import getWorkspace from "@src/routes/workspaces/workspaceId/getWorkspace";
-import getUserProjects from "../../getUserProjects";
-import {
-  paginateItems,
-  formatCount,
-  getCampaignStatus,
-  EXPERIENTIAL_CAMPAIGN_TYPE_ID,
-  FUNCTIONAL_CAMPAIGN_TYPE_ID,
-} from "@src/routes/shared";
+import * as db from "@src/features/db";
+import { getWorkspace } from "@src/utils/workspaces";
+import { getUserProjects } from "@src/utils/projects";
 import {
   ERROR_MESSAGE,
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
-} from "@src/routes/shared";
+  EXPERIENTIAL_CAMPAIGN_TYPE_ID,
+  FUNCTIONAL_CAMPAIGN_TYPE_ID,
+} from "@src/utils/constants";
+import { getCampaignStatus } from "@src/utils/campaigns";
+import { paginateItems, formatCount } from "@src/utils/paginations";
 
 export default async (
   c: Context,
@@ -109,9 +106,15 @@ export default async (
       }
     }
 
-    await getWorkspace(wid, user);
+    await getWorkspace({
+      workspaceId: wid,
+      user: user,
+    });
 
-    let userProjects = await getUserProjects(wid, user);
+    let userProjects = await getUserProjects({
+      workspaceId: wid,
+      user: user,
+    });
 
     if (!userProjects.length) {
       return await paginateItems({ items: [], total: 0 });
@@ -130,6 +133,7 @@ export default async (
         c.status_id,
         c.is_public,
         c.campaign_type_id,
+        c.campaign_type AS bug_form,
         c.project_id,
         c.customer_id,
         ct.name AS campaign_type_name,
@@ -152,7 +156,7 @@ export default async (
 
     if (!campaigns.length) return await paginateItems({ items: [], total: 0 });
 
-    let stoplightCampaign = campaigns.map((campaign: any) => {
+    let stoplightCampaigns = campaigns.map((campaign: any) => {
       // Get campaign family
       let campaign_family = "";
       switch (campaign.campaign_family_id) {
@@ -171,25 +175,39 @@ export default async (
         close_date: campaign.close_date.toString(),
         title: campaign.title,
         customer_title: campaign.customer_title,
-        status_id: campaign.status_id,
-        status_name: getCampaignStatus(campaign),
         is_public: campaign.is_public,
-        campaign_type_id: campaign.campaign_type_id,
-        campaign_type_name: campaign.campaign_type_name || "Crowd Test",
-        campaign_family_id: campaign.campaign_family_id,
-        campaign_family_name: campaign_family,
-        project_id: campaign.project_id,
-        customer_id: campaign.customer_id,
-        project_name: campaign.display_name,
+        bug_form: campaign.bug_form,
+        status: {
+          id: campaign.status_id,
+          name: getCampaignStatus({
+            status_id: campaign.status_id,
+            start_date: campaign.start_date,
+          }),
+        },
+        type: {
+          id: campaign.campaign_type_id,
+          name: campaign.campaign_type_name,
+        },
+        family: {
+          id: campaign.campaign_family_id,
+          name: campaign_family,
+        },
+        project: {
+          id: campaign.project_id,
+          name: campaign.display_name,
+        },
       };
     });
+
     return await paginateItems({
-      items: stoplightCampaign,
+      items: stoplightCampaigns,
       limit,
       start,
       total,
     });
   } catch (e: any) {
+    console.error(e);
+
     if (e.code) {
       error.code = e.code;
       res.status_code = e.code;

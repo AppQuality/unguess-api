@@ -1,9 +1,8 @@
 /** OPENAPI-ROUTE: post-projects */
 import { Context } from "openapi-backend";
-import { ERROR_MESSAGE } from "@src/routes/shared";
-import getWorkspace from "@src/routes/workspaces/workspaceId/getWorkspace";
-import getUserWorkspaces from "@src/routes/workspaces/getUserWorkspaces";
-import createProject from "../createProject";
+import { ERROR_MESSAGE } from "@src/utils/constants";
+import { getWorkspace } from "@src/utils/workspaces";
+import { createProject } from "@src/utils/projects";
 
 export default async (
   c: Context,
@@ -23,13 +22,18 @@ export default async (
 
   try {
     // Check if workspace exists
-    await getWorkspace(request_body.customer_id, user);
+    await getWorkspace({
+      workspaceId: request_body.customer_id,
+      user: user,
+    });
 
     // Create the project
     let project = await createProject(request_body, user);
 
     return project as StoplightComponents["schemas"]["Project"];
   } catch (e: any) {
+    console.error(e);
+
     if (e.code) {
       error.code = e.code;
       res.status_code = e.code;

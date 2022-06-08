@@ -1,10 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { fallBackCsmProfile } from "@src/routes/shared";
-
-jest.mock("@src/features/db");
-jest.mock("@appquality/wp-auth");
+import { fallBackCsmProfile } from "@src/utils/constants";
 
 const customer_profile_1 = {
   id: 1,
@@ -38,7 +35,7 @@ describe("GET /workspaces/{wid}", () => {
           userToCustomers: [user_to_customer_1],
         });
       } catch (error) {
-        console.log(error);
+        console.error(error);
         reject(error);
       }
 

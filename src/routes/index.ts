@@ -1,7 +1,7 @@
-import fs from 'fs';
-import OpenAPIBackend from 'openapi-backend';
-import Comments from 'parse-comments';
-import path from 'path';
+import fs from "fs";
+import OpenAPIBackend from "openapi-backend";
+import Comments from "parse-comments";
+import path from "path";
 
 const getAllRoutesByComment = function (
   dirPath: string,
@@ -26,13 +26,7 @@ const getAllRoutesByComment = function (
         const routeName = routeComment.value.split(":")[1].trim();
         arrayOfFiles.push({
           name: routeName,
-          path:
-            "./" +
-            path.join(
-              dirPath.replace("src/routes", ""),
-              "/",
-              file.replace(".ts", ".js")
-            ),
+          path: `${dirPath}/${file}`,
         });
       }
     }
@@ -45,8 +39,14 @@ export default (api: OpenAPIBackend) => {
   try {
     const files = getAllRoutesByComment("./src/routes");
     files.forEach((file) => {
-      let route = require(file.path).default;
-      api.register(file.name, route);
+      const filePath = file.path
+        .replace("./src/routes", ".")
+        .replace("index.ts", "");
+
+      api.register(file.name, (c, req, res) => {
+        let route = require(filePath).default;
+        return route(c, req, res);
+      });
     });
   } catch (e) {
     console.log(e);

@@ -1,17 +1,16 @@
 /** OPENAPI-ROUTE: get-project-campaigns */
 import { Context } from "openapi-backend";
 import * as db from "@src/features/db";
-import getProjectById from "@src/routes/projects/projectId/getProjectById";
-
-import paginateItems, { formatCount } from "@src/routes/shared/paginateItems";
+import { getProjectById } from "@src/utils/projects";
+import { paginateItems, formatCount } from "@src/utils/paginations";
+import { getCampaignStatus } from "@src/utils/campaigns";
 import {
   ERROR_MESSAGE,
   EXPERIENTIAL_CAMPAIGN_TYPE_ID,
   FUNCTIONAL_CAMPAIGN_TYPE_ID,
-  getCampaignStatus,
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
-} from "@src/routes/shared";
+} from "@src/utils/constants";
 
 export default async (
   c: Context,
@@ -35,10 +34,10 @@ export default async (
     : (START_QUERY_PARAM_DEFAULT as StoplightComponents["parameters"]["start"]);
 
   try {
-    let prj = (await getProjectById(
-      pid,
-      user
-    )) as StoplightComponents["schemas"]["Project"];
+    let prj = (await getProjectById({
+      projectId: pid,
+      user: user,
+    })) as StoplightComponents["schemas"]["Project"];
 
     // Get project campaigns
     let campaignsSql = `SELECT 
@@ -55,8 +54,7 @@ export default async (
         c.customer_id,
         c.campaign_type AS bug_form,
         ct.name AS campaign_type_name,
-        ct.type AS campaign_family_id,
-        p.display_name 
+        ct.type AS campaign_family_id
       FROM wp_appq_evd_campaign c 
       JOIN wp_appq_project p ON c.project_id = p.id 
       JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id 
@@ -97,21 +95,34 @@ export default async (
         close_date: new Date(campaign.close_date).toISOString(),
         title: campaign.title,
         customer_title: campaign.customer_title,
-        status_id: campaign.status_id,
-        status_name: getCampaignStatus(campaign),
         is_public: campaign.is_public,
-        campaign_type_id: campaign.campaign_type_id,
-        campaign_type_name: campaign.campaign_type_name,
-        project_id: campaign.project_id,
-        project_name: prj.name,
-        campaign_family_id: campaign.campaign_family_id,
-        campaign_family_name: campaign_family,
         bug_form: campaign.bug_form,
+        status: {
+          id: campaign.status_id,
+          name: getCampaignStatus({
+            status_id: campaign.status_id,
+            start_date: campaign.start_date,
+          }),
+        },
+        type: {
+          id: campaign.campaign_type_id,
+          name: campaign.campaign_type_name,
+        },
+        project: {
+          id: campaign.project_id,
+          name: prj.name,
+        },
+        family: {
+          id: campaign.campaign_family_id,
+          name: campaign_family,
+        },
       });
     }
 
     return paginateItems({ items: returnCampaigns, limit, start, total });
   } catch (e: any) {
+    console.error(e);
+
     if (e.code) {
       error.code = e.code;
       res.status_code = e.code;

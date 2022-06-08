@@ -1,6 +1,6 @@
-import mysql from 'mysql';
+import mysql from "mysql";
 
-import config from '../../config';
+import config from "@src/config";
 
 export const format = (query: string, data: (string | number)[]) =>
   mysql.format(query, data);

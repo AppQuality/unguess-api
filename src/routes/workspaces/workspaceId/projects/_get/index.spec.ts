@@ -1,10 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { ERROR_MESSAGE, LIMIT_QUERY_PARAM_DEFAULT } from "@src/routes/shared";
-
-jest.mock("@src/features/db");
-jest.mock("@appquality/wp-auth");
+import { ERROR_MESSAGE, LIMIT_QUERY_PARAM_DEFAULT } from "@src/utils/constants";
 
 const customer_profile_1 = {
   id: 1,
@@ -141,7 +138,7 @@ describe("GET /workspaces/{wid}/projects", () => {
           ],
         });
       } catch (error) {
-        console.log(error);
+        console.error(error);
         reject(error);
       }
 
@@ -154,7 +151,7 @@ describe("GET /workspaces/{wid}/projects", () => {
       try {
         await dbAdapter.drop();
       } catch (error) {
-        console.log(error);
+        console.error(error);
         reject(error);
       }
 

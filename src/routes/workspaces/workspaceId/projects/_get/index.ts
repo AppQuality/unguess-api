@@ -1,13 +1,13 @@
 /** OPENAPI-ROUTE: get-workspace-projects */
 import { Context } from "openapi-backend";
-import * as db from "../../../../../features/db";
-import getWorkspace from "../../getWorkspace/";
-import paginateItems, { formatCount } from "@src/routes/shared/paginateItems";
+import * as db from "@src/features/db";
+import { getWorkspace } from "@src/utils/workspaces";
+import { paginateItems, formatCount } from "@src/utils/paginations";
 import {
   ERROR_MESSAGE,
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
-} from "@src/routes/shared";
+} from "@src/utils/constants";
 
 export default async (
   c: Context,
@@ -34,7 +34,10 @@ export default async (
 
   try {
     // Get workspace
-    await getWorkspace(wid, user);
+    await getWorkspace({
+      workspaceId: wid,
+      user: user,
+    });
 
     // Get workspace projects
     let projects: Array<{
@@ -95,6 +98,8 @@ export default async (
             "SELECT COUNT(*) AS count FROM wp_appq_evd_campaign WHERE project_id = ?";
           campaigns = await db.query(db.format(campaignSql, [project.id]));
         } catch (e) {
+          console.error(e);
+
           res.status_code = 500;
           error.code = 500;
           return error;
@@ -112,6 +117,8 @@ export default async (
 
     return paginateItems({ items: returnProjects, start, limit, total });
   } catch (e: any) {
+    console.error(e);
+
     if (e.code) {
       error.code = e.code;
       res.status_code = e.code;

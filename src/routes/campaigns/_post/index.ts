@@ -1,9 +1,8 @@
 /** OPENAPI-ROUTE: post-campaigns */
 import { Context } from "openapi-backend";
-import { ERROR_MESSAGE } from "@src/routes/shared";
-import checkCampaignRequest from "../checkCampaignRequest";
-import getProjectById from "@src/routes/projects/projectId/getProjectById";
-import createCampaign from "../createCampaign";
+import { ERROR_MESSAGE } from "@src/utils/constants";
+import { checkCampaignRequest, createCampaign } from "@src/utils/campaigns";
+import { getProjectById } from "@src/utils/projects";
 
 export default async (
   c: Context,
@@ -26,13 +25,18 @@ export default async (
     let validated_request_body = await checkCampaignRequest(request_body);
 
     // Try to get the project checking all the permissions
-    await getProjectById(validated_request_body.project_id, user);
+    await getProjectById({
+      user: user,
+      projectId: validated_request_body.project_id,
+    });
 
     // Create the campaign
     let campaign = await createCampaign(validated_request_body);
 
     return campaign as StoplightComponents["schemas"]["Campaign"];
   } catch (e: any) {
+    console.error(e);
+
     if (e.code) {
       error.code = e.code;
       res.status_code = e.code;

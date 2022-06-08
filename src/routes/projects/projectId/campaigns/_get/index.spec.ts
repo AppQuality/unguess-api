@@ -1,10 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { ERROR_MESSAGE, LIMIT_QUERY_PARAM_DEFAULT } from "@src/routes/shared";
-
-jest.mock("@src/features/db");
-jest.mock("@appquality/wp-auth");
+import { ERROR_MESSAGE, LIMIT_QUERY_PARAM_DEFAULT } from "@src/utils/constants";
 
 const customer_profile_1 = {
   id: 1,
@@ -86,6 +83,7 @@ const campaign_1 = {
   status_id: 1,
   is_public: 0,
   campaign_type_id: 1,
+  campaign_type: 0,
   project_id: 1,
 };
 
@@ -99,6 +97,7 @@ const campaign_2 = {
   status_id: 1,
   is_public: 0,
   campaign_type_id: 1,
+  campaign_type: 0,
   project_id: 1,
 };
 
@@ -112,6 +111,7 @@ const campaign_3 = {
   status_id: 1,
   is_public: 0,
   campaign_type_id: 1,
+  campaign_type: 0,
   project_id: 3,
 };
 
@@ -142,7 +142,7 @@ describe("GET /projects/{pid}/campaigns", () => {
           campaignTypes: [campaign_type_1],
         });
       } catch (error) {
-        console.log(error);
+        console.error(error);
         reject(error);
       }
 
@@ -155,7 +155,7 @@ describe("GET /projects/{pid}/campaigns", () => {
       try {
         await dbAdapter.drop();
       } catch (error) {
-        console.log(error);
+        console.error(error);
         reject(error);
       }
 
@@ -206,12 +206,12 @@ describe("GET /projects/{pid}/campaigns", () => {
       expect(project).toHaveProperty("close_date");
       expect(project).toHaveProperty("title");
       expect(project).toHaveProperty("customer_title");
-      expect(project).toHaveProperty("status_id");
       expect(project).toHaveProperty("is_public");
-      expect(project).toHaveProperty("campaign_type_id");
-      expect(project).toHaveProperty("campaign_type_name");
-      expect(project).toHaveProperty("project_id");
-      expect(project).toHaveProperty("project_name");
+      expect(project).toHaveProperty("bug_form");
+      expect(project).toHaveProperty("status");
+      expect(project).toHaveProperty("type");
+      expect(project).toHaveProperty("family");
+      expect(project).toHaveProperty("project");
     });
   });
 
@@ -223,28 +223,56 @@ describe("GET /projects/{pid}/campaigns", () => {
     expect(response.body).toStrictEqual({
       items: [
         {
-          ...campaign_1,
-          status_name: "running",
-          project_name: project_1.display_name,
-          campaign_type_name: campaign_type_1.name,
+          id: campaign_1.id,
+          title: campaign_1.title,
+          customer_title: campaign_1.customer_title,
+          is_public: campaign_1.is_public,
           start_date: new Date(campaign_1.start_date).toISOString(),
           end_date: new Date(campaign_1.end_date).toISOString(),
           close_date: new Date(campaign_1.close_date).toISOString(),
-          campaign_family_id: campaign_type_1.type,
-          campaign_family_name: "Experiential",
-          bug_form: 0,
+          bug_form: campaign_1.campaign_type,
+          status: {
+            id: campaign_1.status_id,
+            name: "running",
+          },
+          project: {
+            id: project_1.id,
+            name: project_1.display_name,
+          },
+          type: {
+            id: campaign_1.campaign_type_id,
+            name: campaign_type_1.name,
+          },
+          family: {
+            id: campaign_type_1.type,
+            name: "Experiential",
+          },
         },
         {
-          ...campaign_2,
-          status_name: "running",
-          project_name: project_1.display_name,
-          campaign_type_name: campaign_type_1.name,
+          id: campaign_2.id,
+          title: campaign_2.title,
+          customer_title: campaign_2.customer_title,
+          is_public: campaign_2.is_public,
           start_date: new Date(campaign_2.start_date).toISOString(),
           end_date: new Date(campaign_2.end_date).toISOString(),
           close_date: new Date(campaign_2.close_date).toISOString(),
-          campaign_family_id: campaign_type_1.type,
-          campaign_family_name: "Experiential",
           bug_form: 0,
+          status: {
+            id: campaign_2.status_id,
+            name: "running",
+          },
+          project: {
+            id: project_1.id,
+            name: project_1.display_name,
+          },
+          type: {
+            id: campaign_2.campaign_type_id,
+            name: campaign_type_1.name,
+          },
+          family: {
+            id: campaign_type_1.type,
+            name: "Experiential",
+          },
         },
       ],
       start: 0,
@@ -279,12 +307,12 @@ describe("GET /projects/{pid}/campaigns", () => {
       expect(project).toHaveProperty("close_date");
       expect(project).toHaveProperty("title");
       expect(project).toHaveProperty("customer_title");
-      expect(project).toHaveProperty("status_id");
       expect(project).toHaveProperty("is_public");
-      expect(project).toHaveProperty("campaign_type_id");
-      expect(project).toHaveProperty("campaign_type_name");
-      expect(project).toHaveProperty("project_id");
-      expect(project).toHaveProperty("project_name");
+      expect(project).toHaveProperty("bug_form");
+      expect(project).toHaveProperty("status");
+      expect(project).toHaveProperty("type");
+      expect(project).toHaveProperty("family");
+      expect(project).toHaveProperty("project");
     });
   });
 });

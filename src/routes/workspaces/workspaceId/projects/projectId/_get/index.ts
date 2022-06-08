@@ -1,9 +1,8 @@
 /** OPENAPI-ROUTE: get-workspace-project */
 import { Context } from "openapi-backend";
-import getProject from "../getProject";
-import getWorkspace from "../../../getWorkspace";
-import { ERROR_MESSAGE } from "@src/routes/shared";
-import getUserProjects from "../../../getUserProjects";
+import { getProject, getUserProjects } from "@src/utils/projects";
+import { getWorkspace } from "@src/utils/workspaces";
+import { ERROR_MESSAGE } from "@src/utils/constants";
 
 export default async (
   c: Context,
@@ -22,16 +21,25 @@ export default async (
 
   try {
     // Get customer
-    await getWorkspace(wid, user);
+    await getWorkspace({
+      workspaceId: wid,
+      user: user,
+    });
 
     // Get all customer's project
-    let customerProjects = await getUserProjects(wid, user);
+    let customerProjects = await getUserProjects({
+      user: user,
+      workspaceId: wid,
+    });
 
     // Get all project ids
     let projectIds = customerProjects.map((project) => project.id);
 
     // Get requested project
-    let project = await getProject(pid, wid);
+    let project = await getProject({
+      workspaceId: wid,
+      projectId: pid,
+    });
 
     if (projectIds.includes(project.id)) {
       return project;
@@ -39,6 +47,8 @@ export default async (
 
     return { ...error, code: 403 };
   } catch (e: any) {
+    console.error(e);
+
     if (e.code) {
       error.code = e.code;
       res.status_code = e.code;

@@ -1,12 +1,12 @@
 /** OPENAPI-ROUTE: get-workspaces */
 import { Context } from "openapi-backend";
-import getUserWorkspaces from "../getUserWorkspaces";
-import paginateItems from "@src/routes/shared/paginateItems";
+import { getUserWorkspaces } from "@src/utils/workspaces";
+import { paginateItems } from "@src/utils/paginations";
 import {
   ERROR_MESSAGE,
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
-} from "@src/routes/shared";
+} from "@src/utils/constants";
 
 export default async (
   c: Context,
@@ -43,6 +43,8 @@ export default async (
 
     return await paginateItems({ items: [], total: 0 });
   } catch (e: any) {
+    console.error(e);
+
     if (e.code) {
       error.code = e.code;
       res.status_code = e.code;

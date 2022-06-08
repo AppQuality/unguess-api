@@ -1,10 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { ERROR_MESSAGE } from "@src/routes/shared";
-
-jest.mock("@src/features/db");
-jest.mock("@appquality/wp-auth");
+import { ERROR_MESSAGE } from "@src/utils/constants";
 
 const customer_1 = {
   id: 1,
@@ -69,7 +66,7 @@ describe("GET /projects/{pid}", () => {
           userToCustomers: [user_to_customer_1],
         });
       } catch (error) {
-        console.log(error);
+        console.error(error);
         reject(error);
       }
 

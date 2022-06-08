@@ -1,10 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { ERROR_MESSAGE, LIMIT_QUERY_PARAM_DEFAULT } from "@src/routes/shared";
-
-jest.mock("@src/features/db");
-jest.mock("@appquality/wp-auth");
+import { ERROR_MESSAGE, LIMIT_QUERY_PARAM_DEFAULT } from "@src/utils/constants";
 
 const customer_1 = {
   id: 1,
@@ -58,6 +55,7 @@ const campaign_1 = {
   campaign_type_id: 1,
   project_id: 1,
   customer_id: 1,
+  campaign_type: 0,
 };
 
 const campaign_2 = {
@@ -73,6 +71,7 @@ const campaign_2 = {
   campaign_type_id: 1,
   project_id: 2,
   customer_id: 2,
+  campaign_type: 0,
 };
 
 const campaign_3 = {
@@ -88,6 +87,7 @@ const campaign_3 = {
   campaign_type_id: 2,
   project_id: 2,
   customer_id: 2,
+  campaign_type: 0,
 };
 
 const project_2 = {
@@ -131,7 +131,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
           userToCustomers: [user_to_customer_1, user_to_customer_2],
         });
       } catch (e) {
-        console.log(e);
+        console.error(e);
         rej(e);
       }
       res(true);
@@ -143,7 +143,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       try {
         await dbAdapter.drop();
       } catch (error) {
-        console.log(error);
+        console.error(error);
         reject(error);
       }
 
@@ -214,16 +214,24 @@ describe("GET /workspaces/{wid}/campaigns", () => {
             close_date: campaign_1.close_date,
             title: campaign_1.title,
             customer_title: campaign_1.customer_title,
-            status_id: campaign_1.status_id,
-            status_name: "running",
             is_public: campaign_1.is_public,
-            campaign_type_id: campaign_type_1.id,
-            campaign_type_name: campaign_type_1.name,
-            campaign_family_id: campaign_type_1.type,
-            campaign_family_name: "Experiential",
-            project_id: campaign_1.project_id,
-            customer_id: campaign_1.customer_id,
-            project_name: project_1.display_name,
+            bug_form: campaign_1.campaign_type,
+            status: {
+              id: campaign_1.status_id,
+              name: "running",
+            },
+            type: {
+              id: campaign_1.campaign_type_id,
+              name: campaign_type_1.name,
+            },
+            family: {
+              id: campaign_type_1.type,
+              name: "Experiential",
+            },
+            project: {
+              id: campaign_1.project_id,
+              name: project_1.display_name,
+            },
           },
         ],
         start: 0,
@@ -249,16 +257,24 @@ describe("GET /workspaces/{wid}/campaigns", () => {
             close_date: campaign_2.close_date,
             title: campaign_2.title,
             customer_title: campaign_2.customer_title,
-            status_id: campaign_2.status_id,
-            status_name: "completed",
             is_public: campaign_2.is_public,
-            campaign_type_id: campaign_type_1.id,
-            campaign_type_name: campaign_type_1.name,
-            campaign_family_id: campaign_type_1.type,
-            campaign_family_name: "Experiential",
-            project_id: campaign_2.project_id,
-            customer_id: campaign_2.customer_id,
-            project_name: project_1.display_name,
+            bug_form: campaign_2.campaign_type,
+            status: {
+              id: campaign_2.status_id,
+              name: "completed",
+            },
+            type: {
+              id: campaign_1.campaign_type_id,
+              name: campaign_type_1.name,
+            },
+            family: {
+              id: campaign_type_1.type,
+              name: "Experiential",
+            },
+            project: {
+              id: campaign_2.project_id,
+              name: project_1.display_name,
+            },
           },
           {
             id: campaign_3.id,
@@ -267,16 +283,24 @@ describe("GET /workspaces/{wid}/campaigns", () => {
             close_date: campaign_3.close_date,
             title: campaign_3.title,
             customer_title: campaign_3.customer_title,
-            status_id: campaign_3.status_id,
-            status_name: "running",
             is_public: campaign_3.is_public,
-            campaign_type_id: campaign_type_2.id,
-            campaign_type_name: campaign_type_2.name,
-            campaign_family_id: campaign_type_2.type,
-            campaign_family_name: "Experiential",
-            project_id: campaign_3.project_id,
-            customer_id: campaign_3.customer_id,
-            project_name: project_1.display_name,
+            bug_form: campaign_3.campaign_type,
+            status: {
+              id: campaign_3.status_id,
+              name: "running",
+            },
+            type: {
+              id: campaign_type_2.id,
+              name: campaign_type_2.name,
+            },
+            family: {
+              id: campaign_type_2.type,
+              name: "Experiential",
+            },
+            project: {
+              id: campaign_3.project_id,
+              name: project_1.display_name,
+            },
           },
         ],
         start: 0,
@@ -326,16 +350,24 @@ describe("GET /workspaces/{wid}/campaigns", () => {
             close_date: campaign_3.close_date,
             title: campaign_3.title,
             customer_title: campaign_3.customer_title,
-            status_id: campaign_3.status_id,
-            status_name: "running",
             is_public: campaign_3.is_public,
-            campaign_type_id: campaign_type_2.id,
-            campaign_type_name: campaign_type_2.name,
-            campaign_family_id: campaign_type_2.type,
-            campaign_family_name: "Experiential",
-            project_id: campaign_3.project_id,
-            customer_id: campaign_3.customer_id,
-            project_name: project_1.display_name,
+            bug_form: campaign_3.campaign_type,
+            status: {
+              id: campaign_3.status_id,
+              name: "running",
+            },
+            type: {
+              id: campaign_3.campaign_type_id,
+              name: campaign_type_2.name,
+            },
+            family: {
+              id: campaign_type_2.type,
+              name: "Experiential",
+            },
+            project: {
+              id: campaign_3.project_id,
+              name: project_1.display_name,
+            },
           },
           {
             id: campaign_2.id,
@@ -344,16 +376,24 @@ describe("GET /workspaces/{wid}/campaigns", () => {
             close_date: campaign_2.close_date,
             title: campaign_2.title,
             customer_title: campaign_2.customer_title,
-            status_id: campaign_2.status_id,
-            status_name: "completed",
             is_public: campaign_2.is_public,
-            campaign_type_id: campaign_type_1.id,
-            campaign_type_name: campaign_type_1.name,
-            campaign_family_id: campaign_type_1.type,
-            campaign_family_name: "Experiential",
-            project_id: campaign_2.project_id,
-            customer_id: campaign_2.customer_id,
-            project_name: project_1.display_name,
+            bug_form: campaign_2.campaign_type,
+            status: {
+              id: campaign_2.status_id,
+              name: "completed",
+            },
+            type: {
+              id: campaign_type_1.id,
+              name: campaign_type_1.name,
+            },
+            family: {
+              id: campaign_type_1.type,
+              name: "Experiential",
+            },
+            project: {
+              id: campaign_2.project_id,
+              name: project_1.display_name,
+            },
           },
         ],
         start: 0,

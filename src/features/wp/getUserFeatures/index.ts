@@ -1,4 +1,4 @@
-import * as db from "../../db";
+import * as db from "@src/features/db";
 
 export default async (unguess_user_id: number) => {
   const sql = `SELECT f.id, f.slug, f.display_name from wp_ug_features f
