@@ -2,6 +2,7 @@ import companies from "@src/__mocks__/database/seed/companies.json";
 import profiles from "@src/__mocks__/database/seed/profiles.json";
 import projects from "@src/__mocks__/database/seed/projects.json";
 import campaigns from "@src/__mocks__/database/seed/campaigns.json";
+import users from "@src/__mocks__/database/seed/users.json";
 
 export default {
   profiles: profiles,
@@ -49,4 +50,5 @@ export default {
       project_id: projects[0].id,
     },
   ],
+  user: users,
 };

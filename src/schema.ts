@@ -104,11 +104,11 @@ export interface components {
       email: string;
       role: string;
       name: string;
-      workspaces: components["schemas"]["Workspace"][];
       profile_id: number;
       tryber_wp_user_id: number;
       unguess_wp_user_id: number;
       picture?: string;
+      workspaces: components["schemas"]["Workspace"][];
       features?: components["schemas"]["Feature"][];
     };
     /** Authentication */
@@ -136,6 +136,7 @@ export interface components {
         profile_id: number;
         tryber_wp_user_id: number;
         picture?: string;
+        url?: string;
       };
     };
     /** Campaign */
@@ -253,7 +254,7 @@ export interface components {
           campaign_type_id: number;
           project_id: number;
           pm_id: number;
-          platforms?: components["schemas"]["Platform"][];
+          platforms: components["schemas"]["Platform"][];
           /** @description Da togliere */
           page_preview_id?: number;
           /** @description Da togliere */

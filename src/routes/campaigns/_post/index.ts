@@ -35,8 +35,6 @@ export default async (
 
     return campaign as StoplightComponents["schemas"]["Campaign"];
   } catch (e: any) {
-    console.error(e);
-
     if (e.code) {
       error.code = e.code;
       res.status_code = e.code;

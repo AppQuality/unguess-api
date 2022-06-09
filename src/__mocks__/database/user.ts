@@ -1,7 +1,7 @@
 import sqlite3 from "@src/features/sqlite";
 
 const tableName = "wp_users";
-const db = sqlite3("unguess");
+const db = sqlite3("tryber");
 
 export const table = {
   create: async () => {
@@ -10,6 +10,7 @@ export const table = {
       "user_login VARCHAR(60)",
       "user_pass VARCHAR(255)",
       "user_email VARCHAR(100)",
+      "user_url VARCHAR(100)",
     ]);
   },
   drop: async () => {
