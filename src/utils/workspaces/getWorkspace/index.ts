@@ -71,7 +71,7 @@ export const getWorkspace = async ({
           email: workspace.csmEmail,
           profile_id: workspace.csmProfileId,
           tryber_wp_user_id: workspace.csmTryberWpUserId,
-          url: workspace.csmUserUrl,
+          ...(workspace.csmUserUrl && { url: workspace.csmUserUrl }),
         }
       : fallBackCsmProfile;
 

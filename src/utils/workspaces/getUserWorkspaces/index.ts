@@ -101,7 +101,7 @@ const prepareResponse = async (
           role: "admin",
           profile_id: customer.csmProfileId,
           tryber_wp_user_id: customer.csmTryberWpUserId,
-          user_url: customer.csmUserUrl,
+          ...(customer.csmUserUrl && { url: customer.csmUserUrl }),
         }
       : fallBackCsmProfile;
 
