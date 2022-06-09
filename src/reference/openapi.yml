@@ -455,8 +455,6 @@ components:
           type: integer
         picture:
           type: string
-        url:
-          type: string
         workspaces:
           type: array
           items:
@@ -538,13 +536,13 @@ components:
         logo:
           type: string
         csm:
+          type: object
           required:
             - id
             - email
             - name
             - profile_id
             - tryber_wp_user_id
-          type: object
           properties:
             id:
               type: integer
@@ -557,6 +555,8 @@ components:
             tryber_wp_user_id:
               type: integer
             picture:
+              type: string
+            url:
               type: string
       required:
         - id
