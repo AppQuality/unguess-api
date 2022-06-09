@@ -33,9 +33,10 @@ export const getWorkspace = async ({
 
   // Check if workspace exists
   const customerSql = db.format(
-    `SELECT c.*, p.name as csmName, p.surname as csmSurname, p.email as csmEmail, p.id as csmProfileId, p.wp_user_id as csmTryberWpUserId 
+    `SELECT c.*, p.name as csmName, p.surname as csmSurname, p.email as csmEmail, p.id as csmProfileId, p.wp_user_id as csmTryberWpUserId, u.user_url as csmUserUrl
       FROM wp_appq_customer c
       LEFT JOIN wp_appq_evd_profile p ON (p.id = c.pm_id)
+      LEFT JOIN wp_users u ON (u.ID = p.wp_user_id)
       WHERE c.id = ?`,
     [workspaceId]
   );
@@ -70,6 +71,7 @@ export const getWorkspace = async ({
           email: workspace.csmEmail,
           profile_id: workspace.csmProfileId,
           tryber_wp_user_id: workspace.csmTryberWpUserId,
+          url: workspace.csmUserUrl,
         }
       : fallBackCsmProfile;
 

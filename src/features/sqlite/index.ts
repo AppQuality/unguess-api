@@ -1,6 +1,7 @@
 const sqlite3 = require("better-sqlite3");
 
 export default (dbname: "unguess" | "tryber") => {
+  // const db = new sqlite3(dbname + ".db", { verbose: console.log });
   const db = new sqlite3(dbname + ".db");
   db.function("NOW", () => "datetime('now')");
   db.function("CONCAT", { varargs: true }, (...args: string[]) =>
@@ -31,29 +32,25 @@ export default (dbname: "unguess" | "tryber") => {
       }
     });
   };
-  mockDb.all = (query: string): Promise<any> => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const data = await db.prepare(query).all();
-        resolve(data);
-      } catch (err) {
-        console.log(query);
-        reject(err);
-      }
-    });
+  mockDb.all = async (query: string): Promise<any> => {
+    try {
+      const data = await db.prepare(query).all();
+      return data;
+    } catch (err) {
+      console.log("ciolla", query);
+      console.log("ciollaerr", err);
+      throw err;
+    }
   };
-  mockDb.get = (query: string): Promise<any> => {
-    return new Promise(async (resolve, reject) => {
-      const data = await db.prepare(query).get();
-      resolve(data);
-    });
+
+  mockDb.get = async (query: string): Promise<any> => {
+    return await db.prepare(query).get();
   };
-  mockDb.run = (query: string): Promise<any> => {
-    return new Promise(async (resolve, reject) => {
-      const data = await db.prepare(query).run();
-      resolve(data);
-    });
+
+  mockDb.run = async (query: string): Promise<any> => {
+    return await db.prepare(query).run();
   };
+
   mockDb.insert = (table: string, data: any): Promise<any> => {
     return new Promise(async (resolve, reject) => {
       const sql = `INSERT INTO ${table} (${Object.keys(data)
