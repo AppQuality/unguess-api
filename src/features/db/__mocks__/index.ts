@@ -6,26 +6,24 @@ const tryberDb = sqlite("tryber");
 export const format = (query: string, data: (string | number)[]) =>
   mysql.format(query.replace(/"/g, "'"), data);
 
-export const query = (query: string, db: string): Promise<any> => {
+export const query = async (query: string, db: string): Promise<any> => {
   const myDb = db === "unguess" ? unguessDb : tryberDb;
-  return new Promise(async (resolve, reject) => {
-    try {
-      let data;
-      if (
-        query.includes("UPDATE") ||
-        query.includes("DELETE") ||
-        query.includes("INSERT")
-      ) {
-        data = await myDb.run(query);
-      } else {
-        data = await myDb.all(query);
-      }
-
-      return resolve(data);
-    } catch (error) {
-      return reject(error);
+  try {
+    let data;
+    if (
+      query.includes("UPDATE") ||
+      query.includes("DELETE") ||
+      query.includes("INSERT")
+    ) {
+      data = await myDb.run(query);
+    } else {
+      data = await myDb.all(query);
     }
-  });
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const insert = (table: string, data: any, db: string): Promise<any> => {

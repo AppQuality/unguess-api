@@ -1,0 +1,33 @@
+[
+  {
+    "ID": 1,
+    "user_email": "mario.rossi@example.com",
+    "user_login": "mario.rossi@example.com"
+  },
+  {
+    "ID": 2,
+    "user_email": "giovanni.bianchi@example.com",
+    "user_login": "giovanni.bianchi@example.com"
+  },
+  {
+    "ID": 3,
+    "user_email": "paolo.verdi@example.com",
+    "user_login": "paolo.verdi@example.com"
+  },
+  {
+    "ID": 4,
+    "user_email": "luca.gialli@example.com",
+    "user_login": "luca.gialli@example.com"
+  },
+  {
+    "ID": 5,
+    "user_email": "francesco.neri@example.com",
+    "user_login": "francesco.neri@example.com"
+  },
+  {
+    "ID": 21605,
+    "user_email": "gianluca.peretti@unguess.io",
+    "user_login": "gianluca.peretti@unguess.io",
+    "user_url": "https://meetings.hubspot.com/gianluca-peretti"
+  }
+]

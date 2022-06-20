@@ -22,10 +22,11 @@ export const getUserWorkspaces = async (
 }> => {
   const { limit, start, order, orderBy } = args;
 
-  let query = `SELECT c.*, p.name as csmName, p.surname as csmSurname, p.email as csmEmail, p.id as csmProfileId, p.wp_user_id as csmTryberWpUserId 
+  let query = `SELECT c.*, p.name as csmName, p.surname as csmSurname, p.email as csmEmail, p.id as csmProfileId, p.wp_user_id as csmTryberWpUserId, u.user_url as csmUserUrl
         FROM wp_appq_customer c 
         JOIN wp_appq_user_to_customer utc ON (c.id = utc.customer_id) 
         LEFT JOIN wp_appq_evd_profile p ON (p.id = c.pm_id)
+        LEFT JOIN wp_users u ON (u.ID = p.wp_user_id)
         ${
           user.role !== "administrator" ? `WHERE utc.wp_user_id = ?` : ``
         } GROUP BY c.id`;
@@ -100,7 +101,7 @@ const prepareResponse = async (
           role: "admin",
           profile_id: customer.csmProfileId,
           tryber_wp_user_id: customer.csmTryberWpUserId,
-          workspaces: [],
+          ...(customer.csmUserUrl && { url: customer.csmUserUrl }),
         }
       : fallBackCsmProfile;
 

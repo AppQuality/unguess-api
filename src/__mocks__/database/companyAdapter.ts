@@ -25,6 +25,8 @@ import {
   data as userToFeaturesData,
 } from "./userToFeatures";
 
+import defaultUsers from "@src/__mocks__/database/seed/users.json";
+
 interface dataObject {
   profiles?: Array<any>;
   companies?: Array<any>;
@@ -76,6 +78,7 @@ export const adapter = {
     campaignTypes = [],
     userToProjects = [],
     userToCustomers = [],
+    users = [],
   }: dataObject) => {
     profiles.length &&
       profiles.forEach(async (profile) => {
@@ -110,6 +113,13 @@ export const adapter = {
     userToCustomers.length &&
       userToCustomers.forEach(async (userToCustomer) => {
         await userToCustomerData.basicItem(userToCustomer);
+      });
+
+    const usersList = [...defaultUsers, ...users];
+
+    usersList.length &&
+      usersList.forEach(async (user) => {
+        await userData.basicUser(user);
       });
   },
 };

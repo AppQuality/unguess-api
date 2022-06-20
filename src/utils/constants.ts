@@ -23,4 +23,5 @@ export const fallBackCsmProfile: StoplightComponents["schemas"]["Workspace"]["cs
     email: "gianluca.peretti@unguess.io",
     tryber_wp_user_id: 21605,
     profile_id: 20739,
+    url: "https://meetings.hubspot.com/gianluca-peretti",
   };
