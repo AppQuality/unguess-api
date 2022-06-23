@@ -699,6 +699,38 @@ components:
         name:
           type: string
       description: Flags used to enable functionality to some users
+    Coin:
+      title: Coin
+      x-stoplight:
+        id: o68ensyfcjstr
+      type: object
+      description: |-
+        A coin package is a set of coins (free or paid). 
+        The coin only valid currency in order to run an express campaign (no matter what type of express)
+      properties:
+        id:
+          type: number
+        customer_id:
+          type: integer
+        amount:
+          type: number
+          description: Number of available coin
+        agreement_id:
+          type: string
+        price:
+          type: number
+          default: 0
+          format: float
+          description: This is the single coin price
+        created_on:
+          type: string
+        updated_on:
+          type: string
+          description: 'On each coin use, the related package will be updated'
+      required:
+        - customer_id
+        - amount
+        - price
   securitySchemes:
     JWT:
       type: http
