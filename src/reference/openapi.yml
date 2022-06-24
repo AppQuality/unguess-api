@@ -887,6 +887,7 @@ components:
       required: false
       schema:
         type: number
+        minimum: 1
       description: Limit pagination parameter
     start:
       name: start
@@ -894,6 +895,7 @@ components:
       required: false
       schema:
         type: number
+        minimum: 1
       description: Start pagination parameter
     order:
       name: order
