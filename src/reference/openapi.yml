@@ -69,7 +69,8 @@ paths:
   /workspaces:
     get:
       summary: Get User Workspaces
-      tags: []
+      tags:
+        - Workspaces
       responses:
         '200':
           description: OK
@@ -109,7 +110,8 @@ paths:
       - $ref: '#/components/parameters/wid'
     get:
       summary: GET single Workspace
-      tags: []
+      tags:
+        - Workspaces
       responses:
         '200':
           description: OK
@@ -134,7 +136,9 @@ paths:
       - $ref: '#/components/parameters/wid'
     get:
       summary: GET Workspace campaigns
-      tags: []
+      tags:
+        - Workspaces
+        - Campaigns
       responses:
         '200':
           description: OK
@@ -178,7 +182,9 @@ paths:
       - $ref: '#/components/parameters/wid'
     get:
       summary: GET Workspace Projects
-      tags: []
+      tags:
+        - Workspaces
+        - Projects
       responses:
         '200':
           description: OK
@@ -219,7 +225,9 @@ paths:
       - $ref: '#/components/parameters/pid'
     get:
       summary: GET Workspace single project
-      tags: []
+      tags:
+        - Workspaces
+        - Projects
       responses:
         '200':
           description: OK
@@ -244,7 +252,10 @@ paths:
       - $ref: '#/components/parameters/pid'
     get:
       summary: GET Workspace Project campaigns
-      tags: []
+      tags:
+        - Projects
+        - Workspaces
+        - Campaigns
       responses:
         '200':
           description: OK
