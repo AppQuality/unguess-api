@@ -394,7 +394,7 @@ paths:
     parameters: []
   /projects:
     post:
-      summary: ''
+      summary: Create a new project
       operationId: post-projects
       responses:
         '200':
