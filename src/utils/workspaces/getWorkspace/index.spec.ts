@@ -52,6 +52,13 @@ const customer_2 = {
   tokens: 100,
 };
 
+const customer_3 = {
+  id: 3,
+  company: "Company",
+  company_logo: "logo.png",
+  tokens: 100,
+};
+
 const user_to_customer_1 = {
   wp_user_id: 1,
   customer_id: 1,
@@ -62,6 +69,16 @@ const user_to_customer_2 = {
   customer_id: 2,
 };
 
+const user_to_customer_3 = {
+  wp_user_id: 1,
+  customer_id: 3,
+};
+
+const coins_package_1 = {
+  customer_id: 3,
+  amount: 10,
+};
+
 describe("getWorkspace", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
@@ -69,11 +86,16 @@ describe("getWorkspace", () => {
         await dbAdapter.create();
 
         await dbAdapter.add({
-          companies: [customer_1, customer_2],
-          userToCustomers: [user_to_customer_1, user_to_customer_2],
+          companies: [customer_1, customer_2, customer_3],
+          userToCustomers: [
+            user_to_customer_1,
+            user_to_customer_2,
+            user_to_customer_3,
+          ],
+          coins: [coins_package_1],
         });
       } catch (error) {
-        console.log(error);
+        console.error(error);
         reject(error);
       }
 
@@ -177,6 +199,24 @@ describe("getWorkspace", () => {
         tokens: customer_1.tokens,
         logo: customer_1.company_logo,
         csm: fallBackCsmProfile,
+        coins: 0,
+      })
+    );
+  });
+
+  it("Should return a workspace with coins if customer has any", async () => {
+    let workspace = await getWorkspace({
+      workspaceId: customer_3.id,
+      user: customer_user_1,
+    });
+    expect(JSON.stringify(workspace)).toBe(
+      JSON.stringify({
+        id: customer_3.id,
+        company: customer_3.company,
+        tokens: customer_3.tokens,
+        logo: customer_3.company_logo,
+        csm: fallBackCsmProfile,
+        coins: coins_package_1.amount,
       })
     );
   });
