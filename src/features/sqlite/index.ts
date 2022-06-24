@@ -37,8 +37,6 @@ export default (dbname: "unguess" | "tryber") => {
       const data = await db.prepare(query).all();
       return data;
     } catch (err) {
-      console.log("ciolla", query);
-      console.log("ciollaerr", err);
       throw err;
     }
   };
