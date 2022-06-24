@@ -640,8 +640,6 @@ components:
               type: string
             url:
               type: string
-            '':
-              type: string
         coins:
           type: number
           description: express coins
