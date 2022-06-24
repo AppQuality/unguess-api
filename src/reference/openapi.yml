@@ -425,9 +425,20 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Coin'
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Coin'
+                  start:
+                    type: integer
+                  limit:
+                    type: integer
+                  size:
+                    type: integer
+                  total:
+                    type: integer
               examples:
                 single:
                   value:
@@ -462,7 +473,12 @@ paths:
       operationId: get-workspaces-coins
       security:
         - JWT: []
-      parameters: []
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/order'
+        - $ref: '#/components/parameters/orderBy'
+        - $ref: '#/components/parameters/filterBy'
     parameters:
       - $ref: '#/components/parameters/wid'
     patch:
