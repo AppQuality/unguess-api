@@ -815,8 +815,6 @@ components:
       description: Flags used to enable functionality to some users
     Coin:
       title: Coin
-      x-stoplight:
-        id: o68ensyfcjstr
       type: object
       description: |-
         A coin package is a set of coins (free or paid). 
