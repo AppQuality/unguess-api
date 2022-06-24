@@ -33,7 +33,7 @@ export const getWorkspaceCoins = async ({
     [workspaceId]
   );
 
-  let packages = await db.query(coins);
+  let packages = await db.query(coins, "unguess");
 
   return packages.length ? packages : [];
 };
