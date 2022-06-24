@@ -89,9 +89,21 @@ export interface paths {
   };
   "/campaigns": {
     post: operations["post-campaigns"];
+    parameters: {};
   };
   "/projects": {
     post: operations["post-projects"];
+  };
+  "/workspaces/{wid}/coins": {
+    get: operations["get-workspaces-coins"];
+    /** Update the less recent package of coins with a new amount of coins. */
+    patch: operations["patch-workspaces-wid-coins"];
+    parameters: {
+      path: {
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
+      };
+    };
   };
 }
 
@@ -123,7 +135,10 @@ export interface components {
       iat?: number;
       exp?: number;
     };
-    /** Workspace */
+    /**
+     * Workspace
+     * @description A workspace is the company area with projects and campaigns
+     */
     Workspace: {
       id: number;
       company: string;
@@ -137,7 +152,10 @@ export interface components {
         tryber_wp_user_id: number;
         picture?: string;
         url?: string;
+        ""?: string;
       };
+      /** @description express coins */
+      coins?: number;
     };
     /** Campaign */
     Campaign: {
@@ -206,6 +224,26 @@ export interface components {
     Feature: {
       slug?: string;
       name?: string;
+    };
+    /**
+     * Coin
+     * @description A coin package is a set of coins (free or paid).
+     * The coin only valid currency in order to run an express campaign (no matter what type of express)
+     */
+    Coin: {
+      id?: number;
+      customer_id: number;
+      /** @description Number of available coin */
+      amount: number;
+      agreement_id?: number;
+      /**
+       * Format: float
+       * @description This is the single coin price
+       */
+      price: number;
+      created_on?: string;
+      /** @description On each coin use, the related package will be updated */
+      updated_on?: string;
     };
   };
   responses: {
@@ -585,6 +623,45 @@ export interface operations {
       500: components["responses"]["Error"];
     };
     requestBody: components["requestBodies"]["Project"];
+  };
+  "get-workspaces-coins": {
+    parameters: {
+      path: {
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Coin"][];
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  /** Update the less recent package of coins with a new amount of coins. */
+  "patch-workspaces-wid-coins": {
+    parameters: {
+      path: {
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Coin"];
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
   };
 }
 
