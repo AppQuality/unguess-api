@@ -85,4 +85,13 @@ describe("getWorkspaceCoins", () => {
     const coins = await getWorkspaceCoins({ workspaceId: 999 });
     expect(coins).toEqual([]);
   });
+
+  //Should return an empty array if the offset is greater than the total number of coins
+  it("should return an empty array if the offset is greater than the total number of coins", async () => {
+    const coins = await getWorkspaceCoins({
+      workspaceId: customer_1.id,
+      start: 100,
+    });
+    expect(coins).toEqual([]);
+  });
 });

@@ -69,7 +69,8 @@ paths:
   /workspaces:
     get:
       summary: Get User Workspaces
-      tags: []
+      tags:
+        - Workspaces
       responses:
         '200':
           description: OK
@@ -109,7 +110,8 @@ paths:
       - $ref: '#/components/parameters/wid'
     get:
       summary: GET single Workspace
-      tags: []
+      tags:
+        - Workspaces
       responses:
         '200':
           description: OK
@@ -134,7 +136,9 @@ paths:
       - $ref: '#/components/parameters/wid'
     get:
       summary: GET Workspace campaigns
-      tags: []
+      tags:
+        - Workspaces
+        - Campaigns
       responses:
         '200':
           description: OK
@@ -178,7 +182,9 @@ paths:
       - $ref: '#/components/parameters/wid'
     get:
       summary: GET Workspace Projects
-      tags: []
+      tags:
+        - Workspaces
+        - Projects
       responses:
         '200':
           description: OK
@@ -219,7 +225,9 @@ paths:
       - $ref: '#/components/parameters/pid'
     get:
       summary: GET Workspace single project
-      tags: []
+      tags:
+        - Workspaces
+        - Projects
       responses:
         '200':
           description: OK
@@ -244,7 +252,10 @@ paths:
       - $ref: '#/components/parameters/pid'
     get:
       summary: GET Workspace Project campaigns
-      tags: []
+      tags:
+        - Projects
+        - Workspaces
+        - Campaigns
       responses:
         '200':
           description: OK
@@ -289,7 +300,9 @@ paths:
         description: Project id
     get:
       summary: GET Project campaigns
-      tags: []
+      tags:
+        - Campaign
+        - Projects
       responses:
         '200':
           description: OK
@@ -391,6 +404,8 @@ paths:
         - JWT: []
       requestBody:
         $ref: '#/components/requestBodies/Campaign'
+      tags:
+        - Campaigns
     parameters: []
   /projects:
     post:
@@ -415,44 +430,78 @@ paths:
         - JWT: []
       requestBody:
         $ref: '#/components/requestBodies/Project'
+      tags:
+        - Projects
   '/workspaces/{wid}/coins':
     get:
       summary: Retrieve available customer coins
-      tags: []
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Coin'
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Coin'
+                  start:
+                    type: integer
+                  limit:
+                    type: integer
+                  size:
+                    type: integer
+                  total:
+                    type: integer
               examples:
                 single:
                   value:
-                    - id: 123
-                      customer_id: 98
-                      amount: 5
-                      agreement_id: 14560
-                      price: 900
-                      created_on: '2022-06-23T12:14:12Z'
-                      updated_on: '2022-06-23T14:45:15Z'
+                    items:
+                      - id: 123
+                        customer_id: 98
+                        amount: 5
+                        agreement_id: 14560
+                        price: 900
+                        created_on: '2022-06-23T12:14:12Z'
+                        updated_on: '2022-06-23T14:45:15Z'
+                    start: 0
+                    limit: 10
+                    size: 1
+                    total: 1
                 multiple:
                   value:
-                    - id: 123
-                      customer_id: 98
-                      amount: 5
-                      agreement_id: 2002
-                      price: 900
-                      created_on: '2022-06-23T12:14:12Z'
-                      updated_on: '2022-06-23T14:45:15Z'
-                    - id: 151
-                      customer_id: 98
-                      amount: 50
-                      price: 15
-                      created_on: '2022-06-23T12:14:12Z'
-                      updated_on: '2022-06-23T14:45:15Z'
+                    items:
+                      - id: 123
+                        customer_id: 98
+                        amount: 5
+                        agreement_id: 2002
+                        price: 900
+                        created_on: '2022-06-23T12:14:12Z'
+                        updated_on: '2022-06-23T14:45:15Z'
+                      - id: 151
+                        customer_id: 98
+                        amount: 50
+                        price: 15
+                        created_on: '2022-06-23T12:14:12Z'
+                        updated_on: '2022-06-23T14:45:15Z'
+                      - id: 456
+                        customer_id: 98
+                        amount: 2
+                        price: 1
+                        created_on: '2022-06-23T12:14:12Z'
+                        updated_on: '2022-06-23T14:45:15Z'
+                      - id: 678
+                        customer_id: 98
+                        amount: 200
+                        price: 24
+                        created_on: '2022-06-23T12:14:12Z'
+                        updated_on: '2022-06-23T14:45:15Z'
+                    start: 0
+                    limit: 4
+                    size: 4
+                    total: 18
         '400':
           $ref: '#/components/responses/Error'
         '403':
@@ -462,36 +511,16 @@ paths:
       operationId: get-workspaces-coins
       security:
         - JWT: []
-      parameters: []
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/order'
+        - $ref: '#/components/parameters/orderBy'
+      tags:
+        - Workspaces
+        - Coins
     parameters:
       - $ref: '#/components/parameters/wid'
-    patch:
-      summary: Update customer coins amount
-      operationId: patch-workspaces-wid-coins
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Coin'
-              examples:
-                example-1:
-                  value:
-                    id: 123
-                    customer_id: 98
-                    amount: 4
-                    agreement_id: 2002
-                    price: 900
-                    created_on: '2022-06-23T12:14:12Z'
-                    updated_on: '2022-06-23T14:45:15Z'
-        '400':
-          $ref: '#/components/responses/Error'
-        '403':
-          $ref: '#/components/responses/Error'
-        '500':
-          $ref: '#/components/responses/Error'
-      description: Update the less recent package of coins with a new amount of coins.
 components:
   schemas:
     User:
@@ -786,8 +815,6 @@ components:
       description: Flags used to enable functionality to some users
     Coin:
       title: Coin
-      x-stoplight:
-        id: o68ensyfcjstr
       type: object
       description: |-
         A coin package is a set of coins (free or paid). 
@@ -858,6 +885,7 @@ components:
       required: false
       schema:
         type: number
+        minimum: 1
       description: Limit pagination parameter
     start:
       name: start
@@ -865,6 +893,7 @@ components:
       required: false
       schema:
         type: number
+        minimum: 1
       description: Start pagination parameter
     order:
       name: order

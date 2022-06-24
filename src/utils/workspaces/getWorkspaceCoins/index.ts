@@ -1,8 +1,12 @@
 import * as db from "@src/features/db";
-import { ERROR_MESSAGE } from "@src/utils/constants";
+import { ERROR_MESSAGE, LIMIT_QUERY_PARAM_DEFAULT } from "@src/utils/constants";
 
 interface GetWorkspacesCoinsArgs {
   workspaceId?: number;
+  limit?: number;
+  start?: number;
+  orderBy?: string;
+  order?: string;
 }
 
 /**
@@ -15,6 +19,10 @@ interface GetWorkspacesCoinsArgs {
  */
 export const getWorkspaceCoins = async ({
   workspaceId,
+  limit,
+  start,
+  orderBy,
+  order,
 }: GetWorkspacesCoinsArgs): Promise<
   StoplightComponents["schemas"]["Coin"][]
 > => {
@@ -27,11 +35,19 @@ export const getWorkspaceCoins = async ({
   if (workspaceId == null || workspaceId <= 0) throw { ...error, code: 400 };
 
   // Retrieve coins packages
-  const coins = db.format(`SELECT * FROM wp_ug_coins WHERE customer_id = ?`, [
-    workspaceId,
-  ]);
 
-  let packages = await db.query(coins, "unguess");
+  let query = "SELECT * FROM wp_ug_coins WHERE customer_id = ?";
+
+  if (order && orderBy) {
+    query += ` ORDER BY ${orderBy} ${order}`;
+  }
+
+  if (limit || start) {
+    query += ` LIMIT ${limit || 10} OFFSET ${start || 0}`;
+  }
+
+  const coinsQuery = db.format(query, [workspaceId]);
+  let packages = await db.query(coinsQuery, "unguess");
 
   return packages.length ? packages : [];
 };

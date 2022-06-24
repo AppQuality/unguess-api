@@ -96,8 +96,6 @@ export interface paths {
   };
   "/workspaces/{wid}/coins": {
     get: operations["get-workspaces-coins"];
-    /** Update the less recent package of coins with a new amount of coins. */
-    patch: operations["patch-workspaces-wid-coins"];
     parameters: {
       path: {
         /** Workspace (company, customer) id */
@@ -152,7 +150,6 @@ export interface components {
         tryber_wp_user_id: number;
         picture?: string;
         url?: string;
-        ""?: string;
       };
       /** @description express coins */
       coins?: number;
@@ -630,32 +627,28 @@ export interface operations {
         /** Workspace (company, customer) id */
         wid: components["parameters"]["wid"];
       };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Coin"][];
-        };
-      };
-      400: components["responses"]["Error"];
-      403: components["responses"]["Error"];
-      500: components["responses"]["Error"];
-    };
-  };
-  /** Update the less recent package of coins with a new amount of coins. */
-  "patch-workspaces-wid-coins": {
-    parameters: {
-      path: {
-        /** Workspace (company, customer) id */
-        wid: components["parameters"]["wid"];
+      query: {
+        /** Limit pagination parameter */
+        limit?: components["parameters"]["limit"];
+        /** Start pagination parameter */
+        start?: components["parameters"]["start"];
+        /** Order value (ASC, DESC) */
+        order?: components["parameters"]["order"];
+        /** Order by accepted field */
+        orderBy?: components["parameters"]["orderBy"];
       };
     };
     responses: {
       /** OK */
       200: {
         content: {
-          "application/json": components["schemas"]["Coin"];
+          "application/json": {
+            items?: components["schemas"]["Coin"][];
+            start?: number;
+            limit?: number;
+            size?: number;
+            total?: number;
+          };
         };
       };
       400: components["responses"]["Error"];
