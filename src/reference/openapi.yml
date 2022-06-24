@@ -792,6 +792,15 @@ components:
       description: |-
         A coin package is a set of coins (free or paid). 
         The coin only valid currency in order to run an express campaign (no matter what type of express)
+      x-examples:
+        example-1:
+          id: 1
+          customer_id: 12
+          amount: 250
+          agreement_id: 123
+          price: 50
+          created_on: string
+          updated_on: string
       properties:
         id:
           type: integer
@@ -815,16 +824,6 @@ components:
       required:
         - customer_id
         - amount
-        - price
-      x-examples:
-        example-1:
-          id: 1
-          customer_id: 12
-          amount: 250
-          agreement_id: 123
-          price: 50
-          created_on: string
-          updated_on: string
   securitySchemes:
     JWT:
       type: http
