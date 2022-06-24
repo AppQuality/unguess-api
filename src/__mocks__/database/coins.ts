@@ -21,8 +21,8 @@ export const table = {
       "amount int(11) NOT NULL DEFAULT 0",
       "agreement_id int(11) NULL",
       "price float(6, 2) NOT NULL DEFAULT 0.00",
-      "created_on timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP",
-      "updated_on timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+      "created_on timestamp NOT NULL",
+      "updated_on timestamp NOT NULL",
       "notes varchar(255) NULL",
     ]);
   },

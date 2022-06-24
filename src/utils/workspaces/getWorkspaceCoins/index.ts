@@ -27,13 +27,11 @@ export const getWorkspaceCoins = async ({
   if (workspaceId == null || workspaceId <= 0) throw { ...error, code: 400 };
 
   // Retrieve coins packages
-  const coins = db.format(
-    `SELECT * FROM wp_ug_coins
-      WHERE customer_id = ?`,
-    [workspaceId]
-  );
+  const coins = db.format(`SELECT * FROM wp_ug_coins WHERE customer_id = ?`, [
+    workspaceId,
+  ]);
 
-  let packages = await db.query(coins);
+  let packages = await db.query(coins, "unguess");
 
   return packages.length ? packages : [];
 };
