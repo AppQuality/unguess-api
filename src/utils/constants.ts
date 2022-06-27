@@ -10,6 +10,8 @@ export const DT_TV = 5;
 export const FUNCTIONAL_CAMPAIGN_TYPE_ID = 0;
 export const EXPERIENTIAL_CAMPAIGN_TYPE_ID = 1;
 
+export const DEFAULT_EXPRESS_COST = 1;
+
 export interface ResponseError {
   message: string;
   code: number;
