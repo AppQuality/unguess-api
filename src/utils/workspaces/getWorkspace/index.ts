@@ -1,6 +1,8 @@
 import * as db from "@src/features/db";
 import { getGravatar } from "@src/utils/users";
 import { ERROR_MESSAGE, fallBackCsmProfile } from "@src/utils/constants";
+import { getWorkspaceCoins } from "../getWorkspaceCoins";
+import { getTotalCoins } from "../getTotalCoins";
 
 const loadCsmData = async (
   csm: StoplightComponents["schemas"]["Workspace"]["csm"]
@@ -77,12 +79,19 @@ export const getWorkspace = async ({
 
     let csm = await loadCsmData(rawCsm);
 
+    // Get workspace's express coins
+    const coins = await getWorkspaceCoins({ workspaceId });
+
+    // Get total coins amount
+    const totalCoins = await getTotalCoins(coins);
+
     return {
       id: workspace.id,
       company: workspace.company,
       tokens: workspace.tokens,
       ...(workspace.company_logo && { logo: workspace.company_logo }),
       csm: csm,
+      coins: totalCoins,
     } as StoplightComponents["schemas"]["Workspace"];
   }
 

@@ -3,26 +3,26 @@ import sqlite3 from "@src/features/sqlite";
 const db = sqlite3("unguess");
 
 interface coin {
-  id: number;
+  id?: number;
   customer_id: number;
   amount: number;
   agreement_id?: number;
-  price: number;
-  created_on: string;
-  updated_on: string;
+  price?: number;
+  created_on?: string;
+  updated_on?: string;
   notes?: string;
 }
 
 export const table = {
   create: async () => {
     await db.createTable("wp_ug_coins", [
-      "id int(11) NOT NULL PRIMARY KEY",
+      "id INTEGER PRIMARY KEY AUTOINCREMENT",
       "customer_id int(11) NOT NULL",
       "amount int(11) NOT NULL DEFAULT 0",
       "agreement_id int(11) NULL",
       "price float(6, 2) NOT NULL DEFAULT 0.00",
-      "created_on timestamp NOT NULL",
-      "updated_on timestamp NOT NULL",
+      "created_on timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP",
+      "updated_on timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP",
       "notes varchar(255) NULL",
     ]);
   },

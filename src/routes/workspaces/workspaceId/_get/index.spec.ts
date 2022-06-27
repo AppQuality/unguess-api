@@ -93,6 +93,7 @@ describe("GET /workspaces/{wid}", () => {
         tokens: customer_1.tokens,
         logo: customer_1.company_logo,
         csm: fallBackCsmProfile,
+        coins: 0,
       })
     );
   });
