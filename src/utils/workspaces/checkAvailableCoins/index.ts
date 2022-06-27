@@ -1,26 +1,21 @@
-import { ERROR_MESSAGE } from "@src/utils/constants";
+interface CheckAvailableCoinsArgs {
+  coins: StoplightComponents["schemas"]["Workspace"]["coins"];
+  cost?: number;
+}
 
 /**
- * Check if a workspace has got enough coins to cover a certain amount of coins required (price)
+ * Check if a coins amount is enough to cover a certain amount of coins required (cost)
  *
  *
- * @param workspace (Workspace) - workspace to check
- * @param price? (number) default: 1 - amount of coins required
+ * @param coins (StoplightComponents["schemas"]["Workspace"]["coins"]) - coins amount to check
+ * @param cost? (number) default: 1 - amount of coins required
  * @returns true | false (boolean)
  */
-export const checkAvailableCoins = async (
-  workspace: StoplightComponents["schemas"]["Workspace"],
-  price: number = 1
-): Promise<boolean> => {
-  let error = {
-    message: ERROR_MESSAGE,
-    error: true,
-  } as StoplightComponents["schemas"]["Error"];
+export const checkAvailableCoins = ({
+  coins,
+  cost = 1,
+}: CheckAvailableCoinsArgs): boolean => {
+  if (!coins) return false;
 
-  // Check parameters
-  if (!workspace) throw { ...error, code: 400 };
-
-  if (!workspace.coins) return false;
-
-  return workspace.coins >= price ? true : false;
+  return coins >= cost ? true : false;
 };

@@ -192,16 +192,14 @@ describe("getWorkspace", () => {
       workspaceId: 1,
       user: customer_user_1,
     });
-    expect(JSON.stringify(workspace)).toBe(
-      JSON.stringify({
-        id: customer_1.id,
-        company: customer_1.company,
-        tokens: customer_1.tokens,
-        logo: customer_1.company_logo,
-        csm: fallBackCsmProfile,
-        coins: 0,
-      })
-    );
+    expect(workspace).toMatchObject({
+      id: customer_1.id,
+      company: customer_1.company,
+      tokens: customer_1.tokens,
+      logo: customer_1.company_logo,
+      csm: fallBackCsmProfile,
+      coins: 0,
+    });
   });
 
   it("Should return a workspace with coins if customer has any", async () => {
@@ -209,13 +207,9 @@ describe("getWorkspace", () => {
       workspaceId: customer_3.id,
       user: customer_user_1,
     });
-    expect(JSON.stringify(workspace)).toBe(
-      JSON.stringify({
+    expect(workspace).toEqual(
+      expect.objectContaining({
         id: customer_3.id,
-        company: customer_3.company,
-        tokens: customer_3.tokens,
-        logo: customer_3.company_logo,
-        csm: fallBackCsmProfile,
         coins: coins_package_1.amount,
       })
     );

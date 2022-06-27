@@ -1,6 +1,4 @@
-import { getWorkspace } from "@src/utils/workspaces";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { ERROR_MESSAGE, fallBackCsmProfile } from "@src/utils/constants";
 import { checkAvailableCoins } from ".";
 
 const customer_user_1 = {
@@ -58,7 +56,7 @@ const coins_package_1 = {
 
 const coins_package_2 = {
   customer_id: customer_3.id,
-  amount: 1,
+  amount: 2,
 };
 
 describe("checkAvailableCoins", () => {
@@ -98,63 +96,35 @@ describe("checkAvailableCoins", () => {
     });
   });
 
-  it("Should return true if the customer has at least 1 coin", async () => {
-    try {
-      const workspace = await getWorkspace({
-        workspaceId: customer_1.id,
-        user: customer_user_1,
-      });
-      const response = await checkAvailableCoins(workspace);
+  it("Should return true if the coins amount is greater or equal than 1", async () => {
+    const response = checkAvailableCoins({ coins: coins_package_1.amount });
 
-      expect(response).toBe(true);
-    } catch (error: any) {
-      expect(error.code).toBe(400);
-      expect(error.message).toBe(ERROR_MESSAGE);
-    }
+    expect(response).toBe(true);
   });
 
-  it("Should return false if the customer has 0 coin", async () => {
-    try {
-      const workspace = await getWorkspace({
-        workspaceId: customer_2.id,
-        user: customer_user_1,
-      });
-      const response = await checkAvailableCoins(workspace);
+  it("Should return false if the coin amount is 0", async () => {
+    const response = await checkAvailableCoins({
+      coins: 0,
+    });
 
-      expect(response).toBe(false);
-    } catch (error: any) {
-      expect(error.code).toBe(400);
-      expect(error.message).toBe(ERROR_MESSAGE);
-    }
+    expect(response).toBe(false);
   });
 
-  it("Should return false if the customer has 1 coin and the price is 2", async () => {
-    try {
-      const workspace = await getWorkspace({
-        workspaceId: customer_2.id,
-        user: customer_user_1,
-      });
-      const response = await checkAvailableCoins(workspace, 2);
+  it("Should return false if the coins amount is 1 and the price is 2", async () => {
+    const response = await checkAvailableCoins({
+      coins: coins_package_1.amount,
+      cost: 2,
+    });
 
-      expect(response).toBe(false);
-    } catch (error: any) {
-      expect(error.code).toBe(400);
-      expect(error.message).toBe(ERROR_MESSAGE);
-    }
+    expect(response).toBe(false);
   });
 
-  it("Should return false if the customer has 1 coin and the price is 2", async () => {
-    try {
-      const workspace = await getWorkspace({
-        workspaceId: customer_3.id,
-        user: customer_user_1,
-      });
-      const response = await checkAvailableCoins(workspace, 2);
+  it("Should return true if the amount is 2 and the price is 2", async () => {
+    const response = await checkAvailableCoins({
+      coins: coins_package_2.amount,
+      cost: 2,
+    });
 
-      expect(response).toBe(false);
-    } catch (error: any) {
-      expect(error.code).toBe(400);
-      expect(error.message).toBe(ERROR_MESSAGE);
-    }
+    expect(response).toBe(true);
   });
 });

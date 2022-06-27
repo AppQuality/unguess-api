@@ -30,8 +30,12 @@ export default async (
       projectId: validated_request_body.project_id,
     });
 
+    // TODO: Check express coins availability
+
     // Create the campaign
     let campaign = await createCampaign(validated_request_body);
+
+    // TODO: Deduct express coin(s)
 
     return campaign as StoplightComponents["schemas"]["Campaign"];
   } catch (e: any) {
