@@ -1,6 +1,5 @@
 import { getWorkspaceCoins } from "@src/utils/workspaces";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { ERROR_MESSAGE, fallBackCsmProfile } from "@src/utils/constants";
 
 const customer_1 = {
   id: 1,
@@ -37,6 +36,13 @@ const coins_3 = {
   customer_id: 2,
 };
 
+const coins_4 = {
+  ...coins_1,
+  id: 4,
+  customer_id: 1,
+  amount: 0,
+};
+
 describe("getWorkspaceCoins", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
@@ -45,10 +51,10 @@ describe("getWorkspaceCoins", () => {
 
         await dbAdapter.add({
           companies: [customer_1, customer_2],
-          coins: [coins_1, coins_2, coins_3],
+          coins: [coins_1, coins_2, coins_3, coins_4],
         });
       } catch (error) {
-        console.log(error);
+        console.error(error);
         reject(error);
       }
 
@@ -93,5 +99,17 @@ describe("getWorkspaceCoins", () => {
       start: 100,
     });
     expect(coins).toEqual([]);
+  });
+
+  //Should return only packages with a positive amount (MUST RETURN COINS 1 AND 2)
+  it("should return only packages with a positive amount", async () => {
+    const coins = await getWorkspaceCoins({
+      workspaceId: customer_1.id,
+    });
+
+    expect(coins).toEqual([
+      expect.objectContaining(coins_1),
+      expect.objectContaining(coins_2),
+    ]);
   });
 });

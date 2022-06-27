@@ -22,7 +22,8 @@ export const checkCampaignRequest = async (
     !campaign_request.end_date ||
     !campaign_request.close_date ||
     !campaign_request.campaign_type_id ||
-    !campaign_request.project_id
+    !campaign_request.project_id ||
+    !campaign_request.customer_id
   ) {
     throw { ...error, code: 400 };
   }

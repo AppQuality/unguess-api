@@ -1,3 +1,5 @@
+import { DEFAULT_EXPRESS_COST } from "@src/utils/constants";
+
 interface CheckAvailableCoinsArgs {
   coins: StoplightComponents["schemas"]["Workspace"]["coins"];
   cost?: number;
@@ -13,7 +15,7 @@ interface CheckAvailableCoinsArgs {
  */
 export const checkAvailableCoins = ({
   coins,
-  cost = 1,
+  cost = DEFAULT_EXPRESS_COST,
 }: CheckAvailableCoinsArgs): boolean => {
   if (!coins) return false;
 

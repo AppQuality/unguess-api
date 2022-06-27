@@ -840,6 +840,7 @@ components:
           type: string
           description: 'On each coin use, the related package will be updated'
       required:
+        - id
         - customer_id
         - amount
   securitySchemes:
@@ -977,6 +978,7 @@ components:
               - project_id
               - pm_id
               - platforms
+              - customer_id
     Project:
       content:
         application/json:

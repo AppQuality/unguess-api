@@ -3,6 +3,9 @@ import { Context } from "openapi-backend";
 import { ERROR_MESSAGE } from "@src/utils/constants";
 import { checkCampaignRequest, createCampaign } from "@src/utils/campaigns";
 import { getProjectById } from "@src/utils/projects";
+import { checkAvailableCoins } from "@src/utils/workspaces/checkAvailableCoins";
+import { getWorkspace } from "@src/utils/workspaces";
+import { updateWorkspaceCoins } from "@src/utils/workspaces/updateWorkspaceCoins";
 
 export default async (
   c: Context,
@@ -30,12 +33,23 @@ export default async (
       projectId: validated_request_body.project_id,
     });
 
-    // TODO: Check express coins availability
+    // Retrieve and check workspace
+    const workspace = await getWorkspace({
+      workspaceId: request_body.customer_id,
+      user: user,
+    });
+
+    // Check express coins availability
+    if (!checkAvailableCoins({ coins: workspace.coins }))
+      throw { ...error, code: 403 };
+
+    // Deduct express coin(s)
+    await updateWorkspaceCoins({
+      workspaceId: workspace.id,
+    });
 
     // Create the campaign
     let campaign = await createCampaign(validated_request_body);
-
-    // TODO: Deduct express coin(s)
 
     return campaign as StoplightComponents["schemas"]["Campaign"];
   } catch (e: any) {

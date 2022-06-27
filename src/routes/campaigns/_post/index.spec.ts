@@ -79,6 +79,7 @@ const campaign_request_1 = {
   campaign_type_id: 1,
   project_id: 1,
   pm_id: fallBackCsmProfile.id,
+  customer_id: 1,
 };
 
 const campaign_1 = {
@@ -101,6 +102,12 @@ const campaign_type_1 = {
   type: 0,
 };
 
+const coins_1 = {
+  id: 1,
+  amount: 10,
+  customer_id: 1,
+};
+
 describe("POST /campaigns", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
@@ -115,6 +122,7 @@ describe("POST /campaigns", () => {
           userToProjects: [user_to_project_1, user_to_project_2],
           campaigns: [campaign_1],
           campaignTypes: [campaign_type_1],
+          coins: [coins_1],
         });
 
         await platformData.addItem(AndroidPhone);

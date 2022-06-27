@@ -1,8 +1,8 @@
 import * as db from "@src/features/db";
-import { ERROR_MESSAGE, LIMIT_QUERY_PARAM_DEFAULT } from "@src/utils/constants";
+import { ERROR_MESSAGE } from "@src/utils/constants";
 
 interface GetWorkspacesCoinsArgs {
-  workspaceId?: number;
+  workspaceId: number;
   limit?: number;
   start?: number;
   orderBy?: string;
@@ -36,7 +36,7 @@ export const getWorkspaceCoins = async ({
 
   // Retrieve coins packages
 
-  let query = "SELECT * FROM wp_ug_coins WHERE customer_id = ?";
+  let query = "SELECT * FROM wp_ug_coins WHERE customer_id = ? AND amount > 0";
 
   if (order && orderBy) {
     query += ` ORDER BY ${orderBy} ${order}`;
