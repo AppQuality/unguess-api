@@ -113,7 +113,6 @@ const prepareResponse = async (
       logo: customer.company_logo || "",
       tokens: customer.tokens,
       csm,
-      coins: customer.coins || 0,
     });
   }
 
