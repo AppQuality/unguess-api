@@ -89,9 +89,19 @@ export interface paths {
   };
   "/campaigns": {
     post: operations["post-campaigns"];
+    parameters: {};
   };
   "/projects": {
     post: operations["post-projects"];
+  };
+  "/workspaces/{wid}/coins": {
+    get: operations["get-workspaces-coins"];
+    parameters: {
+      path: {
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
+      };
+    };
   };
 }
 
@@ -123,7 +133,10 @@ export interface components {
       iat?: number;
       exp?: number;
     };
-    /** Workspace */
+    /**
+     * Workspace
+     * @description A workspace is the company area with projects and campaigns
+     */
     Workspace: {
       id: number;
       company: string;
@@ -138,6 +151,8 @@ export interface components {
         picture?: string;
         url?: string;
       };
+      /** @description express coins */
+      coins?: number;
     };
     /** Campaign */
     Campaign: {
@@ -206,6 +221,26 @@ export interface components {
     Feature: {
       slug?: string;
       name?: string;
+    };
+    /**
+     * Coin
+     * @description A coin package is a set of coins (free or paid).
+     * The coin only valid currency in order to run an express campaign (no matter what type of express)
+     */
+    Coin: {
+      id?: number;
+      customer_id: number;
+      /** @description Number of available coin */
+      amount: number;
+      agreement_id?: number;
+      /**
+       * Format: float
+       * @description This is the single coin price
+       */
+      price: number;
+      created_on?: string;
+      /** @description On each coin use, the related package will be updated */
+      updated_on?: string;
     };
   };
   responses: {
@@ -585,6 +620,41 @@ export interface operations {
       500: components["responses"]["Error"];
     };
     requestBody: components["requestBodies"]["Project"];
+  };
+  "get-workspaces-coins": {
+    parameters: {
+      path: {
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
+      };
+      query: {
+        /** Limit pagination parameter */
+        limit?: components["parameters"]["limit"];
+        /** Start pagination parameter */
+        start?: components["parameters"]["start"];
+        /** Order value (ASC, DESC) */
+        order?: components["parameters"]["order"];
+        /** Order by accepted field */
+        orderBy?: components["parameters"]["orderBy"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            items?: components["schemas"]["Coin"][];
+            start?: number;
+            limit?: number;
+            size?: number;
+            total?: number;
+          };
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
   };
 }
 

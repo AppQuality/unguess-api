@@ -25,6 +25,8 @@ import {
   data as userToFeaturesData,
 } from "./userToFeatures";
 
+import { table as coinsTable, data as coinsData } from "./coins";
+
 import defaultUsers from "@src/__mocks__/database/seed/users.json";
 
 interface dataObject {
@@ -37,6 +39,7 @@ interface dataObject {
   userToCustomers?: Array<any>;
   users?: Array<any>;
   customers?: Array<any>;
+  coins?: Array<any>;
 }
 
 export const adapter = {
@@ -54,6 +57,7 @@ export const adapter = {
     //Features Table
     await featuresTable.create();
     await userToFeaturesTable.create();
+    await coinsTable.create();
   },
   drop: async () => {
     await profileTable.drop();
@@ -69,6 +73,8 @@ export const adapter = {
     //Features Table
     await featuresTable.drop();
     await userToFeaturesTable.drop();
+
+    await coinsTable.drop();
   },
   add: async ({
     profiles = [],
@@ -79,6 +85,7 @@ export const adapter = {
     userToProjects = [],
     userToCustomers = [],
     users = [],
+    coins = [],
   }: dataObject) => {
     profiles.length &&
       profiles.forEach(async (profile) => {
@@ -120,6 +127,11 @@ export const adapter = {
     usersList.length &&
       usersList.forEach(async (user) => {
         await userData.basicUser(user);
+      });
+
+    coins.length &&
+      coins.forEach(async (coin) => {
+        await coinsData.basicItem(coin);
       });
   },
 };
