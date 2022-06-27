@@ -237,7 +237,7 @@ export interface components {
        * Format: float
        * @description This is the single coin price
        */
-      price: number;
+      price?: number;
       created_on?: string;
       /** @description On each coin use, the related package will be updated */
       updated_on?: string;
