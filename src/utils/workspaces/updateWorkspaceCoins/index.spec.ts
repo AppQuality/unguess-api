@@ -151,7 +151,7 @@ describe("updateWorkspaceCoins", () => {
   it("Should return only the remaining packages if the cost is equal to the amount of a package", async () => {
     /*
      * The cost is 100
-     * The amount of the first package is 50
+     * The amount of the first package is 49 (50 - first transaction at cost 1)
      * The amount of the second package is 100
      * The result will be only the second package with the amount of 50
      */
@@ -163,7 +163,7 @@ describe("updateWorkspaceCoins", () => {
     expect(packages).toEqual([
       expect.objectContaining({
         id: coins_1.id,
-        amount: 50,
+        amount: 49,
       }),
     ]);
   });

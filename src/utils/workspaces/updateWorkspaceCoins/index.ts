@@ -52,7 +52,7 @@ export const updateWorkspaceCoins = async ({
   let sql =
     "UPDATE wp_ug_coins SET amount = ?, updated_on = CURRENT_TIMESTAMP WHERE id = ?";
   let remainingCost = cost;
-  const deductedPackages = oldPackages.map(async (package_) => {
+  oldPackages.map(async (package_) => {
     if (remainingCost === 0) return package_;
 
     if (package_.amount >= cost) {
@@ -60,15 +60,12 @@ export const updateWorkspaceCoins = async ({
       remainingCost = 0;
 
       // Execute transaction
-      const coinsQuery = db.format(sql, [
-        package_.amount - newAmount,
-        package_.id,
-      ]);
+      const coinsQuery = db.format(sql, [newAmount, package_.id]);
       await db.query(coinsQuery, "unguess");
 
       return {
         ...package_,
-        amount: package_.amount - newAmount,
+        amount: newAmount,
       };
     } else {
       remainingCost -= package_.amount;
