@@ -987,6 +987,7 @@ components:
               - project_id
               - pm_id
               - platforms
+              - customer_id
     Project:
       content:
         application/json:
