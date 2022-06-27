@@ -1,6 +1,5 @@
 import { getWorkspaceCoins } from "@src/utils/workspaces";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { ERROR_MESSAGE, fallBackCsmProfile } from "@src/utils/constants";
 
 const customer_1 = {
   id: 1,
@@ -55,7 +54,7 @@ describe("getWorkspaceCoins", () => {
           coins: [coins_1, coins_2, coins_3, coins_4],
         });
       } catch (error) {
-        console.log(error);
+        console.error(error);
         reject(error);
       }
 

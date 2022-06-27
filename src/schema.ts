@@ -228,7 +228,7 @@ export interface components {
      * The coin only valid currency in order to run an express campaign (no matter what type of express)
      */
     Coin: {
-      id?: number;
+      id: number;
       customer_id: number;
       /** @description Number of available coin */
       amount: number;
@@ -295,7 +295,7 @@ export interface components {
           /** @description Da togliere */
           page_manual_id?: number;
           /** @description Da togliere */
-          customer_id?: number;
+          customer_id: number;
           has_bug_form?: number;
           /** @description if has_bug_form is 0 this has to be 0 */
           has_bug_parade?: number;
