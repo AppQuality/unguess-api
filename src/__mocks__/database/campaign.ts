@@ -12,6 +12,7 @@ export const table = {
       "title varchar(256)",
       "customer_title varchar(256)",
       "description varchar(512)",
+      "base_bug_internal_id varchar(45)",
       "status_id int(1)",
       "is_public int(1)",
       "campaign_type_id int(11)",
