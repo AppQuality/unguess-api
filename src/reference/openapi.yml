@@ -743,6 +743,10 @@ components:
               type: number
             name:
               type: string
+        description:
+          type: string
+        base_bug_internal_id:
+          type: string
       required:
         - id
         - start_date
