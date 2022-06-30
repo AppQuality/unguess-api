@@ -743,6 +743,10 @@ components:
               type: number
             name:
               type: string
+        description:
+          type: string
+        base_bug_internal_id:
+          type: string
       required:
         - id
         - start_date
@@ -969,6 +973,13 @@ components:
                 minimum: 0
                 maximum: 1
                 description: if has_bug_form is 0 this has to be 0
+              description:
+                type: string
+                description: Useless value required by Tryber BackOffice
+                maxLength: 512
+              base_bug_internal_id:
+                type: string
+                maxLength: 45
             required:
               - title
               - start_date

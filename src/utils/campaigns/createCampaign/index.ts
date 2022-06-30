@@ -30,6 +30,8 @@ export const createCampaign = async (
     "platform_id", //Required for db, but useless.
     "form_factor",
     "os",
+    "description", //Required for db, but useless.
+    "base_bug_internal_id",
   ];
 
   // Get bug form
@@ -75,6 +77,8 @@ export const createCampaign = async (
     DEFAULT_PLATFORM_ID as number,
     form_factor_list.join(",") as string,
     os_list.join(",") as string,
+    campaign_request.description as string,
+    campaign_request.base_bug_internal_id as string,
   ];
 
   let insert_sql =
@@ -102,6 +106,8 @@ export const createCampaign = async (
             c.end_date,
             c.close_date,
             c.title,
+            c.description,
+            c.base_bug_internal_id,
             c.customer_title,
             c.status_id,
             c.is_public,
@@ -158,5 +164,7 @@ export const createCampaign = async (
       id: campaign.project_id,
       name: campaign.display_name,
     },
+    description: campaign.description,
+    base_bug_internal_id: campaign.base_bug_internal_id,
   };
 };

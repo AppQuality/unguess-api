@@ -185,6 +185,8 @@ export interface components {
         id: number;
         name: string;
       };
+      description?: string;
+      base_bug_internal_id?: string;
     };
     /** Project */
     Project: {
@@ -299,6 +301,9 @@ export interface components {
           has_bug_form?: number;
           /** @description if has_bug_form is 0 this has to be 0 */
           has_bug_parade?: number;
+          /** @description Useless value required by Tryber BackOffice */
+          description?: string;
+          base_bug_internal_id?: string;
         };
       };
     };
