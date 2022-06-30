@@ -963,7 +963,7 @@ components:
                 description: Da togliere
               customer_id:
                 type: integer
-                description: Da togliere
+                description: Used to check available coins
               has_bug_form:
                 type: integer
                 minimum: 0
