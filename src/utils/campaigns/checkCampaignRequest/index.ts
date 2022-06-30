@@ -1,6 +1,29 @@
-import { ERROR_MESSAGE, fallBackCsmProfile } from "@src/utils/constants";
+import {
+  DEFAULT_BASE_BUG_INTERNAL_ID,
+  ERROR_MESSAGE,
+  fallBackCsmProfile,
+} from "@src/utils/constants";
 import { checkPlatforms } from "../checkPlatforms";
 import { getCampaignType } from "../getCampaignType";
+
+const getInternalIdFromTitle = (title: string) => {
+  if (typeof title != "string" || !title) {
+    return DEFAULT_BASE_BUG_INTERNAL_ID;
+  }
+
+  const acronym = title
+    .match(/[\p{Alpha}\p{Nd}]+/gu)
+    ?.reduce(
+      (previous, next) =>
+        previous +
+        (+next === 0 || parseInt(next) ? parseInt(next) : next[0] || ""),
+      ""
+    )
+    .toUpperCase();
+
+  // Return internal id (max 10 characters)
+  return acronym?.substring(0, 10) || DEFAULT_BASE_BUG_INTERNAL_ID;
+};
 
 export const checkCampaignRequest = async (
   campaign_request: StoplightComponents["requestBodies"]["Campaign"]["content"]["application/json"]
@@ -22,7 +45,8 @@ export const checkCampaignRequest = async (
     !campaign_request.end_date ||
     !campaign_request.close_date ||
     !campaign_request.campaign_type_id ||
-    !campaign_request.project_id
+    !campaign_request.project_id ||
+    !campaign_request.customer_id
   ) {
     throw { ...error, code: 400 };
   }
@@ -44,6 +68,17 @@ export const checkCampaignRequest = async (
 
     if (bug_form_result === false) throw { ...error, code: 400 };
   }
+
+  // Add default description
+  if (!campaign_request.description)
+    campaign_request.description =
+      "Campaign automatically created by express wizard";
+
+  // Add internal bug id
+  if (!campaign_request.base_bug_internal_id)
+    campaign_request.base_bug_internal_id = getInternalIdFromTitle(
+      campaign_request.title
+    );
 
   // Return validated request and set default values
   return {

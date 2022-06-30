@@ -6,6 +6,8 @@ info:
   contact:
     name: Developers
     email: it@unguess.io
+    url: 'https://unguess.io/'
+  termsOfService: 'https://unguess.io/terms-and-conditions/'
 servers:
   - url: 'https://api.unguess.io'
 paths:
@@ -67,7 +69,8 @@ paths:
   /workspaces:
     get:
       summary: Get User Workspaces
-      tags: []
+      tags:
+        - Workspaces
       responses:
         '200':
           description: OK
@@ -107,7 +110,8 @@ paths:
       - $ref: '#/components/parameters/wid'
     get:
       summary: GET single Workspace
-      tags: []
+      tags:
+        - Workspaces
       responses:
         '200':
           description: OK
@@ -132,7 +136,9 @@ paths:
       - $ref: '#/components/parameters/wid'
     get:
       summary: GET Workspace campaigns
-      tags: []
+      tags:
+        - Workspaces
+        - Campaigns
       responses:
         '200':
           description: OK
@@ -176,7 +182,9 @@ paths:
       - $ref: '#/components/parameters/wid'
     get:
       summary: GET Workspace Projects
-      tags: []
+      tags:
+        - Workspaces
+        - Projects
       responses:
         '200':
           description: OK
@@ -217,7 +225,9 @@ paths:
       - $ref: '#/components/parameters/pid'
     get:
       summary: GET Workspace single project
-      tags: []
+      tags:
+        - Workspaces
+        - Projects
       responses:
         '200':
           description: OK
@@ -242,7 +252,10 @@ paths:
       - $ref: '#/components/parameters/pid'
     get:
       summary: GET Workspace Project campaigns
-      tags: []
+      tags:
+        - Projects
+        - Workspaces
+        - Campaigns
       responses:
         '200':
           description: OK
@@ -287,7 +300,9 @@ paths:
         description: Project id
     get:
       summary: GET Project campaigns
-      tags: []
+      tags:
+        - Campaign
+        - Projects
       responses:
         '200':
           description: OK
@@ -389,9 +404,12 @@ paths:
         - JWT: []
       requestBody:
         $ref: '#/components/requestBodies/Campaign'
+      tags:
+        - Campaigns
+    parameters: []
   /projects:
     post:
-      summary: ''
+      summary: Create a new project
       operationId: post-projects
       responses:
         '200':
@@ -412,6 +430,97 @@ paths:
         - JWT: []
       requestBody:
         $ref: '#/components/requestBodies/Project'
+      tags:
+        - Projects
+  '/workspaces/{wid}/coins':
+    get:
+      summary: Retrieve available customer coins
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Coin'
+                  start:
+                    type: integer
+                  limit:
+                    type: integer
+                  size:
+                    type: integer
+                  total:
+                    type: integer
+              examples:
+                single:
+                  value:
+                    items:
+                      - id: 123
+                        customer_id: 98
+                        amount: 5
+                        agreement_id: 14560
+                        price: 900
+                        created_on: '2022-06-23T12:14:12Z'
+                        updated_on: '2022-06-23T14:45:15Z'
+                    start: 0
+                    limit: 10
+                    size: 1
+                    total: 1
+                multiple:
+                  value:
+                    items:
+                      - id: 123
+                        customer_id: 98
+                        amount: 5
+                        agreement_id: 2002
+                        price: 900
+                        created_on: '2022-06-23T12:14:12Z'
+                        updated_on: '2022-06-23T14:45:15Z'
+                      - id: 151
+                        customer_id: 98
+                        amount: 50
+                        price: 15
+                        created_on: '2022-06-23T12:14:12Z'
+                        updated_on: '2022-06-23T14:45:15Z'
+                      - id: 456
+                        customer_id: 98
+                        amount: 2
+                        price: 1
+                        created_on: '2022-06-23T12:14:12Z'
+                        updated_on: '2022-06-23T14:45:15Z'
+                      - id: 678
+                        customer_id: 98
+                        amount: 200
+                        price: 24
+                        created_on: '2022-06-23T12:14:12Z'
+                        updated_on: '2022-06-23T14:45:15Z'
+                    start: 0
+                    limit: 4
+                    size: 4
+                    total: 18
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-workspaces-coins
+      security:
+        - JWT: []
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/order'
+        - $ref: '#/components/parameters/orderBy'
+      tags:
+        - Workspaces
+        - Coins
+    parameters:
+      - $ref: '#/components/parameters/wid'
 components:
   schemas:
     User:
@@ -516,8 +625,9 @@ components:
       title: Workspace
       type: object
       x-examples:
-        - id: 0
-          company: string
+        Single Workspace:
+          id: 0
+          company: Scrofalo & Co.
           tokens: 0
           logo: string
           csm:
@@ -526,6 +636,7 @@ components:
             name: Teomondo Scrofalo
             workspaces: []
             picture: 'https://pbs.twimg.com/media/Ccp6RXFWIAAQQ2V.jpg'
+      description: A workspace is the company area with projects and campaigns
       properties:
         id:
           type: integer
@@ -558,6 +669,9 @@ components:
               type: string
             url:
               type: string
+        coins:
+          type: number
+          description: express coins
       required:
         - id
         - company
@@ -629,6 +743,10 @@ components:
               type: number
             name:
               type: string
+        description:
+          type: string
+        base_bug_internal_id:
+          type: string
       required:
         - id
         - start_date
@@ -699,6 +817,36 @@ components:
         name:
           type: string
       description: Flags used to enable functionality to some users
+    Coin:
+      title: Coin
+      type: object
+      description: |-
+        A coin package is a set of coins (free or paid). 
+        The coin only valid currency in order to run an express campaign (no matter what type of express)
+      properties:
+        id:
+          type: integer
+        customer_id:
+          type: integer
+        amount:
+          type: number
+          description: Number of available coin
+        agreement_id:
+          type: integer
+        price:
+          type: number
+          default: 0
+          format: float
+          description: This is the single coin price
+        created_on:
+          type: string
+        updated_on:
+          type: string
+          description: 'On each coin use, the related package will be updated'
+      required:
+        - id
+        - customer_id
+        - amount
   securitySchemes:
     JWT:
       type: http
@@ -815,7 +963,7 @@ components:
                 description: Da togliere
               customer_id:
                 type: integer
-                description: Da togliere
+                description: Used to check available coins
               has_bug_form:
                 type: integer
                 minimum: 0
@@ -825,6 +973,13 @@ components:
                 minimum: 0
                 maximum: 1
                 description: if has_bug_form is 0 this has to be 0
+              description:
+                type: string
+                description: Useless value required by Tryber BackOffice
+                maxLength: 512
+              base_bug_internal_id:
+                type: string
+                maxLength: 45
             required:
               - title
               - start_date
@@ -834,6 +989,7 @@ components:
               - project_id
               - pm_id
               - platforms
+              - customer_id
     Project:
       content:
         application/json:

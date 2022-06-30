@@ -79,6 +79,7 @@ const campaign_request_1 = {
   campaign_type_id: 1,
   project_id: 1,
   pm_id: fallBackCsmProfile.id,
+  customer_id: 1,
 };
 
 const campaign_1 = {
@@ -101,6 +102,12 @@ const campaign_type_1 = {
   type: 0,
 };
 
+const coins_1 = {
+  id: 1,
+  amount: 10,
+  customer_id: 1,
+};
+
 describe("POST /campaigns", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
@@ -115,6 +122,7 @@ describe("POST /campaigns", () => {
           userToProjects: [user_to_project_1, user_to_project_2],
           campaigns: [campaign_1],
           campaignTypes: [campaign_type_1],
+          coins: [coins_1],
         });
 
         await platformData.addItem(AndroidPhone);
@@ -222,5 +230,20 @@ describe("POST /campaigns", () => {
         name: project_1.display_name,
       },
     });
+  });
+
+  it("Should have description and internal_id filled", async () => {
+    const response = await request(app)
+      .post("/campaigns")
+      .set("Authorization", "Bearer customer")
+      .send({
+        ...campaign_request_1,
+        platforms: [AndroidPhoneBody, WindowsPCBody],
+      });
+    expect(response.status).toBe(200);
+
+    // Check that description and internal_id are filled
+    expect(response.body.description).toBeDefined();
+    expect(response.body.base_bug_internal_id).toBeDefined();
   });
 });
