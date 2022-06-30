@@ -231,4 +231,19 @@ describe("POST /campaigns", () => {
       },
     });
   });
+
+  it("Should have description and internal_id filled", async () => {
+    const response = await request(app)
+      .post("/campaigns")
+      .set("Authorization", "Bearer customer")
+      .send({
+        ...campaign_request_1,
+        platforms: [AndroidPhoneBody, WindowsPCBody],
+      });
+    expect(response.status).toBe(200);
+
+    // Check that description and internal_id are filled
+    expect(response.body.description).toBeDefined();
+    expect(response.body.base_bug_internal_id).toBeDefined();
+  });
 });
