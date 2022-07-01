@@ -566,10 +566,6 @@ components:
           type: integer
         picture:
           type: string
-        workspaces:
-          type: array
-          items:
-            $ref: '#/components/schemas/Workspace'
         features:
           type: array
           items:
@@ -582,7 +578,6 @@ components:
         - profile_id
         - tryber_wp_user_id
         - unguess_wp_user_id
-        - workspaces
     Authentication:
       title: Authentication
       type: object
