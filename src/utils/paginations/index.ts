@@ -24,7 +24,7 @@ export const paginateItems = async (data: PaginationParams) => {
 };
 
 export const formatCount = (count: any[]): number => {
-  return parseInt(count.map((el: any) => el["COUNT(*)"])[0]);
+  return parseInt(count.map((el: any) => el["count"])[0]);
 };
 
 export const emptyPaginatedResponse = () => {

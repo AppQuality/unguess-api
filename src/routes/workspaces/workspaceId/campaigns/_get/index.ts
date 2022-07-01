@@ -150,7 +150,7 @@ export default async (
 
     const campaigns = await db.query(query);
 
-    const countQuery = `SELECT COUNT(*) FROM wp_appq_evd_campaign c JOIN wp_appq_project p ON c.project_id = p.id WHERE p.id IN (${userProjectsID})`;
+    const countQuery = `SELECT COUNT(*) as count FROM wp_appq_evd_campaign c JOIN wp_appq_project p ON c.project_id = p.id WHERE p.id IN (${userProjectsID})`;
     let total = await db.query(countQuery);
     total = formatCount(total);
 

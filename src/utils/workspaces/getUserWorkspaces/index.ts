@@ -39,13 +39,11 @@ export const getUserWorkspaces = async (
     query += ` LIMIT ${limit} OFFSET ${start || START_QUERY_PARAM_DEFAULT}`;
   }
 
-  let countQuery = `SELECT COUNT(*) 
+  let countQuery = `SELECT COUNT(DISTINCT c.id) as count
         FROM wp_appq_customer c 
         JOIN wp_appq_user_to_customer utc ON (c.id = utc.customer_id) 
         LEFT JOIN wp_appq_evd_profile p ON (p.id = c.pm_id)
-        ${
-          user.role !== "administrator" ? `WHERE utc.wp_user_id = ?` : ``
-        } GROUP BY c.id`;
+        ${user.role !== "administrator" ? `WHERE utc.wp_user_id = ?` : ``}`;
 
   try {
     if (

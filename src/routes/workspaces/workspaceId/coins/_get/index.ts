@@ -77,7 +77,7 @@ export default async (
       order,
     });
 
-    const countQuery = `SELECT COUNT(*) FROM wp_ug_coins c WHERE c.customer_id = ${wid}`;
+    const countQuery = `SELECT COUNT(*) as count FROM wp_ug_coins c WHERE c.customer_id = ${wid}`;
     let total = await db.query(countQuery, "unguess");
     total = formatCount(total);
 
