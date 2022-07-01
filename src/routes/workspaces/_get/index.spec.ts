@@ -140,4 +140,34 @@ describe("GET /workspaces", () => {
     expect(response.status).toBe(400);
     expect(response.body.err[0].message).toBe("should be number");
   });
+
+  it("Should answer with an array of workspaces ordered by name", async () => {
+    const response = await request(app)
+      .get("/workspaces?orderBy=company&order=desc")
+      .set("authorization", "Bearer customer");
+    expect(JSON.stringify(response.body)).toStrictEqual(
+      JSON.stringify({
+        items: [
+          {
+            id: customer_2.id,
+            company: customer_2.company,
+            logo: customer_2.company_logo,
+            tokens: customer_2.tokens,
+            csm: fallBackCsmProfile,
+          },
+          {
+            id: customer_1.id,
+            company: customer_1.company,
+            logo: customer_1.company_logo,
+            tokens: customer_1.tokens,
+            csm: fallBackCsmProfile,
+          },
+        ],
+        start: 0,
+        limit: LIMIT_QUERY_PARAM_DEFAULT,
+        size: 2,
+        total: 2,
+      })
+    );
+  });
 });

@@ -296,7 +296,7 @@ export interface components {
           page_preview_id?: number;
           /** @description Da togliere */
           page_manual_id?: number;
-          /** @description Da togliere */
+          /** @description Used to check available coins */
           customer_id: number;
           has_bug_form?: number;
           /** @description if has_bug_form is 0 this has to be 0 */
@@ -364,6 +364,10 @@ export interface operations {
         limit?: components["parameters"]["limit"];
         /** Start pagination parameter */
         start?: components["parameters"]["start"];
+        /** Order value (ASC, DESC) */
+        order?: components["parameters"]["order"];
+        /** Order by accepted field */
+        orderBy?: components["parameters"]["orderBy"];
       };
     };
     responses: {

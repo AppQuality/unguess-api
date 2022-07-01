@@ -6,11 +6,14 @@ import {
   START_QUERY_PARAM_DEFAULT,
 } from "@src/utils/constants";
 
+export type WorkspaceOrderBy = "id" | "company" | "tokens";
+export type WorkspaceOrders = "ASC" | "DESC";
+
 interface GetWorkspacesArgs {
   limit?: StoplightComponents["parameters"]["limit"];
   start?: StoplightComponents["parameters"]["start"];
-  orderBy?: "c.id" | "c.company" | "c.tokens";
-  order?: "ASC" | "DESC";
+  orderBy?: WorkspaceOrderBy;
+  order?: WorkspaceOrders;
 }
 
 export const getUserWorkspaces = async (
@@ -32,7 +35,7 @@ export const getUserWorkspaces = async (
         } GROUP BY c.id`;
 
   if (orderBy) {
-    query += ` ORDER BY ${orderBy} ${order || "ASC"}`;
+    query += ` ORDER BY c.${orderBy} ${order || "ASC"}`;
   }
 
   if (limit) {
