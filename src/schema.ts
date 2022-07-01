@@ -118,7 +118,6 @@ export interface components {
       tryber_wp_user_id: number;
       unguess_wp_user_id: number;
       picture?: string;
-      workspaces: components["schemas"]["Workspace"][];
       features?: components["schemas"]["Feature"][];
     };
     /** Authentication */
