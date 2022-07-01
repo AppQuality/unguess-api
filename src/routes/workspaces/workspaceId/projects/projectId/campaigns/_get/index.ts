@@ -71,7 +71,7 @@ export default async (
       campaignsSql += ` LIMIT ${limit} OFFSET ${start}`;
     }
 
-    const countQuery = `SELECT COUNT(*)  
+    const countQuery = `SELECT COUNT(*) as count 
       FROM wp_appq_evd_campaign c 
       JOIN wp_appq_project p ON c.project_id = p.id 
       JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id 

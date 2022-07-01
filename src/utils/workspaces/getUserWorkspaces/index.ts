@@ -6,11 +6,14 @@ import {
   START_QUERY_PARAM_DEFAULT,
 } from "@src/utils/constants";
 
+export type WorkspaceOrderBy = "id" | "company" | "tokens";
+export type WorkspaceOrders = "ASC" | "DESC";
+
 interface GetWorkspacesArgs {
   limit?: StoplightComponents["parameters"]["limit"];
   start?: StoplightComponents["parameters"]["start"];
-  orderBy?: "c.id" | "c.company" | "c.tokens";
-  order?: "ASC" | "DESC";
+  orderBy?: WorkspaceOrderBy;
+  order?: WorkspaceOrders;
 }
 
 export const getUserWorkspaces = async (
@@ -32,20 +35,18 @@ export const getUserWorkspaces = async (
         } GROUP BY c.id`;
 
   if (orderBy) {
-    query += ` ORDER BY ${orderBy} ${order || "ASC"}`;
+    query += ` ORDER BY c.${orderBy} ${order || "ASC"}`;
   }
 
   if (limit) {
     query += ` LIMIT ${limit} OFFSET ${start || START_QUERY_PARAM_DEFAULT}`;
   }
 
-  let countQuery = `SELECT COUNT(*) 
+  let countQuery = `SELECT COUNT(DISTINCT c.id) as count
         FROM wp_appq_customer c 
         JOIN wp_appq_user_to_customer utc ON (c.id = utc.customer_id) 
         LEFT JOIN wp_appq_evd_profile p ON (p.id = c.pm_id)
-        ${
-          user.role !== "administrator" ? `WHERE utc.wp_user_id = ?` : ``
-        } GROUP BY c.id`;
+        ${user.role !== "administrator" ? `WHERE utc.wp_user_id = ?` : ``}`;
 
   try {
     if (

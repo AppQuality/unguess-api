@@ -77,6 +77,5 @@ describe("GET /users/me", () => {
       .get("/users/me")
       .set("authorization", "Bearer customer");
     expect(response.body.role).toBe("customer");
-    expect(response.body).toHaveProperty("workspaces");
   });
 });

@@ -7,6 +7,10 @@ import {
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
 } from "@src/utils/constants";
+import {
+  WorkspaceOrderBy,
+  WorkspaceOrders,
+} from "@src/utils/workspaces/getUserWorkspaces";
 
 export default async (
   c: Context,
@@ -19,16 +23,34 @@ export default async (
   } as StoplightComponents["schemas"]["Error"];
 
   try {
-    let limit = c.request.query.limit
+    const limit = c.request.query.limit
       ? parseInt(c.request.query.limit as string)
       : (LIMIT_QUERY_PARAM_DEFAULT as StoplightComponents["parameters"]["limit"]);
-    let start = c.request.query.start
+    const start = c.request.query.start
       ? parseInt(c.request.query.start as string)
       : (START_QUERY_PARAM_DEFAULT as StoplightComponents["parameters"]["start"]);
+
+    const order =
+      c.request.query.order &&
+      ["ASC", "DESC"].includes((c.request.query.order as string).toUpperCase())
+        ? ((c.request.query.order as string).toUpperCase() as WorkspaceOrders)
+        : "ASC";
+
+    const orderBy =
+      c.request.query.orderBy &&
+      ["id", "company", "tokens"].includes(
+        (c.request.query.orderBy as string).toLowerCase()
+      )
+        ? ((
+            c.request.query.orderBy as string
+          ).toLowerCase() as WorkspaceOrderBy)
+        : "id";
 
     let userWorkspaces = await getUserWorkspaces(req.user, {
       limit,
       start,
+      ...(order && { order: order }),
+      ...(orderBy && { orderBy: orderBy }),
     });
 
     if (userWorkspaces.workspaces.length) {

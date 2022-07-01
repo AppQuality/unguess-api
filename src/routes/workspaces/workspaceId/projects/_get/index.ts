@@ -55,7 +55,7 @@ export default async (
     projects = await db.query(db.format(projectSql, [wid]));
 
     // Count projects
-    const countQuery = `SELECT COUNT(*) FROM wp_appq_project WHERE customer_id = ?`;
+    const countQuery = `SELECT COUNT(*) as count FROM wp_appq_project WHERE customer_id = ?`;
     total = await db.query(db.format(countQuery, [wid]));
     total = formatCount(total);
 
