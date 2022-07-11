@@ -167,4 +167,19 @@ describe("updateWorkspaceCoins", () => {
       }),
     ]);
   });
+
+  // Once a package is updated, there should be a transaction for it
+  it("Should create a transaction for the package", async () => {
+    const packages = await updateWorkspaceCoins({
+      workspaceId: customer_1.id,
+      cost: DEFAULT_EXPRESS_COST, // Total amount is now 48
+    });
+
+    expect(packages).toEqual([
+      expect.objectContaining({
+        id: coins_1.id,
+        amount: 48,
+      }),
+    ]);
+  });
 });
