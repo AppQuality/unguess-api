@@ -27,9 +27,12 @@ type CoinTransaction = {
  * Notes: we don't check if the user has permission to get the workspace, because this is done in the getWorkspace function
  *
  * @param workspaceId (number) - workspace id
- * @param cost? (number) default: 1 - amount of coins required
- * @param campaignId? (number) - campaign id
- * @returns array of updated coins (Array)
+ * @param profileId (number) - profile id
+ * @param quantity (number) - quantity of coins
+ * @param campaignId (number) - campaign id
+ * @param coinsPackageId (number) - coins package id
+ * @param notes? (string) - notes
+ * @returns the updated coins package (CoinTransaction) or false on failure
  */
 export const updateWorkspaceCoinsTransaction = async ({
   workspaceId,

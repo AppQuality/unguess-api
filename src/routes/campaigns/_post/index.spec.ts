@@ -10,6 +10,7 @@ import {
   DT_SMARTPHONE,
   fallBackCsmProfile,
 } from "@src/utils/constants";
+import { getWorkspaceCoinsTransactions } from "@src/utils/workspaces/getWorkspaceCoinsTransactions";
 
 const customer_1 = {
   id: 1,
@@ -245,5 +246,30 @@ describe("POST /campaigns", () => {
     // Check that description and internal_id are filled
     expect(response.body.description).toBeDefined();
     expect(response.body.base_bug_internal_id).toBeDefined();
+  });
+
+  // A coins transaction should be created after campaign creation
+  it("A coins transaction should be created after campaign creation", async () => {
+    const response = await request(app)
+      .post("/campaigns")
+      .set("Authorization", "Bearer customer")
+      .send({
+        ...campaign_request_1,
+        platforms: [AndroidPhoneBody, WindowsPCBody],
+      });
+    expect(response.status).toBe(200);
+
+    // Check if transaction exists
+    const transaction = await getWorkspaceCoinsTransactions({
+      workspaceId: campaign_request_1.customer_id,
+      campaignId: response.body.id,
+    });
+
+    expect(transaction).toEqual([
+      expect.objectContaining({
+        campaign_id: response.body.id,
+        // TODO: Add cost check here once is defined on endpoint
+      }),
+    ]);
   });
 });

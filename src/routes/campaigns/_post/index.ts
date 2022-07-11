@@ -1,11 +1,12 @@
 /** OPENAPI-ROUTE: post-campaigns */
 import { Context } from "openapi-backend";
-import { ERROR_MESSAGE } from "@src/utils/constants";
+import { DEFAULT_EXPRESS_COST, ERROR_MESSAGE } from "@src/utils/constants";
 import { checkCampaignRequest, createCampaign } from "@src/utils/campaigns";
 import { getProjectById } from "@src/utils/projects";
 import { checkAvailableCoins } from "@src/utils/workspaces/checkAvailableCoins";
 import { getWorkspace } from "@src/utils/workspaces";
 import { updateWorkspaceCoins } from "@src/utils/workspaces/updateWorkspaceCoins";
+import { updateWorkspaceCoinsTransaction } from "@src/utils/workspaces/updateWorkspaceCoinsTransactions";
 
 export default async (
   c: Context,
@@ -39,17 +40,32 @@ export default async (
       user: user,
     });
 
+    const cost = DEFAULT_EXPRESS_COST; // TODO: handle different costs from request
+
     // Check express coins availability
-    if (!checkAvailableCoins({ coins: workspace.coins }))
+    if (!checkAvailableCoins({ coins: workspace.coins, cost: cost }))
       throw { ...error, code: 403 };
 
     // Deduct express coin(s)
-    await updateWorkspaceCoins({
+
+    const updatedCoinsPackages = await updateWorkspaceCoins({
       workspaceId: workspace.id,
+      cost: cost,
     });
+
+    const updatedCoinsPackage = updatedCoinsPackages[0];
 
     // Create the campaign
     let campaign = await createCampaign(validated_request_body);
+
+    // Insert coins transaction
+    await updateWorkspaceCoinsTransaction({
+      workspaceId: workspace.id,
+      profileId: user.id,
+      quantity: cost,
+      campaignId: campaign.id,
+      coinsPackageId: updatedCoinsPackage.id,
+    });
 
     return campaign as StoplightComponents["schemas"]["Campaign"];
   } catch (e: any) {
