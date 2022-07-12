@@ -977,6 +977,8 @@ components:
               base_bug_internal_id:
                 type: string
                 maxLength: 45
+              express_slug:
+                type: string
             required:
               - title
               - start_date
@@ -987,6 +989,7 @@ components:
               - pm_id
               - platforms
               - customer_id
+              - express_slug
     Project:
       content:
         application/json:
