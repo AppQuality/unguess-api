@@ -33,7 +33,9 @@ export default (
   ) {
     return responseData.examples[example].value;
   }
-  const firstExample = Object.values(response.examples).pop() as { value: any };
+  const firstExample = Object.values(responseData.examples).shift() as {
+    value: any;
+  };
   if (!firstExample.hasOwnProperty("value")) {
     return false;
   }
