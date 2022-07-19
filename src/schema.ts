@@ -303,6 +303,7 @@ export interface components {
           /** @description Useless value required by Tryber BackOffice */
           description?: string;
           base_bug_internal_id?: string;
+          express_slug: string;
         };
       };
     };

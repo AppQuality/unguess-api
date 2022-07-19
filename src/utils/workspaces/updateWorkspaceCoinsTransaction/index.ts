@@ -6,7 +6,7 @@ interface UpdateWorkspaceHistoryCoinsArgs {
   profileId: number;
   quantity: number;
   campaignId: number;
-  coinsPackageId: number;
+  coinsPackageId?: number;
   notes?: string;
 }
 
@@ -16,7 +16,7 @@ type CoinTransaction = {
   profile_id: number;
   quantity: number;
   campaign_id: number;
-  coins_package_id: number;
+  coins_package_id?: number;
   created_on: string;
   notes: string;
 };
@@ -30,7 +30,7 @@ type CoinTransaction = {
  * @param profileId (number) - profile id
  * @param quantity (number) - quantity of coins
  * @param campaignId (number) - campaign id
- * @param coinsPackageId (number) - coins package id
+ * @param coinsPackageId? (number) - coins package id
  * @param notes? (string) - notes
  * @returns the updated coins package (CoinTransaction) or false on failure
  */
@@ -52,12 +52,9 @@ export const updateWorkspaceCoinsTransaction = async ({
 
   if (profileId == null || profileId <= 0) throw { ...error, code: 400 };
 
-  if (quantity == null || quantity <= 0) throw { ...error, code: 400 };
+  if (quantity == null || quantity < 0) throw { ...error, code: 400 };
 
   if (campaignId == null || campaignId <= 0) throw { ...error, code: 400 };
-
-  if (coinsPackageId == null || coinsPackageId <= 0)
-    throw { ...error, code: 400 };
 
   // Insert transaction history
   const sql =
@@ -68,7 +65,7 @@ export const updateWorkspaceCoinsTransaction = async ({
     profileId,
     quantity,
     campaignId,
-    coinsPackageId,
+    coinsPackageId || "",
     notes || "",
   ]);
 

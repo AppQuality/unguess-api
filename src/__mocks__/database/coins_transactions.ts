@@ -21,7 +21,7 @@ export const table = {
       "profile_id int(11) NOT NULL",
       "quantity int(11) NOT NULL",
       "campaign_id int(11) NOT NULL",
-      "coins_package_id int(11) NOT NULL",
+      "coins_package_id int(11) NULL",
       "created_on timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP",
       "notes varchar(255) NULL",
     ]);

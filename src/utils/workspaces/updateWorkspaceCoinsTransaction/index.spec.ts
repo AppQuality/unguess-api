@@ -60,7 +60,7 @@ const campaign_type_1 = {
   type: 1,
 };
 
-describe("updateWorkspaceCoinsTransactions", () => {
+describe("updateWorkspaceCoinsTransaction", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
@@ -121,7 +121,7 @@ describe("updateWorkspaceCoinsTransactions", () => {
   // Should throw an error if parameters are wrong
   it("Should throw an error if parameters are wrong", async () => {
     try {
-      const transaction = await updateWorkspaceCoinsTransaction({
+      await updateWorkspaceCoinsTransaction({
         workspaceId: customer_1.id,
         profileId: customer_profile_1.id,
         quantity: DEFAULT_EXPRESS_COST,

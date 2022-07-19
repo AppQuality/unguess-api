@@ -31,6 +31,8 @@ import {
   data as coinsTransactionsData,
 } from "./coins_transactions";
 
+import { table as expressTable, data as expressData } from "./express";
+
 import defaultUsers from "@src/__mocks__/database/seed/users.json";
 
 interface dataObject {
@@ -45,6 +47,7 @@ interface dataObject {
   customers?: Array<any>;
   coins?: Array<any>;
   transactions?: Array<any>;
+  express?: Array<any>;
 }
 
 export const adapter = {
@@ -59,11 +62,14 @@ export const adapter = {
     await userTable.create();
     await customerTable.create();
 
-    //Features Table
+    //Features Tables
     await featuresTable.create();
     await userToFeaturesTable.create();
+
+    // Express Tables
     await coinsTable.create();
     await coinsTransactionsTable.create();
+    await expressTable.create();
   },
   drop: async () => {
     await profileTable.drop();
@@ -76,12 +82,14 @@ export const adapter = {
     await userTable.drop();
     await customerTable.drop();
 
-    //Features Table
+    //Features Tables
     await featuresTable.drop();
     await userToFeaturesTable.drop();
 
+    // Express Tables
     await coinsTable.drop();
     await coinsTransactionsTable.drop();
+    await expressTable.drop();
   },
   add: async ({
     profiles = [],
@@ -94,6 +102,7 @@ export const adapter = {
     users = [],
     coins = [],
     transactions = [],
+    express = [],
   }: dataObject) => {
     profiles.length &&
       profiles.forEach(async (profile) => {
@@ -145,6 +154,11 @@ export const adapter = {
     transactions.length &&
       transactions.forEach(async (transaction) => {
         await coinsTransactionsData.basicItem(transaction);
+      });
+
+    express.length &&
+      express.forEach(async (expressItem) => {
+        await expressData.basicItem(expressItem);
       });
   },
 };

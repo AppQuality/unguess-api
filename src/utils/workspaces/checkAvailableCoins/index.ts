@@ -17,7 +17,7 @@ export const checkAvailableCoins = ({
   coins,
   cost = DEFAULT_EXPRESS_COST,
 }: CheckAvailableCoinsArgs): boolean => {
-  if (!coins) return false;
+  if (!coins) coins = 0; // If no coins are available, assume there are no coins
 
   return coins >= cost ? true : false;
 };
