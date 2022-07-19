@@ -26,10 +26,11 @@ module.exports = {
   collectCoverageFrom: [
     "src/**/*.{js,jsx,ts,tsx}",
     "!<rootDir>/node_modules/",
-    "!<rootDir>/src/features/db/*",
-    "!<rootDir>/src/features/sqlite/*",
     "!<rootDir>/src/index.ts",
     "!<rootDir>/src/config.ts",
+    "!<rootDir>/src/features/db/*",
+    "!<rootDir>/src/features/sqlite/*",
+    "!<rootDir>/src/features/debugMessage/index.ts",
     "!<rootDir>/src/middleware/postResponseHandler.ts",
   ],
 };
