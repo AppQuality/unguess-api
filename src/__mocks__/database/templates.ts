@@ -9,11 +9,10 @@ type TemplateParams = {
   device_type?: "webapp" | "mobileapp";
   image?: string;
   locale?: string;
-  requires_login?: boolean;
+  requires_login?: number;
 };
 
 const defaultItem: TemplateParams = {
-  id: 1,
   title: "???",
   description: "???",
   content: "???",

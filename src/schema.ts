@@ -706,10 +706,6 @@ export interface operations {
       query: {
         /** filterBy[<fieldName>]=<fieldValue> */
         filterBy?: components["parameters"]["filterBy"];
-        /** Limit pagination parameter */
-        limit?: components["parameters"]["limit"];
-        /** Start pagination parameter */
-        start?: components["parameters"]["start"];
         /** Order value (ASC, DESC) */
         order?: components["parameters"]["order"];
         /** Order by accepted field */
