@@ -520,9 +520,54 @@ paths:
         - $ref: '#/components/parameters/orderBy'
       tags:
         - Workspaces
-        - Coins
     parameters:
       - $ref: '#/components/parameters/wid'
+  /templates:
+    get:
+      summary: GET /templates
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - type: object
+                      properties:
+                        id:
+                          type: number
+                    - $ref: '#/components/schemas/Template'
+              examples:
+                example-1:
+                  value:
+                    - id: 0
+                      title: Ricerca con form
+                      description: 'Ricerca di soluzioni e prodotti tramite parametri specifici. (es. cerca biglietto, cerca offerta..)'
+                      content: <h3>Descrizione della funzionalità</h3><p>Stai per testare la funzionalità “barra di ricerca” il cui scopo è quello di “cercare prodotti”</p>
+                      category:
+                        id: 12
+                        name: Flusso di ricerca e acquisto
+                      device_type: webapp
+                      locale: en
+                      image: 'http://example.com'
+                      requiresLogin: false
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-templates
+      description: Retrieve all available use case templates
+      security:
+        - JWT: []
+      parameters:
+        - $ref: '#/components/parameters/filterBy'
+        - $ref: '#/components/parameters/order'
+        - $ref: '#/components/parameters/orderBy'
 components:
   schemas:
     User:
@@ -674,6 +719,8 @@ components:
         - company
         - tokens
         - csm
+      x-tags:
+        - workspace
     Campaign:
       title: Campaign
       type: object
@@ -844,6 +891,61 @@ components:
         - id
         - customer_id
         - amount
+    Template:
+      title: Template
+      type: object
+      description: Define all details of a use case.
+      x-tags:
+        - templates
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+          description: Short description used as preview of template or in templates dropdown
+        content:
+          type: string
+          description: HTML content used to pre-fill the use case editor
+        category:
+          $ref: '#/components/schemas/TemplateCategory'
+        device_type:
+          type: string
+          enum:
+            - webapp
+            - mobileapp
+        locale:
+          type: string
+          enum:
+            - en
+            - it
+          default: en
+        image:
+          type: string
+          format: uri
+        requiresLogin:
+          type: boolean
+          default: false
+          description: The use case created by this template needs a login or not?
+      required:
+        - title
+        - description
+        - content
+        - category
+        - device_type
+        - locale
+      x-examples: {}
+    TemplateCategory:
+      title: TemplateCategory
+      type: object
+      description: Group different templates
+      x-examples: {}
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+      required:
+        - name
   securitySchemes:
     JWT:
       type: http
