@@ -7,6 +7,9 @@ export default (dbname: "unguess" | "tryber") => {
   db.function("CONCAT", { varargs: true }, (...args: string[]) =>
     args.join("")
   );
+  db.function("COALESCE", { varargs: true }, (...args: string[]) =>
+    (args.find((a: any) => a) || null)?.toString()
+  );
   const mockDb: any = {};
   mockDb.createTable = (table: string, columns: string[]) => {
     return new Promise(async (resolve, reject) => {
