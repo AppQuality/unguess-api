@@ -910,7 +910,7 @@ components:
         content:
           type: string
           description: HTML content used to pre-fill the use case editor
-        group:
+        category:
           $ref: '#/components/schemas/TemplateCategory'
         device_type:
           type: string
@@ -934,7 +934,7 @@ components:
         - title
         - description
         - content
-        - group
+        - category
         - device_type
         - locale
     TemplateCategory:
