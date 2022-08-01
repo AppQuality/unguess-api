@@ -10,7 +10,7 @@ const defaultItem: TemplateCategoryParams = {
   name: "???",
 };
 class TemplateCategories extends Table<TemplateCategoryParams> {
-  protected name = "template_categories";
+  protected name = "wp_ug_template_categories";
   protected columns = [
     "id INTEGER PRIMARY KEY AUTOINCREMENT",
     "name VARCHAR(255)",

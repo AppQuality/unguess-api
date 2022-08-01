@@ -257,7 +257,7 @@ export interface components {
       description: string;
       /** @description HTML content used to pre-fill the use case editor */
       content: string;
-      group: components["schemas"]["TemplateCategory"];
+      category: components["schemas"]["TemplateCategory"];
       /** @enum {string} */
       device_type: "webapp" | "mobileapp";
       /**
