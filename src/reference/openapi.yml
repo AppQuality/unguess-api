@@ -547,7 +547,7 @@ paths:
                       title: Ricerca con form
                       description: 'Ricerca di soluzioni e prodotti tramite parametri specifici. (es. cerca biglietto, cerca offerta..)'
                       content: <h3>Descrizione della funzionalità</h3><p>Stai per testare la funzionalità “barra di ricerca” il cui scopo è quello di “cercare prodotti”</p>
-                      group:
+                      category:
                         id: 12
                         name: Flusso di ricerca e acquisto
                       device_type: webapp
@@ -895,8 +895,6 @@ components:
         - amount
     Template:
       title: Template
-      x-stoplight:
-        id: qt43wp7zi0qt4
       type: object
       description: Define all details of a use case.
       x-tags:
@@ -937,16 +935,12 @@ components:
         - category
         - device_type
         - locale
+      x-examples: {}
     TemplateCategory:
       title: TemplateCategory
-      x-stoplight:
-        id: hsoh0alklz1hj
       type: object
       description: Group different templates
-      x-examples:
-        example-1:
-          id: 12
-          name: Flusso di ricerca e acquisto
+      x-examples: {}
       properties:
         id:
           type: number
