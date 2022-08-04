@@ -37,7 +37,6 @@ describe("GET /templates", () => {
           content: "<h1>Template 2</h1><p>content</p>",
           category_id: 123,
           device_type: "webapp",
-          image: "https://placehold.it/300x300",
         });
 
         Templates.insert({
@@ -98,6 +97,38 @@ describe("GET /templates", () => {
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
     expect(response.body[1].category.name).toBe("Uncategorized");
+  });
+
+  it("Should return a list of templates with logged flag if the templates requires login", async () => {
+    const response = await request(app)
+      .get("/templates")
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(200);
+    expect(response.body[0].requiresLogin).toBe(true);
+  });
+
+  it("Should return a list of templates with device type", async () => {
+    const response = await request(app)
+      .get("/templates")
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(200);
+    expect(response.body[0].device_type).toBe("webapp");
+  });
+
+  it("Should return a list of templates with image if has one", async () => {
+    const response = await request(app)
+      .get("/templates")
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(200);
+    expect(response.body[0].image).toBe("https://placehold.it/300x300");
+  });
+
+  it("Should return a list of templates without image if template has no image", async () => {
+    const response = await request(app)
+      .get("/templates")
+      .set("authorization", "Bearer customer");
+    expect(response.status).toBe(200);
+    expect(response.body[1].image).toBe(undefined);
   });
 
   it("Should return an error if an invalid query string is provided", async () => {

@@ -135,7 +135,7 @@ const prepareItems = (items: TemplateObject[]) => {
       },
     }),
     locale: item.locale,
-    requiresLogin: !item.requires_login,
+    requiresLogin: !!item.requires_login,
     device_type: item.device_type,
     ...(item.image && { image: item.image }),
   }));
