@@ -44,6 +44,8 @@ interface dataObject {
   campaignTypes?: Array<any>;
   userToProjects?: Array<any>;
   userToCustomers?: Array<any>;
+  userToFeatures?: Array<any>;
+  features?: Array<any>;
   users?: Array<any>;
   customers?: Array<any>;
   coins?: Array<any>;
@@ -103,6 +105,8 @@ export const adapter = {
     campaignTypes = [],
     userToProjects = [],
     userToCustomers = [],
+    userToFeatures = [],
+    features = [],
     users = [],
     coins = [],
     transactions = [],
@@ -169,6 +173,16 @@ export const adapter = {
     unguess_users.length &&
       unguess_users.forEach(async (user) => {
         await userDataUG.basicUser(user);
+      });
+
+    userToFeatures.length &&
+      userToFeatures.forEach(async (userToFeature) => {
+        await userToFeaturesData.basicItem(userToFeature);
+      });
+
+    features.length &&
+      features.forEach(async (feature) => {
+        await featuresData.basicItem(feature);
       });
   },
 };
