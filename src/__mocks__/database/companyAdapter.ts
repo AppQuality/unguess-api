@@ -7,6 +7,7 @@ import {
   data as campaignTypesData,
 } from "./campaign_type";
 import { table as userTable, data as userData } from "./user";
+import { table as userTableUG, data as userDataUG } from "./user_unguess";
 
 import {
   table as userToProjectTable,
@@ -43,11 +44,14 @@ interface dataObject {
   campaignTypes?: Array<any>;
   userToProjects?: Array<any>;
   userToCustomers?: Array<any>;
+  userToFeatures?: Array<any>;
+  features?: Array<any>;
   users?: Array<any>;
   customers?: Array<any>;
   coins?: Array<any>;
   transactions?: Array<any>;
   express?: Array<any>;
+  unguess_users?: Array<any>;
 }
 
 export const adapter = {
@@ -61,6 +65,7 @@ export const adapter = {
     await userToProjectTable.create();
     await userTable.create();
     await customerTable.create();
+    await userTableUG.create();
 
     //Features Tables
     await featuresTable.create();
@@ -81,6 +86,7 @@ export const adapter = {
     await userToProjectTable.drop();
     await userTable.drop();
     await customerTable.drop();
+    await userTableUG.drop();
 
     //Features Tables
     await featuresTable.drop();
@@ -99,10 +105,13 @@ export const adapter = {
     campaignTypes = [],
     userToProjects = [],
     userToCustomers = [],
+    userToFeatures = [],
+    features = [],
     users = [],
     coins = [],
     transactions = [],
     express = [],
+    unguess_users = [],
   }: dataObject) => {
     profiles.length &&
       profiles.forEach(async (profile) => {
@@ -159,6 +168,21 @@ export const adapter = {
     express.length &&
       express.forEach(async (expressItem) => {
         await expressData.basicItem(expressItem);
+      });
+
+    unguess_users.length &&
+      unguess_users.forEach(async (user) => {
+        await userDataUG.basicUser(user);
+      });
+
+    userToFeatures.length &&
+      userToFeatures.forEach(async (userToFeature) => {
+        await userToFeaturesData.basicItem(userToFeature);
+      });
+
+    features.length &&
+      features.forEach(async (feature) => {
+        await featuresData.basicItem(feature);
       });
   },
 };
