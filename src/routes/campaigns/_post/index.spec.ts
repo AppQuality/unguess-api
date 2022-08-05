@@ -16,6 +16,8 @@ import {
   getWorkspaceCoinsTransactions,
 } from "@src/utils/workspaces";
 
+import UseCase from "@src/__mocks__/database/use_cases";
+
 const customer_1 = {
   id: 1,
   company: "Company 1",
@@ -154,12 +156,27 @@ const express_2 = {
   slug: "express-free",
 };
 
+const use_case_1 = {
+  title: "Use Case 1",
+  description: "Use Case 1 description",
+  content: "<h1>Use Case 1</h1><p>content</p>",
+  device_type: "webapp",
+  requiresLogin: true,
+  category: {
+    id: 1,
+    name: "Category 1",
+  },
+  locale: "it",
+  image: "https://placehold.it/300x300",
+};
+
 describe("POST /campaigns", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
         await dbAdapter.create();
         await platformTable.create();
+        await UseCase.mock();
 
         await dbAdapter.add({
           companies: [customer_1, customer_2],
@@ -188,6 +205,7 @@ describe("POST /campaigns", () => {
       try {
         await dbAdapter.drop();
         await platformTable.drop();
+        await UseCase.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -195,6 +213,10 @@ describe("POST /campaigns", () => {
 
       resolve(true);
     });
+  });
+
+  afterEach(async () => {
+    await UseCase.clear();
   });
 
   it("Should answer 403 if not logged in", async () => {
@@ -355,4 +377,60 @@ describe("POST /campaigns", () => {
       }),
     ]);
   });
+
+  // Should create the use cases if some are provided
+  it("Should create the use cases if some are provided", async () => {
+    const response = await request(app)
+      .post("/campaigns")
+      .set("Authorization", "Bearer customer")
+      .send({
+        ...campaign_request_2,
+        express_slug: express_2.slug,
+        platforms: [AndroidPhoneBody, WindowsPCBody],
+        use_cases: [use_case_1, { ...use_case_1, title: "Use case 2" }],
+      });
+
+    expect(response.status).toBe(200);
+
+    const useCases = await UseCase.all(undefined, [
+      { campaign_id: response.body.id },
+    ]);
+    expect(useCases).toHaveLength(2);
+  });
+
+  it("Should raise an error if one or more use case are malformed", async () => {
+    const response = await request(app)
+      .post("/campaigns")
+      .set("Authorization", "Bearer customer")
+      .send({
+        ...campaign_request_2,
+        express_slug: express_2.slug,
+        platforms: [AndroidPhoneBody, WindowsPCBody],
+        use_cases: [use_case_1, { title: "Use case 2" }],
+      });
+
+    expect(response.status).toBe(400);
+
+    const useCases = await UseCase.all();
+    expect(useCases).toHaveLength(0);
+  });
+
+  it("Should not create use case if campaign is malformed", async () => {
+    const response = await request(app)
+      .post("/campaigns")
+      .set("Authorization", "Bearer customer")
+      .send({
+        ...campaign_request_2,
+        express_slug: "pippo",
+        platforms: [AndroidPhoneBody, WindowsPCBody],
+        use_cases: [use_case_1, { title: "Use case 2" }],
+      });
+
+    expect(response.status).toBe(400);
+
+    const useCases = await UseCase.all();
+    expect(useCases).toHaveLength(0);
+  });
+
+  // end of tests
 });
