@@ -1081,6 +1081,10 @@ components:
                 maxLength: 45
               express_slug:
                 type: string
+              use_cases:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Template'
             required:
               - title
               - start_date
