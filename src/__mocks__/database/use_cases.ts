@@ -1,6 +1,6 @@
 import Table from "./tryber_table";
 
-type TemplateParams = {
+type UseCaseParams = {
   id?: number;
   title?: string;
   content?: string;
@@ -14,7 +14,7 @@ type TemplateParams = {
   optimize_media?: number;
 };
 
-const defaultItem: TemplateParams = {
+const defaultItem: UseCaseParams = {
   title: "???",
   content: "???",
   campaign_id: 0,
@@ -26,7 +26,7 @@ const defaultItem: TemplateParams = {
   allow_media: 0,
   optimize_media: 0,
 };
-class Templates extends Table<TemplateParams> {
+class Templates extends Table<UseCaseParams> {
   protected name = "wp_appq_campaign_task";
   protected columns = [
     "id INTEGER PRIMARY KEY AUTOINCREMENT",
@@ -47,4 +47,4 @@ class Templates extends Table<TemplateParams> {
 }
 const templates = new Templates();
 export default templates;
-export type { TemplateParams };
+export type { UseCaseParams };

@@ -1,7 +1,11 @@
 /** OPENAPI-ROUTE: post-campaigns */
 import { Context } from "openapi-backend";
 import { ERROR_MESSAGE } from "@src/utils/constants";
-import { checkCampaignRequest, createCampaign } from "@src/utils/campaigns";
+import {
+  checkCampaignRequest,
+  createCampaign,
+  createUseCases,
+} from "@src/utils/campaigns";
 import { getProjectById } from "@src/utils/projects";
 import { checkAvailableCoins, getExpressCost } from "@src/utils/workspaces";
 import { getWorkspace } from "@src/utils/workspaces";
@@ -62,6 +66,10 @@ export default async (
 
       const updatedCoinsPackage = updatedCoinsPackages[0];
       coinsPackageId = updatedCoinsPackage.id;
+    }
+
+    if (request_body.use_cases) {
+      const useCases = await createUseCases(request_body.use_cases);
     }
 
     // Create the campaign
