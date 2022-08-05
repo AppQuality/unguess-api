@@ -339,6 +339,7 @@ export interface components {
           description?: string;
           base_bug_internal_id?: string;
           express_slug: string;
+          use_cases?: components["schemas"]["Template"][];
         };
       };
     };
