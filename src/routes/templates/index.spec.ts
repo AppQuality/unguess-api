@@ -88,7 +88,7 @@ describe("GET /templates", () => {
       .get("/templates")
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
-    expect(response.body.length).toBe(3);
+    expect(response.body).toHaveLength(3);
   });
 
   it("Should return an Uncategorized category for templates without a valid category", async () => {
@@ -143,7 +143,7 @@ describe("GET /templates", () => {
       .get("/templates?filterBy[invalid]=123")
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
-    expect(response.body.length).toBe(3);
+    expect(response.body).toHaveLength(3);
   });
 
   it("Should filter templates by category if provided", async () => {
@@ -151,7 +151,7 @@ describe("GET /templates", () => {
       .get("/templates?filterBy[category_id]=123")
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
-    expect(response.body.length).toBe(1);
+    expect(response.body).toHaveLength(1);
   });
 
   it("Should return an empty array of templates if the are no templates matching the category value", async () => {
@@ -159,7 +159,7 @@ describe("GET /templates", () => {
       .get("/templates?filterBy[category_id]=999")
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
-    expect(response.body.length).toBe(0);
+    expect(response.body).toHaveLength(0);
   });
 
   it("Should filter templates by device type if provided", async () => {
@@ -167,7 +167,7 @@ describe("GET /templates", () => {
       .get("/templates?filterBy[device_type]=webapp")
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
-    expect(response.body.length).toBe(2);
+    expect(response.body).toHaveLength(2);
   });
 
   it("Should return an empty array of templates if the are no templates matching the deviceType value", async () => {
@@ -175,7 +175,7 @@ describe("GET /templates", () => {
       .get("/templates?filterBy[device_type]=smarttv")
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
-    expect(response.body.length).toBe(0);
+    expect(response.body).toHaveLength(0);
   });
 
   it("Should filter templates by locale if provided", async () => {
@@ -183,7 +183,7 @@ describe("GET /templates", () => {
       .get("/templates?filterBy[locale]=it")
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
-    expect(response.body.length).toBe(1);
+    expect(response.body).toHaveLength(1);
   });
 
   it("Should return an empty array of templates if the are no templates matching the locale value", async () => {
@@ -191,7 +191,7 @@ describe("GET /templates", () => {
       .get("/templates?filterBy[locale]=es")
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
-    expect(response.body.length).toBe(0);
+    expect(response.body).toHaveLength(0);
   });
 
   it("Should filter templates by requiresLogin if provided", async () => {
@@ -199,7 +199,7 @@ describe("GET /templates", () => {
       .get("/templates?filterBy[requires_login]=1")
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
-    expect(response.body.length).toBe(1);
+    expect(response.body).toHaveLength(1);
   });
 
   it("Should return an empty array of templates if the are no templates matching the requiresLogin value", async () => {
@@ -207,7 +207,7 @@ describe("GET /templates", () => {
       .get("/templates?filterBy[requires_login]=123")
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
-    expect(response.body.length).toBe(0);
+    expect(response.body).toHaveLength(0);
   });
 
   it("Should return templates ordered by 'id' if orderBy is provided", async () => {

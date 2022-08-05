@@ -1,12 +1,17 @@
 /** OPENAPI-ROUTE: post-campaigns */
 import { Context } from "openapi-backend";
 import { ERROR_MESSAGE } from "@src/utils/constants";
-import { checkCampaignRequest, createCampaign } from "@src/utils/campaigns";
+import {
+  checkCampaignRequest,
+  createCampaign,
+  createUseCases,
+} from "@src/utils/campaigns";
 import { getProjectById } from "@src/utils/projects";
 import { checkAvailableCoins, getExpressCost } from "@src/utils/workspaces";
 import { getWorkspace } from "@src/utils/workspaces";
 import { updateWorkspaceCoins } from "@src/utils/workspaces";
 import { updateWorkspaceCoinsTransaction } from "@src/utils/workspaces";
+import * as db from "@src/features/db";
 
 export default async (
   c: Context,
@@ -22,6 +27,9 @@ export default async (
   let request_body: StoplightComponents["requestBodies"]["Campaign"]["content"]["application/json"] =
     req.body;
 
+  let useCases: Array<
+    { id: number } & StoplightComponents["schemas"]["Template"]
+  > = [];
   res.status_code = 200;
 
   try {
@@ -64,6 +72,10 @@ export default async (
       coinsPackageId = updatedCoinsPackage.id;
     }
 
+    if (request_body.use_cases) {
+      useCases = await createUseCases(request_body.use_cases);
+    }
+
     // Create the campaign
     let campaign = await createCampaign(validated_request_body);
 
@@ -75,6 +87,21 @@ export default async (
       campaignId: campaign.id,
       ...(cost && { coinsPackageId: coinsPackageId }),
     });
+
+    // Update useCase setting cp id
+    if (request_body.use_cases) {
+      // Get useCases ids
+      const useCasesIds = useCases.map((useCase) => useCase.id);
+      if (useCasesIds.length > 0) {
+        const updateSql = `UPDATE wp_appq_campaign_task SET campaign_id = ${
+          campaign.id
+        } WHERE id IN (${useCasesIds.join(" ,")})`;
+
+        await db.query(updateSql);
+      } else {
+        throw { ...error, code: 400 };
+      }
+    }
 
     return campaign as StoplightComponents["schemas"]["Campaign"];
   } catch (e: any) {

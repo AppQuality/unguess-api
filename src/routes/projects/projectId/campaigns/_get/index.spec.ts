@@ -299,7 +299,7 @@ describe("GET /projects/{pid}/campaigns", () => {
       .set("authorization", "Bearer customer");
     expect(response.status).toBe(200);
     expect(Array.isArray(response.body.items)).toBe(true);
-    expect(response.body.items.length).toBe(2); //campaign_1 and campaign_2
+    expect(response.body.items).toHaveLength(2); //campaign_1 and campaign_2
     response.body.items.forEach((project: Object) => {
       expect(project).toHaveProperty("id");
       expect(project).toHaveProperty("start_date");

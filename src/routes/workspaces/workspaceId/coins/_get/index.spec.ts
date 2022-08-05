@@ -127,14 +127,14 @@ describe("GET /workspaces/{wid}/coins", () => {
     const response = await request(app)
       .get("/workspaces/2/coins?limit=1")
       .set("authorization", "Bearer customer");
-    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toHaveLength(1);
   });
 
   it("Should return an array of 1 element because start is set to 1", async () => {
     const response = await request(app)
       .get("/workspaces/2/coins?limit=1")
       .set("authorization", "Bearer customer");
-    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toHaveLength(1);
   });
 
   it("Should return an error 400 if the limit is not a number", async () => {
