@@ -66,7 +66,7 @@ describe("wp/getUserFeatures", () => {
 
   it("Should return all features if the users is #1", async () => {
     const response = await getUserFeatures(1);
-    expect(response.length).toBe(2);
+    expect(response).toHaveLength(2);
     expect(response).toEqual([
       {
         slug: feature1.slug,
@@ -81,7 +81,7 @@ describe("wp/getUserFeatures", () => {
 
   it("Should return just 'mind control' if the users is #2", async () => {
     const response = await getUserFeatures(2);
-    expect(response.length).toBe(1);
+    expect(response).toHaveLength(1);
     expect(response).toEqual([
       {
         slug: feature2.slug,

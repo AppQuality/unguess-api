@@ -71,7 +71,7 @@ describe("createUseCases", () => {
     ]);
 
     const useCases = await UseCase.all();
-    expect(useCases.length).toBe(2);
+    expect(useCases).toHaveLength(2);
   });
 
   // end of describe
