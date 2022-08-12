@@ -1109,12 +1109,7 @@ components:
               use_cases:
                 type: array
                 items:
-                  allOf:
-                    - type: object
-                      properties:
-                        id:
-                          type: number
-                    - $ref: '#/components/schemas/UseCase'
+                  $ref: '#/components/schemas/UseCase'
             required:
               - title
               - start_date
