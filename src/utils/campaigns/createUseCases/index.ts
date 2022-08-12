@@ -35,12 +35,19 @@ export const createUseCases = async (
   // Insert use cases, singolarly because we need to know the id of the new use case
   use_cases.forEach(async (use_case) => {
     const values = getUCFieldsFromTemplate(
-      { ...defaultUseCase, ...use_case },
+      {
+        ...defaultUseCase,
+        ...use_case,
+        ...(use_case.description && { content: use_case.description }),
+      },
       allowedFields
     );
     const sql = insert_sql + ` (${values.join(",")})`;
 
     const response = await db.query(sql);
+
+    console.log("response from UseCase creation", response);
+
     const id = getId(response);
 
     if (response && id) {
