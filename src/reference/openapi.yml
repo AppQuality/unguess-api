@@ -894,7 +894,7 @@ components:
     Template:
       title: Template
       type: object
-      description: Define all details of a use case.
+      description: Template of a usecase object
       x-tags:
         - templates
       properties:
@@ -946,6 +946,31 @@ components:
           type: string
       required:
         - name
+    UseCase:
+      title: UseCase
+      x-stoplight:
+        id: a08quvwbf9ion
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        functionality:
+          allOf:
+            - type: object
+              properties:
+                id:
+                  type: number
+            - $ref: '#/components/schemas/Template'
+          description: Optional in experiential campaigns
+        logged:
+          type: boolean
+        link:
+          type: string
+      required:
+        - title
+        - description
   securitySchemes:
     JWT:
       type: http
@@ -1084,7 +1109,12 @@ components:
               use_cases:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Template'
+                  allOf:
+                    - type: object
+                      properties:
+                        id:
+                          type: number
+                    - $ref: '#/components/schemas/UseCase'
             required:
               - title
               - start_date
@@ -1096,6 +1126,7 @@ components:
               - platforms
               - customer_id
               - express_slug
+          examples: {}
     Project:
       content:
         application/json:
