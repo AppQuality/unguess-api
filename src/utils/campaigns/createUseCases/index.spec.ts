@@ -98,5 +98,20 @@ describe("createUseCases", () => {
       '<h1>Use Case 1</h1><p>Cera una volta il \\"content\\"</p>'
     );
   });
+
+  it("should remove unsupported characters if presents", async () => {
+    await createUseCases([
+      {
+        ...UseCase1,
+        description: `<h1>Use Case 1</h1><p>Cera una volta il "content"</p>`,
+      },
+    ]);
+
+    const useCases = await UseCase.all();
+    expect(useCases).toHaveLength(1);
+    expect(useCases[0].content).toBe(
+      '<h1>Use Case 1</h1><p>Cera una volta il \\"content\\"</p>'
+    );
+  });
   // end of describe
 });
