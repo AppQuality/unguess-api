@@ -87,7 +87,7 @@ export default async (
     // Insert coins transaction
     await updateWorkspaceCoinsTransaction({
       workspaceId: workspace.id,
-      profileId: user.id,
+      profileId: user.profile_id,
       quantity: cost,
       campaignId: campaign.id,
       ...(cost && { coinsPackageId: coinsPackageId }),
