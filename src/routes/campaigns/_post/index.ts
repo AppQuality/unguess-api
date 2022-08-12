@@ -28,7 +28,7 @@ export default async (
     req.body;
 
   let useCases: Array<
-    { id: number } & StoplightComponents["schemas"]["Template"]
+    { id: number } & StoplightComponents["schemas"]["UseCase"]
   > = [];
   res.status_code = 200;
 
