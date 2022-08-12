@@ -131,7 +131,7 @@ describe("updateWorkspaceCoinsTransaction", () => {
     } catch (error) {
       expect(error).toEqual(
         expect.objectContaining({
-          message: ERROR_MESSAGE,
+          message: ERROR_MESSAGE + " with coins transaction",
         })
       );
     }
