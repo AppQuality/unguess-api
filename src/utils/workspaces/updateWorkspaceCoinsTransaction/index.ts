@@ -3,7 +3,7 @@ import * as db from "@src/features/db";
 
 interface UpdateWorkspaceHistoryCoinsArgs {
   workspaceId: number;
-  profileId: number;
+  user: UserType;
   quantity: number;
   campaignId: number;
   coinsPackageId?: number;
@@ -27,7 +27,7 @@ type CoinTransaction = {
  * Notes: we don't check if the user has permission to get the workspace, because this is done in the getWorkspace function
  *
  * @param workspaceId (number) - workspace id
- * @param profileId (number) - profile id
+ * @param user (UserType) - user profile
  * @param quantity (number) - quantity of coins
  * @param campaignId (number) - campaign id
  * @param coinsPackageId? (number) - coins package id
@@ -36,7 +36,7 @@ type CoinTransaction = {
  */
 export const updateWorkspaceCoinsTransaction = async ({
   workspaceId,
-  profileId,
+  user,
   quantity,
   campaignId,
   coinsPackageId,
@@ -49,7 +49,7 @@ export const updateWorkspaceCoinsTransaction = async ({
 
   console.log("Trans params", {
     workspaceId,
-    profileId,
+    user,
     quantity,
     campaignId,
     coinsPackageId,
@@ -58,7 +58,10 @@ export const updateWorkspaceCoinsTransaction = async ({
   // Check parameters
   if (workspaceId == null || workspaceId <= 0) throw { ...error, code: 400 };
 
-  if (profileId == null || profileId <= 0) throw { ...error, code: 400 };
+  if (user.role !== "administrator") {
+    if (user.profile_id == null || user.profile_id <= 0)
+      throw { ...error, code: 400 };
+  }
 
   if (quantity == null || quantity < 0) throw { ...error, code: 400 };
 
