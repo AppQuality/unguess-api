@@ -47,14 +47,6 @@ export const updateWorkspaceCoinsTransaction = async ({
     error: true,
   } as StoplightComponents["schemas"]["Error"];
 
-  console.log("Trans params", {
-    workspaceId,
-    user,
-    quantity,
-    campaignId,
-    coinsPackageId,
-    notes,
-  });
   // Check parameters
   if (workspaceId == null || workspaceId <= 0) throw { ...error, code: 400 };
 
@@ -105,6 +97,4 @@ export const updateWorkspaceCoinsTransaction = async ({
     console.error(error);
     return false;
   }
-
-  return false;
 };

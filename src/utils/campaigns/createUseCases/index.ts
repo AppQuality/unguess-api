@@ -44,17 +44,21 @@ export const createUseCases = async (
     );
     const sql = insert_sql + ` (${values.join(",")})`;
 
-    const response = await db.query(sql);
+    try {
+      const response = await db.query(sql);
 
-    console.log("response from UseCase creation", response);
+      const id = getId(response);
 
-    const id = getId(response);
-
-    if (response && id) {
-      results.push({
-        id: id,
-        ...use_case,
-      });
+      if (response && id) {
+        results.push({
+          id: id,
+          ...use_case,
+        });
+      }
+    } catch (error) {
+      if (process.env && process.env.DEBUG) {
+        console.log("Something went wrong in uc creation: ", error);
+      }
     }
   });
 
@@ -78,7 +82,7 @@ const getUCFieldsFromTemplate = (
   keys.forEach((key) => {
     if (key in template) {
       const value = template[key];
-      fields.push(typeof value === "string" ? `'${value}'` : value);
+      fields.push(typeof value === "string" ? db.format(`?`, [value]) : value);
     }
   });
 

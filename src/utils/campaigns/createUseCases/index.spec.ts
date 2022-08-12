@@ -84,5 +84,19 @@ describe("createUseCases", () => {
     expect(useCases[1].title).toBe("Use Case 2");
   });
 
+  it("should create use case even if rich formatted", async () => {
+    await createUseCases([
+      {
+        ...UseCase1,
+        description: `<h1>Use Case 1</h1><p>Cera una volta il "content"</p>`,
+      },
+    ]);
+
+    const useCases = await UseCase.all();
+    expect(useCases).toHaveLength(1);
+    expect(useCases[0].content).toBe(
+      '<h1>Use Case 1</h1><p>Cera una volta il \\"content\\"</p>'
+    );
+  });
   // end of describe
 });
