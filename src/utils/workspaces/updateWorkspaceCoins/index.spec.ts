@@ -117,7 +117,7 @@ describe("updateWorkspaceCoins", () => {
       });
     } catch (error: any) {
       expect(error.code).toBe(400);
-      expect(error.message).toBe(ERROR_MESSAGE);
+      expect(error.message).toBe(ERROR_MESSAGE + " with workspace coins");
     }
   });
 
@@ -129,7 +129,7 @@ describe("updateWorkspaceCoins", () => {
       });
     } catch (error: any) {
       expect(error.code).toBe(400);
-      expect(error.message).toBe(ERROR_MESSAGE);
+      expect(error.message).toBe(ERROR_MESSAGE + " with workspace coins");
     }
   });
 
@@ -143,7 +143,7 @@ describe("updateWorkspaceCoins", () => {
       });
     } catch (error: any) {
       expect(error.code).toBe(400);
-      expect(error.message).toBe(ERROR_MESSAGE);
+      expect(error.message).toBe(ERROR_MESSAGE + " with workspace coins");
     }
   });
 

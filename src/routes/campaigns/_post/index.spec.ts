@@ -236,7 +236,7 @@ describe("POST /campaigns", () => {
     });
   });
 
-  afterEach(async () => {
+  beforeEach(async () => {
     await UseCase.clear();
   });
 
@@ -464,11 +464,11 @@ describe("POST /campaigns", () => {
         use_cases: [{ title: "Use case 2" }],
       });
 
-    expect(response.status).toBe(400);
-
     const useCases = await UseCase.all(undefined, [
       { campaign_id: response.body.id },
     ]);
+
+    expect(response.status).toBe(400);
     expect(useCases).toHaveLength(0);
   });
 
@@ -493,8 +493,7 @@ describe("POST /campaigns", () => {
         express_slug: "unmoderated-usability-testing",
         use_cases: [
           {
-            id: 1,
-            title: "Example use case",
+            title: "Example exp use case",
             logged: false,
             description:
               "<p>Stai per testare la funzionalità “Registrazione e Login” il cui scopo è “permettere all’utente di autenticarsi al servizio”.</p><h4>Per testare [edited 📝 il funzionamento:</h4><ul><li><p>Effettua la registrazione di un nuovo account, inserendo tutti i dati richiesti</p></li><li><p>Prova ad effettuare il login e il logout più volte</p></li><li><p>[SE PREVISTO] Prova poi a effettuare la registrazione e il login anche tramite i social presenti</p></li><li><p>Prova a stressare anche il processo di recupero della password</p></li></ul><p><strong>Assicurati che:</strong></p><ul><li><p>Il processo e le azioni richieste vengano sempre portate a buon fine, già dal primo tentativo</p></li><li><p>verifica il flusso e la corretta gestione dei campi (obbligatorietà, errori, check automatici)</p></li></ul>",
@@ -503,12 +502,11 @@ describe("POST /campaigns", () => {
         ],
       });
 
-    console.log(response.body);
-    expect(response.status).toBe(200);
-
     const useCases = await UseCase.all(undefined, [
       { campaign_id: response.body.id },
     ]);
+
+    expect(response.status).toBe(200);
     expect(useCases).toHaveLength(1);
   });
 
