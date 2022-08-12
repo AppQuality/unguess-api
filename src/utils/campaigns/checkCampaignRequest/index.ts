@@ -31,7 +31,7 @@ export const checkCampaignRequest = async (
   StoplightComponents["requestBodies"]["Campaign"]["content"]["application/json"]
 > => {
   let error = {
-    message: ERROR_MESSAGE,
+    message: ERROR_MESSAGE + " with campaign check",
     error: true,
   } as StoplightComponents["schemas"]["Error"];
 
