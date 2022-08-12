@@ -156,8 +156,8 @@ const express_2 = {
   slug: "express-free",
 };
 
-const use_case_1 = {
-  title: "Use Case 1",
+const useCaseTemplate: StoplightComponents["schemas"]["Template"] = {
+  title: "Use Template Case 1",
   description: "Use Case 1 description",
   content: "<h1>Use Case 1</h1><p>content</p>",
   device_type: "webapp",
@@ -168,6 +168,15 @@ const use_case_1 = {
   },
   locale: "it",
   image: "https://placehold.it/300x300",
+};
+
+const UseCase1 = {
+  title: "Use Case 1",
+  description: "Use Case 1 description",
+  requiresLogin: false,
+  functionality: useCaseTemplate,
+  logged: true,
+  link: "https://www.google.com",
 };
 
 describe("POST /campaigns", () => {
@@ -387,7 +396,7 @@ describe("POST /campaigns", () => {
         ...campaign_request_2,
         express_slug: express_2.slug,
         platforms: [AndroidPhoneBody, WindowsPCBody],
-        use_cases: [use_case_1, { ...use_case_1, title: "Use case 2" }],
+        use_cases: [UseCase1, { ...UseCase1, title: "Use case 2" }],
       });
 
     expect(response.status).toBe(200);
@@ -406,7 +415,7 @@ describe("POST /campaigns", () => {
         ...campaign_request_2,
         express_slug: express_2.slug,
         platforms: [AndroidPhoneBody, WindowsPCBody],
-        use_cases: [use_case_1, { title: "Use case 2" }],
+        use_cases: [UseCase1, { title: "Use case 2" }],
       });
 
     expect(response.status).toBe(400);
@@ -423,12 +432,31 @@ describe("POST /campaigns", () => {
         ...campaign_request_2,
         express_slug: "pippo",
         platforms: [AndroidPhoneBody, WindowsPCBody],
-        use_cases: [use_case_1, { title: "Use case 2" }],
+        use_cases: [UseCase1, { title: "Use case 2" }],
       });
 
     expect(response.status).toBe(400);
 
     const useCases = await UseCase.all();
+    expect(useCases).toHaveLength(0);
+  });
+
+  it("Should return an error if the use cases provided doesn't contains all required fields", async () => {
+    const response = await request(app)
+      .post("/campaigns")
+      .set("Authorization", "Bearer customer")
+      .send({
+        ...campaign_request_2,
+        express_slug: express_2.slug,
+        platforms: [AndroidPhoneBody, WindowsPCBody],
+        use_cases: [{ title: "Use case 2" }],
+      });
+
+    expect(response.status).toBe(400);
+
+    const useCases = await UseCase.all(undefined, [
+      { campaign_id: response.body.id },
+    ]);
     expect(useCases).toHaveLength(0);
   });
 

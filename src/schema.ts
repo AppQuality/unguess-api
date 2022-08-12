@@ -249,7 +249,7 @@ export interface components {
     };
     /**
      * Template
-     * @description Define all details of a use case.
+     * @description Template of a usecase object
      */
     Template: {
       title: string;
@@ -277,6 +277,17 @@ export interface components {
     TemplateCategory: {
       id?: number;
       name: string;
+    };
+    /** UseCase */
+    UseCase: {
+      title: string;
+      description: string;
+      /** @description Optional in experiential campaigns */
+      functionality?: {
+        id?: number;
+      } & components["schemas"]["Template"];
+      logged?: boolean;
+      link?: string;
     };
   };
   responses: {
@@ -339,7 +350,7 @@ export interface components {
           description?: string;
           base_bug_internal_id?: string;
           express_slug: string;
-          use_cases?: components["schemas"]["Template"][];
+          use_cases?: components["schemas"]["UseCase"][];
         };
       };
     };

@@ -2,9 +2,9 @@ import * as db from "@src/features/db";
 import { UseCaseParams } from "@src/__mocks__/database/use_cases";
 
 export const createUseCases = async (
-  use_cases?: Array<StoplightComponents["schemas"]["Template"]>
+  use_cases?: Array<StoplightComponents["schemas"]["UseCase"]>
 ): Promise<
-  Array<{ id: number } & StoplightComponents["schemas"]["Template"]>
+  Array<{ id: number } & StoplightComponents["schemas"]["UseCase"]>
 > => {
   if (!use_cases || !use_cases.length) return [];
 
@@ -29,7 +29,7 @@ export const createUseCases = async (
     `) VALUES`;
 
   const results: Array<
-    { id: number } & StoplightComponents["schemas"]["Template"]
+    { id: number } & StoplightComponents["schemas"]["UseCase"]
   > = [];
 
   // Insert use cases, singolarly because we need to know the id of the new use case

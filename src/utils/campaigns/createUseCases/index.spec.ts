@@ -2,7 +2,7 @@ import UseCase from "@src/__mocks__/database/use_cases";
 import { createUseCases } from ".";
 
 const useCaseTemplate: StoplightComponents["schemas"]["Template"] = {
-  title: "Use Case 1",
+  title: "Use Template Case 1",
   description: "Use Case 1 description",
   content: "<h1>Use Case 1</h1><p>content</p>",
   device_type: "webapp",
@@ -13,6 +13,14 @@ const useCaseTemplate: StoplightComponents["schemas"]["Template"] = {
   },
   locale: "it",
   image: "https://placehold.it/300x300",
+};
+
+const UseCase1: StoplightComponents["schemas"]["UseCase"] = {
+  title: "Use Case 1",
+  description: "Use Case 1 description",
+  functionality: useCaseTemplate,
+  logged: true,
+  link: "https://www.google.com",
 };
 
 describe("createUseCases", () => {
@@ -61,17 +69,19 @@ describe("createUseCases", () => {
   it("should return an array of use cases", async () => {
     await createUseCases([
       {
-        ...useCaseTemplate,
+        ...UseCase1,
       },
       {
-        ...useCaseTemplate,
+        ...UseCase1,
         title: "Use Case 2",
-        requiresLogin: false,
+        logged: false,
       },
     ]);
 
     const useCases = await UseCase.all();
     expect(useCases).toHaveLength(2);
+    expect(useCases[0].title).toBe(UseCase1.title);
+    expect(useCases[1].title).toBe("Use Case 2");
   });
 
   // end of describe
