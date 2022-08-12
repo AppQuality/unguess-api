@@ -25,6 +25,7 @@ const config: {
     user: string;
     password: string;
     database: string;
+    charset: string;
   };
   unguessDb: {
     host: string;
@@ -32,6 +33,7 @@ const config: {
     user: string;
     password: string;
     database: string;
+    charset: string;
   };
   APP_URL: string;
   ssl?: {
@@ -62,13 +64,17 @@ const config: {
     user: process.env.DB_USER || "root",
     password: process.env.DB_PASSWORD || "",
     database: process.env.DB_NAME || "tryber_wp",
+    charset: process.env.DB_CHARSET || "UTF8MB4_BIN",
   },
   unguessDb: {
     host: process.env.DB_SECONDARY_HOST || "127.0.0.1",
-    port: process.env.DB_SECONDARY_PORT ? parseInt(process.env.DB_SECONDARY_PORT) : 3306,
+    port: process.env.DB_SECONDARY_PORT
+      ? parseInt(process.env.DB_SECONDARY_PORT)
+      : 3306,
     user: process.env.DB_SECONDARY_USER || "root",
     password: process.env.DB_SECONDARY_PASSWORD || "",
     database: process.env.DB_SECONDARY_NAME || "unguess_wp",
+    charset: process.env.DB_CHARSET || "UTF8MB4_BIN",
   },
   APP_URL: process.env.APP_URL || "https://app.unguess.io/",
 };
