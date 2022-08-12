@@ -47,6 +47,18 @@ const customer_profile_1 = {
   email: "customer@unguess.io",
 };
 
+const user_1 = {
+  id: 1,
+  user_login: "customer@unguess.io",
+  user_pass: "customer@unguess.io",
+  email: "customer@unguess.io",
+  role: "customer",
+  tryber_wp_user_id: 1,
+  unguess_wp_user_id: 456,
+  profile_id: 1,
+  workspaces: [],
+};
+
 const project_1 = {
   id: 1,
   display_name: "Project",
@@ -101,7 +113,7 @@ describe("updateWorkspaceCoinsTransaction", () => {
   it("Should return true if the transaction was successful", async () => {
     const transaction = await updateWorkspaceCoinsTransaction({
       workspaceId: customer_1.id,
-      profileId: customer_profile_1.id,
+      user: user_1,
       quantity: DEFAULT_EXPRESS_COST,
       campaignId: campaign_1.id,
       coinsPackageId: coins_1.id,
@@ -123,7 +135,7 @@ describe("updateWorkspaceCoinsTransaction", () => {
     try {
       await updateWorkspaceCoinsTransaction({
         workspaceId: customer_1.id,
-        profileId: customer_profile_1.id,
+        user: user_1,
         quantity: DEFAULT_EXPRESS_COST,
         campaignId: -1, // Wrong campaign id
         coinsPackageId: coins_1.id,

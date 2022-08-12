@@ -73,7 +73,7 @@ export const updateWorkspaceCoinsTransaction = async ({
 
   const coinsQuery = db.format(sql, [
     workspaceId,
-    profileId,
+    user.profile_id,
     quantity,
     campaignId,
     coinsPackageId || "",
