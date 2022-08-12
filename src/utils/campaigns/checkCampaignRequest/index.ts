@@ -36,7 +36,8 @@ export const checkCampaignRequest = async (
   } as StoplightComponents["schemas"]["Error"];
 
   // Check request
-  if (!campaign_request) throw { ...error, code: 400 };
+  if (!campaign_request)
+    throw { ...error, message: "missing cp request", code: 400 };
 
   // Check mandatory fields
   if (
@@ -48,13 +49,18 @@ export const checkCampaignRequest = async (
     !campaign_request.project_id ||
     !campaign_request.customer_id
   ) {
-    throw { ...error, code: 400 };
+    throw { ...error, message: "mandatory fields missing", code: 400 };
   }
 
   // Check Platforms
   let platforms_result = await checkPlatforms(campaign_request.platforms);
 
-  if (!platforms_result) throw { ...error, code: 400 };
+  if (!platforms_result)
+    throw {
+      ...error,
+      message: "something went wrong with platforms check",
+      code: 400,
+    };
 
   // Check bug form
   if (
@@ -66,7 +72,12 @@ export const checkCampaignRequest = async (
       has_bug_parade: campaign_request.has_bug_parade,
     });
 
-    if (bug_form_result === false) throw { ...error, code: 400 };
+    if (bug_form_result === false)
+      throw {
+        ...error,
+        message: "something went wrong with bug form checks",
+        code: 400,
+      };
   }
 
   // Add default description

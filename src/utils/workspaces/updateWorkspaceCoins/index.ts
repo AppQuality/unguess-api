@@ -24,7 +24,7 @@ export const updateWorkspaceCoins = async ({
   StoplightComponents["schemas"]["Coin"][]
 > => {
   let error = {
-    message: ERROR_MESSAGE,
+    message: ERROR_MESSAGE + " with workspace coins",
     error: true,
   } as StoplightComponents["schemas"]["Error"];
 

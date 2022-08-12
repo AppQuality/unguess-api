@@ -54,11 +54,16 @@ export default async (
     });
 
     // Throw error if express is not defined
-    if (cost === false) throw { ...error, code: 400 };
+    if (cost === false)
+      throw {
+        ...error,
+        message: "something went wrong in xps costs",
+        code: 400,
+      };
 
     // Check express coins availability
     if (!checkAvailableCoins({ coins: workspace.coins, cost: cost }))
-      throw { ...error, code: 403 };
+      throw { ...error, message: "coins issues", code: 403 };
 
     // Deduct express coin(s) if express is not free (has cost)
     let coinsPackageId;
@@ -99,7 +104,11 @@ export default async (
 
         await db.query(updateSql);
       } else {
-        throw { ...error, code: 400 };
+        throw {
+          ...error,
+          message: "something went wrong in usecase update",
+          code: 400,
+        };
       }
     }
 

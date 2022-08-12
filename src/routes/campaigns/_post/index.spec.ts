@@ -38,6 +38,12 @@ const AndroidPhone = {
   form_factor: DT_SMARTPHONE,
 };
 
+const iOSPhone = {
+  id: 2,
+  name: "iOS",
+  form_factor: DT_SMARTPHONE,
+};
+
 const AndroidPhoneBody = {
   id: 1,
   name: "Android",
@@ -156,6 +162,11 @@ const express_2 = {
   slug: "express-free",
 };
 
+const express_3 = {
+  slug: "unmoderated-usability-testing",
+  cost: DEFAULT_EXPRESS_COST,
+};
+
 const useCaseTemplate: StoplightComponents["schemas"]["Template"] = {
   title: "Use Template Case 1",
   description: "Use Case 1 description",
@@ -195,10 +206,11 @@ describe("POST /campaigns", () => {
           campaigns: [campaign_1],
           campaignTypes: [campaign_type_1],
           coins: [coins_1],
-          express: [express_1, express_2],
+          express: [express_1, express_2, express_3],
         });
 
         await platformData.addItem(AndroidPhone);
+        await platformData.addItem(iOSPhone);
         await platformData.addItem(WindowsPC);
       } catch (error) {
         console.error(error);
@@ -458,6 +470,46 @@ describe("POST /campaigns", () => {
       { campaign_id: response.body.id },
     ]);
     expect(useCases).toHaveLength(0);
+  });
+
+  it("Should create the campaign and the usecase with an experiential cp provided", async () => {
+    const response = await request(app)
+      .post("/campaigns")
+      .set("Authorization", "Bearer customer")
+      .send({
+        title: "PROVA - NON RUNNARE",
+        start_date: "2022-08-12 13:05:18",
+        end_date: "2022-08-16 13:05:18",
+        close_date: "2022-08-16 13:05:18",
+        customer_title: "PROVA - NON RUNNARE",
+        campaign_type_id: 1,
+        project_id: 1,
+        pm_id: 20739,
+        platforms: [
+          { id: 1, deviceType: 0 },
+          { id: 2, deviceType: 0 },
+        ],
+        customer_id: 1,
+        express_slug: "unmoderated-usability-testing",
+        use_cases: [
+          {
+            id: 1,
+            title: "Example use case",
+            logged: false,
+            description:
+              "<p>Stai per testare la funzionalità “Registrazione e Login” il cui scopo è “permettere all’utente di autenticarsi al servizio”.</p><h4>Per testare [edited 📝 il funzionamento:</h4><ul><li><p>Effettua la registrazione di un nuovo account, inserendo tutti i dati richiesti</p></li><li><p>Prova ad effettuare il login e il logout più volte</p></li><li><p>[SE PREVISTO] Prova poi a effettuare la registrazione e il login anche tramite i social presenti</p></li><li><p>Prova a stressare anche il processo di recupero della password</p></li></ul><p><strong>Assicurati che:</strong></p><ul><li><p>Il processo e le azioni richieste vengano sempre portate a buon fine, già dal primo tentativo</p></li><li><p>verifica il flusso e la corretta gestione dei campi (obbligatorietà, errori, check automatici)</p></li></ul>",
+            link: "",
+          },
+        ],
+      });
+
+    console.log(response.body);
+    expect(response.status).toBe(200);
+
+    const useCases = await UseCase.all(undefined, [
+      { campaign_id: response.body.id },
+    ]);
+    expect(useCases).toHaveLength(1);
   });
 
   // end of tests

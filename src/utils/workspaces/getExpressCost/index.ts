@@ -15,7 +15,7 @@ export const getExpressCost = async ({
   slug,
 }: GetExpressCostArgs): Promise<number | false> => {
   let error = {
-    message: ERROR_MESSAGE,
+    message: ERROR_MESSAGE + " with express",
     error: true,
   } as StoplightComponents["schemas"]["Error"];
 
