@@ -43,10 +43,18 @@ export const updateWorkspaceCoinsTransaction = async ({
   notes,
 }: UpdateWorkspaceHistoryCoinsArgs): Promise<CoinTransaction | false> => {
   let error = {
-    message: ERROR_MESSAGE,
+    message: ERROR_MESSAGE + " with coins transaction",
     error: true,
   } as StoplightComponents["schemas"]["Error"];
 
+  console.log("Trans params", {
+    workspaceId,
+    profileId,
+    quantity,
+    campaignId,
+    coinsPackageId,
+    notes,
+  });
   // Check parameters
   if (workspaceId == null || workspaceId <= 0) throw { ...error, code: 400 };
 
