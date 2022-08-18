@@ -11,7 +11,7 @@ export const getProjectById = async ({
   user,
 }: getProjectByIdArgs): Promise<StoplightComponents["schemas"]["Project"]> => {
   let error = {
-    message: ERROR_MESSAGE,
+    message: ERROR_MESSAGE + " with project",
     error: true,
     code: 400,
   } as StoplightComponents["schemas"]["Error"];

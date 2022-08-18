@@ -1,11 +1,14 @@
 const sqlite3 = require("better-sqlite3");
 
 export default (dbname: "unguess" | "tryber") => {
-  // const db = new sqlite3(dbname + ".db", { verbose: console.log });
-  const db = new sqlite3(dbname + ".db");
+  const db = new sqlite3(dbname + ".db", { verbose: console.log });
+  // const db = new sqlite3(dbname + ".db");
   db.function("NOW", () => "datetime('now')");
   db.function("CONCAT", { varargs: true }, (...args: string[]) =>
     args.join("")
+  );
+  db.function("COALESCE", { varargs: true }, (...args: string[]) =>
+    (args.find((a: any) => a) || null)?.toString()
   );
   const mockDb: any = {};
   mockDb.createTable = (table: string, columns: string[]) => {

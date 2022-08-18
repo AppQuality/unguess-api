@@ -23,7 +23,7 @@ export const getWorkspace = async ({
   user,
 }: GetWorkspacesArgs): Promise<StoplightComponents["schemas"]["Workspace"]> => {
   let error = {
-    message: ERROR_MESSAGE,
+    message: ERROR_MESSAGE + " with workspace",
     error: true,
   } as StoplightComponents["schemas"]["Error"];
 
@@ -60,7 +60,7 @@ export const getWorkspace = async ({
       if (userToCustomer.length) {
         userToCustomer = userToCustomer[0];
       } else {
-        throw { ...error, code: 403 };
+        throw { ...error, message: "workspace issue", code: 403 };
       }
     }
 
@@ -95,5 +95,5 @@ export const getWorkspace = async ({
     } as StoplightComponents["schemas"]["Workspace"];
   }
 
-  throw { ...error, code: 403 };
+  throw { ...error, message: "generic workspace error", code: 403 };
 };

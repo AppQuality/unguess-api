@@ -124,7 +124,7 @@ describe("getWorkspace", () => {
       });
     } catch (error: any) {
       expect(error.code).toBe(400);
-      expect(error.message).toBe(ERROR_MESSAGE);
+      expect(error.message).toBe(ERROR_MESSAGE + " with workspace");
     }
   });
 
@@ -136,7 +136,7 @@ describe("getWorkspace", () => {
       });
     } catch (error: any) {
       expect(error.code).toBe(403);
-      expect(error.message).toBe(ERROR_MESSAGE);
+      expect(error.message).toBe("workspace issue");
     }
   });
 
@@ -161,7 +161,7 @@ describe("getWorkspace", () => {
       });
     } catch (error: any) {
       expect(error.code).toBe(403);
-      expect(error.message).toBe(ERROR_MESSAGE);
+      expect(error.message).toBe("generic workspace error");
     }
   });
 

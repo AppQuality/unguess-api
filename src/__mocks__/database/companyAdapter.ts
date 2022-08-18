@@ -7,6 +7,7 @@ import {
   data as campaignTypesData,
 } from "./campaign_type";
 import { table as userTable, data as userData } from "./user";
+import { table as userTableUG, data as userDataUG } from "./user_unguess";
 
 import {
   table as userToProjectTable,
@@ -26,6 +27,12 @@ import {
 } from "./userToFeatures";
 
 import { table as coinsTable, data as coinsData } from "./coins";
+import {
+  table as coinsTransactionsTable,
+  data as coinsTransactionsData,
+} from "./coins_transactions";
+
+import { table as expressTable, data as expressData } from "./express";
 
 import defaultUsers from "@src/__mocks__/database/seed/users.json";
 
@@ -37,9 +44,14 @@ interface dataObject {
   campaignTypes?: Array<any>;
   userToProjects?: Array<any>;
   userToCustomers?: Array<any>;
+  userToFeatures?: Array<any>;
+  features?: Array<any>;
   users?: Array<any>;
   customers?: Array<any>;
   coins?: Array<any>;
+  transactions?: Array<any>;
+  express?: Array<any>;
+  unguess_users?: Array<any>;
 }
 
 export const adapter = {
@@ -53,11 +65,16 @@ export const adapter = {
     await userToProjectTable.create();
     await userTable.create();
     await customerTable.create();
+    await userTableUG.create();
 
-    //Features Table
+    //Features Tables
     await featuresTable.create();
     await userToFeaturesTable.create();
+
+    // Express Tables
     await coinsTable.create();
+    await coinsTransactionsTable.create();
+    await expressTable.create();
   },
   drop: async () => {
     await profileTable.drop();
@@ -69,12 +86,16 @@ export const adapter = {
     await userToProjectTable.drop();
     await userTable.drop();
     await customerTable.drop();
+    await userTableUG.drop();
 
-    //Features Table
+    //Features Tables
     await featuresTable.drop();
     await userToFeaturesTable.drop();
 
+    // Express Tables
     await coinsTable.drop();
+    await coinsTransactionsTable.drop();
+    await expressTable.drop();
   },
   add: async ({
     profiles = [],
@@ -84,8 +105,13 @@ export const adapter = {
     campaignTypes = [],
     userToProjects = [],
     userToCustomers = [],
+    userToFeatures = [],
+    features = [],
     users = [],
     coins = [],
+    transactions = [],
+    express = [],
+    unguess_users = [],
   }: dataObject) => {
     profiles.length &&
       profiles.forEach(async (profile) => {
@@ -132,6 +158,31 @@ export const adapter = {
     coins.length &&
       coins.forEach(async (coin) => {
         await coinsData.basicItem(coin);
+      });
+
+    transactions.length &&
+      transactions.forEach(async (transaction) => {
+        await coinsTransactionsData.basicItem(transaction);
+      });
+
+    express.length &&
+      express.forEach(async (expressItem) => {
+        await expressData.basicItem(expressItem);
+      });
+
+    unguess_users.length &&
+      unguess_users.forEach(async (user) => {
+        await userDataUG.basicUser(user);
+      });
+
+    userToFeatures.length &&
+      userToFeatures.forEach(async (userToFeature) => {
+        await userToFeaturesData.basicItem(userToFeature);
+      });
+
+    features.length &&
+      features.forEach(async (feature) => {
+        await featuresData.basicItem(feature);
       });
   },
 };

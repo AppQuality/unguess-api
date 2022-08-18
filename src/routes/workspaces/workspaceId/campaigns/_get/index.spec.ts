@@ -182,14 +182,14 @@ describe("GET /workspaces/{wid}/campaigns", () => {
     const response = await request(app)
       .get("/workspaces/2/campaigns?limit=1&start=0")
       .set("authorization", "Bearer customer");
-    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toHaveLength(1);
   });
 
   it("Should return an array of 1 element because start is set to 1", async () => {
     const response = await request(app)
       .get("/workspaces/2/campaigns?limit=1&start=1")
       .set("authorization", "Bearer customer");
-    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toHaveLength(1);
   });
 
   it("Should return an error 400 if the limit is not a number", async () => {
@@ -432,7 +432,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
     const response = await request(app)
       .get("/workspaces/2/campaigns?filterBy[title]=Campagnetta della banana")
       .set("authorization", "Bearer customer");
-    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toHaveLength(1);
   });
 
   it("Should return an array with two elements using project_name", async () => {
@@ -441,13 +441,13 @@ describe("GET /workspaces/{wid}/campaigns", () => {
         "/workspaces/2/campaigns?filterBy[project_name]=Nome del progetto abbastanza figo"
       )
       .set("authorization", "Bearer customer");
-    expect(response.body.items.length).toBe(2);
+    expect(response.body.items).toHaveLength(2);
   });
 
   it("Should return an array with one element using only a part of the title", async () => {
     const response = await request(app)
       .get("/workspaces/2/campaigns?filterBy[title]=della banana")
       .set("authorization", "Bearer customer");
-    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toHaveLength(1);
   });
 });

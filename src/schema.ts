@@ -103,6 +103,10 @@ export interface paths {
       };
     };
   };
+  "/templates": {
+    /** Retrieve all available use case templates */
+    get: operations["get-templates"];
+  };
 }
 
 export interface components {
@@ -243,6 +247,48 @@ export interface components {
       /** @description On each coin use, the related package will be updated */
       updated_on?: string;
     };
+    /**
+     * Template
+     * @description Template of a usecase object
+     */
+    Template: {
+      title: string;
+      /** @description Short description used as preview of template or in templates dropdown */
+      description: string;
+      /** @description HTML content used to pre-fill the use case editor */
+      content: string;
+      category: components["schemas"]["TemplateCategory"];
+      /** @enum {string} */
+      device_type: "webapp" | "mobileapp";
+      /**
+       * @default en
+       * @enum {string}
+       */
+      locale: "en" | "it";
+      /** Format: uri */
+      image?: string;
+      /** @description The use case created by this template needs a login or not? */
+      requiresLogin?: boolean;
+    };
+    /**
+     * TemplateCategory
+     * @description Group different templates
+     */
+    TemplateCategory: {
+      id?: number;
+      name: string;
+    };
+    /** UseCase */
+    UseCase: {
+      title: string;
+      description: string;
+      /** @description Optional in experiential campaigns */
+      functionality?: {
+        id?: number;
+      } & components["schemas"]["Template"];
+      logged?: boolean;
+      link?: string;
+    };
   };
   responses: {
     /** Example response */
@@ -303,6 +349,8 @@ export interface components {
           /** @description Useless value required by Tryber BackOffice */
           description?: string;
           base_bug_internal_id?: string;
+          express_slug: string;
+          use_cases?: components["schemas"]["UseCase"][];
         };
       };
     };
@@ -657,6 +705,32 @@ export interface operations {
             size?: number;
             total?: number;
           };
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  /** Retrieve all available use case templates */
+  "get-templates": {
+    parameters: {
+      query: {
+        /** filterBy[<fieldName>]=<fieldValue> */
+        filterBy?: components["parameters"]["filterBy"];
+        /** Order value (ASC, DESC) */
+        order?: components["parameters"]["order"];
+        /** Order by accepted field */
+        orderBy?: components["parameters"]["orderBy"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": ({
+            id?: number;
+          } & components["schemas"]["Template"])[];
         };
       };
       400: components["responses"]["Error"];

@@ -117,7 +117,7 @@ describe("updateWorkspaceCoins", () => {
       });
     } catch (error: any) {
       expect(error.code).toBe(400);
-      expect(error.message).toBe(ERROR_MESSAGE);
+      expect(error.message).toBe(ERROR_MESSAGE + " with workspace coins");
     }
   });
 
@@ -129,7 +129,7 @@ describe("updateWorkspaceCoins", () => {
       });
     } catch (error: any) {
       expect(error.code).toBe(400);
-      expect(error.message).toBe(ERROR_MESSAGE);
+      expect(error.message).toBe(ERROR_MESSAGE + " with workspace coins");
     }
   });
 
@@ -143,7 +143,7 @@ describe("updateWorkspaceCoins", () => {
       });
     } catch (error: any) {
       expect(error.code).toBe(400);
-      expect(error.message).toBe(ERROR_MESSAGE);
+      expect(error.message).toBe(ERROR_MESSAGE + " with workspace coins");
     }
   });
 
@@ -164,6 +164,21 @@ describe("updateWorkspaceCoins", () => {
       expect.objectContaining({
         id: coins_1.id,
         amount: 49,
+      }),
+    ]);
+  });
+
+  // Once a package is updated, there should be a transaction for it
+  it("Should create a transaction for the package", async () => {
+    const packages = await updateWorkspaceCoins({
+      workspaceId: customer_1.id,
+      cost: DEFAULT_EXPRESS_COST, // Total amount is now 48
+    });
+
+    expect(packages).toEqual([
+      expect.objectContaining({
+        id: coins_1.id,
+        amount: 48,
       }),
     ]);
   });
