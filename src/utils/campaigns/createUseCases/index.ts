@@ -33,35 +33,35 @@ export const createUseCases = async (
   > = [];
 
   // Insert use cases, singolarly because we need to know the id of the new use case
-  use_cases.forEach(async (use_case) => {
-    const values = getUCFieldsFromTemplate(
-      {
-        ...defaultUseCase,
-        ...use_case,
-        ...(use_case.description && { content: use_case.description }),
-      },
-      allowedFields
+  try {
+    await Promise.all(
+      use_cases.map(async (use_case) => {
+        const values = getUCFieldsFromTemplate(
+          {
+            ...defaultUseCase,
+            ...use_case,
+            ...(use_case.description && { content: use_case.description }),
+          },
+          allowedFields
+        );
+        const sql = insert_sql + ` (${values.join(",")})`;
+        const response = await db.query(sql);
+
+        const id = getId(response);
+
+        if (response && id) {
+          results.push({
+            ...use_case,
+            id: id,
+          });
+        }
+      })
     );
-    const sql = insert_sql + ` (${values.join(",")})`;
-
-    try {
-      const response = await db.query(sql);
-
-      const id = getId(response);
-
-      if (response && id) {
-        results.push({
-          id: id,
-          ...use_case,
-        });
-      }
-    } catch (error) {
-      if (process.env && process.env.DEBUG) {
-        console.log("Something went wrong in uc creation: ", error);
-      }
+  } catch (error) {
+    if (process.env && process.env.DEBUG) {
+      console.log("Something went wrong in uc creation: ", error);
     }
-  });
-
+  }
   return results;
 };
 
