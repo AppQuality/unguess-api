@@ -15,7 +15,7 @@ export const createUseCases = async (
     is_required: 1,
     jf_code: "",
     jf_text: "",
-    group_id: 1,
+    group_id: -1,
     position: 0,
     allow_media: 0,
     optimize_media: 0,
@@ -50,6 +50,14 @@ export const createUseCases = async (
         const id = getId(response);
 
         if (response && id) {
+          // Set default group relation
+          await db.query(
+            db.format(
+              `INSERT INTO wp_appq_campaign_task_group (task_id, group_id) VALUES (?, ?)`,
+              [id, 0]
+            )
+          );
+
           results.push({
             ...use_case,
             id: id,
