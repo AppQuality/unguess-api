@@ -17,6 +17,7 @@ import {
 } from "@src/utils/workspaces";
 
 import UseCase from "@src/__mocks__/database/use_cases";
+import useCaseGroup from "@src/__mocks__/database/use_case_group";
 
 const customer_1 = {
   id: 1,
@@ -197,6 +198,7 @@ describe("POST /campaigns", () => {
         await dbAdapter.create();
         await platformTable.create();
         await UseCase.mock();
+        await useCaseGroup.mock();
 
         await dbAdapter.add({
           companies: [customer_1, customer_2],
@@ -227,6 +229,7 @@ describe("POST /campaigns", () => {
         await dbAdapter.drop();
         await platformTable.drop();
         await UseCase.dropMock();
+        await useCaseGroup.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -238,6 +241,7 @@ describe("POST /campaigns", () => {
 
   beforeEach(async () => {
     await UseCase.clear();
+    await useCaseGroup.clear();
   });
 
   it("Should answer 403 if not logged in", async () => {
@@ -510,7 +514,6 @@ describe("POST /campaigns", () => {
     expect(useCases).toHaveLength(1);
   });
 
-  // Should create the use cases if some are provided
   it("Should create the use cases also with a custom functionality", async () => {
     const response = await request(app)
       .post("/campaigns")
@@ -538,6 +541,35 @@ describe("POST /campaigns", () => {
       { campaign_id: response.body.id },
     ]);
     expect(useCases).toHaveLength(2);
+  });
+
+  it("Should create the use cases if some are provided with a default group definition", async () => {
+    const response = await request(app)
+      .post("/campaigns")
+      .set("Authorization", "Bearer customer")
+      .send({
+        ...campaign_request_2,
+        express_slug: express_2.slug,
+        platforms: [AndroidPhoneBody, WindowsPCBody],
+        use_cases: [UseCase1, { ...UseCase1, title: "Use case 2" }],
+      });
+
+    expect(response.status).toBe(200);
+
+    const useCases = await UseCase.all(undefined, [
+      { campaign_id: response.body.id },
+    ]);
+
+    const groups = await useCaseGroup.all();
+
+    expect(groups).toHaveLength(2);
+
+    expect(groups).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ task_id: useCases[0].id }),
+        expect.objectContaining({ task_id: useCases[1].id }),
+      ])
+    );
   });
 
   // end of tests
