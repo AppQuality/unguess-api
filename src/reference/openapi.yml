@@ -897,6 +897,7 @@ components:
       description: Template of a usecase object
       x-tags:
         - templates
+      x-examples: {}
       properties:
         title:
           type: string
@@ -928,12 +929,6 @@ components:
           description: The use case created by this template needs a login or not?
       required:
         - title
-        - description
-        - content
-        - category
-        - device_type
-        - locale
-      x-examples: {}
     TemplateCategory:
       title: TemplateCategory
       type: object
@@ -951,6 +946,7 @@ components:
       x-stoplight:
         id: a08quvwbf9ion
       type: object
+      x-examples: {}
       properties:
         title:
           type: string
@@ -958,19 +954,12 @@ components:
           type: string
         functionality:
           description: Optional in experiential campaigns
-          oneOf:
+          allOf:
             - type: object
               properties:
                 id:
                   type: number
-                title:
-                  type: string
-            - allOf:
-                - type: object
-                  properties:
-                    id:
-                      type: number
-                - $ref: '#/components/schemas/Template'
+            - $ref: '#/components/schemas/Template'
         logged:
           type: boolean
         link:
@@ -978,7 +967,6 @@ components:
       required:
         - title
         - description
-      x-examples: {}
   securitySchemes:
     JWT:
       type: http
