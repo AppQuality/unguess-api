@@ -510,5 +510,35 @@ describe("POST /campaigns", () => {
     expect(useCases).toHaveLength(1);
   });
 
+  // Should create the use cases if some are provided
+  it("Should create the use cases also with a custom functionality", async () => {
+    const response = await request(app)
+      .post("/campaigns")
+      .set("Authorization", "Bearer customer")
+      .send({
+        ...campaign_request_2,
+        express_slug: express_2.slug,
+        platforms: [AndroidPhoneBody, WindowsPCBody],
+        use_cases: [
+          UseCase1,
+          {
+            ...UseCase1,
+            title: "Use case 2",
+            functionality: {
+              id: -1,
+              title: "Custom functionality",
+            },
+          },
+        ],
+      });
+
+    expect(response.status).toBe(200);
+
+    const useCases = await UseCase.all(undefined, [
+      { campaign_id: response.body.id },
+    ]);
+    expect(useCases).toHaveLength(2);
+  });
+
   // end of tests
 });

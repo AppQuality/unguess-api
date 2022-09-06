@@ -254,17 +254,17 @@ export interface components {
     Template: {
       title: string;
       /** @description Short description used as preview of template or in templates dropdown */
-      description: string;
+      description?: string;
       /** @description HTML content used to pre-fill the use case editor */
-      content: string;
-      category: components["schemas"]["TemplateCategory"];
+      content?: string;
+      category?: components["schemas"]["TemplateCategory"];
       /** @enum {string} */
-      device_type: "webapp" | "mobileapp";
+      device_type?: "webapp" | "mobileapp";
       /**
        * @default en
        * @enum {string}
        */
-      locale: "en" | "it";
+      locale?: "en" | "it";
       /** Format: uri */
       image?: string;
       /** @description The use case created by this template needs a login or not? */
