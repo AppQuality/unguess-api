@@ -572,5 +572,45 @@ describe("POST /campaigns", () => {
     );
   });
 
+  it("Should answer 200 with a campaign object with bug form enabled if provided", async () => {
+    const response = await request(app)
+      .post("/campaigns")
+      .set("Authorization", "Bearer customer")
+      .send({
+        ...campaign_request_1,
+        has_bug_form: 1,
+        platforms: [AndroidPhoneBody, WindowsPCBody],
+      });
+    expect(response.status).toBe(200);
+    expect(response.body.bug_form).toEqual(0);
+  });
+
+  it("Should answer 200 with a campaign object with bug parade enabled if provided", async () => {
+    const response = await request(app)
+      .post("/campaigns")
+      .set("Authorization", "Bearer customer")
+      .send({
+        ...campaign_request_1,
+        has_bug_form: 1,
+        has_bug_parade: 1,
+        platforms: [AndroidPhoneBody, WindowsPCBody],
+      });
+    expect(response.status).toBe(200);
+    expect(response.body.bug_form).toEqual(1);
+  });
+
+  it("Should answer 400 if a campaign object is provided with bug parade enabled and bug form disabled", async () => {
+    const response = await request(app)
+      .post("/campaigns")
+      .set("Authorization", "Bearer customer")
+      .send({
+        ...campaign_request_1,
+        has_bug_form: 0,
+        has_bug_parade: 1,
+        platforms: [AndroidPhoneBody, WindowsPCBody],
+      });
+    expect(response.status).toBe(400);
+  });
+
   // end of tests
 });
