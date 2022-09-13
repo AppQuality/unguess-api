@@ -897,6 +897,7 @@ components:
       description: Template of a usecase object
       x-tags:
         - templates
+      x-examples: {}
       properties:
         title:
           type: string
@@ -928,12 +929,6 @@ components:
           description: The use case created by this template needs a login or not?
       required:
         - title
-        - description
-        - content
-        - category
-        - device_type
-        - locale
-      x-examples: {}
     TemplateCategory:
       title: TemplateCategory
       type: object
@@ -951,19 +946,20 @@ components:
       x-stoplight:
         id: a08quvwbf9ion
       type: object
+      x-examples: {}
       properties:
         title:
           type: string
         description:
           type: string
         functionality:
+          description: Optional in experiential campaigns
           allOf:
             - type: object
               properties:
                 id:
                   type: number
             - $ref: '#/components/schemas/Template'
-          description: Optional in experiential campaigns
         logged:
           type: boolean
         link:
@@ -1121,7 +1117,38 @@ components:
               - platforms
               - customer_id
               - express_slug
-          examples: {}
+          examples:
+            example-1:
+              value:
+                title: string
+                start_date: string
+                end_date: string
+                close_date: string
+                customer_title: string
+                status_id: 0
+                is_public: 0
+                campaign_type_id: 0
+                project_id: 0
+                pm_id: 0
+                platforms:
+                  - id: 0
+                    deviceType: 0
+                page_preview_id: 0
+                page_manual_id: 0
+                customer_id: 0
+                has_bug_form: 0
+                has_bug_parade: 0
+                description: string
+                base_bug_internal_id: string
+                express_slug: string
+                use_cases:
+                  - title: string
+                    description: string
+                    functionality:
+                      id: 0
+                      title: string
+                    logged: true
+                    link: string
     Project:
       content:
         application/json:

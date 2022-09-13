@@ -17,6 +17,7 @@ import {
 } from "@src/utils/workspaces";
 
 import UseCase from "@src/__mocks__/database/use_cases";
+import useCaseGroup from "@src/__mocks__/database/use_case_group";
 
 const customer_1 = {
   id: 1,
@@ -197,6 +198,7 @@ describe("POST /campaigns", () => {
         await dbAdapter.create();
         await platformTable.create();
         await UseCase.mock();
+        await useCaseGroup.mock();
 
         await dbAdapter.add({
           companies: [customer_1, customer_2],
@@ -227,6 +229,7 @@ describe("POST /campaigns", () => {
         await dbAdapter.drop();
         await platformTable.drop();
         await UseCase.dropMock();
+        await useCaseGroup.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -238,6 +241,7 @@ describe("POST /campaigns", () => {
 
   beforeEach(async () => {
     await UseCase.clear();
+    await useCaseGroup.clear();
   });
 
   it("Should answer 403 if not logged in", async () => {
@@ -508,6 +512,104 @@ describe("POST /campaigns", () => {
 
     expect(response.status).toBe(200);
     expect(useCases).toHaveLength(1);
+  });
+
+  it("Should create the use cases also with a custom functionality", async () => {
+    const response = await request(app)
+      .post("/campaigns")
+      .set("Authorization", "Bearer customer")
+      .send({
+        ...campaign_request_2,
+        express_slug: express_2.slug,
+        platforms: [AndroidPhoneBody, WindowsPCBody],
+        use_cases: [
+          UseCase1,
+          {
+            ...UseCase1,
+            title: "Use case 2",
+            functionality: {
+              id: -1,
+              title: "Custom functionality",
+            },
+          },
+        ],
+      });
+
+    expect(response.status).toBe(200);
+
+    const useCases = await UseCase.all(undefined, [
+      { campaign_id: response.body.id },
+    ]);
+    expect(useCases).toHaveLength(2);
+  });
+
+  it("Should create the use cases if some are provided with a default group definition", async () => {
+    const response = await request(app)
+      .post("/campaigns")
+      .set("Authorization", "Bearer customer")
+      .send({
+        ...campaign_request_2,
+        express_slug: express_2.slug,
+        platforms: [AndroidPhoneBody, WindowsPCBody],
+        use_cases: [UseCase1, { ...UseCase1, title: "Use case 2" }],
+      });
+
+    expect(response.status).toBe(200);
+
+    const useCases = await UseCase.all(undefined, [
+      { campaign_id: response.body.id },
+    ]);
+
+    const groups = await useCaseGroup.all();
+
+    expect(groups).toHaveLength(2);
+
+    expect(groups).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ task_id: useCases[0].id }),
+        expect.objectContaining({ task_id: useCases[1].id }),
+      ])
+    );
+  });
+
+  it("Should answer 200 with a campaign object with bug form enabled if provided", async () => {
+    const response = await request(app)
+      .post("/campaigns")
+      .set("Authorization", "Bearer customer")
+      .send({
+        ...campaign_request_1,
+        has_bug_form: 1,
+        platforms: [AndroidPhoneBody, WindowsPCBody],
+      });
+    expect(response.status).toBe(200);
+    expect(response.body.bug_form).toEqual(0);
+  });
+
+  it("Should answer 200 with a campaign object with bug parade enabled if provided", async () => {
+    const response = await request(app)
+      .post("/campaigns")
+      .set("Authorization", "Bearer customer")
+      .send({
+        ...campaign_request_1,
+        has_bug_form: 1,
+        has_bug_parade: 1,
+        platforms: [AndroidPhoneBody, WindowsPCBody],
+      });
+    expect(response.status).toBe(200);
+    expect(response.body.bug_form).toEqual(1);
+  });
+
+  it("Should answer 400 if a campaign object is provided with bug parade enabled and bug form disabled", async () => {
+    const response = await request(app)
+      .post("/campaigns")
+      .set("Authorization", "Bearer customer")
+      .send({
+        ...campaign_request_1,
+        has_bug_form: 0,
+        has_bug_parade: 1,
+        platforms: [AndroidPhoneBody, WindowsPCBody],
+      });
+    expect(response.status).toBe(400);
   });
 
   // end of tests
