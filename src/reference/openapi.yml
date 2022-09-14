@@ -409,6 +409,28 @@ paths:
       tags:
         - Campaigns
     parameters: []
+    patch:
+      summary: ''
+      operationId: patch-campaigns
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campaign'
+      description: ''
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customer_title:
+                  type: string
+        description: ''
   /projects:
     post:
       summary: Create a new project
