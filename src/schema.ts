@@ -673,7 +673,7 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": {
-          name: string;
+          display_name: string;
         };
       };
     };
