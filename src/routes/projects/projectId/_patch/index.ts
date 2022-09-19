@@ -49,8 +49,6 @@ export default async (
       ...project,
       name: validData.display_name,
     };
-
-    return { code: 123, message: "Project not found", error: true };
   } catch (e: any) {
     console.log("Catch", e);
     if (e.code) {
