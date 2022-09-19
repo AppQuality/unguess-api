@@ -382,7 +382,7 @@ paths:
       description: Retrieve projects details from an ID.
       security:
         - JWT: []
-  /campaigns:
+  '/campaigns/{cid}':
     post:
       summary: Create campaign
       operationId: post-campaigns
@@ -408,7 +408,13 @@ paths:
         $ref: '#/components/requestBodies/Campaign'
       tags:
         - Campaigns
-    parameters: []
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: number
+        description: Campaign id
     patch:
       summary: ''
       operationId: patch-campaigns
@@ -1050,6 +1056,13 @@ components:
       required: false
       schema: {}
       description: 'filterBy[<fieldName>]=<fieldValue>'
+    cid:
+      name: cid
+      in: path
+      required: true
+      schema:
+        type: number
+      description: Campaign id
   requestBodies:
     Credentials:
       content:
