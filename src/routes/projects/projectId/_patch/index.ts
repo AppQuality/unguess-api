@@ -29,38 +29,26 @@ export default async (
         return obj;
       }, {});
 
-    if (Object.keys(validData).length) {
-      const project = await getProjectById({
-        user: user,
-        projectId: pid,
-      });
+    const project = await getProjectById({
+      user: user,
+      projectId: pid,
+    });
 
-      const changes = Object.keys(validData).map((key) =>
-        db.format(`${key} = ?`, [validData[key]])
-      );
+    const changes = Object.keys(validData).map((key) =>
+      db.format(`${key} = ?`, [validData[key]])
+    );
 
-      const updateQuery = db.format(
-        `UPDATE wp_appq_project SET ${changes.join(",")} WHERE id = ?`,
-        [project.id]
-      );
+    const updateQuery = db.format(
+      `UPDATE wp_appq_project SET ${changes.join(",")} WHERE id = ?`,
+      [project.id]
+    );
 
-      await db.query(updateQuery);
+    await db.query(updateQuery);
 
-      return {
-        ...project,
-        name: validData.display_name,
-      };
-    } else {
-      res.status_code = 400;
-      return {
-        ...error,
-        message: "No valid fields provided",
-      };
-    }
-
-    // if (project) {
-    return error;
-    // }
+    return {
+      ...project,
+      name: validData.display_name,
+    };
 
     return { code: 123, message: "Project not found", error: true };
   } catch (e: any) {
