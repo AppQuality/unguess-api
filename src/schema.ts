@@ -80,6 +80,8 @@ export interface paths {
   "/projects/{pid}": {
     /** Retrieve projects details from an ID. */
     get: operations["get-projects-projectId"];
+    /** Update fields of a specific project. Currently only the project name is editable. */
+    patch: operations["patch-projects-pid"];
     parameters: {
       path: {
         /** Project id */
@@ -642,8 +644,38 @@ export interface operations {
         };
       };
       400: components["responses"]["Error"];
+      401: components["responses"]["Error"];
       403: components["responses"]["Error"];
       500: components["responses"]["Error"];
+    };
+  };
+  /** Update fields of a specific project. Currently only the project name is editable. */
+  "patch-projects-pid": {
+    parameters: {
+      path: {
+        /** Project id */
+        pid: components["parameters"]["pid"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Project"];
+        };
+      };
+      400: components["responses"]["Error"];
+      401: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      405: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          name: string;
+        };
+      };
     };
   };
   "post-campaigns": {
