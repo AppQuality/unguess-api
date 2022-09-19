@@ -419,10 +419,10 @@ paths:
             schema:
               type: object
               properties:
-                name:
+                display_name:
                   type: string
               required:
-                - name
+                - display_name
             examples:
               example-1:
                 value:
