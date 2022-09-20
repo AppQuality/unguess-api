@@ -382,7 +382,7 @@ paths:
       description: Retrieve projects details from an ID.
       security:
         - JWT: []
-  /campaigns/:
+  /campaigns:
     post:
       summary: Create campaign
       operationId: post-campaigns
