@@ -108,6 +108,15 @@ describe("PATCH /campaigns", () => {
     });
   });
 
+  // It should answer 403 if user is not logged in
+  it("should answer 403 if user is not logged in", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}`)
+      .send(campaign_patch_request);
+
+    expect(response.status).toBe(403);
+  });
+
   // It should return 200 with the updated campaign
   it("Should return 200 with the updated campaign", async () => {
     const response = await request(app)
