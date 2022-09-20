@@ -87,8 +87,11 @@ export interface paths {
       };
     };
   };
-  "/campaigns/{cid}": {
+  "/campaigns": {
     post: operations["post-campaigns"];
+    parameters: {};
+  };
+  "/campaigns/{cid}": {
     patch: operations["patch-campaigns"];
     parameters: {
       path: {
@@ -655,12 +658,7 @@ export interface operations {
     };
   };
   "post-campaigns": {
-    parameters: {
-      path: {
-        /** Campaign id */
-        cid: number;
-      };
-    };
+    parameters: {};
     responses: {
       /** OK */
       200: {
