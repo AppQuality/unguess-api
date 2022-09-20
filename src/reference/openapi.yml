@@ -374,6 +374,8 @@ paths:
                 $ref: '#/components/schemas/Project'
         '400':
           $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
         '403':
           $ref: '#/components/responses/Error'
         '500':
@@ -382,6 +384,49 @@ paths:
       description: Retrieve projects details from an ID.
       security:
         - JWT: []
+    patch:
+      summary: Update single project
+      operationId: patch-projects-pid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+              examples:
+                example-1:
+                  value:
+                    id: 123
+                    name: New project name
+                    campaigns_count: 0
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '405':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      description: Update fields of a specific project. Currently only the project name is editable.
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                display_name:
+                  type: string
+              required:
+                - display_name
+            examples:
+              example-1:
+                value:
+                  name: New project name
   /campaigns:
     post:
       summary: Create campaign
