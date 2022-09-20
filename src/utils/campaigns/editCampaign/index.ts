@@ -17,6 +17,11 @@ export const editCampaign = async (
     throw error;
   }
 
+  // Check if customer_title is too long
+  if (patchRequest.customer_title.length > 256) {
+    throw error;
+  }
+
   // Get campaign fields and values to update
   const campaignFields = Object.keys(patchRequest);
   const campaignValues = Object.values(patchRequest);

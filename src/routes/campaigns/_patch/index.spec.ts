@@ -236,4 +236,16 @@ describe("PATCH /campaigns", () => {
 
     expect(response.status).toBe(403);
   });
+
+  // It should fail if the customer_title is too long
+  it("Should fail if the customer_title is too long", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}`)
+      .set("Authorization", `Bearer customer`)
+      .send({
+        customer_title: "a".repeat(257), // varchar(256)
+      });
+
+    expect(response.status).toBe(400);
+  });
 });
