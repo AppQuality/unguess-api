@@ -156,6 +156,14 @@ describe("PATCH /projects/{pid}", () => {
     expect(response.status).toBe(400);
   });
 
+  it("Should answer 400 if the display_name has more than 64 characters", async () => {
+    const response = await request(app)
+      .patch(`/projects/${project_1.id}`)
+      .set("authorization", "Bearer customer")
+      .send({ display_name: "a".repeat(65) });
+    expect(response.status).toBe(400);
+  });
+
   it("Should answer 200 if a valid body is provided", async () => {
     const response = await request(app)
       .patch(`/projects/${project_1.id}`)
