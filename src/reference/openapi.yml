@@ -1067,6 +1067,23 @@ components:
       x-stoplight:
         id: hszr1597imsce
       type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        campaign_id:
+          type: integer
+        uploader_id:
+          type: integer
+        url:
+          type: string
+        creation_date:
+          type: string
+        update_date:
+          type: string
   securitySchemes:
     JWT:
       type: http
