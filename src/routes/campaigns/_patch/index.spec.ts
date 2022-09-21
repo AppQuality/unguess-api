@@ -117,6 +117,15 @@ describe("PATCH /campaigns", () => {
     expect(response.status).toBe(403);
   });
 
+  // It should answer 400 if no body is sent
+  it("should answer 400 if no body is sent", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}`)
+      .set("Authorization", "Bearer customer")
+      .send();
+    expect(response.status).toBe(400);
+  });
+
   // It should return 200 with the updated campaign
   it("Should return 200 with the updated campaign", async () => {
     const response = await request(app)
@@ -211,6 +220,27 @@ describe("PATCH /campaigns", () => {
       });
 
     expect(response.status).toBe(200);
+  });
+
+  // It should execute correctly if the customer_title contains an xss attack
+  it("Should execute correctly if the customer_title contains an xss attack", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}`)
+      .set("Authorization", `Bearer customer`)
+      .send({
+        customer_title:
+          campaign_1.customer_title + " <script>alert('PATCHED')</script>",
+      });
+
+    expect(response.status).toBe(200);
+
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        id: campaign_1.id,
+        customer_title:
+          campaign_1.customer_title + " <script>alert('PATCHED')</script>",
+      })
+    );
   });
 
   // It should fail if the campaign does not exist
