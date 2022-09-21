@@ -421,6 +421,7 @@ paths:
               properties:
                 display_name:
                   type: string
+                  maxLength: 64
               required:
                 - display_name
             examples:
