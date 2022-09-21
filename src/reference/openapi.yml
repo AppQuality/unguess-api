@@ -426,7 +426,7 @@ paths:
             examples:
               example-1:
                 value:
-                  name: New project name
+                  display_name: New project name
   /campaigns:
     post:
       summary: Create campaign
