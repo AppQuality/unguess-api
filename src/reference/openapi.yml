@@ -454,6 +454,36 @@ paths:
       tags:
         - Campaigns
     parameters: []
+  '/campaigns/{cid}':
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: number
+        description: Campaign id
+    patch:
+      summary: Patch campaign
+      operationId: patch-campaigns
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campaign'
+      description: ''
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customer_title:
+                  type: string
+        description: ''
   /projects:
     post:
       summary: Create a new project
@@ -1073,6 +1103,13 @@ components:
       required: false
       schema: {}
       description: 'filterBy[<fieldName>]=<fieldValue>'
+    cid:
+      name: cid
+      in: path
+      required: true
+      schema:
+        type: number
+      description: Campaign id
   requestBodies:
     Credentials:
       content:

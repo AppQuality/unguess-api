@@ -5,7 +5,6 @@ export default (dbname: "unguess" | "tryber") => {
     process.env.DEBUG === "1"
       ? new sqlite3(dbname + ".db", { verbose: console.log })
       : new sqlite3(dbname + ".db");
-
   db.function("NOW", () => "datetime('now')");
   db.function("CONCAT", { varargs: true }, (...args: string[]) =>
     args.join("")

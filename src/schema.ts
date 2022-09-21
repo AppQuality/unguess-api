@@ -93,6 +93,15 @@ export interface paths {
     post: operations["post-campaigns"];
     parameters: {};
   };
+  "/campaigns/{cid}": {
+    patch: operations["patch-campaigns"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: number;
+      };
+    };
+  };
   "/projects": {
     post: operations["post-projects"];
   };
@@ -315,6 +324,8 @@ export interface components {
     orderBy: string;
     /** @description filterBy[<fieldName>]=<fieldValue> */
     filterBy: unknown;
+    /** @description Campaign id */
+    cid: number;
   };
   requestBodies: {
     Credentials: {
@@ -693,6 +704,29 @@ export interface operations {
       500: components["responses"]["Error"];
     };
     requestBody: components["requestBodies"]["Campaign"];
+  };
+  "patch-campaigns": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Campaign"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          customer_title?: string;
+        };
+      };
+    };
   };
   "post-projects": {
     responses: {

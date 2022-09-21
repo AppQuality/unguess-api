@@ -17,3 +17,15 @@ export const query = (query: string, dbName: string = ""): Promise<any> => {
     });
   }).finally(() => connection.end());
 };
+
+export const escape = (value: string) => {
+  let data = value;
+
+  // Escape single quotes
+  data = data.replace(/'/g, "''");
+
+  // Escape double quotes
+  data = data.replace(/"/g, "''");
+
+  return data;
+};
