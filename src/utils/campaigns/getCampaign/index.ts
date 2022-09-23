@@ -5,7 +5,9 @@ import {
 } from "@src/utils/constants";
 import { getCampaignStatus } from "../getCampaignStatus";
 
-export const getCampaign = async (cp_id: number) => {
+export const getCampaign = async (
+  cp_id: number
+): Promise<StoplightComponents["schemas"]["Campaign"] | false> => {
   const result = await db.query(
     db.format(
       `SELECT 
