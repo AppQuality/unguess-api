@@ -10,7 +10,7 @@ export const table = {
       "description VARCHAR(255)",
       "campaign_id INT(16)",
       "uploader_id INT(16)",
-      "url VARCHAR(255)",
+      "url VARCHAR(255) NULL",
       "creation_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP",
       "update_date timestamp NULL",
     ]);
@@ -31,10 +31,6 @@ data.basicItem = async (params) => {
   const item = {
     title: "Report",
     description: "Description",
-    campaign_id: 1,
-    uploader_id: 1,
-    url: "https://example.com",
-    creation_date: "2022-01-01 00:00:00",
     ...params,
   };
   await db.insert("wp_appq_report", item);
