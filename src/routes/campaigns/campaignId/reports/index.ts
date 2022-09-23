@@ -2,7 +2,8 @@
 import { Context } from "openapi-backend";
 import * as db from "@src/features/db";
 import { ERROR_MESSAGE } from "@src/utils/constants";
-import { getCampaignReports } from "@src/utils/campaigns";
+import { getCampaign, getCampaignReports } from "@src/utils/campaigns";
+import { getProjectById } from "@src/utils/projects";
 
 export default async (
   c: Context,
@@ -21,11 +22,26 @@ export default async (
   res.status_code = 200;
 
   try {
+    // Check if the campaign exists
+    let campaign = await getCampaign(cid);
+
+    if (!campaign) {
+      error.code = 400;
+      throw error;
+    }
+
+    // Check if user has permission to edit the campaign
+    await getProjectById({
+      projectId: campaign.project.id,
+      user: user,
+    });
+
     // Get the campaign reports
     const reports = await getCampaignReports(cid);
 
     return reports as StoplightComponents["schemas"]["Report"][];
   } catch (e: any) {
+    console.error(e);
     if (e.code) {
       error.code = e.code;
       res.status_code = e.code;

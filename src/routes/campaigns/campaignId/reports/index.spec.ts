@@ -52,13 +52,45 @@ const campaign_1 = {
   project_id: project_1.id,
 };
 
+const campaign_2 = {
+  id: 2,
+  start_date: "2017-07-20 10:00:00",
+  end_date: "2017-07-20 10:00:00",
+  close_date: "2017-07-20 10:00:00",
+  title: "Campaign 2 title",
+  customer_title: "Campaign 2 customer title",
+  status_id: 1,
+  is_public: 1,
+  campaign_type_id: campaign_type_1.id,
+  campaign_type: -1,
+  project_id: project_2.id,
+};
+
 const report_1 = {
   id: 1,
   title: "Report 1 title",
   description: "Report 1 description",
   campaign_id: campaign_1.id,
   uploader_id: 1,
+  url: "https://s3-eu-west-1.amazonaws.com/crowd.appq.testbucket/report/111/DEMO%20-%20MOBILE%20PROXIMITY%20PAYMENT%20SAMPLE%20SET%20UP%20TEST.asd.pdf",
+};
+
+const report_2 = {
+  id: 2,
+  title: "Report 2 title",
+  description: "Report 2 description",
+  campaign_id: campaign_1.id,
+  uploader_id: 1,
   url: "https://www.google.com",
+  update_date: "2017-07-20 10:00:00",
+};
+
+const report_3 = {
+  id: 3,
+  title: "Report 3 title",
+  description: "Report 3 description",
+  campaign_id: campaign_1.id,
+  uploader_id: 1,
 };
 
 describe("GET /campaigns/{cid}/reports", () => {
@@ -74,8 +106,8 @@ describe("GET /campaigns/{cid}/reports", () => {
           projects: [project_1, project_2],
           userToProjects: [user_to_project_1],
           campaignTypes: [campaign_type_1],
-          campaigns: [campaign_1],
-          reports: [report_1],
+          campaigns: [campaign_1, campaign_2],
+          reports: [report_1, report_2, report_3],
         });
       } catch (error) {
         console.error(error);
@@ -115,16 +147,98 @@ describe("GET /campaigns/{cid}/reports", () => {
       .set("Authorization", `Bearer customer`);
 
     expect(response.status).toBe(200);
+    expect(response.body).toEqual([
+      expect.objectContaining({
+        id: report_1.id,
+        url: report_1.url,
+      }),
+      expect.objectContaining({
+        id: report_2.id,
+        url: report_2.url,
+      }),
+    ]);
+  });
+
+  // It should fail if the campaign does not exist
+  it("Should fail if the campaign does not exist", async () => {
+    const response = await request(app)
+      .get(`/campaigns/999999/reports`)
+      .set("Authorization", `Bearer customer`);
+
+    expect(response.status).toBe(400);
+  });
+
+  // It should fail if the user has no permission to see the campaign's project
+  it("Should fail if the user has no permission to see the campaign's project", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_2.id}/reports`)
+      .set("Authorization", `Bearer customer`);
+
+    expect(response.status).toBe(403);
+  });
+
+  // It should filter out reports that have not url
+  it("Should filter out reports that have not url", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/reports`)
+      .set("Authorization", `Bearer customer`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual([
+      expect.objectContaining({
+        id: report_1.id,
+        url: report_1.url,
+      }),
+      expect.objectContaining({
+        id: report_2.id,
+        url: report_2.url,
+      }),
+    ]);
+  });
+
+  // It should return update_date in returned reports if present
+  it("Should return update_date in returned reports if present", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/reports`)
+      .set("Authorization", `Bearer customer`);
+
+    expect(response.status).toBe(200);
     expect(response.body).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          ...report_1,
+          id: report_2.id,
+          url: report_2.url,
+          update_date: report_2.update_date,
         }),
       ])
     );
   });
 
-  // It should fail if the campaign does not exist
+  // It should return the file_type if recognized
+  it("Should return the file_type if recognized", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/reports`)
+      .set("Authorization", `Bearer customer`);
 
-  // It should fail if the user has no permission to see the campaign's project
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: report_1.id,
+          url: report_1.url,
+          file_type: "pdf",
+        }),
+      ])
+    );
+  });
+
+  // It should not return the file_type if not recognized
+  it("Should not return the file_type if not recognized", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/reports`)
+      .set("Authorization", `Bearer customer`);
+
+    expect(response.status).toBe(200);
+    expect(response.body[1].file_type).toBeUndefined();
+  });
 });
