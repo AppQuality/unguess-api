@@ -1074,16 +1074,16 @@ components:
           type: string
         description:
           type: string
-        campaign_id:
-          type: integer
-        uploader_id:
-          type: integer
         url:
+          type: string
+        file_type:
           type: string
         creation_date:
           type: string
         update_date:
           type: string
+      required:
+        - url
   securitySchemes:
     JWT:
       type: http
