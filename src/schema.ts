@@ -314,9 +314,8 @@ export interface components {
       id?: number;
       title?: string;
       description?: string;
-      campaign_id?: number;
-      uploader_id?: number;
-      url?: string;
+      url: string;
+      file_type?: string;
       creation_date?: string;
       update_date?: string;
     };
