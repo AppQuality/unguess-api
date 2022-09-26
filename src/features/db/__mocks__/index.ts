@@ -39,3 +39,15 @@ export const insert = (table: string, data: any, db: string): Promise<any> => {
     }
   });
 };
+
+export const escape = (value: string) => {
+  let data = value;
+
+  // Escape single quotes
+  data = data.replace(/'/g, "''");
+
+  // Escape double quotes
+  data = data.replace(/"/g, "''");
+
+  return data;
+};

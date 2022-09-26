@@ -80,6 +80,8 @@ export interface paths {
   "/projects/{pid}": {
     /** Retrieve projects details from an ID. */
     get: operations["get-projects-projectId"];
+    /** Update fields of a specific project. Currently only the project name is editable. */
+    patch: operations["patch-projects-pid"];
     parameters: {
       path: {
         /** Project id */
@@ -90,6 +92,24 @@ export interface paths {
   "/campaigns": {
     post: operations["post-campaigns"];
     parameters: {};
+  };
+  "/campaigns/{cid}": {
+    patch: operations["patch-campaigns"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: number;
+      };
+    };
+  };
+  "/campaigns/{cid}/reports": {
+    get: operations["get-campaigns-reports"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+      };
+    };
   };
   "/projects": {
     post: operations["post-projects"];
@@ -289,6 +309,16 @@ export interface components {
       logged?: boolean;
       link?: string;
     };
+    /** Report */
+    Report: {
+      id?: number;
+      title?: string;
+      description?: string;
+      url: string;
+      file_type?: string;
+      creation_date?: string;
+      update_date?: string;
+    };
   };
   responses: {
     /** Example response */
@@ -313,6 +343,8 @@ export interface components {
     orderBy: string;
     /** @description filterBy[<fieldName>]=<fieldValue> */
     filterBy: unknown;
+    /** @description Campaign id */
+    cid: number;
   };
   requestBodies: {
     Credentials: {
@@ -642,8 +674,38 @@ export interface operations {
         };
       };
       400: components["responses"]["Error"];
+      401: components["responses"]["Error"];
       403: components["responses"]["Error"];
       500: components["responses"]["Error"];
+    };
+  };
+  /** Update fields of a specific project. Currently only the project name is editable. */
+  "patch-projects-pid": {
+    parameters: {
+      path: {
+        /** Project id */
+        pid: components["parameters"]["pid"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Project"];
+        };
+      };
+      400: components["responses"]["Error"];
+      401: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      405: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          display_name: string;
+        };
+      };
     };
   };
   "post-campaigns": {
@@ -661,6 +723,45 @@ export interface operations {
       500: components["responses"]["Error"];
     };
     requestBody: components["requestBodies"]["Campaign"];
+  };
+  "patch-campaigns": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Campaign"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          customer_title?: string;
+        };
+      };
+    };
+  };
+  "get-campaigns-reports": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Report"][];
+        };
+      };
+    };
   };
   "post-projects": {
     responses: {

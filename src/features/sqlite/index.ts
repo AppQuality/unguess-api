@@ -1,8 +1,10 @@
 const sqlite3 = require("better-sqlite3");
 
 export default (dbname: "unguess" | "tryber") => {
-  const db = new sqlite3(dbname + ".db", { verbose: console.log });
-  // const db = new sqlite3(dbname + ".db");
+  const db =
+    process.env.DEBUG === "1"
+      ? new sqlite3(dbname + ".db", { verbose: console.log })
+      : new sqlite3(dbname + ".db");
   db.function("NOW", () => "datetime('now')");
   db.function("CONCAT", { varargs: true }, (...args: string[]) =>
     args.join("")
