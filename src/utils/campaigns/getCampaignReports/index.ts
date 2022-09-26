@@ -37,9 +37,50 @@ export const getCampaignReports = async (
   return reports ?? false;
 };
 
-const getFileType = (url: string): string | false => {
+const getFileType = (
+  url: string
+): StoplightComponents["schemas"]["Report"]["file_type"] => {
+  // Get file url domain
+  const urlDomain = getUrlDomain(url);
+
+  // Get the file extension
+  const fileExtension = getFileExtension(
+    url
+  ) as StoplightComponents["schemas"]["ReportExtensions"];
+
+  // Get file type name
+  const fileName = getFileTypeName(fileExtension);
+
+  return {
+    type: fileName,
+    ...(fileExtension && { extension: fileExtension }),
+    ...(urlDomain && { domain_name: urlDomain }),
+  };
+};
+
+const getUrlDomain = (url: string): string | false => {
+  const allowedDomains = [
+    "google.com",
+    "miro.com",
+    "youtube.com",
+    "figma.com",
+    "dropbox.com",
+    "mural.co",
+    "iterspace.com",
+    "tryber.me",
+  ];
+  const urlDomain = new URL(url).hostname.replace("www.", "");
+
+  if (urlDomain) {
+    return allowedDomains.includes(urlDomain) ? urlDomain : false;
+  }
+
+  return false;
+};
+
+const getFileExtension = (url: string): string | false => {
   // Allowed file types
-  const allowed_file_types = [
+  const allowedFileTypes = [
     "pdf",
     "doc",
     "docx",
@@ -47,22 +88,47 @@ const getFileType = (url: string): string | false => {
     "xlsx",
     "ppt",
     "pptx",
-    "rar",
     "txt",
     "csv",
+    "rar",
     "zip",
     "gzip",
     "gz",
     "7z",
   ];
 
-  // Get the file extension
-  const file_extension = url.split(".").pop();
-
-  // Check if the file extension is allowed
-  if (file_extension && allowed_file_types.includes(file_extension)) {
-    return file_extension;
+  const fileExtension = url.split(".").pop()?.toLowerCase();
+  if (fileExtension && allowedFileTypes.includes(fileExtension)) {
+    return fileExtension;
   }
 
   return false;
+};
+
+const getFileTypeName = (extension: string): string => {
+  switch (extension) {
+    case "pdf":
+      return "pdf";
+    case "doc":
+    case "docx":
+      return "document";
+    case "xls":
+    case "xlsx":
+      return "spreadsheet";
+    case "ppt":
+    case "pptx":
+      return "presentation";
+    case "txt":
+      return "text";
+    case "csv":
+      return "csv";
+    case "rar":
+    case "zip":
+    case "gzip":
+    case "gz":
+    case "7z":
+      return "archive";
+    default:
+      return "link";
+  }
 };

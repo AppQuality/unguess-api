@@ -81,7 +81,7 @@ const report_2 = {
   description: "Report 2 description",
   campaign_id: campaign_1.id,
   uploader_id: 1,
-  url: "https://www.google.com",
+  url: "https://google.com",
   update_date: "2017-07-20 10:00:00",
 };
 
@@ -226,19 +226,24 @@ describe("GET /campaigns/{cid}/reports", () => {
         expect.objectContaining({
           id: report_1.id,
           url: report_1.url,
-          file_type: "pdf",
+          file_type: {
+            type: "pdf",
+            extension: "pdf",
+          },
         }),
       ])
     );
   });
 
-  // It should not return the file_type if not recognized
-  it("Should not return the file_type if not recognized", async () => {
+  // It should not return the file_type if not recognized and should return the domain name
+  it("Should not return the file_type if not recognized and should return the domain name", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/reports`)
       .set("Authorization", `Bearer customer`);
 
     expect(response.status).toBe(200);
-    expect(response.body[1].file_type).toBeUndefined();
+    expect(response.body[1].file_type.type).toBe("link");
+    expect(response.body[1].file_type.extension).toBeUndefined();
+    expect(response.body[1].file_type.domain_name).toBe("google.com");
   });
 });
