@@ -1077,7 +1077,47 @@ components:
         url:
           type: string
         file_type:
-          type: string
+          type: object
+          properties:
+            extension:
+              type: string
+              enum:
+                - pdf
+                - doc
+                - docx
+                - xls
+                - xlsx
+                - ppt
+                - pptx
+                - rar
+                - txt
+                - csv
+                - zip
+                - gzip
+                - gz
+                - 7z
+            type:
+              type: string
+              enum:
+                - pdf
+                - spreadsheet
+                - presentation
+                - text
+                - archive
+                - link
+              default: link
+            domain_name:
+              type: string
+              enum:
+                - drive
+                - miro
+                - youtube
+                - figma
+                - mural
+                - iterspace
+                - tryber
+          required:
+            - type
         creation_date:
           type: string
         update_date:
