@@ -2,7 +2,7 @@ import * as db from "@src/features/db";
 
 export const getCampaignReports = async (
   cp_id: number
-): Promise<StoplightComponents["schemas"]["Report"][] | false> => {
+): Promise<StoplightComponents["schemas"]["Report"][]> => {
   const results = await db.query(
     db.format(`SELECT * FROM wp_appq_report WHERE campaign_id = ?`, [cp_id])
   );
@@ -34,7 +34,7 @@ export const getCampaignReports = async (
     []
   );
 
-  return reports ?? false;
+  return reports;
 };
 
 const getFileType = (

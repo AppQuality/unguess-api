@@ -67,6 +67,20 @@ const campaign_2 = {
   project_id: project_2.id,
 };
 
+const campaign_3 = {
+  id: 3,
+  start_date: "2017-07-20 10:00:00",
+  end_date: "2017-07-20 10:00:00",
+  close_date: "2017-07-20 10:00:00",
+  title: "Campaign 3 title",
+  customer_title: "Campaign 3 customer title",
+  status_id: 1,
+  is_public: 1,
+  campaign_type_id: campaign_type_1.id,
+  campaign_type: -1,
+  project_id: project_1.id,
+};
+
 const report_1 = {
   id: 1,
   title: "Report 1 title",
@@ -107,7 +121,7 @@ describe("GET /campaigns/{cid}/reports", () => {
           projects: [project_1, project_2],
           userToProjects: [user_to_project_1],
           campaignTypes: [campaign_type_1],
-          campaigns: [campaign_1, campaign_2],
+          campaigns: [campaign_1, campaign_2, campaign_3],
         });
 
         await Reports.mock();
@@ -252,6 +266,16 @@ describe("GET /campaigns/{cid}/reports", () => {
     expect(response.body[1].file_type.type).toBe("link");
     expect(response.body[1].file_type.extension).toBeUndefined();
     expect(response.body[1].file_type.domain_name).toBe("google.com");
+  });
+
+  // it should return an empty array if no reports are found
+  it("Should return an empty array if no reports are found", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_3.id}/reports`)
+      .set("Authorization", `Bearer customer`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual([]);
   });
 
   describe(" /GET presentational reports", () => {
