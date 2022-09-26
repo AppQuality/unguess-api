@@ -485,6 +485,25 @@ paths:
                 customer_title:
                   type: string
         description: ''
+  '/campaigns/{cid}/reports':
+    parameters:
+      - $ref: '#/components/parameters/cid'
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Report'
+      operationId: get-campaigns-reports
+      description: ''
+      security:
+        - JWT: []
   /projects:
     post:
       summary: Create a new project
@@ -1043,6 +1062,28 @@ components:
       required:
         - title
         - description
+    Report:
+      title: Report
+      x-stoplight:
+        id: hszr1597imsce
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        url:
+          type: string
+        file_type:
+          type: string
+        creation_date:
+          type: string
+        update_date:
+          type: string
+      required:
+        - url
   securitySchemes:
     JWT:
       type: http

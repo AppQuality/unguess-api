@@ -102,6 +102,15 @@ export interface paths {
       };
     };
   };
+  "/campaigns/{cid}/reports": {
+    get: operations["get-campaigns-reports"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+      };
+    };
+  };
   "/projects": {
     post: operations["post-projects"];
   };
@@ -299,6 +308,16 @@ export interface components {
       } & components["schemas"]["Template"];
       logged?: boolean;
       link?: string;
+    };
+    /** Report */
+    Report: {
+      id?: number;
+      title?: string;
+      description?: string;
+      url: string;
+      file_type?: string;
+      creation_date?: string;
+      update_date?: string;
     };
   };
   responses: {
@@ -724,6 +743,22 @@ export interface operations {
       content: {
         "application/json": {
           customer_title?: string;
+        };
+      };
+    };
+  };
+  "get-campaigns-reports": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Report"][];
         };
       };
     };

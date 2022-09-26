@@ -6,6 +6,7 @@ import { getCampaignType } from "./getCampaignType";
 import { createUseCases } from "./createUseCases";
 import { editCampaign } from "./editCampaign";
 import { getCampaign } from "./getCampaign";
+import { getCampaignReports } from "./getCampaignReports";
 
 export {
   checkCampaignRequest,
@@ -16,4 +17,5 @@ export {
   createUseCases,
   editCampaign,
   getCampaign,
+  getCampaignReports,
 };
