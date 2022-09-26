@@ -489,7 +489,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/cid'
     get:
-      summary: Your GET endpoint
+      summary: GET Reports by Campaign
       tags: []
       responses:
         '200':
@@ -501,7 +501,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/Report'
       operationId: get-campaigns-reports
-      description: ''
+      description: Return all available report of a specific campaign
       security:
         - JWT: []
   /projects:
@@ -1077,13 +1077,42 @@ components:
         url:
           type: string
         file_type:
-          type: string
+          type: object
+          properties:
+            extension:
+              $ref: '#/components/schemas/ReportExtensions'
+            type:
+              type: string
+            domain_name:
+              type: string
+          required:
+            - type
         creation_date:
           type: string
         update_date:
           type: string
       required:
         - url
+    ReportExtensions:
+      title: ReportExtensions
+      x-stoplight:
+        id: 2of0ncwz36s1u
+      type: string
+      enum:
+        - pdf
+        - doc
+        - docx
+        - xls
+        - xlsx
+        - ppt
+        - pptx
+        - rar
+        - txt
+        - csv
+        - zip
+        - gzip
+        - gz
+        - 7z
   securitySchemes:
     JWT:
       type: http

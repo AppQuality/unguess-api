@@ -103,6 +103,7 @@ export interface paths {
     };
   };
   "/campaigns/{cid}/reports": {
+    /** Return all available report of a specific campaign */
     get: operations["get-campaigns-reports"];
     parameters: {
       path: {
@@ -315,10 +316,33 @@ export interface components {
       title?: string;
       description?: string;
       url: string;
-      file_type?: string;
+      file_type?: {
+        extension?: components["schemas"]["ReportExtensions"];
+        type: string;
+        domain_name?: string;
+      };
       creation_date?: string;
       update_date?: string;
     };
+    /**
+     * ReportExtensions
+     * @enum {string}
+     */
+    ReportExtensions:
+      | "pdf"
+      | "doc"
+      | "docx"
+      | "xls"
+      | "xlsx"
+      | "ppt"
+      | "pptx"
+      | "rar"
+      | "txt"
+      | "csv"
+      | "zip"
+      | "gzip"
+      | "gz"
+      | "7z";
   };
   responses: {
     /** Example response */
@@ -747,6 +771,7 @@ export interface operations {
       };
     };
   };
+  /** Return all available report of a specific campaign */
   "get-campaigns-reports": {
     parameters: {
       path: {
