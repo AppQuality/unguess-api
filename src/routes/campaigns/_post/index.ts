@@ -94,7 +94,7 @@ export default async (
     });
 
     // Update useCase setting cp id
-    if (request_body.use_cases) {
+    if (request_body.use_cases?.length) {
       // Get useCases ids
       const useCasesIds = useCases.map((useCase) => useCase.id);
       if (useCasesIds.length > 0) {
