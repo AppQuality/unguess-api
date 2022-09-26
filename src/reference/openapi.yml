@@ -489,7 +489,7 @@ paths:
     parameters:
       - $ref: '#/components/parameters/cid'
     get:
-      summary: Your GET endpoint
+      summary: GET Reports by Campaign
       tags: []
       responses:
         '200':
@@ -501,7 +501,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/Report'
       operationId: get-campaigns-reports
-      description: ''
+      description: Return all available report of a specific campaign
       security:
         - JWT: []
   /projects:
