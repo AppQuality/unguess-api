@@ -34,8 +34,6 @@ import {
 
 import { table as expressTable, data as expressData } from "./express";
 
-import { table as reportTable, data as reportData } from "./report";
-
 import defaultUsers from "@src/__mocks__/database/seed/users.json";
 
 interface dataObject {
@@ -54,7 +52,6 @@ interface dataObject {
   transactions?: Array<any>;
   express?: Array<any>;
   unguess_users?: Array<any>;
-  reports?: Array<any>;
 }
 
 export const adapter = {
@@ -69,7 +66,6 @@ export const adapter = {
     await userTable.create();
     await customerTable.create();
     await userTableUG.create();
-    await reportTable.create();
 
     //Features Tables
     await featuresTable.create();
@@ -91,7 +87,6 @@ export const adapter = {
     await userTable.drop();
     await customerTable.drop();
     await userTableUG.drop();
-    await reportTable.drop();
 
     //Features Tables
     await featuresTable.drop();
@@ -117,7 +112,6 @@ export const adapter = {
     transactions = [],
     express = [],
     unguess_users = [],
-    reports = [],
   }: dataObject) => {
     profiles.length &&
       profiles.forEach(async (profile) => {
@@ -189,11 +183,6 @@ export const adapter = {
     features.length &&
       features.forEach(async (feature) => {
         await featuresData.basicItem(feature);
-      });
-
-    reports.length &&
-      reports.forEach(async (report) => {
-        await reportData.basicItem(report);
       });
   },
 };

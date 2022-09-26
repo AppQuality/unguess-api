@@ -2,6 +2,7 @@ import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { table as platformTable } from "@src/__mocks__/database/platforms";
+import Reports from "@src/__mocks__/database/report";
 
 const customer_1 = {
   id: 999,
@@ -107,8 +108,9 @@ describe("GET /campaigns/{cid}/reports", () => {
           userToProjects: [user_to_project_1],
           campaignTypes: [campaign_type_1],
           campaigns: [campaign_1, campaign_2],
-          reports: [report_1, report_2, report_3],
         });
+
+        await Reports.mock();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -123,6 +125,7 @@ describe("GET /campaigns/{cid}/reports", () => {
       try {
         await dbAdapter.drop();
         await platformTable.drop();
+        await Reports.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -130,6 +133,16 @@ describe("GET /campaigns/{cid}/reports", () => {
 
       resolve(true);
     });
+  });
+
+  beforeEach(async () => {
+    await Reports.insert(report_1);
+    await Reports.insert(report_2);
+    await Reports.insert(report_3);
+  });
+
+  afterEach(async () => {
+    await Reports.clear();
   });
 
   // It should answer 403 if user is not logged in
