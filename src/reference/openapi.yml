@@ -1080,22 +1080,7 @@ components:
           type: object
           properties:
             extension:
-              type: string
-              enum:
-                - pdf
-                - doc
-                - docx
-                - xls
-                - xlsx
-                - ppt
-                - pptx
-                - rar
-                - txt
-                - csv
-                - zip
-                - gzip
-                - gz
-                - 7z
+              $ref: '#/components/schemas/ReportExtensions'
             type:
               type: string
               enum:
@@ -1124,6 +1109,26 @@ components:
           type: string
       required:
         - url
+    ReportExtensions:
+      title: ReportExtensions
+      x-stoplight:
+        id: 2of0ncwz36s1u
+      type: string
+      enum:
+        - pdf
+        - doc
+        - docx
+        - xls
+        - xlsx
+        - ppt
+        - pptx
+        - rar
+        - txt
+        - csv
+        - zip
+        - gzip
+        - gz
+        - 7z
   securitySchemes:
     JWT:
       type: http
