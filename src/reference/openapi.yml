@@ -1083,24 +1083,8 @@ components:
               $ref: '#/components/schemas/ReportExtensions'
             type:
               type: string
-              enum:
-                - pdf
-                - spreadsheet
-                - presentation
-                - text
-                - archive
-                - link
-              default: link
             domain_name:
               type: string
-              enum:
-                - drive
-                - miro
-                - youtube
-                - figma
-                - mural
-                - iterspace
-                - tryber
           required:
             - type
         creation_date:
