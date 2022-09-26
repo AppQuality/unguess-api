@@ -111,6 +111,10 @@ describe("GET /campaigns/{cid}/reports", () => {
         });
 
         await Reports.mock();
+
+        await Reports.insert(report_1);
+        await Reports.insert(report_2);
+        await Reports.insert(report_3);
       } catch (error) {
         console.error(error);
         reject(error);
@@ -133,16 +137,6 @@ describe("GET /campaigns/{cid}/reports", () => {
 
       resolve(true);
     });
-  });
-
-  beforeEach(async () => {
-    await Reports.insert(report_1);
-    await Reports.insert(report_2);
-    await Reports.insert(report_3);
-  });
-
-  afterEach(async () => {
-    await Reports.clear();
   });
 
   // It should answer 403 if user is not logged in
@@ -258,5 +252,353 @@ describe("GET /campaigns/{cid}/reports", () => {
     expect(response.body[1].file_type.type).toBe("link");
     expect(response.body[1].file_type.extension).toBeUndefined();
     expect(response.body[1].file_type.domain_name).toBe("google.com");
+  });
+
+  describe(" /GET presentational reports", () => {
+    beforeAll(async () => {
+      return new Promise(async (resolve, reject) => {
+        try {
+          await Reports.clear();
+          await Reports.insert({
+            ...report_1,
+            id: 4,
+            url: "https://s3-eu-west-1.amazonaws.com/crowd.appq.testbucket/report/115/DEMO%20-%20MOCKUP%20VALIDATION%20SAMPLE%20SET%20UP%20TEST.pptx",
+          });
+          await Reports.insert({
+            ...report_1,
+            id: 5,
+            url: "https://s3-eu-west-1.amazonaws.com/crowd.appq.testbucket/report/115/DEMO%20-%20MOCKUP%20VALIDATION%20SAMPLE%20SET%20UP%20TEST.ppt",
+          });
+
+          resolve(true);
+        } catch (error) {
+          console.error(error);
+          reject(error);
+        }
+      });
+    });
+
+    afterEach(async () => {
+      return new Promise(async (resolve, reject) => {
+        try {
+          await Reports.clear();
+          resolve(true);
+        } catch (error) {
+          console.error(error);
+          reject(error);
+        }
+      });
+    });
+
+    // It should return the file_type if recognized
+    it("Should return the file_type if recognized", async () => {
+      const response = await request(app)
+        .get(`/campaigns/${campaign_1.id}/reports`)
+        .set("Authorization", `Bearer customer`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.length).toBe(2);
+      expect(response.body).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 4,
+            url: "https://s3-eu-west-1.amazonaws.com/crowd.appq.testbucket/report/115/DEMO%20-%20MOCKUP%20VALIDATION%20SAMPLE%20SET%20UP%20TEST.pptx",
+            file_type: {
+              type: "presentation",
+              extension: "pptx",
+            },
+          }),
+          expect.objectContaining({
+            id: 5,
+            url: "https://s3-eu-west-1.amazonaws.com/crowd.appq.testbucket/report/115/DEMO%20-%20MOCKUP%20VALIDATION%20SAMPLE%20SET%20UP%20TEST.ppt",
+            file_type: {
+              type: "presentation",
+              extension: "ppt",
+            },
+          }),
+        ])
+      );
+    });
+
+    // end describe presentational reports
+  });
+
+  describe(" /GET spreadsheet reports", () => {
+    beforeAll(async () => {
+      return new Promise(async (resolve, reject) => {
+        try {
+          await Reports.clear();
+          await Reports.insert({
+            ...report_1,
+            id: 4,
+            url: "https://s3-eu-west-1.amazonaws.com/crowd.appq.testbucket/report/115/DEMO%20-%20MOCKUP%20VALIDATION%20SAMPLE%20SET%20UP%20TEST.xlsx",
+          });
+          await Reports.insert({
+            ...report_1,
+            id: 5,
+            url: "https://s3-eu-west-1.amazonaws.com/crowd.appq.testbucket/report/115/DEMO%20-%20MOCKUP%20VALIDATION%20SAMPLE%20SET%20UP%20TEST.xls",
+          });
+
+          await Reports.insert({
+            ...report_1,
+            id: 6,
+            url: "https://s3-eu-west-1.amazonaws.com/crowd.appq.testbucket/report/115/DEMO%20-%20MOCKUP%20VALIDATION%20SAMPLE%20SET%20UP%20TEST.csv",
+          });
+
+          resolve(true);
+        } catch (error) {
+          console.error(error);
+          reject(error);
+        }
+      });
+    });
+
+    afterEach(async () => {
+      return new Promise(async (resolve, reject) => {
+        try {
+          await Reports.clear();
+          resolve(true);
+        } catch (error) {
+          console.error(error);
+          reject(error);
+        }
+      });
+    });
+
+    // It should return the file_type if recognized
+    it("Should return the file_type if recognized", async () => {
+      const response = await request(app)
+        .get(`/campaigns/${campaign_1.id}/reports`)
+        .set("Authorization", `Bearer customer`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.length).toBe(3);
+
+      expect(response.body).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 4,
+            url: "https://s3-eu-west-1.amazonaws.com/crowd.appq.testbucket/report/115/DEMO%20-%20MOCKUP%20VALIDATION%20SAMPLE%20SET%20UP%20TEST.xlsx",
+            file_type: {
+              type: "spreadsheet",
+              extension: "xlsx",
+            },
+          }),
+          expect.objectContaining({
+            id: 5,
+            url: "https://s3-eu-west-1.amazonaws.com/crowd.appq.testbucket/report/115/DEMO%20-%20MOCKUP%20VALIDATION%20SAMPLE%20SET%20UP%20TEST.xls",
+            file_type: {
+              type: "spreadsheet",
+              extension: "xls",
+            },
+          }),
+          expect.objectContaining({
+            id: 6,
+            url: "https://s3-eu-west-1.amazonaws.com/crowd.appq.testbucket/report/115/DEMO%20-%20MOCKUP%20VALIDATION%20SAMPLE%20SET%20UP%20TEST.csv",
+            file_type: {
+              type: "spreadsheet",
+              extension: "csv",
+            },
+          }),
+        ])
+      );
+    });
+
+    // end describe spreadsheet reports
+  });
+
+  describe(" /GET doc reports", () => {
+    beforeAll(async () => {
+      return new Promise(async (resolve, reject) => {
+        try {
+          await Reports.clear();
+          await Reports.insert({
+            ...report_1,
+            id: 4,
+            url: "https://s3-eu-west-1.amazonaws.com/crowd.appq.testbucket/report/115/DEMO%20-%20MOCKUP%20VALIDATION%20SAMPLE%20SET%20UP%20TEST.doc",
+          });
+          await Reports.insert({
+            ...report_1,
+            id: 5,
+            url: "https://s3-eu-west-1.amazonaws.com/crowd.appq.testbucket/report/115/DEMO%20-%20MOCKUP%20VALIDATION%20SAMPLE%20SET%20UP%20TEST.docx",
+          });
+
+          resolve(true);
+        } catch (error) {
+          console.error(error);
+          reject(error);
+        }
+      });
+    });
+
+    afterEach(async () => {
+      return new Promise(async (resolve, reject) => {
+        try {
+          await Reports.clear();
+          resolve(true);
+        } catch (error) {
+          console.error(error);
+          reject(error);
+        }
+      });
+    });
+
+    // It should return the file_type if recognized
+    it("Should return the file_type if recognized", async () => {
+      const response = await request(app)
+        .get(`/campaigns/${campaign_1.id}/reports`)
+        .set("Authorization", `Bearer customer`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.length).toBe(2);
+      expect(response.body).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 4,
+            url: "https://s3-eu-west-1.amazonaws.com/crowd.appq.testbucket/report/115/DEMO%20-%20MOCKUP%20VALIDATION%20SAMPLE%20SET%20UP%20TEST.doc",
+            file_type: {
+              type: "document",
+              extension: "doc",
+            },
+          }),
+          expect.objectContaining({
+            id: 5,
+            url: "https://s3-eu-west-1.amazonaws.com/crowd.appq.testbucket/report/115/DEMO%20-%20MOCKUP%20VALIDATION%20SAMPLE%20SET%20UP%20TEST.docx",
+            file_type: {
+              type: "document",
+              extension: "docx",
+            },
+          }),
+        ])
+      );
+    });
+
+    // end describe doc reports
+  });
+
+  describe(" /GET archive reports", () => {
+    beforeAll(async () => {
+      return new Promise(async (resolve, reject) => {
+        try {
+          await Reports.clear();
+          await Reports.insert({
+            ...report_1,
+            id: 4,
+            url: "https://s3-eu-west-1.amazonaws.com/crowd.appq.testbucket/report/115/DEMO%20-%20MOCKUP%20VALIDATION%20SAMPLE%20SET%20UP%20TEST.rar",
+          });
+          await Reports.insert({
+            ...report_1,
+            id: 5,
+            url: "https://s3-eu-west-1.amazonaws.com/crowd.appq.testbucket/report/115/DEMO%20-%20MOCKUP%20VALIDATION%20SAMPLE%20SET%20UP%20TEST.zip",
+          });
+
+          await Reports.insert({
+            ...report_1,
+            id: 6,
+            url: "https://s3-eu-west-1.amazonaws.com/crowd.appq.testbucket/report/115/DEMO%20-%20MOCKUP%20VALIDATION%20SAMPLE%20SET%20UP%20TEST.gzip",
+          });
+
+          await Reports.insert({
+            ...report_1,
+            id: 7,
+            url: "https://s3-eu-west-1.amazonaws.com/crowd.appq.testbucket/report/115/DEMO%20-%20MOCKUP%20VALIDATION%20SAMPLE%20SET%20UP%20TEST.7z",
+          });
+
+          await Reports.insert({
+            ...report_1,
+            id: 8,
+            url: "https://s3-eu-west-1.amazonaws.com/crowd.appq.testbucket/report/115/DEMO%20-%20MOCKUP%20VALIDATION%20SAMPLE%20SET%20UP%20TEST.tar",
+          });
+
+          await Reports.insert({
+            ...report_1,
+            id: 9,
+            url: "https://s3-eu-west-1.amazonaws.com/crowd.appq.testbucket/report/115/DEMO%20-%20MOCKUP%20VALIDATION%20SAMPLE%20SET%20UP%20TEST.gz",
+          });
+
+          resolve(true);
+        } catch (error) {
+          console.error(error);
+          reject(error);
+        }
+      });
+    });
+
+    afterEach(async () => {
+      return new Promise(async (resolve, reject) => {
+        try {
+          await Reports.clear();
+          resolve(true);
+        } catch (error) {
+          console.error(error);
+          reject(error);
+        }
+      });
+    });
+
+    // It should return the file_type if recognized
+    it("Should return the file_type if recognized", async () => {
+      const response = await request(app)
+        .get(`/campaigns/${campaign_1.id}/reports`)
+        .set("Authorization", `Bearer customer`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.length).toBe(6);
+
+      expect(response.body).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 4,
+            url: "https://s3-eu-west-1.amazonaws.com/crowd.appq.testbucket/report/115/DEMO%20-%20MOCKUP%20VALIDATION%20SAMPLE%20SET%20UP%20TEST.rar",
+            file_type: {
+              type: "archive",
+              extension: "rar",
+            },
+          }),
+          expect.objectContaining({
+            id: 5,
+            url: "https://s3-eu-west-1.amazonaws.com/crowd.appq.testbucket/report/115/DEMO%20-%20MOCKUP%20VALIDATION%20SAMPLE%20SET%20UP%20TEST.zip",
+            file_type: {
+              type: "archive",
+              extension: "zip",
+            },
+          }),
+          expect.objectContaining({
+            id: 6,
+            url: "https://s3-eu-west-1.amazonaws.com/crowd.appq.testbucket/report/115/DEMO%20-%20MOCKUP%20VALIDATION%20SAMPLE%20SET%20UP%20TEST.gzip",
+            file_type: {
+              type: "archive",
+              extension: "gzip",
+            },
+          }),
+          expect.objectContaining({
+            id: 7,
+            url: "https://s3-eu-west-1.amazonaws.com/crowd.appq.testbucket/report/115/DEMO%20-%20MOCKUP%20VALIDATION%20SAMPLE%20SET%20UP%20TEST.7z",
+            file_type: {
+              type: "archive",
+              extension: "7z",
+            },
+          }),
+          expect.objectContaining({
+            id: 8,
+            url: "https://s3-eu-west-1.amazonaws.com/crowd.appq.testbucket/report/115/DEMO%20-%20MOCKUP%20VALIDATION%20SAMPLE%20SET%20UP%20TEST.tar",
+            file_type: {
+              type: "link",
+              // extension: "tar", // tar is not officially supported by the library
+            },
+          }),
+          expect.objectContaining({
+            id: 9,
+            url: "https://s3-eu-west-1.amazonaws.com/crowd.appq.testbucket/report/115/DEMO%20-%20MOCKUP%20VALIDATION%20SAMPLE%20SET%20UP%20TEST.gz",
+            file_type: {
+              type: "archive",
+              extension: "gz",
+            },
+          }),
+        ])
+      );
+    });
+
+    // end describe archive reports
   });
 });

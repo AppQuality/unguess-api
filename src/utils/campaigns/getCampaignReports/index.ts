@@ -69,7 +69,7 @@ const getUrlDomain = (url: string): string | false => {
     "iterspace.com",
     "tryber.me",
   ];
-  const urlDomain = new URL(url).hostname.replace("www.", "");
+  const urlDomain = new URL(url).hostname.replace(/^www\./, "");
 
   if (urlDomain) {
     return allowedDomains.includes(urlDomain) ? urlDomain : false;
@@ -121,7 +121,7 @@ const getFileTypeName = (extension: string): string => {
     case "txt":
       return "text";
     case "csv":
-      return "csv";
+      return "spreadsheet";
     case "rar":
     case "zip":
     case "gzip":
