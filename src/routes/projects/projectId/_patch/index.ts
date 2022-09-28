@@ -50,7 +50,6 @@ export default async (
       name: validData.display_name,
     };
   } catch (e: any) {
-    console.log("Catch", e);
     if (e.code) {
       error.code = e.code;
       res.status_code = e.code;
