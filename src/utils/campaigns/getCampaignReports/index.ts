@@ -21,7 +21,7 @@ export const getCampaignReports = async (
         acc.push({
           id: report.id,
           title: report.title,
-          description: report.description,
+          description: report.description || "",
           url: report.url,
           ...(report.creation_date && {
             creation_date: format(
