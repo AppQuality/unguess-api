@@ -1,4 +1,5 @@
 import * as db from "@src/features/db";
+import { format } from "date-fns";
 
 export const getCampaignReports = async (
   cp_id: number
@@ -22,9 +23,17 @@ export const getCampaignReports = async (
           title: report.title,
           description: report.description,
           url: report.url,
-          creation_date: report.creation_date,
+          ...(report.creation_date && {
+            creation_date: format(
+              new Date(report.creation_date),
+              "Y-MM-dd HH:mm:ss"
+            ),
+          }),
           ...(report.update_date && {
-            update_date: report.update_date,
+            update_date: format(
+              new Date(report.update_date),
+              "Y-MM-dd HH:mm:ss"
+            ),
           }),
           ...(file_type && { file_type }),
         });
