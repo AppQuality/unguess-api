@@ -1,6 +1,10 @@
 import { updateWorkspaceCoinsTransaction } from ".";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { DEFAULT_EXPRESS_COST, ERROR_MESSAGE } from "@src/utils/constants";
+import {
+  DEFAULT_EXPRESS_COST,
+  ERROR_MESSAGE,
+  EXPERIENTIAL_CAMPAIGN_TYPE_ID,
+} from "@src/utils/constants";
 
 const customer_1 = {
   id: 1,
@@ -69,7 +73,7 @@ const project_1 = {
 const campaign_type_1 = {
   id: 1,
   name: "Campaign Type",
-  type: 1,
+  type: EXPERIENTIAL_CAMPAIGN_TYPE_ID,
 };
 
 describe("updateWorkspaceCoinsTransaction", () => {
