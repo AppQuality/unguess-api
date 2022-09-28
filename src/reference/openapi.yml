@@ -457,12 +457,7 @@ paths:
     parameters: []
   '/campaigns/{cid}':
     parameters:
-      - name: cid
-        in: path
-        required: true
-        schema:
-          type: number
-        description: Campaign id
+      - $ref: '#/components/parameters/cid'
     patch:
       summary: Patch campaign
       operationId: patch-campaigns
@@ -485,6 +480,18 @@ paths:
                 customer_title:
                   type: string
         description: ''
+    get:
+      summary: ''
+      operationId: get-campaign
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campaign'
+      security:
+        - JWT: []
   '/campaigns/{cid}/reports':
     parameters:
       - $ref: '#/components/parameters/cid'
