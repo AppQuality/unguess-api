@@ -38,6 +38,7 @@ class Table<T> {
           return item
             .map(
               (subItem, index) =>
+                subItem &&
                 `${Object.keys(subItem)[0]}='${Object.values(subItem)[0]}'`
             )
             .join(" OR ");
@@ -46,7 +47,8 @@ class Table<T> {
       });
       WHERE = `WHERE ${orQueries
         .map(
-          (item, index) => `${Object.keys(item)[0]}='${Object.values(item)[0]}'`
+          (item, index) =>
+            item && `${Object.keys(item)[0]}='${Object.values(item)[0]}'`
         )
         .join(" AND ")}`;
     }
