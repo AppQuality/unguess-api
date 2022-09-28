@@ -457,12 +457,7 @@ paths:
     parameters: []
   '/campaigns/{cid}':
     parameters:
-      - name: cid
-        in: path
-        required: true
-        schema:
-          type: number
-        description: Campaign id
+      - $ref: '#/components/parameters/cid'
     patch:
       summary: Patch campaign
       operationId: patch-campaigns
@@ -485,6 +480,18 @@ paths:
                 customer_title:
                   type: string
         description: ''
+    get:
+      summary: ''
+      operationId: get-campaign
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campaign'
+      security:
+        - JWT: []
   '/campaigns/{cid}/reports':
     parameters:
       - $ref: '#/components/parameters/cid'
@@ -1038,8 +1045,6 @@ components:
         - name
     UseCase:
       title: UseCase
-      x-stoplight:
-        id: a08quvwbf9ion
       type: object
       x-examples: {}
       properties:
@@ -1064,8 +1069,6 @@ components:
         - description
     Report:
       title: Report
-      x-stoplight:
-        id: hszr1597imsce
       type: object
       properties:
         id:
@@ -1095,8 +1098,6 @@ components:
         - url
     ReportExtensions:
       title: ReportExtensions
-      x-stoplight:
-        id: 2of0ncwz36s1u
       type: string
       enum:
         - pdf
