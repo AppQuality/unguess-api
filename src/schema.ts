@@ -94,11 +94,12 @@ export interface paths {
     parameters: {};
   };
   "/campaigns/{cid}": {
+    get: operations["get-campaign"];
     patch: operations["patch-campaigns"];
     parameters: {
       path: {
         /** Campaign id */
-        cid: number;
+        cid: components["parameters"]["cid"];
       };
     };
   };
@@ -748,11 +749,27 @@ export interface operations {
     };
     requestBody: components["requestBodies"]["Campaign"];
   };
+  "get-campaign": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Campaign"];
+        };
+      };
+    };
+  };
   "patch-campaigns": {
     parameters: {
       path: {
         /** Campaign id */
-        cid: number;
+        cid: components["parameters"]["cid"];
       };
     };
     responses: {

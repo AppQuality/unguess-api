@@ -1045,8 +1045,6 @@ components:
         - name
     UseCase:
       title: UseCase
-      x-stoplight:
-        id: a08quvwbf9ion
       type: object
       x-examples: {}
       properties:
@@ -1071,8 +1069,6 @@ components:
         - description
     Report:
       title: Report
-      x-stoplight:
-        id: hszr1597imsce
       type: object
       properties:
         id:
@@ -1102,8 +1098,6 @@ components:
         - url
     ReportExtensions:
       title: ReportExtensions
-      x-stoplight:
-        id: 2of0ncwz36s1u
       type: string
       enum:
         - pdf
