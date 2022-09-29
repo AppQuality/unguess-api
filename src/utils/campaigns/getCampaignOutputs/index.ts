@@ -1,0 +1,42 @@
+import * as db from "@src/features/db";
+
+export const getCampaignOutputs = async ({
+  campaignId,
+}: {
+  campaignId: number;
+}): Promise<string[]> => {
+  let availableOutputs = [] as string[];
+
+  // This campaign has bugs?
+  const hasBugs = await db.query(
+    db.format(`SELECT id FROM wp_appq_evd_bug WHERE campaign_id = ? LIMIT 1`, [
+      campaignId,
+    ])
+  );
+  if (hasBugs.length > 0) {
+    availableOutputs.push("bugs");
+  }
+
+  // This campaign has media?
+  const hasMedia = await db.query(
+    db.format(
+      `SELECT t.id FROM wp_appq_user_task_media m JOIN wp_appq_campaign_task t  ON (m.campaign_task_id = t.id) WHERE t.campaign_id = ? LIMIT 1`,
+      [campaignId]
+    )
+  );
+  if (hasMedia.length > 0) {
+    availableOutputs.push("media");
+  }
+
+  // This campaign has reports?
+  const hasReports = await db.query(
+    db.format(`SELECT id FROM wp_appq_report WHERE campaign_id = ? LIMIT 1`, [
+      campaignId,
+    ])
+  );
+  if (hasReports.length > 0) {
+    availableOutputs.push("reports");
+  }
+
+  return availableOutputs;
+};
