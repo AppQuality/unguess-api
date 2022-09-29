@@ -1,10 +1,7 @@
 import * as db from "@src/features/db";
-import {
-  EXPERIENTIAL_CAMPAIGN_TYPE_ID,
-  FUNCTIONAL_CAMPAIGN_TYPE_ID,
-} from "@src/utils/constants";
 import { getCampaignType } from "../getCampaignType";
 import { getCampaignStatus } from "../getCampaignStatus";
+import { getCampaignFamily } from "../getCampaignFamily";
 
 const DEFAULT_PLATFORM_ID = 0;
 
@@ -129,15 +126,9 @@ export const createCampaign = async (
   campaign = campaign[0];
 
   // Get campaign family
-  let campaign_family = "";
-  switch (campaign.campaign_family_id) {
-    case EXPERIENTIAL_CAMPAIGN_TYPE_ID:
-      campaign_family = "Experiential";
-      break;
-    case FUNCTIONAL_CAMPAIGN_TYPE_ID:
-      campaign_family = "Functional";
-      break;
-  }
+  const campaign_family = getCampaignFamily({
+    familyId: campaign.campaign_family_id,
+  });
 
   return {
     id: campaign.id,
