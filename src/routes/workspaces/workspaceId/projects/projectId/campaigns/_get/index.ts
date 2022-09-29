@@ -3,14 +3,12 @@ import { Context } from "openapi-backend";
 import * as db from "@src/features/db";
 import { getProject } from "@src/utils/projects";
 import { getWorkspace } from "@src/utils/workspaces";
-import { getCampaignStatus } from "@src/utils/campaigns";
+import { getCampaignFamily, getCampaignStatus } from "@src/utils/campaigns";
 import { paginateItems, formatCount } from "@src/utils/paginations";
 import {
   ERROR_MESSAGE,
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
-  EXPERIENTIAL_CAMPAIGN_TYPE_ID,
-  FUNCTIONAL_CAMPAIGN_TYPE_ID,
 } from "@src/utils/constants";
 
 export default async (
@@ -84,15 +82,9 @@ export default async (
     let returnCampaigns: Array<StoplightComponents["schemas"]["Campaign"]> = [];
     for (let campaign of campaigns) {
       // Get campaign family
-      let campaign_family = "";
-      switch (campaign.campaign_family_id) {
-        case EXPERIENTIAL_CAMPAIGN_TYPE_ID:
-          campaign_family = "Experiential";
-          break;
-        case FUNCTIONAL_CAMPAIGN_TYPE_ID:
-          campaign_family = "Functional";
-          break;
-      }
+      const campaign_family = getCampaignFamily({
+        familyId: campaign.campaign_family_id,
+      });
 
       returnCampaigns.push({
         id: campaign.id,
