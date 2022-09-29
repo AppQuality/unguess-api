@@ -893,6 +893,10 @@ components:
           type: string
         base_bug_internal_id:
           type: string
+        outputs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Output'
       required:
         - id
         - start_date
@@ -905,6 +909,7 @@ components:
         - family
         - status
         - project
+        - outputs
     Project:
       title: Project
       type: object
@@ -1114,6 +1119,16 @@ components:
         - gzip
         - gz
         - 7z
+    Output:
+      type: string
+      title: Output
+      x-stoplight:
+        id: 319v4cufuqnsu
+      enum:
+        - bugs
+        - reports
+        - media
+      description: campaign output item
   securitySchemes:
     JWT:
       type: http
