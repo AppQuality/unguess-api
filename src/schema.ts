@@ -212,6 +212,7 @@ export interface components {
       };
       description?: string;
       base_bug_internal_id?: string;
+      outputs: components["schemas"]["Output"][];
     };
     /** Project */
     Project: {
@@ -263,6 +264,7 @@ export interface components {
       /**
        * Format: float
        * @description This is the single coin price
+       * @default 0
        */
       price?: number;
       created_on?: string;
@@ -289,7 +291,10 @@ export interface components {
       locale?: "en" | "it";
       /** Format: uri */
       image?: string;
-      /** @description The use case created by this template needs a login or not? */
+      /**
+       * @description The use case created by this template needs a login or not?
+       * @default false
+       */
       requiresLogin?: boolean;
     };
     /**
@@ -344,6 +349,12 @@ export interface components {
       | "gzip"
       | "gz"
       | "7z";
+    /**
+     * Output
+     * @description campaign output item
+     * @enum {string}
+     */
+    Output: "bugs" | "reports" | "media";
   };
   responses: {
     /** Example response */

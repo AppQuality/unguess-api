@@ -3,7 +3,11 @@ import { Context } from "openapi-backend";
 import * as db from "@src/features/db";
 import { getProject } from "@src/utils/projects";
 import { getWorkspace } from "@src/utils/workspaces";
-import { getCampaignFamily, getCampaignStatus } from "@src/utils/campaigns";
+import {
+  getCampaignFamily,
+  getCampaignOutputs,
+  getCampaignStatus,
+} from "@src/utils/campaigns";
 import { paginateItems, formatCount } from "@src/utils/paginations";
 import {
   ERROR_MESSAGE,
@@ -86,6 +90,8 @@ export default async (
         familyId: campaign.campaign_family_id,
       });
 
+      const outputs = await getCampaignOutputs({ campaignId: campaign.id });
+
       returnCampaigns.push({
         id: campaign.id,
         start_date: new Date(campaign.start_date).toISOString(),
@@ -114,6 +120,7 @@ export default async (
           id: campaign.campaign_family_id,
           name: campaign_family,
         },
+        outputs,
       });
     }
 
