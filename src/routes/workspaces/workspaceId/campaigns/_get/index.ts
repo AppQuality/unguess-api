@@ -158,15 +158,17 @@ export default async (
 
     if (!campaigns.length) return await paginateItems({ items: [], total: 0 });
 
-    let stoplightCampaigns = campaigns.map(async (campaign: any) => {
-      // Get campaign family
+    const preparedCampaignResponse =
+      [] as StoplightComponents["schemas"]["CampaignWithOutput"][];
+
+    for (const campaign of campaigns) {
       const campaign_family = getCampaignFamily({
         familyId: campaign.campaign_family_id,
       });
 
       const outputs = await getCampaignOutputs({ campaignId: campaign.id });
 
-      return {
+      preparedCampaignResponse.push({
         id: campaign.id,
         start_date: campaign.start_date.toString(),
         end_date: campaign.end_date.toString(),
@@ -195,11 +197,11 @@ export default async (
           name: campaign.display_name,
         },
         outputs,
-      };
-    });
+      });
+    }
 
     return await paginateItems({
-      items: stoplightCampaigns,
+      items: preparedCampaignResponse,
       limit,
       start,
       total,

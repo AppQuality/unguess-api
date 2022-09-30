@@ -212,7 +212,41 @@ export interface components {
       };
       description?: string;
       base_bug_internal_id?: string;
-      outputs: components["schemas"]["Output"][];
+    };
+    /** Campaign */
+    CampaignWithOutput: {
+      id: number;
+      start_date: string;
+      end_date: string;
+      close_date: string;
+      title: string;
+      customer_title: string;
+      is_public: number;
+      /**
+       * @description -1: no bug form;
+       * 0: only bug form;
+       * 1: bug form with bug parade';
+       */
+      bug_form?: number;
+      type: {
+        id: number;
+        name: string;
+      };
+      family: {
+        id: number;
+        name: string;
+      };
+      status: {
+        id: number;
+        name: string;
+      };
+      project: {
+        id: number;
+        name: string;
+      };
+      description?: string;
+      base_bug_internal_id?: string;
+      outputs?: components["schemas"]["Output"][];
     };
     /** Project */
     Project: {
@@ -548,7 +582,7 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            items?: components["schemas"]["Campaign"][];
+            items?: components["schemas"]["CampaignWithOutput"][];
             start?: number;
             limit?: number;
             size?: number;
@@ -636,7 +670,7 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            items?: components["schemas"]["Campaign"][];
+            items?: components["schemas"]["CampaignWithOutput"][];
             start?: number;
             limit?: number;
             size?: number;
@@ -668,7 +702,7 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            items?: components["schemas"]["Campaign"][];
+            items?: components["schemas"]["CampaignWithOutput"][];
             start?: number;
             limit?: number;
             size?: number;
@@ -771,7 +805,7 @@ export interface operations {
       /** OK */
       200: {
         content: {
-          "application/json": components["schemas"]["Campaign"];
+          "application/json": components["schemas"]["CampaignWithOutput"];
         };
       };
     };

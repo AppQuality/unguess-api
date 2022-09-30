@@ -46,8 +46,6 @@ export const getCampaign = async (
     familyId: campaign.campaign_family_id,
   });
 
-  const outputs = await getCampaignOutputs({ campaignId: campaign.id });
-
   return {
     id: campaign.id,
     start_date: campaign.start_date.toString(),
@@ -77,6 +75,5 @@ export const getCampaign = async (
     ...(campaign.base_bug_internal_id && {
       base_bug_internal_id: campaign.base_bug_internal_id,
     }),
-    outputs,
   };
 };

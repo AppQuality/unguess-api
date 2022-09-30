@@ -77,7 +77,9 @@ export default async (
     let total = await db.query(db.format(countQuery, [prj.id]));
     total = formatCount(total);
 
-    let returnCampaigns: Array<StoplightComponents["schemas"]["Campaign"]> = [];
+    let returnCampaigns: Array<
+      StoplightComponents["schemas"]["CampaignWithOutput"]
+    > = [];
     for (let campaign of campaigns) {
       // Get campaign family
       const campaign_family = getCampaignFamily({

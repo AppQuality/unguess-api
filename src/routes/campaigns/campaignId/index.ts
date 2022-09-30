@@ -1,7 +1,7 @@
 /** OPENAPI-ROUTE: get-campaign */
 import { Context } from "openapi-backend";
 import { ERROR_MESSAGE } from "@src/utils/constants";
-import { getCampaign } from "@src/utils/campaigns";
+import { getCampaign, getCampaignOutputs } from "@src/utils/campaigns";
 import { getProjectById } from "@src/utils/projects";
 
 export default async (
@@ -36,7 +36,13 @@ export default async (
     });
 
     // Get the campaign
-    return campaign as StoplightComponents["schemas"]["Campaign"];
+    const outputs = await getCampaignOutputs({
+      campaignId: campaign.id,
+    });
+    return {
+      ...campaign,
+      outputs,
+    } as StoplightComponents["schemas"]["CampaignWithOutput"];
   } catch (e: any) {
     if (e.code) {
       error.code = e.code;

@@ -13,7 +13,16 @@ type UserTaskMediaParams = {
   creation_date?: string;
 };
 
-const defaultItem: UserTaskMediaParams = {};
+const defaultItem: UserTaskMediaParams = {
+  campaign_task_id: 0,
+  user_task_id: 0,
+  tester_id: 0,
+  filename: "???",
+  size: 0,
+  location: "???",
+  status: 0,
+  favorite: 0,
+};
 class UserTaskMedia extends Table<UserTaskMediaParams> {
   protected name = "wp_appq_user_task_media";
   protected columns = [
