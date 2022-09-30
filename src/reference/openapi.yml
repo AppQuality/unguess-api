@@ -152,7 +152,7 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Campaign'
+                      $ref: '#/components/schemas/CampaignWithOutput'
                   start:
                     type: integer
                   limit:
@@ -269,7 +269,7 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Campaign'
+                      $ref: '#/components/schemas/CampaignWithOutput'
                   start:
                     type: integer
                   limit:
@@ -316,7 +316,7 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Campaign'
+                      $ref: '#/components/schemas/CampaignWithOutput'
                   start:
                     type: integer
                   limit:
@@ -325,6 +325,7 @@ paths:
                     type: integer
                   total:
                     type: integer
+              examples: {}
         '400':
           $ref: '#/components/responses/Error'
         '401':
@@ -481,7 +482,7 @@ paths:
                   type: string
         description: ''
     get:
-      summary: ''
+      summary: Get campaign by ID
       operationId: get-campaign
       responses:
         '200':
@@ -489,7 +490,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Campaign'
+                $ref: '#/components/schemas/CampaignWithOutput'
       security:
         - JWT: []
   '/campaigns/{cid}/reports':
@@ -893,6 +894,88 @@ components:
           type: string
         base_bug_internal_id:
           type: string
+      required:
+        - id
+        - start_date
+        - end_date
+        - close_date
+        - title
+        - customer_title
+        - is_public
+        - type
+        - family
+        - status
+        - project
+    CampaignWithOutput:
+      title: Campaign
+      type: object
+      properties:
+        id:
+          type: integer
+        start_date:
+          type: string
+        end_date:
+          type: string
+        close_date:
+          type: string
+        title:
+          type: string
+        customer_title:
+          type: string
+        is_public:
+          type: number
+        bug_form:
+          type: number
+          minimum: -1
+          maximum: 1
+          description: |-
+            -1: no bug form;
+            0: only bug form;
+            1: bug form with bug parade';
+        type:
+          type: object
+          required:
+            - id
+            - name
+          properties:
+            id:
+              type: number
+            name:
+              type: string
+        family:
+          type: object
+          required:
+            - id
+            - name
+          properties:
+            id:
+              type: number
+            name:
+              type: string
+        status:
+          type: object
+          required:
+            - id
+            - name
+          properties:
+            id:
+              type: number
+            name:
+              type: string
+        project:
+          type: object
+          required:
+            - id
+            - name
+          properties:
+            id:
+              type: number
+            name:
+              type: string
+        description:
+          type: string
+        base_bug_internal_id:
+          type: string
         outputs:
           type: array
           items:
@@ -909,7 +992,6 @@ components:
         - family
         - status
         - project
-        - outputs
     Project:
       title: Project
       type: object
