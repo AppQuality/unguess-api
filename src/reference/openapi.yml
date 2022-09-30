@@ -1208,7 +1208,6 @@ components:
         id: 319v4cufuqnsu
       enum:
         - bugs
-        - reports
         - media
       description: campaign output item
   securitySchemes:
