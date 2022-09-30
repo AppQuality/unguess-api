@@ -13,7 +13,7 @@ export const getCampaignOutputs = async ({
       campaignId,
     ])
   );
-  console.log("hasBugs", hasBugs);
+
   if (hasBugs.length > 0) {
     availableOutputs.push("bugs");
   }
@@ -25,7 +25,7 @@ export const getCampaignOutputs = async ({
       [campaignId]
     )
   );
-  console.log("hasMedia", hasMedia);
+
   if (hasMedia.length > 0) {
     availableOutputs.push("media");
   }
@@ -36,7 +36,7 @@ export const getCampaignOutputs = async ({
       campaignId,
     ])
   );
-  console.log("hasReports", hasReports);
+
   if (hasReports.length > 0) {
     availableOutputs.push("reports");
   }
