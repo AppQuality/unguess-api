@@ -388,7 +388,7 @@ export interface components {
      * @description campaign output item
      * @enum {string}
      */
-    Output: "bugs" | "reports" | "media";
+    Output: "bugs" | "media";
   };
   responses: {
     /** Example response */

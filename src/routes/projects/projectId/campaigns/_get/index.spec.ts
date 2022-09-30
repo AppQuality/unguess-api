@@ -9,7 +9,6 @@ import {
 import bugs from "@src/__mocks__/database/bugs";
 import userTaskMedia from "@src/__mocks__/database/user_task_media";
 import useCases from "@src/__mocks__/database/use_cases";
-import reports from "@src/__mocks__/database/report";
 
 const customer_profile_1 = {
   id: 1,
@@ -154,7 +153,6 @@ describe("GET /projects/{pid}/campaigns", () => {
         await bugs.mock();
         await useCases.mock();
         await userTaskMedia.mock();
-        await reports.mock();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -173,7 +171,6 @@ describe("GET /projects/{pid}/campaigns", () => {
         await bugs.dropMock();
         await useCases.dropMock();
         await userTaskMedia.dropMock();
-        await reports.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -344,7 +341,6 @@ describe("GET /projects/{pid}/campaigns", () => {
       await bugs.clear();
       await userTaskMedia.clear();
       await useCases.clear();
-      await reports.clear();
     });
 
     // Should return a bug output if campaign has bug output
@@ -374,44 +370,8 @@ describe("GET /projects/{pid}/campaigns", () => {
       );
     });
 
-    // Should return a report output if campaign has bug output
-    it("Should return a report output if campaign has bug output", async () => {
-      await reports.insert({
-        id: 123,
-        campaign_id: campaign_1.id,
-        title: "Report 1",
-        description: "Report 1 description",
-        url: "http://report1.com",
-      });
-
-      const response = await request(app)
-        .get(`/projects/${project_1.id}/campaigns?limit=1`)
-        .set("authorization", "Bearer customer");
-
-      expect(response.status).toBe(200);
-      expect(Array.isArray(response.body.items)).toBe(true);
-      expect(response.body.items).toHaveLength(1);
-
-      expect(response.body.items[0].outputs).toHaveLength(1);
-      expect(response.body.items).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            outputs: expect.arrayContaining(["reports"]),
-          }),
-        ])
-      );
-    });
-
     // Should return all outputs available
     it("Should return all outputs available", async () => {
-      await reports.insert({
-        id: 32,
-        campaign_id: campaign_1.id,
-        title: "Report 1",
-        description: "Report 1 description",
-        url: "http://report1.com",
-      });
-
       await bugs.insert({
         id: 123,
         campaign_id: campaign_1.id,
@@ -440,11 +400,11 @@ describe("GET /projects/{pid}/campaigns", () => {
       expect(Array.isArray(response.body.items)).toBe(true);
       expect(response.body.items).toHaveLength(1);
 
-      expect(response.body.items[0].outputs).toHaveLength(3);
+      expect(response.body.items[0].outputs).toHaveLength(2);
       expect(response.body.items).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            outputs: expect.arrayContaining(["reports", "bugs", "media"]),
+            outputs: expect.arrayContaining(["bugs", "media"]),
           }),
         ])
       );

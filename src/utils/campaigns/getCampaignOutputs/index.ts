@@ -30,16 +30,5 @@ export const getCampaignOutputs = async ({
     availableOutputs.push("media");
   }
 
-  // This campaign has reports?
-  const hasReports = await db.query(
-    db.format(`SELECT id FROM wp_appq_report WHERE campaign_id = ? LIMIT 1`, [
-      campaignId,
-    ])
-  );
-
-  if (hasReports.length > 0) {
-    availableOutputs.push("reports");
-  }
-
   return availableOutputs;
 };
