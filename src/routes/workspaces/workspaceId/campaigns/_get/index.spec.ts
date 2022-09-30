@@ -6,6 +6,10 @@ import {
   EXPERIENTIAL_CAMPAIGN_TYPE_ID,
   LIMIT_QUERY_PARAM_DEFAULT,
 } from "@src/utils/constants";
+import bugs from "@src/__mocks__/database/bugs";
+import userTaskMedia from "@src/__mocks__/database/user_task_media";
+import useCases from "@src/__mocks__/database/use_cases";
+import reports from "@src/__mocks__/database/report";
 
 const customer_1 = {
   id: 1,
@@ -134,6 +138,12 @@ describe("GET /workspaces/{wid}/campaigns", () => {
           companies: [customer_1, customer_2, customer_3],
           userToCustomers: [user_to_customer_1, user_to_customer_2],
         });
+
+        //Outputs
+        await bugs.mock();
+        await useCases.mock();
+        await userTaskMedia.mock();
+        await reports.mock();
       } catch (e) {
         console.error(e);
         rej(e);
@@ -146,6 +156,11 @@ describe("GET /workspaces/{wid}/campaigns", () => {
     return new Promise(async (resolve, reject) => {
       try {
         await dbAdapter.drop();
+        //Outputs
+        await bugs.dropMock();
+        await useCases.dropMock();
+        await userTaskMedia.dropMock();
+        await reports.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -204,45 +219,54 @@ describe("GET /workspaces/{wid}/campaigns", () => {
     expect(response.body.err[0].message).toBe("should be number");
   });
 
+  it("Should return the campaigns with a defined paginations structure", async () => {
+    const response = await request(app)
+      .get("/workspaces/1/campaigns")
+      .set("authorization", "Bearer customer");
+
+    expect(response.body.items).toHaveLength(1);
+    expect(response.body.start).toBe(0);
+    expect(response.body.limit).toBe(LIMIT_QUERY_PARAM_DEFAULT);
+    expect(response.body.size).toBe(1);
+    expect(response.body.total).toBe(1);
+  });
+
   it("Should return an array of campaigns", async () => {
     const response = await request(app)
       .get("/workspaces/1/campaigns")
       .set("authorization", "Bearer customer");
-    expect(JSON.stringify(response.body)).toBe(
-      JSON.stringify({
-        items: [
-          {
-            id: campaign_1.id,
-            start_date: campaign_1.start_date,
-            end_date: campaign_1.end_date,
-            close_date: campaign_1.close_date,
-            title: campaign_1.title,
-            customer_title: campaign_1.customer_title,
-            is_public: campaign_1.is_public,
-            bug_form: campaign_1.campaign_type,
-            status: {
-              id: campaign_1.status_id,
-              name: "running",
-            },
-            type: {
-              id: campaign_1.campaign_type_id,
-              name: campaign_type_1.name,
-            },
-            family: {
-              id: campaign_type_1.type,
-              name: "Experiential",
-            },
-            project: {
-              id: campaign_1.project_id,
-              name: project_1.display_name,
-            },
+
+    expect(response.body.items).toHaveLength(1);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: campaign_1.id,
+          start_date: campaign_1.start_date,
+          end_date: campaign_1.end_date,
+          close_date: campaign_1.close_date,
+          title: campaign_1.title,
+          customer_title: campaign_1.customer_title,
+          is_public: campaign_1.is_public,
+          bug_form: campaign_1.campaign_type,
+          status: {
+            id: campaign_1.status_id,
+            name: "running",
           },
-        ],
-        start: 0,
-        limit: LIMIT_QUERY_PARAM_DEFAULT,
-        size: 1,
-        total: 1,
-      })
+          type: {
+            id: campaign_1.campaign_type_id,
+            name: campaign_type_1.name,
+          },
+          family: {
+            id: campaign_type_1.type,
+            name: "Experiential",
+          },
+          project: {
+            id: campaign_1.project_id,
+            name: project_1.display_name,
+          },
+          outputs: [],
+        }),
+      ])
     );
   });
 
@@ -251,68 +275,67 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       .get("/workspaces/2/campaigns")
       .set("authorization", "Bearer customer");
     expect(Array.isArray(response.body.items)).toBeTruthy();
-    expect(JSON.stringify(response.body)).toStrictEqual(
-      JSON.stringify({
-        items: [
-          {
-            id: campaign_2.id,
-            start_date: campaign_2.start_date,
-            end_date: campaign_2.end_date,
-            close_date: campaign_2.close_date,
-            title: campaign_2.title,
-            customer_title: campaign_2.customer_title,
-            is_public: campaign_2.is_public,
-            bug_form: campaign_2.campaign_type,
-            status: {
-              id: campaign_2.status_id,
-              name: "completed",
-            },
-            type: {
-              id: campaign_1.campaign_type_id,
-              name: campaign_type_1.name,
-            },
-            family: {
-              id: campaign_type_1.type,
-              name: "Experiential",
-            },
-            project: {
-              id: campaign_2.project_id,
-              name: project_1.display_name,
-            },
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        {
+          id: campaign_2.id,
+          start_date: campaign_2.start_date,
+          end_date: campaign_2.end_date,
+          close_date: campaign_2.close_date,
+          title: campaign_2.title,
+          customer_title: campaign_2.customer_title,
+          is_public: campaign_2.is_public,
+          bug_form: campaign_2.campaign_type,
+          status: {
+            id: campaign_2.status_id,
+            name: "completed",
           },
-          {
-            id: campaign_3.id,
-            start_date: campaign_3.start_date,
-            end_date: campaign_3.end_date,
-            close_date: campaign_3.close_date,
-            title: campaign_3.title,
-            customer_title: campaign_3.customer_title,
-            is_public: campaign_3.is_public,
-            bug_form: campaign_3.campaign_type,
-            status: {
-              id: campaign_3.status_id,
-              name: "running",
-            },
-            type: {
-              id: campaign_type_2.id,
-              name: campaign_type_2.name,
-            },
-            family: {
-              id: campaign_type_2.type,
-              name: "Experiential",
-            },
-            project: {
-              id: campaign_3.project_id,
-              name: project_1.display_name,
-            },
+          type: {
+            id: campaign_1.campaign_type_id,
+            name: campaign_type_1.name,
           },
-        ],
-        start: 0,
-        limit: LIMIT_QUERY_PARAM_DEFAULT,
-        size: 2,
-        total: 2,
-      })
+          family: {
+            id: campaign_type_1.type,
+            name: "Experiential",
+          },
+          project: {
+            id: campaign_2.project_id,
+            name: project_1.display_name,
+          },
+          outputs: [],
+        },
+        {
+          id: campaign_3.id,
+          start_date: campaign_3.start_date,
+          end_date: campaign_3.end_date,
+          close_date: campaign_3.close_date,
+          title: campaign_3.title,
+          customer_title: campaign_3.customer_title,
+          is_public: campaign_3.is_public,
+          bug_form: campaign_3.campaign_type,
+          status: {
+            id: campaign_3.status_id,
+            name: "running",
+          },
+          type: {
+            id: campaign_type_2.id,
+            name: campaign_type_2.name,
+          },
+          family: {
+            id: campaign_type_2.type,
+            name: "Experiential",
+          },
+          project: {
+            id: campaign_3.project_id,
+            name: project_1.display_name,
+          },
+          outputs: [],
+        },
+      ])
     );
+
+    expect(response.body.total).toEqual(2);
+    expect(response.body.size).toEqual(2);
   });
 
   it("Should return 400 because the order parameter is wrong", async () => {
@@ -344,67 +367,63 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       .get("/workspaces/2/campaigns?order=DESC&orderBy=start_date")
       .set("authorization", "Bearer customer");
     expect(Array.isArray(response.body.items)).toBeTruthy();
-    expect(JSON.stringify(response.body)).toStrictEqual(
-      JSON.stringify({
-        items: [
-          {
-            id: campaign_3.id,
-            start_date: campaign_3.start_date,
-            end_date: campaign_3.end_date,
-            close_date: campaign_3.close_date,
-            title: campaign_3.title,
-            customer_title: campaign_3.customer_title,
-            is_public: campaign_3.is_public,
-            bug_form: campaign_3.campaign_type,
-            status: {
-              id: campaign_3.status_id,
-              name: "running",
-            },
-            type: {
-              id: campaign_3.campaign_type_id,
-              name: campaign_type_2.name,
-            },
-            family: {
-              id: campaign_type_2.type,
-              name: "Experiential",
-            },
-            project: {
-              id: campaign_3.project_id,
-              name: project_1.display_name,
-            },
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        {
+          id: campaign_3.id,
+          start_date: campaign_3.start_date,
+          end_date: campaign_3.end_date,
+          close_date: campaign_3.close_date,
+          title: campaign_3.title,
+          customer_title: campaign_3.customer_title,
+          is_public: campaign_3.is_public,
+          bug_form: campaign_3.campaign_type,
+          status: {
+            id: campaign_3.status_id,
+            name: "running",
           },
-          {
-            id: campaign_2.id,
-            start_date: campaign_2.start_date,
-            end_date: campaign_2.end_date,
-            close_date: campaign_2.close_date,
-            title: campaign_2.title,
-            customer_title: campaign_2.customer_title,
-            is_public: campaign_2.is_public,
-            bug_form: campaign_2.campaign_type,
-            status: {
-              id: campaign_2.status_id,
-              name: "completed",
-            },
-            type: {
-              id: campaign_type_1.id,
-              name: campaign_type_1.name,
-            },
-            family: {
-              id: campaign_type_1.type,
-              name: "Experiential",
-            },
-            project: {
-              id: campaign_2.project_id,
-              name: project_1.display_name,
-            },
+          type: {
+            id: campaign_3.campaign_type_id,
+            name: campaign_type_2.name,
           },
-        ],
-        start: 0,
-        limit: LIMIT_QUERY_PARAM_DEFAULT,
-        size: 2,
-        total: 2,
-      })
+          family: {
+            id: campaign_type_2.type,
+            name: "Experiential",
+          },
+          project: {
+            id: campaign_3.project_id,
+            name: project_1.display_name,
+          },
+          outputs: [],
+        },
+        {
+          id: campaign_2.id,
+          start_date: campaign_2.start_date,
+          end_date: campaign_2.end_date,
+          close_date: campaign_2.close_date,
+          title: campaign_2.title,
+          customer_title: campaign_2.customer_title,
+          is_public: campaign_2.is_public,
+          bug_form: campaign_2.campaign_type,
+          status: {
+            id: campaign_2.status_id,
+            name: "completed",
+          },
+          type: {
+            id: campaign_type_1.id,
+            name: campaign_type_1.name,
+          },
+          family: {
+            id: campaign_type_1.type,
+            name: "Experiential",
+          },
+          project: {
+            id: campaign_2.project_id,
+            name: project_1.display_name,
+          },
+          outputs: [],
+        },
+      ])
     );
   });
 
@@ -454,4 +473,130 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       .set("authorization", "Bearer customer");
     expect(response.body.items).toHaveLength(1);
   });
+
+  it("Should return an array of containing only the campaign 3 if a limit is provided with a specific order", async () => {
+    const response = await request(app)
+      .get("/workspaces/2/campaigns?order=DESC&orderBy=start_date&limit=1")
+      .set("authorization", "Bearer customer");
+
+    expect(response.body.items).toHaveLength(1);
+    expect(response.body.items[0].id).toBe(campaign_3.id);
+
+    expect(response.body.size).toBe(1);
+    expect(response.body.total).toBe(2);
+  });
+
+  describe("Outputs", () => {
+    afterEach(async () => {
+      await bugs.clear();
+      await userTaskMedia.clear();
+      await useCases.clear();
+      await reports.clear();
+    });
+
+    // Should return a bug output if campaign has bug output
+    it("Should return a bug output if campaign has bug output", async () => {
+      await bugs.insert({
+        id: 123,
+        campaign_id: campaign_1.id,
+        message: "Bug 1",
+        wp_user_id: 1,
+      });
+
+      const response = await request(app)
+        .get(`/workspaces/1/campaigns`)
+        .set("authorization", "Bearer customer");
+
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body.items)).toBe(true);
+      expect(response.body.items).toHaveLength(1);
+
+      expect(response.body.items[0].outputs).toHaveLength(1);
+      expect(response.body.items).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            outputs: expect.arrayContaining(["bugs"]),
+          }),
+        ])
+      );
+    });
+
+    // Should return a report output if campaign has bug output
+    it("Should return a report output if campaign has bug output", async () => {
+      await reports.insert({
+        id: 123,
+        campaign_id: campaign_1.id,
+        title: "Report 1",
+        description: "Report 1 description",
+        url: "http://report1.com",
+      });
+
+      const response = await request(app)
+        .get(`/workspaces/1/campaigns`)
+        .set("authorization", "Bearer customer");
+
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body.items)).toBe(true);
+      expect(response.body.items).toHaveLength(1);
+
+      expect(response.body.items[0].outputs).toHaveLength(1);
+      expect(response.body.items).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            outputs: expect.arrayContaining(["reports"]),
+          }),
+        ])
+      );
+    });
+
+    // Should return all outputs available
+    it("Should return all outputs available", async () => {
+      await reports.insert({
+        id: 32,
+        campaign_id: campaign_1.id,
+        title: "Report 1",
+        description: "Report 1 description",
+        url: "http://report1.com",
+      });
+
+      await bugs.insert({
+        id: 123,
+        campaign_id: campaign_1.id,
+        message: "Bug 1",
+        wp_user_id: 1,
+      });
+
+      await useCases.insert({
+        id: 456,
+        campaign_id: campaign_1.id,
+        title: "Use Case 1",
+        content: "Use Case 1 description",
+      });
+
+      await userTaskMedia.insert({
+        id: 789,
+        campaign_task_id: 456,
+        location: "http://image1.com",
+      });
+
+      const response = await request(app)
+        .get(`/workspaces/1/campaigns`)
+        .set("authorization", "Bearer customer");
+
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body.items)).toBe(true);
+      expect(response.body.items).toHaveLength(1);
+
+      expect(response.body.items[0].outputs).toHaveLength(3);
+      expect(response.body.items).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            outputs: expect.arrayContaining(["reports", "bugs", "media"]),
+          }),
+        ])
+      );
+    });
+  });
+
+  // end of describe
 });

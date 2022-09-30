@@ -8,6 +8,7 @@ import { editCampaign } from "./editCampaign";
 import { getCampaign } from "./getCampaign";
 import { getCampaignReports } from "./getCampaignReports";
 import { getCampaignFamily } from "./getCampaignFamily";
+import { getCampaignOutputs } from "./getCampaignOutputs";
 
 export {
   checkCampaignRequest,
@@ -20,4 +21,5 @@ export {
   getCampaign,
   getCampaignReports,
   getCampaignFamily,
+  getCampaignOutputs,
 };

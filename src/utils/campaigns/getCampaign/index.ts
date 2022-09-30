@@ -1,5 +1,6 @@
 import * as db from "@src/features/db";
 import { getCampaignFamily } from "../getCampaignFamily";
+import { getCampaignOutputs } from "../getCampaignOutputs";
 import { getCampaignStatus } from "../getCampaignStatus";
 
 export const getCampaign = async (

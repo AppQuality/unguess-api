@@ -3,7 +3,11 @@ import { Context } from "openapi-backend";
 import * as db from "@src/features/db";
 import { getProject } from "@src/utils/projects";
 import { getWorkspace } from "@src/utils/workspaces";
-import { getCampaignFamily, getCampaignStatus } from "@src/utils/campaigns";
+import {
+  getCampaignFamily,
+  getCampaignOutputs,
+  getCampaignStatus,
+} from "@src/utils/campaigns";
 import { paginateItems, formatCount } from "@src/utils/paginations";
 import {
   ERROR_MESSAGE,
@@ -79,12 +83,16 @@ export default async (
     let total = await db.query(db.format(countQuery, [projectResult.id]));
     total = formatCount(total);
 
-    let returnCampaigns: Array<StoplightComponents["schemas"]["Campaign"]> = [];
+    let returnCampaigns: Array<
+      StoplightComponents["schemas"]["CampaignWithOutput"]
+    > = [];
     for (let campaign of campaigns) {
       // Get campaign family
       const campaign_family = getCampaignFamily({
         familyId: campaign.campaign_family_id,
       });
+
+      const outputs = await getCampaignOutputs({ campaignId: campaign.id });
 
       returnCampaigns.push({
         id: campaign.id,
@@ -114,6 +122,7 @@ export default async (
           id: campaign.campaign_family_id,
           name: campaign_family,
         },
+        outputs,
       });
     }
 

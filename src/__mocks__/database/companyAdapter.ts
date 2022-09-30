@@ -33,7 +33,6 @@ import {
 } from "./coins_transactions";
 
 import { table as expressTable, data as expressData } from "./express";
-
 import defaultUsers from "@src/__mocks__/database/seed/users.json";
 
 interface dataObject {

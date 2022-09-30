@@ -8,7 +8,11 @@ import {
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
 } from "@src/utils/constants";
-import { getCampaignFamily, getCampaignStatus } from "@src/utils/campaigns";
+import {
+  getCampaignFamily,
+  getCampaignOutputs,
+  getCampaignStatus,
+} from "@src/utils/campaigns";
 import { paginateItems, formatCount } from "@src/utils/paginations";
 
 export default async (
@@ -154,13 +158,17 @@ export default async (
 
     if (!campaigns.length) return await paginateItems({ items: [], total: 0 });
 
-    let stoplightCampaigns = campaigns.map((campaign: any) => {
-      // Get campaign family
+    const preparedCampaignResponse =
+      [] as StoplightComponents["schemas"]["CampaignWithOutput"][];
+
+    for (const campaign of campaigns) {
       const campaign_family = getCampaignFamily({
         familyId: campaign.campaign_family_id,
       });
 
-      return {
+      const outputs = await getCampaignOutputs({ campaignId: campaign.id });
+
+      preparedCampaignResponse.push({
         id: campaign.id,
         start_date: campaign.start_date.toString(),
         end_date: campaign.end_date.toString(),
@@ -188,11 +196,12 @@ export default async (
           id: campaign.project_id,
           name: campaign.display_name,
         },
-      };
-    });
+        outputs,
+      });
+    }
 
     return await paginateItems({
-      items: stoplightCampaigns,
+      items: preparedCampaignResponse,
       limit,
       start,
       total,

@@ -26,7 +26,7 @@ const defaultItem: UseCaseParams = {
   allow_media: 0,
   optimize_media: 0,
 };
-class Templates extends Table<UseCaseParams> {
+class UseCases extends Table<UseCaseParams> {
   protected name = "wp_appq_campaign_task";
   protected columns = [
     "id INTEGER PRIMARY KEY AUTOINCREMENT",
@@ -45,6 +45,6 @@ class Templates extends Table<UseCaseParams> {
     super(defaultItem);
   }
 }
-const templates = new Templates();
-export default templates;
+const useCases = new UseCases();
+export default useCases;
 export type { UseCaseParams };

@@ -6,6 +6,10 @@ import {
   LIMIT_QUERY_PARAM_DEFAULT,
   EXPERIENTIAL_CAMPAIGN_TYPE_ID,
 } from "@src/utils/constants";
+import bugs from "@src/__mocks__/database/bugs";
+import userTaskMedia from "@src/__mocks__/database/user_task_media";
+import useCases from "@src/__mocks__/database/use_cases";
+import reports from "@src/__mocks__/database/report";
 
 const customer_profile_1 = {
   id: 1,
@@ -146,6 +150,12 @@ describe("GET /workspaces/{wid}/projects/{pid}/campaigns", () => {
           ],
           campaignTypes: [campaign_type_1],
         });
+
+        //Outputs
+        await bugs.mock();
+        await useCases.mock();
+        await userTaskMedia.mock();
+        await reports.mock();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -159,6 +169,11 @@ describe("GET /workspaces/{wid}/projects/{pid}/campaigns", () => {
     return new Promise(async (resolve, reject) => {
       try {
         await dbAdapter.drop();
+        //Outputs
+        await bugs.dropMock();
+        await useCases.dropMock();
+        await userTaskMedia.dropMock();
+        await reports.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -217,6 +232,7 @@ describe("GET /workspaces/{wid}/projects/{pid}/campaigns", () => {
       expect(project).toHaveProperty("type");
       expect(project).toHaveProperty("family");
       expect(project).toHaveProperty("project");
+      expect(project).toHaveProperty("outputs");
     });
   });
 
@@ -251,6 +267,7 @@ describe("GET /workspaces/{wid}/projects/{pid}/campaigns", () => {
             id: project_1.id,
             name: project_1.display_name,
           },
+          outputs: [],
         },
         {
           id: campaign_2.id,
@@ -277,6 +294,7 @@ describe("GET /workspaces/{wid}/projects/{pid}/campaigns", () => {
             id: project_1.id,
             name: project_1.display_name,
           },
+          outputs: [],
         },
       ],
       start: 0,
@@ -285,4 +303,124 @@ describe("GET /workspaces/{wid}/projects/{pid}/campaigns", () => {
       total: 2,
     });
   });
+
+  describe("Outputs", () => {
+    afterEach(async () => {
+      await bugs.clear();
+      await userTaskMedia.clear();
+      await useCases.clear();
+      await reports.clear();
+    });
+
+    // Should return a bug output if campaign has bug output
+    it("Should return a bug output if campaign has bug output", async () => {
+      await bugs.insert({
+        id: 123,
+        campaign_id: campaign_1.id,
+        message: "Bug 1",
+        wp_user_id: 1,
+      });
+
+      const response = await request(app)
+        .get(
+          `/workspaces/${customer_1.id}/projects/${project_1.id}/campaigns?limit=1`
+        )
+        .set("authorization", "Bearer customer");
+
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body.items)).toBe(true);
+      expect(response.body.items).toHaveLength(1);
+
+      expect(response.body.items[0].outputs).toHaveLength(1);
+      expect(response.body.items).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            outputs: expect.arrayContaining(["bugs"]),
+          }),
+        ])
+      );
+    });
+
+    // Should return a report output if campaign has bug output
+    it("Should return a report output if campaign has bug output", async () => {
+      await reports.insert({
+        id: 123,
+        campaign_id: campaign_1.id,
+        title: "Report 1",
+        description: "Report 1 description",
+        url: "http://report1.com",
+      });
+
+      const response = await request(app)
+        .get(
+          `/workspaces/${customer_1.id}/projects/${project_1.id}/campaigns?limit=1`
+        )
+        .set("authorization", "Bearer customer");
+
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body.items)).toBe(true);
+      expect(response.body.items).toHaveLength(1);
+
+      expect(response.body.items[0].outputs).toHaveLength(1);
+      expect(response.body.items).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            outputs: expect.arrayContaining(["reports"]),
+          }),
+        ])
+      );
+    });
+
+    // Should return all outputs available
+    it("Should return all outputs available", async () => {
+      await reports.insert({
+        id: 32,
+        campaign_id: campaign_1.id,
+        title: "Report 1",
+        description: "Report 1 description",
+        url: "http://report1.com",
+      });
+
+      await bugs.insert({
+        id: 123,
+        campaign_id: campaign_1.id,
+        message: "Bug 1",
+        wp_user_id: 1,
+      });
+
+      await useCases.insert({
+        id: 456,
+        campaign_id: campaign_1.id,
+        title: "Use Case 1",
+        content: "Use Case 1 description",
+      });
+
+      await userTaskMedia.insert({
+        id: 789,
+        campaign_task_id: 456,
+        location: "http://image1.com",
+      });
+
+      const response = await request(app)
+        .get(
+          `/workspaces/${customer_1.id}/projects/${project_1.id}/campaigns?limit=1`
+        )
+        .set("authorization", "Bearer customer");
+
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body.items)).toBe(true);
+      expect(response.body.items).toHaveLength(1);
+
+      expect(response.body.items[0].outputs).toHaveLength(3);
+      expect(response.body.items).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            outputs: expect.arrayContaining(["reports", "bugs", "media"]),
+          }),
+        ])
+      );
+    });
+  });
+
+  // end describe
 });
