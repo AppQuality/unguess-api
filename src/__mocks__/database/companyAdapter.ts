@@ -31,7 +31,7 @@ import {
   table as coinsTransactionsTable,
   data as coinsTransactionsData,
 } from "./coins_transactions";
-
+import campaignOutputs from "./cp_outputs_view";
 import { table as expressTable, data as expressData } from "./express";
 import defaultUsers from "@src/__mocks__/database/seed/users.json";
 
@@ -74,6 +74,9 @@ export const adapter = {
     await coinsTable.create();
     await coinsTransactionsTable.create();
     await expressTable.create();
+
+    // Views
+    await campaignOutputs.mock();
   },
   drop: async () => {
     await profileTable.drop();
@@ -95,6 +98,9 @@ export const adapter = {
     await coinsTable.drop();
     await coinsTransactionsTable.drop();
     await expressTable.drop();
+
+    // Views
+    await campaignOutputs.dropMock();
   },
   add: async ({
     profiles = [],

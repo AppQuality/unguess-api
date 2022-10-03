@@ -37,6 +37,31 @@ export default (dbname: "unguess" | "tryber") => {
       }
     });
   };
+
+  mockDb.createView = (view: string, query: string) => {
+    return new Promise(async (resolve, reject) => {
+      const queryView = `CREATE VIEW IF NOT EXISTS ${view} AS ${query};`;
+      try {
+        await db.exec(queryView);
+        resolve(true);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  };
+
+  mockDb.dropView = (view: string) => {
+    return new Promise(async (resolve, reject) => {
+      const query = `DROP VIEW IF EXISTS ${view};`;
+      try {
+        await db.exec(query);
+        resolve(true);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  };
+
   mockDb.all = async (query: string): Promise<any> => {
     try {
       const data = await db.prepare(query).all();

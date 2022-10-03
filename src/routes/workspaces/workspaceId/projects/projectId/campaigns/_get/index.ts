@@ -63,11 +63,14 @@ export default async (
         c.campaign_type AS bug_form,
         ct.name AS campaign_type_name,
         ct.type AS campaign_family_id,
-        p.display_name 
+        p.display_name,
+        o.bugs, 
+        o.media
       FROM wp_appq_evd_campaign c 
       JOIN wp_appq_project p ON c.project_id = p.id 
-      JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id 
-      WHERE c.project_id = ?`;
+      JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id
+      LEFT JOIN campaigns_outputs o ON (o.campaign_id = c.id)
+      WHERE c.project_id = ? GROUP BY c.id`;
 
     if (limit) {
       campaignsSql += ` LIMIT ${limit} OFFSET ${start}`;
@@ -92,7 +95,7 @@ export default async (
         familyId: campaign.campaign_family_id,
       });
 
-      const outputs = await getCampaignOutputs({ campaignId: campaign.id });
+      const outputs = getCampaignOutputs(campaign);
 
       returnCampaigns.push({
         id: campaign.id,

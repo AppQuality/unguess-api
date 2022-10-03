@@ -125,6 +125,7 @@ export default async (
     // Return all the user projects ids
     let userProjectsID = userProjects.map((p) => p.id).join(",");
 
+    //TODO: check why the cp type is in a LEFT JOIN relation
     const query = `SELECT 
         c.id,  
         c.start_date,  
@@ -140,12 +141,16 @@ export default async (
         c.customer_id,
         ct.name AS campaign_type_name,
         ct.type AS campaign_family_id,
-        p.display_name 
+        p.display_name,
+        o.bugs, 
+        o.media
       FROM wp_appq_evd_campaign c 
       JOIN wp_appq_project p ON c.project_id = p.id 
       LEFT JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id 
+      LEFT JOIN campaigns_outputs o ON (o.campaign_id = c.id)
       WHERE p.id IN (${userProjectsID})
       ${AND}
+      GROUP BY c.id
       ${order && orderBy ? ` ORDER BY ${orderBy} ${order}` : ``}
       ${limit ? ` LIMIT ${limit} OFFSET ${start}` : ``}
     `;
@@ -166,7 +171,7 @@ export default async (
         familyId: campaign.campaign_family_id,
       });
 
-      const outputs = await getCampaignOutputs({ campaignId: campaign.id });
+      const outputs = getCampaignOutputs(campaign);
 
       preparedCampaignResponse.push({
         id: campaign.id,

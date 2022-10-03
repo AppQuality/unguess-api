@@ -23,7 +23,7 @@ export default async (
 
   try {
     // Check if the campaign exists
-    let campaign = await getCampaign(cid);
+    let campaign = await getCampaign({ campaignId: cid });
 
     if (!campaign) {
       error.code = 400;

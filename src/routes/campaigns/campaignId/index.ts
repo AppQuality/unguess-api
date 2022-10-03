@@ -22,7 +22,10 @@ export default async (
 
   try {
     // Check if the campaign exists
-    let campaign = await getCampaign(cid);
+    let campaign = await getCampaign({
+      campaignId: cid,
+      withOutputs: true,
+    });
 
     if (!campaign) {
       error.code = 400;
@@ -35,14 +38,7 @@ export default async (
       user: user,
     });
 
-    // Get the campaign
-    const outputs = await getCampaignOutputs({
-      campaignId: campaign.id,
-    });
-    return {
-      ...campaign,
-      outputs,
-    } as StoplightComponents["schemas"]["CampaignWithOutput"];
+    return campaign as StoplightComponents["schemas"]["CampaignWithOutput"];
   } catch (e: any) {
     if (e.code) {
       error.code = e.code;
