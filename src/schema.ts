@@ -253,6 +253,7 @@ export interface components {
       id: number;
       name: string;
       campaigns_count: number;
+      workspaceId: number;
     };
     /** Error */
     Error: {
