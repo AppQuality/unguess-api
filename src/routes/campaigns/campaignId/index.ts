@@ -1,8 +1,7 @@
-/** OPENAPI-ROUTE: get-campaigns-reports */
+/** OPENAPI-ROUTE: get-campaign */
 import { Context } from "openapi-backend";
-import * as db from "@src/features/db";
 import { ERROR_MESSAGE } from "@src/utils/constants";
-import { getCampaign, getCampaignReports } from "@src/utils/campaigns";
+import { getCampaign, getCampaignOutputs } from "@src/utils/campaigns";
 import { getProjectById } from "@src/utils/projects";
 
 export default async (
@@ -23,7 +22,10 @@ export default async (
 
   try {
     // Check if the campaign exists
-    let campaign = await getCampaign({ campaignId: cid });
+    let campaign = await getCampaign({
+      campaignId: cid,
+      withOutputs: true,
+    });
 
     if (!campaign) {
       error.code = 400;
@@ -36,10 +38,7 @@ export default async (
       user: user,
     });
 
-    // Get the campaign reports
-    const reports = await getCampaignReports(cid);
-
-    return reports as StoplightComponents["schemas"]["Report"][];
+    return campaign as StoplightComponents["schemas"]["CampaignWithOutput"];
   } catch (e: any) {
     if (e.code) {
       error.code = e.code;

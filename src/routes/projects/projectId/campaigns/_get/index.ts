@@ -3,11 +3,13 @@ import { Context } from "openapi-backend";
 import * as db from "@src/features/db";
 import { getProjectById } from "@src/utils/projects";
 import { paginateItems, formatCount } from "@src/utils/paginations";
-import { getCampaignStatus } from "@src/utils/campaigns";
+import {
+  getCampaignFamily,
+  getCampaignOutputs,
+  getCampaignStatus,
+} from "@src/utils/campaigns";
 import {
   ERROR_MESSAGE,
-  EXPERIENTIAL_CAMPAIGN_TYPE_ID,
-  FUNCTIONAL_CAMPAIGN_TYPE_ID,
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
 } from "@src/utils/constants";
@@ -54,11 +56,14 @@ export default async (
         c.customer_id,
         c.campaign_type AS bug_form,
         ct.name AS campaign_type_name,
-        ct.type AS campaign_family_id
+        ct.type AS campaign_family_id,
+        o.bugs, 
+        o.media
       FROM wp_appq_evd_campaign c 
       JOIN wp_appq_project p ON c.project_id = p.id 
-      JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id 
-      WHERE c.project_id = ?`;
+      JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id
+      LEFT JOIN campaigns_outputs o ON (o.campaign_id = c.id)
+      WHERE c.project_id = ? group by c.id`;
 
     if (limit) {
       campaignsSql += ` LIMIT ${limit} OFFSET ${start}`;
@@ -75,18 +80,16 @@ export default async (
     let total = await db.query(db.format(countQuery, [prj.id]));
     total = formatCount(total);
 
-    let returnCampaigns: Array<StoplightComponents["schemas"]["Campaign"]> = [];
+    let returnCampaigns: Array<
+      StoplightComponents["schemas"]["CampaignWithOutput"]
+    > = [];
     for (let campaign of campaigns) {
       // Get campaign family
-      let campaign_family = "";
-      switch (campaign.campaign_family_id) {
-        case EXPERIENTIAL_CAMPAIGN_TYPE_ID:
-          campaign_family = "Experiential";
-          break;
-        case FUNCTIONAL_CAMPAIGN_TYPE_ID:
-          campaign_family = "Functional";
-          break;
-      }
+      const campaign_family = getCampaignFamily({
+        familyId: campaign.campaign_family_id,
+      });
+
+      const outputs = getCampaignOutputs(campaign);
 
       returnCampaigns.push({
         id: campaign.id,
@@ -116,6 +119,7 @@ export default async (
           id: campaign.campaign_family_id,
           name: campaign_family,
         },
+        outputs,
       });
     }
 

@@ -7,10 +7,12 @@ import {
   ERROR_MESSAGE,
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
-  EXPERIENTIAL_CAMPAIGN_TYPE_ID,
-  FUNCTIONAL_CAMPAIGN_TYPE_ID,
 } from "@src/utils/constants";
-import { getCampaignStatus } from "@src/utils/campaigns";
+import {
+  getCampaignFamily,
+  getCampaignOutputs,
+  getCampaignStatus,
+} from "@src/utils/campaigns";
 import { paginateItems, formatCount } from "@src/utils/paginations";
 
 export default async (
@@ -123,6 +125,7 @@ export default async (
     // Return all the user projects ids
     let userProjectsID = userProjects.map((p) => p.id).join(",");
 
+    //TODO: check why the cp type is in a LEFT JOIN relation
     const query = `SELECT 
         c.id,  
         c.start_date,  
@@ -138,12 +141,16 @@ export default async (
         c.customer_id,
         ct.name AS campaign_type_name,
         ct.type AS campaign_family_id,
-        p.display_name 
+        p.display_name,
+        o.bugs, 
+        o.media
       FROM wp_appq_evd_campaign c 
       JOIN wp_appq_project p ON c.project_id = p.id 
       LEFT JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id 
+      LEFT JOIN campaigns_outputs o ON (o.campaign_id = c.id)
       WHERE p.id IN (${userProjectsID})
       ${AND}
+      GROUP BY c.id
       ${order && orderBy ? ` ORDER BY ${orderBy} ${order}` : ``}
       ${limit ? ` LIMIT ${limit} OFFSET ${start}` : ``}
     `;
@@ -156,19 +163,17 @@ export default async (
 
     if (!campaigns.length) return await paginateItems({ items: [], total: 0 });
 
-    let stoplightCampaigns = campaigns.map((campaign: any) => {
-      // Get campaign family
-      let campaign_family = "";
-      switch (campaign.campaign_family_id) {
-        case EXPERIENTIAL_CAMPAIGN_TYPE_ID:
-          campaign_family = "Experiential";
-          break;
-        case FUNCTIONAL_CAMPAIGN_TYPE_ID:
-          campaign_family = "Functional";
-          break;
-      }
+    const preparedCampaignResponse =
+      [] as StoplightComponents["schemas"]["CampaignWithOutput"][];
 
-      return {
+    for (const campaign of campaigns) {
+      const campaign_family = getCampaignFamily({
+        familyId: campaign.campaign_family_id,
+      });
+
+      const outputs = getCampaignOutputs(campaign);
+
+      preparedCampaignResponse.push({
         id: campaign.id,
         start_date: campaign.start_date.toString(),
         end_date: campaign.end_date.toString(),
@@ -196,11 +201,12 @@ export default async (
           id: campaign.project_id,
           name: campaign.display_name,
         },
-      };
-    });
+        outputs,
+      });
+    }
 
     return await paginateItems({
-      items: stoplightCampaigns,
+      items: preparedCampaignResponse,
       limit,
       start,
       total,

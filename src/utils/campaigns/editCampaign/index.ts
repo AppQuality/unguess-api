@@ -43,7 +43,7 @@ export const editCampaign = async (
     await db.query(updateCampaignSql);
 
     // Get the updated campaign
-    const campaign = await getCampaign(campaignId);
+    const campaign = await getCampaign({ campaignId });
 
     return campaign as StoplightComponents["schemas"]["Campaign"];
   } catch (e: any) {

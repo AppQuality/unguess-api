@@ -1,30 +1,18 @@
 import sqlite3 from "@src/features/sqlite";
 
-const db = sqlite3("unguess");
+const db = sqlite3("tryber");
 
-class Table<T> {
-  protected columns = ["id INTEGER PRIMARY KEY"];
-  protected name = "my_table";
-  constructor(public defaultItem: T) {
-    this.defaultItem = defaultItem;
-  }
+class View<T> {
+  protected query = "";
+  protected name = "my_view";
+  constructor() {}
   async mock() {
-    await db.createTable(this.name, this.columns);
+    await db.createView(this.name, this.query);
   }
   async dropMock() {
-    await db.dropTable(this.name);
+    await db.dropView(this.name);
   }
-  async insert(params?: T): Promise<T> {
-    const item: T = {
-      ...this.defaultItem,
-      ...params,
-    };
-    await db.insert(this.name, item);
-    return item;
-  }
-  async clear() {
-    return await db.run(`DELETE FROM ${this.name}`);
-  }
+
   async all(
     params?: (keyof T)[],
     where?: (T | T[])[],
@@ -63,4 +51,4 @@ class Table<T> {
     return items[0];
   }
 }
-export default Table;
+export default View;

@@ -152,7 +152,7 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Campaign'
+                      $ref: '#/components/schemas/CampaignWithOutput'
                   start:
                     type: integer
                   limit:
@@ -269,7 +269,7 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Campaign'
+                      $ref: '#/components/schemas/CampaignWithOutput'
                   start:
                     type: integer
                   limit:
@@ -316,7 +316,7 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Campaign'
+                      $ref: '#/components/schemas/CampaignWithOutput'
                   start:
                     type: integer
                   limit:
@@ -325,6 +325,7 @@ paths:
                     type: integer
                   total:
                     type: integer
+              examples: {}
         '400':
           $ref: '#/components/responses/Error'
         '401':
@@ -457,12 +458,7 @@ paths:
     parameters: []
   '/campaigns/{cid}':
     parameters:
-      - name: cid
-        in: path
-        required: true
-        schema:
-          type: number
-        description: Campaign id
+      - $ref: '#/components/parameters/cid'
     patch:
       summary: Patch campaign
       operationId: patch-campaigns
@@ -485,11 +481,23 @@ paths:
                 customer_title:
                   type: string
         description: ''
+    get:
+      summary: Get campaign by ID
+      operationId: get-campaign
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignWithOutput'
+      security:
+        - JWT: []
   '/campaigns/{cid}/reports':
     parameters:
       - $ref: '#/components/parameters/cid'
     get:
-      summary: Your GET endpoint
+      summary: GET Reports by Campaign
       tags: []
       responses:
         '200':
@@ -501,7 +509,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/Report'
       operationId: get-campaigns-reports
-      description: ''
+      description: Return all available report of a specific campaign
       security:
         - JWT: []
   /projects:
@@ -898,6 +906,92 @@ components:
         - family
         - status
         - project
+    CampaignWithOutput:
+      title: Campaign
+      type: object
+      properties:
+        id:
+          type: integer
+        start_date:
+          type: string
+        end_date:
+          type: string
+        close_date:
+          type: string
+        title:
+          type: string
+        customer_title:
+          type: string
+        is_public:
+          type: number
+        bug_form:
+          type: number
+          minimum: -1
+          maximum: 1
+          description: |-
+            -1: no bug form;
+            0: only bug form;
+            1: bug form with bug parade';
+        type:
+          type: object
+          required:
+            - id
+            - name
+          properties:
+            id:
+              type: number
+            name:
+              type: string
+        family:
+          type: object
+          required:
+            - id
+            - name
+          properties:
+            id:
+              type: number
+            name:
+              type: string
+        status:
+          type: object
+          required:
+            - id
+            - name
+          properties:
+            id:
+              type: number
+            name:
+              type: string
+        project:
+          type: object
+          required:
+            - id
+            - name
+          properties:
+            id:
+              type: number
+            name:
+              type: string
+        description:
+          type: string
+        base_bug_internal_id:
+          type: string
+        outputs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Output'
+      required:
+        - id
+        - start_date
+        - end_date
+        - close_date
+        - title
+        - customer_title
+        - is_public
+        - type
+        - family
+        - status
+        - project
     Project:
       title: Project
       type: object
@@ -1038,8 +1132,6 @@ components:
         - name
     UseCase:
       title: UseCase
-      x-stoplight:
-        id: a08quvwbf9ion
       type: object
       x-examples: {}
       properties:
@@ -1064,8 +1156,6 @@ components:
         - description
     Report:
       title: Report
-      x-stoplight:
-        id: hszr1597imsce
       type: object
       properties:
         id:
@@ -1077,13 +1167,49 @@ components:
         url:
           type: string
         file_type:
-          type: string
+          type: object
+          properties:
+            extension:
+              $ref: '#/components/schemas/ReportExtensions'
+            type:
+              type: string
+            domain_name:
+              type: string
+          required:
+            - type
         creation_date:
           type: string
         update_date:
           type: string
       required:
         - url
+    ReportExtensions:
+      title: ReportExtensions
+      type: string
+      enum:
+        - pdf
+        - doc
+        - docx
+        - xls
+        - xlsx
+        - ppt
+        - pptx
+        - rar
+        - txt
+        - csv
+        - zip
+        - gzip
+        - gz
+        - 7z
+    Output:
+      type: string
+      title: Output
+      x-stoplight:
+        id: 319v4cufuqnsu
+      enum:
+        - bugs
+        - media
+      description: campaign output item
   securitySchemes:
     JWT:
       type: http

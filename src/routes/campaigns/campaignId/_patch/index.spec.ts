@@ -2,6 +2,7 @@ import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { table as platformTable } from "@src/__mocks__/database/platforms";
+import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 
 const customer_1 = {
   id: 999,
@@ -35,7 +36,7 @@ const user_to_project_1 = {
 const campaign_type_1 = {
   id: 999,
   name: "Functional Testing (Bug Hunting)",
-  type: 0,
+  type: FUNCTIONAL_CAMPAIGN_TYPE_ID,
 };
 
 const campaign_1 = {

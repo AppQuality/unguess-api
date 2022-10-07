@@ -24,7 +24,7 @@ export default async (
 
   try {
     // Check if cp exists
-    const campaign = await getCampaign(cid);
+    const campaign = await getCampaign({ campaignId: cid });
 
     if (!campaign) {
       throw { ...error, code: 400 };

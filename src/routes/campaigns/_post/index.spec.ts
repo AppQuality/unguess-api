@@ -10,6 +10,7 @@ import {
   DT_DESKTOP,
   DT_SMARTPHONE,
   fallBackCsmProfile,
+  FUNCTIONAL_CAMPAIGN_TYPE_ID,
 } from "@src/utils/constants";
 import {
   getExpressCost,
@@ -146,7 +147,7 @@ const campaign_1 = {
 const campaign_type_1 = {
   id: 1,
   name: "Functional Testing (Bug Hunting)",
-  type: 0,
+  type: FUNCTIONAL_CAMPAIGN_TYPE_ID,
 };
 
 const coins_1 = {

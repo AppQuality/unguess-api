@@ -1,13 +1,15 @@
 import * as db from "@src/features/db";
-import {
-  EXPERIENTIAL_CAMPAIGN_TYPE_ID,
-  FUNCTIONAL_CAMPAIGN_TYPE_ID,
-} from "@src/utils/constants";
+import { getCampaignFamily } from "../getCampaignFamily";
+import { getCampaignOutputs } from "../getCampaignOutputs";
 import { getCampaignStatus } from "../getCampaignStatus";
 
-export const getCampaign = async (
-  cp_id: number
-): Promise<StoplightComponents["schemas"]["Campaign"] | false> => {
+export const getCampaign = async ({
+  campaignId,
+  withOutputs,
+}: {
+  campaignId: number;
+  withOutputs?: boolean;
+}): Promise<StoplightComponents["schemas"]["Campaign"] | false> => {
   const result = await db.query(
     db.format(
       `SELECT 
@@ -27,12 +29,19 @@ export const getCampaign = async (
         c.campaign_type AS bug_form,
         ct.name AS campaign_type_name,
         ct.type AS campaign_family_id,
+        ${withOutputs ? "o.bugs, o.media," : ""}
         p.display_name 
         FROM wp_appq_evd_campaign c 
         JOIN wp_appq_project p ON c.project_id = p.id 
         JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id
-        WHERE c.id = ?`,
-      [cp_id]
+        ${
+          withOutputs
+            ? "LEFT JOIN campaigns_outputs o ON (o.campaign_id = c.id)"
+            : ""
+        }
+        WHERE c.id = ?
+        GROUP BY c.id`,
+      [campaignId]
     )
   );
 
@@ -44,15 +53,12 @@ export const getCampaign = async (
   }
 
   // Get campaign family
-  let campaign_family = "";
-  switch (campaign.campaign_family_id) {
-    case EXPERIENTIAL_CAMPAIGN_TYPE_ID:
-      campaign_family = "Experiential";
-      break;
-    case FUNCTIONAL_CAMPAIGN_TYPE_ID:
-      campaign_family = "Functional";
-      break;
-  }
+  const campaign_family = getCampaignFamily({
+    familyId: campaign.campaign_family_id,
+  });
+
+  // Get campaign outputs
+  const outputs = getCampaignOutputs(campaign);
 
   return {
     id: campaign.id,
@@ -83,5 +89,6 @@ export const getCampaign = async (
     ...(campaign.base_bug_internal_id && {
       base_bug_internal_id: campaign.base_bug_internal_id,
     }),
+    ...(withOutputs && { outputs: outputs }),
   };
 };

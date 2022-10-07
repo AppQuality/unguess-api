@@ -1,40 +1,36 @@
-import sqlite3 from "@src/features/sqlite";
+import Table from "./tryber_table";
 
-const db = sqlite3("tryber");
-
-export const table = {
-  create: async () => {
-    await db.createTable("wp_appq_report", [
-      "id INTEGER PRIMARY KEY AUTOINCREMENT",
-      "title VARCHAR(64)",
-      "description VARCHAR(255)",
-      "campaign_id INT(16)",
-      "uploader_id INT(16)",
-      "url VARCHAR(255) NULL",
-      "creation_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP",
-      "update_date timestamp NULL",
-    ]);
-  },
-  drop: async () => {
-    await db.dropTable("wp_appq_report");
-  },
-  clear: async () => {
-    return await db.run(`DELETE FROM wp_appq_report`);
-  },
+type ReportParams = {
+  id?: number;
+  title?: string;
+  description?: string;
+  campaign_id?: number;
+  uploader_id?: number;
+  url?: string;
+  creation_date?: string;
+  update_date?: string;
 };
 
-const data: {
-  [key: string]: (params?: any) => Promise<{ [key: string]: any }>;
-} = {};
-
-data.basicItem = async (params) => {
-  const item = {
-    title: "Report",
-    description: "Description",
-    ...params,
-  };
-  await db.insert("wp_appq_report", item);
-  return item;
+const defaultItem: ReportParams = {
+  title: "???",
+  description: "???",
 };
-
-export { data };
+class Reports extends Table<ReportParams> {
+  protected name = "wp_appq_report";
+  protected columns = [
+    "id INTEGER PRIMARY KEY AUTOINCREMENT",
+    "title VARCHAR(64)",
+    "description VARCHAR(255)",
+    "campaign_id INT(16)",
+    "uploader_id INT(16)",
+    "url VARCHAR(255) NULL",
+    "creation_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP",
+    "update_date timestamp NULL",
+  ];
+  constructor() {
+    super(defaultItem);
+  }
+}
+const reports = new Reports();
+export default reports;
+export type { ReportParams };
