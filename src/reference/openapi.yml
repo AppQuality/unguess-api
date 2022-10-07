@@ -1002,13 +1002,13 @@ components:
           type: string
         campaigns_count:
           type: integer
-        workspace:
-          $ref: '#/components/schemas/Workspace'
+        workspaceId:
+          type: number
       required:
         - id
         - name
         - campaigns_count
-        - workspace
+        - workspaceId
     Error:
       title: Error
       type: object
