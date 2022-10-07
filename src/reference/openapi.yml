@@ -1002,10 +1002,13 @@ components:
           type: string
         campaigns_count:
           type: integer
+        workspaceId:
+          type: number
       required:
         - id
         - name
         - campaigns_count
+        - workspaceId
     Error:
       title: Error
       type: object

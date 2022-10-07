@@ -53,5 +53,6 @@ export const createProject = async (
     id: project.id,
     name: project.display_name,
     campaigns_count: 0,
+    workspaceId: project.customer_id,
   };
 };

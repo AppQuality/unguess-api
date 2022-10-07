@@ -1,5 +1,6 @@
 import * as db from "@src/features/db";
 import { ERROR_MESSAGE } from "@src/utils/constants";
+import { getWorkspace } from "@src/utils/workspaces";
 
 interface getProjectByIdArgs {
   user: UserType;
@@ -83,5 +84,6 @@ const formatProject = async (project: any) => {
     id: project.id,
     name: project.display_name,
     campaigns_count: campaignsCount[0].count,
+    workspaceId: project.customer_id ? Number(project.customer_id) : -1,
   };
 };

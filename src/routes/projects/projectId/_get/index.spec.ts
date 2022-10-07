@@ -27,6 +27,11 @@ const project_2 = {
   customer_id: 1,
 };
 
+const project_3 = {
+  id: 12,
+  display_name: "Projettino tre",
+};
+
 const user_to_project_1 = {
   wp_user_id: 1,
   project_id: 1,
@@ -59,7 +64,7 @@ describe("GET /projects/{pid}", () => {
         await dbAdapter.create();
 
         await dbAdapter.add({
-          projects: [project_1, project_2],
+          projects: [project_1, project_2, project_3],
           userToProjects: [user_to_project_1, user_to_project_2],
           campaigns: [campaign_1],
           companies: [customer_1],
@@ -117,11 +122,35 @@ describe("GET /projects/{pid}", () => {
     const response = await request(app)
       .get(`/projects/${project_1.id}`)
       .set("authorization", "Bearer customer");
+
+    expect(response.status).toBe(200);
     expect(response.body).toMatchObject({
       id: 1,
       name: "Projettino unoh",
       campaigns_count: 1,
+      workspaceId: 1,
     });
+  });
+
+  it("Should answer with a project object if not associated with any customer but is an admin", async () => {
+    const response = await request(app)
+      .get(`/projects/${project_3.id}`)
+      .set("authorization", "Bearer administrator");
+
+    expect(response.body).toMatchObject({
+      id: project_3.id,
+      name: "Projettino tre",
+      campaigns_count: 0,
+      workspaceId: -1,
+    });
+  });
+
+  it("Should answer with an error if not associated with any customer and is NOT an admin", async () => {
+    const response = await request(app)
+      .get(`/projects/${project_3.id}`)
+      .set("authorization", "Bearer customer");
+
+    expect(response.status).toBe(403);
   });
 
   //Should answer with an error if the project is limited to a customer

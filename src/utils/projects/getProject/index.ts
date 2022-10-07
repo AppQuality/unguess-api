@@ -22,7 +22,7 @@ export const getProject = async ({
 
   // Get project
   const sql = db.format(
-    `SELECT p.id, p.display_name FROM wp_appq_project p WHERE p.id = ? AND p.customer_id = ?`,
+    `SELECT p.id, p.display_name, p.customer_id FROM wp_appq_project p WHERE p.id = ? AND p.customer_id = ?`,
     [projectId, workspaceId]
   );
 
@@ -40,6 +40,7 @@ export const getProject = async ({
       id: project.id,
       name: project.display_name,
       campaigns_count: campaigns[0].count,
+      workspaceId: project.customer_id,
     };
   }
 
