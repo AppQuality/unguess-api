@@ -28,7 +28,6 @@ const data: {
 data.basicProject = async (params) => {
   const item = {
     display_name: "Nome del progetto abbastanza figo",
-    customer_id: 123,
     last_edit: "2017-07-20 00:00:00",
     ...params,
   };

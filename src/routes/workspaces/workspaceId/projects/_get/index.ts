@@ -43,10 +43,11 @@ export default async (
     let projects: Array<{
       id: number;
       display_name: string;
+      customer_id: number;
     }> = [];
 
     // Get customer's projects
-    let projectSql = `SELECT id, display_name FROM wp_appq_project WHERE customer_id = ? ORDER BY id`;
+    let projectSql = `SELECT id, display_name, customer_id FROM wp_appq_project WHERE customer_id = ? ORDER BY id`;
 
     if (limit) {
       projectSql += ` LIMIT ${limit} OFFSET ${start}`;
@@ -107,6 +108,7 @@ export default async (
           id: project.id,
           name: project.display_name,
           campaigns_count: campaigns[0].count,
+          workspaceId: Number(project.customer_id),
         };
 
         returnProjects.push(item);

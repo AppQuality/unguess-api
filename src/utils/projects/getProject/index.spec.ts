@@ -115,12 +115,11 @@ describe("getProject", () => {
       workspaceId: customer_1.id,
       projectId: project_1.id,
     });
-    expect(JSON.stringify(project)).toBe(
-      JSON.stringify({
-        id: project_1.id,
-        name: project_1.display_name,
-        campaigns_count: 1,
-      })
-    );
+    expect(project).toMatchObject({
+      id: project_1.id,
+      name: project_1.display_name,
+      campaigns_count: 1,
+      workspaceId: project_1.customer_id,
+    });
   });
 });
