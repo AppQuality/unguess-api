@@ -1213,6 +1213,93 @@ components:
         - bugs
         - media
       description: campaign output item
+    Bug:
+      title: Bug
+      x-stoplight:
+        id: aw5zx248tc26w
+      type: object
+      properties:
+        id:
+          type: integer
+        internal_id:
+          type: string
+        campaign_id:
+          type: integer
+        message:
+          type: string
+        description:
+          type: string
+        expected_result:
+          type: string
+        current_result:
+          type: string
+        pubblish:
+          type: integer
+        status:
+          type: object
+          properties:
+            id:
+              type: integer
+            reason:
+              type: string
+        severity:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+        type:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+        bug_replicability_id:
+          type: integer
+        created:
+          type: string
+          format: date-time
+        updated:
+          type: string
+          format: date-time
+        last_seen:
+          type: string
+          format: date-time
+        note:
+          type: string
+        device_meta:
+          type: object
+          properties:
+            manufacturer:
+              type: string
+            model:
+              type: string
+            os:
+              type: string
+            os_version:
+              type: string
+        version_id:
+          type: integer
+        reviewer:
+          type: integer
+        is_favorite:
+          type: integer
+        duplicated:
+          type: object
+          properties:
+            is_duplicated:
+              type: integer
+            duplicated_of_id:
+              type: integer
+        application_section:
+          type: object
+          properties:
+            id:
+              type: integer
+            description:
+              type: string
   securitySchemes:
     JWT:
       type: http
