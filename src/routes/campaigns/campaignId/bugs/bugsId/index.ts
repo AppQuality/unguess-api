@@ -1,8 +1,9 @@
-/** OPENAPI-ROUTE: get-campaigns-single-bug */
+/** OPENAPI-ROUTE: get-campaign */
 import { Context } from "openapi-backend";
 import { ERROR_MESSAGE } from "@src/utils/constants";
 import { getCampaign } from "@src/utils/campaigns";
 import { getProjectById } from "@src/utils/projects";
+import { getBugById } from "@src/utils/bugs";
 
 export default async (
   c: Context,
@@ -16,14 +17,20 @@ export default async (
     error: true,
   } as StoplightComponents["schemas"]["Error"];
 
-  let cid = parseInt(c.request.params.cid as string);
+  const campaign_id = parseInt(c.request.params.cid as string);
+  const bug_id = parseInt(c.request.params.cìbid as string);
 
   res.status_code = 200;
 
   try {
+    if (!campaign_id || !bug_id) {
+      error.code = 400;
+      throw error;
+    }
+
     // Check if the campaign exists
     let campaign = await getCampaign({
-      campaignId: cid,
+      campaignId: campaign_id,
       withOutputs: true,
     });
 
@@ -38,7 +45,9 @@ export default async (
       user: user,
     });
 
-    return campaign as StoplightComponents["schemas"]["CampaignWithOutput"];
+    const bug = getBugById(bug_id);
+
+    return bug as StoplightComponents["schemas"]["Bug"];
   } catch (e: any) {
     if (e.code) {
       error.code = e.code;
