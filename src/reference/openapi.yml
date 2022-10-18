@@ -398,9 +398,10 @@ paths:
               examples:
                 example-1:
                   value:
-                    id: 123
-                    name: New project name
+                    id: 0
+                    name: string
                     campaigns_count: 0
+                    workspaceId: 0
         '400':
           $ref: '#/components/responses/Error'
         '401':
@@ -428,7 +429,7 @@ paths:
             examples:
               example-1:
                 value:
-                  display_name: New project name
+                  display_name: string
   /campaigns:
     post:
       summary: Create campaign
@@ -1225,51 +1226,31 @@ components:
           type: string
         campaign_id:
           type: integer
-        message:
+        title:
           type: string
-        description:
+        step-by-step:
           type: string
         expected_result:
           type: string
         current_result:
           type: string
-        pubblish:
-          type: integer
         status:
-          type: object
-          properties:
-            id:
-              type: integer
-            reason:
-              type: string
+          $ref: '#/components/schemas/BugStatus'
         severity:
-          type: object
-          properties:
-            id:
-              type: integer
-            name:
-              type: string
+          $ref: '#/components/schemas/BugSeverity'
         type:
-          type: object
-          properties:
-            id:
-              type: integer
-            name:
-              type: string
-        bug_replicability_id:
-          type: integer
+          $ref: '#/components/schemas/BugType'
+        replicability:
+          $ref: '#/components/schemas/BugReplicability'
         created:
           type: string
           format: date-time
         updated:
           type: string
           format: date-time
-        last_seen:
-          type: string
-          format: date-time
         note:
           type: string
-        device_meta:
+        device:
           type: object
           properties:
             manufacturer:
@@ -1280,26 +1261,114 @@ components:
               type: string
             os_version:
               type: string
-        version_id:
-          type: integer
-        reviewer:
-          type: integer
-        is_favorite:
-          type: integer
-        duplicated:
-          type: object
-          properties:
-            is_duplicated:
-              type: integer
-            duplicated_of_id:
-              type: integer
         application_section:
           type: object
           properties:
             id:
               type: integer
-            description:
+            title:
               type: string
+        duplicated_of_id:
+          type: integer
+        is_favorite:
+          type: integer
+      required:
+        - id
+        - internal_id
+        - campaign_id
+        - title
+        - step-by-step
+        - expected_result
+        - current_result
+        - status
+        - severity
+        - type
+        - replicability
+        - created
+        - device
+        - application_section
+    BugSeverity:
+      title: BugSeverity
+      x-stoplight:
+        id: e1d49ps1v77oz
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
+    BugType:
+      title: BugType
+      x-stoplight:
+        id: e1d49ps1v77oz
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
+    BugReplicability:
+      title: BugReplicability
+      x-stoplight:
+        id: e1d49ps1v77oz
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
+    BugStatus:
+      title: BugStatus
+      x-stoplight:
+        id: e1d49ps1v77oz
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
+    BugMedia:
+      title: BugMedia
+      x-stoplight:
+        id: e1d49ps1v77oz
+      type: object
+      properties:
+        type:
+          type: object
+          required:
+            - type
+            - extension
+          properties:
+            type:
+              type: string
+              enum:
+                - video
+                - image
+                - other
+            extension:
+              type: string
+        url:
+          type: string
+          format: uri
+        creation_date:
+          type: string
+          format: date
+      required:
+        - type
+        - url
+        - creation_date
   securitySchemes:
     JWT:
       type: http
