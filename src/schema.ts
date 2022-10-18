@@ -129,6 +129,26 @@ export interface paths {
     /** Retrieve all available use case templates */
     get: operations["get-templates"];
   };
+  "/campaigns/{cid}/bugs": {
+    get: operations["get-campaigns-cid-bugs"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+      };
+    };
+  };
+  "/campaigns/{cid}/bugs/{bid}": {
+    get: operations["get-campaigns-single-bug"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+        /** Defines an identifier for the bug object (BUG ID) */
+        bid: components["parameters"]["bid"];
+      };
+    };
+  };
 }
 
 export interface components {
@@ -504,6 +524,8 @@ export interface components {
     filterBy: unknown;
     /** @description Campaign id */
     cid: number;
+    /** @description Defines an identifier for the bug object (BUG ID) */
+    bid: string;
   };
   requestBodies: {
     Credentials: {
@@ -1011,6 +1033,68 @@ export interface operations {
         };
       };
       400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  "get-campaigns-cid-bugs": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+      };
+      query: {
+        /** Limit pagination parameter */
+        limit?: components["parameters"]["limit"];
+        /** Start pagination parameter */
+        start?: components["parameters"]["start"];
+        /** Order value (ASC, DESC) */
+        order?: components["parameters"]["order"];
+        /** Order by accepted field */
+        orderBy?: components["parameters"]["orderBy"];
+        /** filterBy[<fieldName>]=<fieldValue> */
+        filterBy?: components["parameters"]["filterBy"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            items?: components["schemas"]["Bug"][];
+            start?: number;
+            limit?: number;
+            size?: number;
+            total?: number;
+          };
+        };
+      };
+      400: components["responses"]["Error"];
+      401: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  "get-campaigns-single-bug": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+        /** Defines an identifier for the bug object (BUG ID) */
+        bid: components["parameters"]["bid"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Bug"] & {
+            media?: components["schemas"]["BugMedia"][];
+          };
+        };
+      };
+      400: components["responses"]["Error"];
+      401: components["responses"]["Error"];
       403: components["responses"]["Error"];
       500: components["responses"]["Error"];
     };
