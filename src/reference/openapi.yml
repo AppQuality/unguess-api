@@ -1251,16 +1251,10 @@ components:
         note:
           type: string
         device:
-          type: object
-          properties:
-            manufacturer:
-              type: string
-            model:
-              type: string
-            os:
-              type: string
-            os_version:
-              type: string
+          oneOf:
+            - $ref: '#/components/schemas/Smartphone'
+            - $ref: '#/components/schemas/Tablet'
+            - $ref: '#/components/schemas/Desktop'
         application_section:
           type: object
           properties:
@@ -1369,6 +1363,94 @@ components:
         - type
         - url
         - creation_date
+    Smartphone:
+      title: Smartphone
+      x-stoplight:
+        id: 5voa2qvfngn94
+      allOf:
+        - type: object
+          properties:
+            manufacturer:
+              type: string
+            model:
+              type: string
+          required:
+            - manufacturer
+            - model
+        - $ref: '#/components/schemas/GenericDevice'
+      x-examples:
+        example-1:
+          manufacturer: Samsung
+          model: Galaxy S22 Ultra
+          os: Android
+          os_version: '13'
+          type: smartphone
+      x-internal: true
+    Tablet:
+      title: Tablet
+      x-stoplight:
+        id: 5voa2qvfngn94
+      allOf:
+        - type: object
+          properties:
+            manufacturer:
+              type: string
+            model:
+              type: string
+          required:
+            - manufacturer
+            - model
+        - $ref: '#/components/schemas/GenericDevice'
+      x-examples:
+        example-1:
+          manufacturer: Samsung
+          model: Galaxy Tab
+          os: Android
+          os_version: '12'
+          type: tablet
+      x-internal: true
+    Desktop:
+      title: Desktop
+      x-stoplight:
+        id: 5voa2qvfngn94
+      allOf:
+        - type: object
+          properties:
+            desktop_type:
+              type: string
+              enum:
+                - Desktop
+                - Gaming PC
+                - Notebook
+                - Tablet PC / Hybrid
+                - Ultrabook
+          required:
+            - desktop_type
+        - $ref: '#/components/schemas/GenericDevice'
+      x-examples:
+        example-1:
+          desktop_type: Gaming PC
+          os: Windows
+          os_version: Windows 10 May 2021 Update (19043)
+          type: desktop
+      x-internal: true
+    GenericDevice:
+      title: Generic Device
+      x-stoplight:
+        id: 5voa2qvfngn94
+      type: object
+      properties:
+        os:
+          type: string
+        os_version:
+          type: string
+        type:
+          type: string
+          enum:
+            - desktop
+            - smartphone
+            - tablet
+      x-internal: true
   securitySchemes:
     JWT:
       type: http
