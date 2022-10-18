@@ -390,6 +390,94 @@ export interface components {
      * @enum {string}
      */
     Output: "bugs" | "media";
+    /** Bug */
+    Bug: {
+      id: number;
+      internal_id: string;
+      campaign_id: number;
+      title: string;
+      "step-by-step": string;
+      expected_result: string;
+      current_result: string;
+      status: components["schemas"]["BugStatus"];
+      severity: components["schemas"]["BugSeverity"];
+      type: components["schemas"]["BugType"];
+      replicability: components["schemas"]["BugReplicability"];
+      /** Format: date-time */
+      created: string;
+      /** Format: date-time */
+      updated?: string;
+      note?: string;
+      device:
+        | components["schemas"]["Smartphone"]
+        | components["schemas"]["Tablet"]
+        | components["schemas"]["Desktop"];
+      application_section: {
+        id?: number;
+        title?: string;
+      };
+      duplicated_of_id?: number;
+      is_favorite?: number;
+    };
+    /** BugSeverity */
+    BugSeverity: {
+      id: number;
+      name: string;
+    };
+    /** BugType */
+    BugType: {
+      id: number;
+      name: string;
+    };
+    /** BugReplicability */
+    BugReplicability: {
+      id: number;
+      name: string;
+    };
+    /** BugStatus */
+    BugStatus: {
+      id: number;
+      name: string;
+    };
+    /** BugMedia */
+    BugMedia: {
+      type: {
+        /** @enum {string} */
+        type: "video" | "image" | "other";
+        extension: string;
+      };
+      /** Format: uri */
+      url: string;
+      /** Format: date */
+      creation_date: string;
+    };
+    /** Smartphone */
+    Smartphone: {
+      manufacturer: string;
+      model: string;
+    } & components["schemas"]["GenericDevice"];
+    /** Tablet */
+    Tablet: {
+      manufacturer: string;
+      model: string;
+    } & components["schemas"]["GenericDevice"];
+    /** Desktop */
+    Desktop: {
+      /** @enum {string} */
+      desktop_type:
+        | "Desktop"
+        | "Gaming PC"
+        | "Notebook"
+        | "Tablet PC / Hybrid"
+        | "Ultrabook";
+    } & components["schemas"]["GenericDevice"];
+    /** Generic Device */
+    GenericDevice: {
+      os?: string;
+      os_version?: string;
+      /** @enum {string} */
+      type?: "desktop" | "smartphone" | "tablet";
+    };
   };
   responses: {
     /** Example response */
