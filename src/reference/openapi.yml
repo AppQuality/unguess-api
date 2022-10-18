@@ -1385,7 +1385,7 @@ components:
           type: integer
         title:
           type: string
-        step-by-step:
+        step_by_step:
           type: string
         expected_result:
           type: string
@@ -1428,7 +1428,7 @@ components:
         - internal_id
         - campaign_id
         - title
-        - step-by-step
+        - step_by_step
         - expected_result
         - current_result
         - status
