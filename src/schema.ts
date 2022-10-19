@@ -416,7 +416,7 @@ export interface components {
       internal_id: string;
       campaign_id: number;
       title: string;
-      "step-by-step": string;
+      step_by_step: string;
       expected_result: string;
       current_result: string;
       status: components["schemas"]["BugStatus"];

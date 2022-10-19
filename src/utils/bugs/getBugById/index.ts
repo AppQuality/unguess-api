@@ -1,9 +1,13 @@
 import * as db from "@src/features/db";
+import { getBugDevice } from "../getBugDevice";
 import { getBugMedia } from "../getBugMedia";
+
+type BugWithMedia =
+  StoplightOperations["get-campaigns-single-bug"]["responses"]["200"]["content"]["application/json"];
 
 export const getBugById = async (
   bugId: number
-): Promise<StoplightComponents["schemas"]["Bug"] | false> => {
+): Promise<BugWithMedia | false> => {
   const result = await db.query(
     db.format(
       `SELECT b.id,
@@ -50,6 +54,9 @@ export const getBugById = async (
     return false;
   }
 
+  // Get bug device
+  const device = await getBugDevice(bug);
+
   // Get bug additional fields (TODO)
 
   // Get bug media
@@ -79,9 +86,14 @@ export const getBugById = async (
       id: bug.bug_replicability_id,
       name: bug.replicability,
     },
+    application_section: {
+      id: bug.application_section_id,
+      title: bug.application_section,
+    },
     created: bug.created,
     updated: bug.updated,
     note: bug.note,
-    ...(media && { media }),
+    device,
+    media: media || [],
   };
 };

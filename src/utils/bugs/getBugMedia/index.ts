@@ -37,5 +37,5 @@ from wp_appq_evd_bug_media
     };
   });
 
-  return results;
+  return results as StoplightComponents["schemas"]["BugMedia"][];
 };

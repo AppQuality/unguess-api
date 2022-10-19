@@ -45,9 +45,9 @@ export default async (
       user: user,
     });
 
-    const bug = getBugById(bug_id);
+    const bug = await getBugById(bug_id);
 
-    return bug as StoplightComponents["schemas"]["Bug"];
+    return bug as StoplightOperations["get-campaigns-single-bug"]["responses"]["200"]["content"]["application/json"];
   } catch (e: any) {
     if (e.code) {
       error.code = e.code;
@@ -55,6 +55,10 @@ export default async (
     } else {
       error.code = 500;
       res.status_code = 500;
+    }
+
+    if (e.message) {
+      error.message = e.message;
     }
 
     return error;
