@@ -1365,16 +1365,12 @@ components:
     Output:
       type: string
       title: Output
-      x-stoplight:
-        id: 319v4cufuqnsu
       enum:
         - bugs
         - media
       description: campaign output item
     Bug:
       title: Bug
-      x-stoplight:
-        id: aw5zx248tc26w
       type: object
       properties:
         id:
@@ -1440,8 +1436,6 @@ components:
         - application_section
     BugSeverity:
       title: BugSeverity
-      x-stoplight:
-        id: e1d49ps1v77oz
       type: object
       properties:
         id:
@@ -1453,8 +1447,6 @@ components:
         - name
     BugType:
       title: BugType
-      x-stoplight:
-        id: e1d49ps1v77oz
       type: object
       properties:
         id:
@@ -1466,8 +1458,6 @@ components:
         - name
     BugReplicability:
       title: BugReplicability
-      x-stoplight:
-        id: e1d49ps1v77oz
       type: object
       properties:
         id:
@@ -1479,8 +1469,6 @@ components:
         - name
     BugStatus:
       title: BugStatus
-      x-stoplight:
-        id: e1d49ps1v77oz
       type: object
       properties:
         id:
@@ -1492,8 +1480,6 @@ components:
         - name
     BugMedia:
       title: BugMedia
-      x-stoplight:
-        id: e1d49ps1v77oz
       type: object
       properties:
         type:
@@ -1522,8 +1508,6 @@ components:
         - creation_date
     Smartphone:
       title: Smartphone
-      x-stoplight:
-        id: 5voa2qvfngn94
       allOf:
         - type: object
           properties:
@@ -1545,8 +1529,6 @@ components:
       x-internal: true
     Tablet:
       title: Tablet
-      x-stoplight:
-        id: 5voa2qvfngn94
       allOf:
         - type: object
           properties:
@@ -1568,8 +1550,6 @@ components:
       x-internal: true
     Desktop:
       title: Desktop
-      x-stoplight:
-        id: 5voa2qvfngn94
       allOf:
         - type: object
           properties:
@@ -1593,8 +1573,6 @@ components:
       x-internal: true
     GenericDevice:
       title: Generic Device
-      x-stoplight:
-        id: 5voa2qvfngn94
       type: object
       properties:
         os:
