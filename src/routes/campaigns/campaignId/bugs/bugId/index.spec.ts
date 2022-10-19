@@ -243,11 +243,11 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
         }),
         severity: expect.objectContaining({
           id: bug_1.severity_id,
-          name: "Low",
+          name: "LOW",
         }),
         replicability: expect.objectContaining({
           id: bug_1.bug_replicability_id,
-          name: "Always",
+          name: "Sometimes",
         }),
         type: expect.objectContaining({
           id: bug_1.bug_type_id,
