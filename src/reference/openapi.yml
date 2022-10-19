@@ -1401,10 +1401,8 @@ components:
           $ref: '#/components/schemas/BugReplicability'
         created:
           type: string
-          format: date-time
         updated:
           type: string
-          format: date-time
         note:
           type: string
         device:
@@ -1603,10 +1601,6 @@ components:
           type: string
         type:
           type: string
-          enum:
-            - desktop
-            - smartphone
-            - tablet
       x-internal: true
   securitySchemes:
     JWT:
