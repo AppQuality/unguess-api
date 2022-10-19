@@ -1,4 +1,4 @@
-/** OPENAPI-ROUTE: get-campaigns-single-bug */
+/** OPENAPI-ROUTE: get-campaign */
 import { Context } from "openapi-backend";
 import { ERROR_MESSAGE } from "@src/utils/constants";
 import { getCampaign } from "@src/utils/campaigns";

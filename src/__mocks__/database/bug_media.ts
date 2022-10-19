@@ -26,7 +26,7 @@ class Media extends Table<BugMediaParams> {
     "description VARCHAR(45)",
     "location VARCHAR(256)",
     "bug_id int(11)",
-    "uploaded datetime",
+    "uploaded string",
   ];
   constructor() {
     super(defaultItem);

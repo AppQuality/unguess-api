@@ -11,12 +11,12 @@ export const getBugMedia = async (
 ): Promise<StoplightComponents["schemas"]["BugMedia"][] | false> => {
   const results = await db.query(
     db.format(
-      `SELECT b.id,
-      type,
-      location,
-      uploaded
-from wp_appq_evd_bug_media
-        WHERE bug_id = ?;`,
+      `SELECT id,
+        type,
+        location,
+        uploaded
+       from wp_appq_evd_bug_media
+       WHERE bug_id = ?;`,
       [bugId]
     )
   );
@@ -26,16 +26,19 @@ from wp_appq_evd_bug_media
     return false;
   }
 
-  results.map((result: BugMedia) => {
-    return {
+  const media = [] as StoplightComponents["schemas"]["BugMedia"][];
+  results.forEach((result: BugMedia) => {
+    media.push({
       type: {
-        type: result.type,
-        extension: result.location.split(".").pop()?.toLowerCase(),
+        type: result.type as StoplightComponents["schemas"]["BugMedia"]["type"]["type"],
+        extension: result.location.split(".").pop()?.toLowerCase() || "-",
       },
       url: result.location,
       creation_date: result.uploaded,
-    };
+    });
   });
 
-  return results as StoplightComponents["schemas"]["BugMedia"][];
+  console.log(">>> results", results);
+
+  return media;
 };

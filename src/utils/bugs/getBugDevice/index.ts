@@ -1,12 +1,5 @@
-import * as db from "@src/features/db";
 import { ERROR_MESSAGE } from "@src/utils/constants";
 import { BugsParams } from "@src/__mocks__/database/bugs";
-
-interface BugMedia {
-  type: string;
-  location: string;
-  uploaded: string;
-}
 
 export const getBugDevice = async (
   bug: BugsParams & { form_factor: string; pc_type: string }
@@ -43,8 +36,8 @@ const getSmartphone = (
 ): StoplightComponents["schemas"]["Smartphone"] => ({
   manufacturer: bug.manufacturer || "-",
   model: bug.model || "-",
-  os: bug.os,
-  os_version: bug.os_version,
+  os: bug.os || "-",
+  os_version: bug.os_version || "-",
   type: "smartphone",
 });
 
@@ -53,8 +46,8 @@ const getTablet = (
 ): StoplightComponents["schemas"]["Tablet"] => ({
   manufacturer: bug.manufacturer || "-",
   model: bug.model || "-",
-  os: bug.os,
-  os_version: bug.os_version,
+  os: bug.os || "-",
+  os_version: bug.os_version || "-",
   type: "tablet",
 });
 
@@ -63,17 +56,20 @@ const getDesktop = (
 ): StoplightComponents["schemas"]["Desktop"] => ({
   desktop_type: (bug.pc_type ||
     "Desktop") as StoplightComponents["schemas"]["Desktop"]["desktop_type"],
-  os: bug.os,
-  os_version: bug.os_version,
+  os: bug.os || "-",
+  os_version: bug.os_version || "-",
   type: "desktop",
 });
 
 const getGenericDevice = (
   bug: BugsParams & { form_factor: string; pc_type: string }
-): StoplightComponents["schemas"]["Desktop"] => ({
+):
+  | StoplightComponents["schemas"]["Desktop"]
+  | StoplightComponents["schemas"]["Smartphone"]
+  | StoplightComponents["schemas"]["Tablet"] => ({
   desktop_type: (bug.pc_type ||
     "Desktop") as StoplightComponents["schemas"]["Desktop"]["desktop_type"],
-  os: bug.os,
-  os_version: bug.os_version,
+  os: bug.os || "-",
+  os_version: bug.os_version || "-",
   type: "desktop",
 });

@@ -8,6 +8,7 @@ type BugWithMedia =
 export const getBugById = async (
   bugId: number
 ): Promise<BugWithMedia | false> => {
+  console.log("getBugById");
   const result = await db.query(
     db.format(
       `SELECT b.id,
@@ -35,17 +36,22 @@ export const getBugById = async (
       b.application_section_id,
       b.is_duplicated,
       b.duplicated_of_id,
-      b.is_favorite
+      b.is_favorite,
+      b.bug_replicability_id,
+      b.bug_type_id,
+      b.severity_id
       from wp_appq_evd_bug b
         JOIN wp_appq_evd_severity s ON (b.severity_id = s.id)
         JOIN wp_appq_evd_bug_type t ON (b.bug_type_id = t.id)
         JOIN wp_appq_evd_bug_replicability r ON (b.bug_replicability_id = r.id)
         JOIN wp_appq_evd_bug_status status ON (b.status_id = status.id)
         LEFT JOIN wp_crowd_appq_device device ON (b.dev_id = device.id)
-        WHERE b.campaign_id = ?;`,
+        WHERE b.id = ?;`,
       [bugId]
     )
   );
+
+  console.log(">>> result", result);
 
   const bug = result[0];
 

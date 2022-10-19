@@ -423,9 +423,7 @@ export interface components {
       severity: components["schemas"]["BugSeverity"];
       type: components["schemas"]["BugType"];
       replicability: components["schemas"]["BugReplicability"];
-      /** Format: date-time */
       created: string;
-      /** Format: date-time */
       updated?: string;
       note?: string;
       device:
@@ -475,12 +473,18 @@ export interface components {
     Smartphone: {
       manufacturer: string;
       model: string;
-    } & components["schemas"]["GenericDevice"];
+      os: string;
+      os_version: string;
+      type: string;
+    };
     /** Tablet */
     Tablet: {
       manufacturer: string;
       model: string;
-    } & components["schemas"]["GenericDevice"];
+      os: string;
+      os_version: string;
+      type: string;
+    };
     /** Desktop */
     Desktop: {
       /** @enum {string} */
@@ -490,13 +494,15 @@ export interface components {
         | "Notebook"
         | "Tablet PC / Hybrid"
         | "Ultrabook";
-    } & components["schemas"]["GenericDevice"];
+      os: string;
+      os_version: string;
+      type: string;
+    };
     /** Generic Device */
     GenericDevice: {
       os?: string;
       os_version?: string;
-      /** @enum {string} */
-      type?: "desktop" | "smartphone" | "tablet";
+      type?: string;
     };
   };
   responses: {

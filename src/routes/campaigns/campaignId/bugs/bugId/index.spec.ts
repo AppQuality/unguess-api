@@ -3,10 +3,13 @@ import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { table as platformTable } from "@src/__mocks__/database/platforms";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
-import bugs from "@src/__mocks__/database/bugs";
-import userTaskMedia from "@src/__mocks__/database/user_task_media";
-import useCases from "@src/__mocks__/database/use_cases";
-import reports from "@src/__mocks__/database/report";
+import bugs, { BugsParams } from "@src/__mocks__/database/bugs";
+import bugMedia from "@src/__mocks__/database/bug_media";
+import bugSeverity from "@src/__mocks__/database/bug_severity";
+import bugReplicability from "@src/__mocks__/database/bug_replicability";
+import bugType from "@src/__mocks__/database/bug_type";
+import bugStatus from "@src/__mocks__/database/bug_status";
+import devices, { DeviceParams } from "@src/__mocks__/database/device";
 
 const customer_1 = {
   id: 999,
@@ -71,7 +74,51 @@ const campaign_2 = {
   project_id: project_2.id,
 };
 
-describe("GET /campaigns/{cid}", () => {
+const device_1: DeviceParams = {
+  id: 12,
+  manufacturer: "Apple",
+  model: "iPhone 13",
+  platform_id: 2,
+  id_profile: 61042,
+  os_version: "iOS 16 (16)",
+  operating_system: "iOS",
+  form_factor: "Smartphone",
+};
+
+const bug_1: BugsParams = {
+  id: 12999,
+  internal_id: "UG12999",
+  wp_user_id: 1,
+  message: "Bug 12999 message",
+  description: "Bug 12999 description",
+  expected_result: "Bug 12999 expected result",
+  current_result: "Bug 12999 actual result",
+  campaign_id: campaign_1.id,
+  status_id: 2,
+  created: "2021-10-19 12:57:57.0",
+  updated: "2021-10-19 12:57:57.0",
+  dev_id: device_1.id,
+  severity_id: 1,
+  bug_replicability_id: 1,
+  bug_type_id: 1,
+  application_section_id: 1,
+  application_section: "Application section 1",
+  note: "Bug 12999 notes",
+  manufacturer: device_1.manufacturer,
+  model: device_1.model,
+  os: device_1.operating_system,
+  os_version: device_1.os_version,
+};
+
+const bug_media_1 = {
+  id: 123,
+  bug_id: bug_1.id,
+  location: "https://example.com/bug_media_1.png",
+  type: "image",
+  uploaded: "2021-10-19 12:57:57.0",
+};
+
+describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
@@ -87,11 +134,21 @@ describe("GET /campaigns/{cid}", () => {
           campaigns: [campaign_1, campaign_2],
         });
 
-        //Outputs
         await bugs.mock();
-        await useCases.mock();
-        await userTaskMedia.mock();
-        await reports.mock();
+        await bugSeverity.mock();
+        await bugReplicability.mock();
+        await bugType.mock();
+        await bugStatus.mock();
+        await bugMedia.mock();
+        await devices.mock();
+
+        await bugs.insert(bug_1);
+        await devices.insert(device_1);
+        await bugMedia.insert(bug_media_1);
+        await bugSeverity.addDefaultItems();
+        await bugReplicability.addDefaultItems();
+        await bugType.addDefaultItems();
+        await bugStatus.addDefaultItems();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -106,11 +163,13 @@ describe("GET /campaigns/{cid}", () => {
       try {
         await dbAdapter.drop();
         await platformTable.drop();
-        //Outputs
         await bugs.dropMock();
-        await useCases.dropMock();
-        await userTaskMedia.dropMock();
-        await reports.dropMock();
+        await bugSeverity.dropMock();
+        await bugReplicability.dropMock();
+        await bugType.dropMock();
+        await bugStatus.dropMock();
+        await bugMedia.dropMock();
+        await devices.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -122,14 +181,16 @@ describe("GET /campaigns/{cid}", () => {
 
   // It should answer 403 if user is not logged in
   it("Should answer 403 if user is not logged in", async () => {
-    const response = await request(app).get(`/campaigns/${campaign_1.id}`);
+    const response = await request(app).get(
+      `/campaigns/${campaign_1.id}/bugs/${bug_1.id}`
+    );
     expect(response.status).toBe(403);
   });
 
   // It should answer 400 if campaign does not exist
   it("Should answer 400 if campaign does not exist", async () => {
     const response = await request(app)
-      .get(`/campaigns/999999`)
+      .get(`/campaigns/999999/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer customer");
     expect(response.status).toBe(400);
   });
@@ -137,64 +198,64 @@ describe("GET /campaigns/{cid}", () => {
   // It should answer 403 if the user has no permissions to see the campaign
   it("Should answer 403 if the user has no permissions to see the campaign", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_2.id}`)
+      .get(`/campaigns/${campaign_2.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer customer");
     expect(response.status).toBe(403);
   });
 
   // It should answer 200 with the campaign
-  it("Should answer 200 with the campaign", async () => {
+  it("Should answer 200 with the bug", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}`)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer customer");
     expect(response.status).toBe(200);
+
     expect(response.body).toEqual(
       expect.objectContaining({
-        id: campaign_1.id,
-        project: expect.objectContaining({
-          id: project_1.id,
-        }),
+        id: bug_1.id,
         status: expect.objectContaining({
-          id: campaign_1.status_id,
+          id: bug_1.status_id,
+          name: "Approved",
         }),
         type: expect.objectContaining({
-          id: campaign_1.campaign_type_id,
+          id: bug_1.bug_type_id,
+          name: "Crash",
         }),
       })
     );
-  });
 
-  // It should have all the required fields
-  it("Should have all the required fields", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}`)
-      .set("Authorization", "Bearer customer");
+    // {
+    //   id: 12999,
+    //   internal_id: 'UG12999',
+    //   campaign_id: 1,
+    //   title: 'Bug 12999 message',
+    //   step_by_step: 'Bug 12999 description',
+    //   expected_result: 'Bug 12999 expected result',
+    //   current_result: 'Bug 12999 actual result',
+    //   status: { id: 2, name: 'Approved' },
+    //   severity: { id: 1, name: 'LOW' },
+    //   type: { id: 1, name: 'Crash' },
+    //   replicability: { id: 1, name: 'Sometimes' },
+    //   application_section: { id: 1, title: 'Application section 1' },
+    //   created: '2021-10-19 12:57:57.0',
+    //   updated: '2021-10-19 12:57:57.0',
+    //   note: 'Bug 12999 notes',
+    //   device: {
+    //     manufacturer: 'Apple',
+    //     model: 'iPhone 13',
+    //     os: 'iOS',
+    //     os_version: 'iOS 16 (16)',
+    //     type: 'smartphone'
+    //   },
+    //   media: [
+    //     {
+    //       type: [Object],
+    //       url: 'https://example.com/bug_media_1.png',
+    //       creation_date: '2021-10-19 12:57:57.0'
+    //     }
+    //   ]
+    // }
 
-    expect(response.status).toBe(200);
-    expect(response.body).toEqual(
-      expect.objectContaining({
-        id: campaign_1.id,
-        start_date: campaign_1.start_date,
-        end_date: campaign_1.end_date,
-        close_date: campaign_1.close_date,
-        title: campaign_1.title,
-        customer_title: campaign_1.customer_title,
-        is_public: campaign_1.is_public,
-        type: expect.objectContaining({
-          id: campaign_1.campaign_type_id,
-          name: campaign_type_1.name,
-        }),
-        family: expect.objectContaining({
-          id: campaign_type_1.type,
-          name: "Functional",
-        }),
-        project: expect.objectContaining({
-          id: project_1.id,
-        }),
-        status: expect.objectContaining({
-          id: campaign_1.status_id,
-        }),
-      })
-    );
+    expect(response.body.media.length).toEqual(1);
   });
 });
