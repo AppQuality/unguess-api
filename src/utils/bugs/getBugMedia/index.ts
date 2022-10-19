@@ -38,7 +38,5 @@ export const getBugMedia = async (
     });
   });
 
-  console.log(">>> results", results);
-
   return media;
 };

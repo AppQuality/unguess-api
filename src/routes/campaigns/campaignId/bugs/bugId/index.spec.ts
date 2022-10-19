@@ -85,6 +85,18 @@ const device_1: DeviceParams = {
   form_factor: "Smartphone",
 };
 
+const device_2: DeviceParams = {
+  id: 13,
+  manufacturer: "Apple",
+  model: "iPhone 13",
+  platform_id: 8,
+  id_profile: 59455,
+  os_version: "Windows 10 May 2021 Update",
+  operating_system: "Windows",
+  form_factor: "PC",
+  pc_type: "Notebook",
+};
+
 const bug_1: BugsParams = {
   id: 12999,
   internal_id: "UG12999",
@@ -108,6 +120,16 @@ const bug_1: BugsParams = {
   model: device_1.model,
   os: device_1.operating_system,
   os_version: device_1.os_version,
+};
+
+const bug_2 = {
+  ...bug_1,
+  id: 13000,
+  dev_id: device_2.id,
+  manufacturer: device_2.manufacturer,
+  model: device_2.model,
+  os: device_2.operating_system,
+  os_version: device_2.os_version,
 };
 
 const bug_media_1 = {
@@ -143,7 +165,9 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
         await devices.mock();
 
         await bugs.insert(bug_1);
+        await bugs.insert(bug_2);
         await devices.insert(device_1);
+        await devices.insert(device_2);
         await bugMedia.insert(bug_media_1);
         await bugSeverity.addDefaultItems();
         await bugReplicability.addDefaultItems();
@@ -217,6 +241,14 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
           id: bug_1.status_id,
           name: "Approved",
         }),
+        severity: expect.objectContaining({
+          id: bug_1.severity_id,
+          name: "Low",
+        }),
+        replicability: expect.objectContaining({
+          id: bug_1.bug_replicability_id,
+          name: "Always",
+        }),
         type: expect.objectContaining({
           id: bug_1.bug_type_id,
           name: "Crash",
@@ -240,5 +272,49 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
       .get(`/campaigns/${campaign_1.id}/bugs/invalid`)
       .set("Authorization", "Bearer customer");
     expect(response.status).toBe(400);
+  });
+
+  // If smartphone, should return manufacturer and model
+  it("Should return manufacturer and model if smartphone", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer customer");
+    expect(response.status).toBe(200);
+
+    expect(response.body.device).toEqual(
+      expect.objectContaining({
+        manufacturer: device_1.manufacturer,
+        model: device_1.model,
+        type: "smartphone",
+      })
+    );
+  });
+
+  it("Should NOT return manufacturer and model if desktop, bug desktop_type", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_2.id}`)
+      .set("Authorization", "Bearer customer");
+    expect(response.status).toBe(200);
+
+    expect(response.body.device.manufacture).toBeUndefined();
+    expect(response.body.device.model).toBeUndefined();
+
+    expect(response.body.device).toEqual(
+      expect.objectContaining({
+        desktop_type: "Notebook",
+        os: device_2.operating_system,
+        os_version: device_2.os_version,
+        type: "desktop",
+      })
+    );
+  });
+
+  it("Should return an empty array if the bug has no media", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_2.id}`)
+      .set("Authorization", "Bearer customer");
+    expect(response.status).toBe(200);
+
+    expect(response.body.media).toEqual([]);
   });
 });
