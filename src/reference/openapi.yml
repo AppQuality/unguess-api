@@ -1523,16 +1523,23 @@ components:
       x-stoplight:
         id: 5voa2qvfngn94
       allOf:
-        - type: object
-          properties:
+        - properties:
             manufacturer:
               type: string
             model:
               type: string
+            os:
+              type: string
+            os_version:
+              type: string
+            type:
+              type: string
           required:
             - manufacturer
             - model
-        - $ref: '#/components/schemas/GenericDevice'
+            - os
+            - os_version
+            - type
       x-examples:
         example-1:
           manufacturer: Samsung
@@ -1541,21 +1548,29 @@ components:
           os_version: '13'
           type: smartphone
       x-internal: true
+      type: object
     Tablet:
       title: Tablet
       x-stoplight:
         id: 5voa2qvfngn94
       allOf:
-        - type: object
-          properties:
+        - properties:
             manufacturer:
               type: string
             model:
               type: string
+            os:
+              type: string
+            os_version:
+              type: string
+            type:
+              type: string
           required:
             - manufacturer
             - model
-        - $ref: '#/components/schemas/GenericDevice'
+            - os
+            - os_version
+            - type
       x-examples:
         example-1:
           manufacturer: Samsung
@@ -1564,13 +1579,13 @@ components:
           os_version: '12'
           type: tablet
       x-internal: true
+      type: object
     Desktop:
       title: Desktop
       x-stoplight:
         id: 5voa2qvfngn94
       allOf:
-        - type: object
-          properties:
+        - properties:
             desktop_type:
               type: string
               enum:
@@ -1579,9 +1594,17 @@ components:
                 - Notebook
                 - Tablet PC / Hybrid
                 - Ultrabook
+            os:
+              type: string
+            os_version:
+              type: string
+            type:
+              type: string
           required:
             - desktop_type
-        - $ref: '#/components/schemas/GenericDevice'
+            - os
+            - os_version
+            - type
       x-examples:
         example-1:
           desktop_type: Gaming PC
@@ -1589,6 +1612,7 @@ components:
           os_version: Windows 10 May 2021 Update (19043)
           type: desktop
       x-internal: true
+      type: object
     GenericDevice:
       title: Generic Device
       x-stoplight:
