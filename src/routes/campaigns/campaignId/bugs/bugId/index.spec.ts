@@ -224,38 +224,21 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
       })
     );
 
-    // {
-    //   id: 12999,
-    //   internal_id: 'UG12999',
-    //   campaign_id: 1,
-    //   title: 'Bug 12999 message',
-    //   step_by_step: 'Bug 12999 description',
-    //   expected_result: 'Bug 12999 expected result',
-    //   current_result: 'Bug 12999 actual result',
-    //   status: { id: 2, name: 'Approved' },
-    //   severity: { id: 1, name: 'LOW' },
-    //   type: { id: 1, name: 'Crash' },
-    //   replicability: { id: 1, name: 'Sometimes' },
-    //   application_section: { id: 1, title: 'Application section 1' },
-    //   created: '2021-10-19 12:57:57.0',
-    //   updated: '2021-10-19 12:57:57.0',
-    //   note: 'Bug 12999 notes',
-    //   device: {
-    //     manufacturer: 'Apple',
-    //     model: 'iPhone 13',
-    //     os: 'iOS',
-    //     os_version: 'iOS 16 (16)',
-    //     type: 'smartphone'
-    //   },
-    //   media: [
-    //     {
-    //       type: [Object],
-    //       url: 'https://example.com/bug_media_1.png',
-    //       creation_date: '2021-10-19 12:57:57.0'
-    //     }
-    //   ]
-    // }
-
     expect(response.body.media.length).toEqual(1);
+  });
+
+  // It should answer 400 if an invalid campaign id is provided
+  it("Should answer 400 if an invalid campaign id is provided", async () => {
+    const response = await request(app)
+      .get(`/campaigns/invalid/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer customer");
+    expect(response.status).toBe(400);
+  });
+
+  it("Should answer 400 if an invalid bug id is provided", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/invalid`)
+      .set("Authorization", "Bearer customer");
+    expect(response.status).toBe(400);
   });
 });
