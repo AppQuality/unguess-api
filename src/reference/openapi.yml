@@ -706,7 +706,7 @@ paths:
                         internal_id: string
                         campaign_id: 0
                         title: string
-                        step-by-step: string
+                        step_by_step: string
                         expected_result: string
                         current_result: string
                         status:
@@ -784,7 +784,7 @@ paths:
                     internal_id: string
                     campaign_id: 0
                     title: string
-                    step-by-step: string
+                    step_by_step: string
                     expected_result: string
                     current_result: string
                     status:
@@ -1402,7 +1402,7 @@ components:
         note:
           type: string
         device:
-          anyOf:
+          oneOf:
             - $ref: '#/components/schemas/Smartphone'
             - $ref: '#/components/schemas/Tablet'
             - $ref: '#/components/schemas/Desktop'
@@ -1517,6 +1517,8 @@ components:
               type: string
             type:
               type: string
+              enum:
+                - smartphone
           required:
             - manufacturer
             - model
@@ -1546,6 +1548,8 @@ components:
               type: string
             type:
               type: string
+              enum:
+                - tablet
           required:
             - manufacturer
             - model
@@ -1579,6 +1583,8 @@ components:
               type: string
             type:
               type: string
+              enum:
+                - desktop
           required:
             - desktop_type
             - os
