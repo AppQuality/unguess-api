@@ -2,8 +2,14 @@ import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { table as platformTable } from "@src/__mocks__/database/platforms";
-import Bugs from "@src/__mocks__/database/bugs";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
+import bugs, { BugsParams } from "@src/__mocks__/database/bugs";
+import bugMedia from "@src/__mocks__/database/bug_media";
+import bugSeverity from "@src/__mocks__/database/bug_severity";
+import bugReplicability from "@src/__mocks__/database/bug_replicability";
+import bugType from "@src/__mocks__/database/bug_type";
+import bugStatus from "@src/__mocks__/database/bug_status";
+import devices, { DeviceParams } from "@src/__mocks__/database/device";
 
 const customer_1 = {
   id: 999,
@@ -82,7 +88,7 @@ const campaign_3 = {
   project_id: project_1.id,
 };
 
-const bug_1 = {
+const bug_1: BugsParams = {
   id: 1,
   internal_id: "BUG1",
   message: "Bug 1 message",
@@ -103,6 +109,25 @@ const bug_1 = {
   wp_user_id: 1,
 };
 
+const device_1: DeviceParams = {
+  id: 12,
+  manufacturer: "Apple",
+  model: "iPhone 13",
+  platform_id: 2,
+  id_profile: 61042,
+  os_version: "iOS 16 (16)",
+  operating_system: "iOS",
+  form_factor: "Smartphone",
+};
+
+const bug_media_1 = {
+  id: 123,
+  bug_id: bug_1.id,
+  location: "https://example.com/bug_media_1.png",
+  type: "image",
+  uploaded: "2021-10-19 12:57:57.0",
+};
+
 describe("GET /campaigns/{cid}/bugs", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
@@ -119,9 +144,21 @@ describe("GET /campaigns/{cid}/bugs", () => {
           campaigns: [campaign_1, campaign_2, campaign_3],
         });
 
-        await Bugs.mock();
+        await bugs.mock();
+        await bugMedia.mock();
+        await bugSeverity.mock();
+        await bugReplicability.mock();
+        await bugType.mock();
+        await bugStatus.mock();
+        await devices.mock();
 
-        await Bugs.insert(bug_1);
+        await bugs.insert(bug_1);
+        await bugMedia.insert(bug_media_1);
+        await bugSeverity.addDefaultItems();
+        await bugReplicability.addDefaultItems();
+        await bugType.addDefaultItems();
+        await bugStatus.addDefaultItems();
+        await devices.insert(device_1);
       } catch (error) {
         console.error(error);
         reject(error);
@@ -136,7 +173,13 @@ describe("GET /campaigns/{cid}/bugs", () => {
       try {
         await dbAdapter.drop();
         await platformTable.drop();
-        await Bugs.dropMock();
+        await bugs.dropMock();
+        await bugMedia.dropMock();
+        await bugSeverity.dropMock();
+        await bugReplicability.dropMock();
+        await bugType.dropMock();
+        await bugStatus.dropMock();
+        await devices.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -197,8 +240,6 @@ describe("GET /campaigns/{cid}/bugs", () => {
     );
   });
 
-  // Check pagination params
-
   // Should return an error if the limit is not a number
   it("Should return an error if the limit is not a number", async () => {
     const response = await request(app)
@@ -209,16 +250,33 @@ describe("GET /campaigns/{cid}/bugs", () => {
   });
 
   // Should return an error if the start is not a number
+  it("Should return an error if the start is not a number", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?limit=1&start=abc`)
+      .set("Authorization", "Bearer customer");
 
-  // Check bug status
+    expect(response.status).toBe(400);
+  });
 
-  // Check bug severity
+  // Should return an error if the order is a not valid string
 
-  // Check bug type
+  // Should return an error if the order is not valid
 
-  // Check bug replicability
+  // Should return the results ordered by the order parameter
 
-  // Check bug device
+  // Should return an error if the orderBy is not valid
 
-  // Check bug application section
+  // Should return the results ordered by the orderBy parameter
+
+  // Should return an error if the filterBy is not valid
+
+  // Should return the results filtered by the filterBy parameter
+
+  // Should return the correct severity_name based on the severity_id
+
+  // Should return the correct bug_type_name based on the bug_type_id
+
+  // Should return the correct bug_replicability_name based on the bug_replicability_id
+
+  // Should return the correct device type
 });

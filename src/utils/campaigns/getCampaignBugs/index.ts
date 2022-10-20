@@ -63,8 +63,8 @@ const formattedBugs = async (bugs: any) => {
         name: "replicability", // TODO: get replicability name
       },
       created: bug.created,
-      updated: bug.updated,
-      note: bug.note,
+      ...(bug.updated && { updated: bug.updated }),
+      ...(bug.note && { note: bug.note }),
       device: {
         manufacturer: bug.manufacturer,
         model: bug.model,
@@ -77,7 +77,7 @@ const formattedBugs = async (bugs: any) => {
         title: bug.application_section,
       },
       ...(bug.duplicated_of_id && { duplicated_of_id: bug.duplicated_of_id }),
-      is_favorite: bug.is_favorite,
+      ...(bug.is_favorite && { is_favorite: bug.is_favorite }),
     });
   }
 
