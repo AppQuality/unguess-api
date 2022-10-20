@@ -1609,6 +1609,28 @@ components:
         type:
           type: string
       x-internal: true
+    BugTag:
+      title: BugTag
+      x-stoplight:
+        id: vart6bnw9c9fp
+      type: object
+      properties:
+        id:
+          type: integer
+        tag_id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        bug_id:
+          type: integer
+        campaign_id:
+          type: integer
+        creation_date:
+          type: string
+        is_visible_to_customer:
+          type: string
   securitySchemes:
     JWT:
       type: http
