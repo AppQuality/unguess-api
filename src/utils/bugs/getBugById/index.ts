@@ -51,8 +51,6 @@ export const getBugById = async (
     )
   );
 
-  console.log(">>> result", result);
-
   const bug = result[0];
 
   // Check if bug exists

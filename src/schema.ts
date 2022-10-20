@@ -466,7 +466,6 @@ export interface components {
       };
       /** Format: uri */
       url: string;
-      /** Format: date */
       creation_date: string;
     };
     /** Smartphone */
@@ -475,7 +474,8 @@ export interface components {
       model: string;
       os: string;
       os_version: string;
-      type: string;
+      /** @enum {string} */
+      type: "smartphone";
     };
     /** Tablet */
     Tablet: {
@@ -483,7 +483,8 @@ export interface components {
       model: string;
       os: string;
       os_version: string;
-      type: string;
+      /** @enum {string} */
+      type: "tablet";
     };
     /** Desktop */
     Desktop: {
@@ -496,7 +497,8 @@ export interface components {
         | "Ultrabook";
       os: string;
       os_version: string;
-      type: string;
+      /** @enum {string} */
+      type: "desktop";
     };
     /** Generic Device */
     GenericDevice: {

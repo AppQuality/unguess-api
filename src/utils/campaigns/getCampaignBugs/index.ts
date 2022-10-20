@@ -70,7 +70,7 @@ const formattedBugs = async (bugs: any) => {
         model: bug.model,
         os: bug.os,
         os_version: bug.os_version,
-        type: "device type", // TODO: get device type name
+        type: "smartphone", // TODO: get device type name
       },
       application_section: {
         id: bug.application_section_id,
