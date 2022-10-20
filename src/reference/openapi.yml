@@ -1627,10 +1627,22 @@ components:
           type: integer
         campaign_id:
           type: integer
+        author_wp_id:
+          type: integer
+        author_tid:
+          type: integer
         creation_date:
           type: string
         is_visible_to_customer:
           type: string
+      required:
+        - id
+        - tag_id
+        - name
+        - slug
+        - bug_id
+        - campaign_id
+        - creation_date
   securitySchemes:
     JWT:
       type: http
