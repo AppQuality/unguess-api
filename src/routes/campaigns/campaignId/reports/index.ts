@@ -1,6 +1,5 @@
 /** OPENAPI-ROUTE: get-campaigns-reports */
 import { Context } from "openapi-backend";
-import * as db from "@src/features/db";
 import { ERROR_MESSAGE } from "@src/utils/constants";
 import { getCampaign, getCampaignReports } from "@src/utils/campaigns";
 import { getProjectById } from "@src/utils/projects";

@@ -42,6 +42,7 @@ const defaultItem: BugsParams = {
   current_result: "???",
   campaign_id: 0,
   status_id: 0,
+  publish: 1,
   status_reason: "???",
   application_section: "???",
   note: "???",

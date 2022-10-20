@@ -13,34 +13,34 @@ export const getCampaign = async ({
   const result = await db.query(
     db.format(
       `SELECT 
-        c.id,  
-        c.start_date,  
-        c.end_date,
-        c.close_date,
-        c.title,
-        c.description,
-        c.base_bug_internal_id,
-        c.customer_title,
-        c.status_id,
-        c.is_public,
-        c.campaign_type_id,
-        c.project_id,
-        c.customer_id,
-        c.campaign_type AS bug_form,
-        ct.name AS campaign_type_name,
-        ct.type AS campaign_family_id,
-        ${withOutputs ? "o.bugs, o.media," : ""}
-        p.display_name 
-        FROM wp_appq_evd_campaign c 
-        JOIN wp_appq_project p ON c.project_id = p.id 
-        JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id
-        ${
-          withOutputs
-            ? "LEFT JOIN campaigns_outputs o ON (o.campaign_id = c.id)"
-            : ""
-        }
-        WHERE c.id = ?
-        GROUP BY c.id`,
+      c.id,  
+      c.start_date,  
+      c.end_date,
+      c.close_date,
+      c.title,
+      c.description,
+      c.base_bug_internal_id,
+      c.customer_title,
+      c.status_id,
+      c.is_public,
+      c.campaign_type_id,
+      c.project_id,
+      c.customer_id,
+      c.campaign_type AS bug_form,
+      ct.name AS campaign_type_name,
+      ct.type AS campaign_family_id,
+      ${withOutputs ? "o.bugs, o.media," : ""}
+      p.display_name 
+      FROM wp_appq_evd_campaign c 
+      JOIN wp_appq_project p ON c.project_id = p.id 
+      JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id
+      ${
+        withOutputs
+          ? "LEFT JOIN campaigns_outputs o ON (o.campaign_id = c.id)"
+          : ""
+      }
+      WHERE c.id = ?
+      GROUP BY c.id`,
       [campaignId]
     )
   );
@@ -58,7 +58,7 @@ export const getCampaign = async ({
   });
 
   // Get campaign outputs
-  const outputs = getCampaignOutputs(campaign);
+  const outputs = withOutputs ? getCampaignOutputs(campaign) : false;
 
   return {
     id: campaign.id,
