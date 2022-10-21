@@ -119,6 +119,7 @@ const bug_1: BugsParams = {
   model: device_1.model,
   os: device_1.operating_system,
   os_version: device_1.os_version,
+  severity_id: 1,
 };
 
 const bug_2: BugsParams = {
@@ -142,6 +143,7 @@ const bug_2: BugsParams = {
   model: device_1.model,
   os: device_1.operating_system,
   os_version: device_1.os_version,
+  severity_id: 2,
 };
 
 const bug_media_1 = {
@@ -242,7 +244,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
   // It should answer 200 with paginated bugs
   it("Should answer 200 with paginated bugs", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs?limit=1&start=0`)
+      .get(`/campaigns/${campaign_1.id}/bugs`)
       .set("Authorization", "Bearer customer");
 
     expect(response.status).toBe(200);
@@ -285,6 +287,15 @@ describe("GET /campaigns/{cid}/bugs", () => {
     );
   });
 
+  // Should return an empty items array if the campaign has not bugs
+  it("Should return Should return an empty items array if the campaign has not bugs", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_3.id}/bugs`)
+      .set("Authorization", "Bearer customer");
+
+    expect(response.body.items).toEqual([]);
+  });
+
   // Should return an error if the limit is not a number
   it("Should return an error if the limit is not a number", async () => {
     const response = await request(app)
@@ -301,6 +312,25 @@ describe("GET /campaigns/{cid}/bugs", () => {
       .set("Authorization", "Bearer customer");
 
     expect(response.status).toBe(400);
+  });
+
+  // Should return the items paginated by limit and start parameters
+  it("Should return the items paginated by limit and start parameters", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?limit=1&start=0`)
+      .set("Authorization", "Bearer customer");
+
+    expect(response.status).toBe(200);
+
+    expect(response.body).toMatchObject(
+      expect.objectContaining({
+        items: [
+          expect.objectContaining({
+            id: bug_2.id,
+          }),
+        ],
+      })
+    );
   });
 
   // Should order by the default order if the order is not valid or not provided
@@ -425,6 +455,27 @@ describe("GET /campaigns/{cid}/bugs", () => {
     const response = await request(app)
       .get(
         `/campaigns/${campaign_1.id}/bugs?limit=10&start=0&filterBy[is_favorite]=1`
+      )
+      .set("Authorization", "Bearer customer");
+
+    expect(response.status).toBe(200);
+
+    expect(response.body).toMatchObject(
+      expect.objectContaining({
+        items: [
+          expect.objectContaining({
+            id: bug_2.id,
+          }),
+        ],
+      })
+    );
+  });
+
+  // Should return the correct items in the correct order if all parameters are specified
+  it("Should return the correct items in the correct order if all parameters are specified", async () => {
+    const response = await request(app)
+      .get(
+        `/campaigns/${campaign_1.id}/bugs?limit=10&start=0&orderBy=severity_id&order=ASC&filterBy[is_favorite]=1`
       )
       .set("Authorization", "Bearer customer");
 

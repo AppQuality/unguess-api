@@ -1,9 +1,15 @@
 import * as db from "@src/features/db";
 import { getBugDevice } from "@src/utils/bugs/getBugDevice";
-import {
-  DEFAULT_ORDER_BY_PARAMETER,
-  DEFAULT_ORDER_PARAMETER,
-} from "@src/utils/constants";
+import { START_QUERY_PARAM_DEFAULT } from "@src/utils/constants";
+
+interface GetCampaignBugsArgs {
+  campaignId: number;
+  limit?: StoplightComponents["parameters"]["limit"];
+  start?: StoplightComponents["parameters"]["start"];
+  order?: string;
+  orderBy?: string;
+  filterBy?: BugsFilterBy;
+}
 
 interface BugsFilterBy {
   [key: string]: string | string[];
@@ -28,17 +34,11 @@ export const BugsFilterByValues = [
   "is_favorite",
 ];
 
-export const getCampaignBugs = async ({
-  campaignId,
-  order = DEFAULT_ORDER_PARAMETER,
-  orderBy = DEFAULT_ORDER_BY_PARAMETER,
-  filterBy,
-}: {
-  campaignId: number;
-  order?: string;
-  orderBy?: string;
-  filterBy?: BugsFilterBy;
-}): Promise<StoplightComponents["schemas"]["Bug"][] | false> => {
+export const getCampaignBugs = async (
+  args: GetCampaignBugsArgs
+): Promise<StoplightComponents["schemas"]["Bug"][] | false> => {
+  const { campaignId, limit, start, order, orderBy, filterBy } = args;
+
   const queryData: string[] = [];
   queryData.push(campaignId.toString());
 
@@ -103,6 +103,10 @@ export const getCampaignBugs = async ({
   }
 
   query += ` ORDER BY b.${orderBy} ${order}`;
+
+  if (limit) {
+    query += ` LIMIT ${limit} OFFSET ${start || START_QUERY_PARAM_DEFAULT}`;
+  }
 
   const formattedQuery = db.format(query, queryData);
 

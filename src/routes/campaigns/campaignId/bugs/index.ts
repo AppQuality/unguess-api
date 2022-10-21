@@ -73,6 +73,8 @@ export default async (
     // Get the campaign bugs
     const bugs = await getCampaignBugs({
       campaignId: cid,
+      limit,
+      start,
       ...(order && { order }),
       ...(orderBy && { orderBy }),
       ...(req.query.filterBy !== undefined && {
