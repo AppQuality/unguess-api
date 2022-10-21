@@ -113,12 +113,12 @@ const bug_1: BugsParams = {
   status_reason: "Bug 1 status reason",
   application_section: "Bug 1 application section",
   note: "Bug 1 note",
-  manufacturer: "Bug 1 manufacturer",
-  model: "Bug 1 model",
-  os: "Bug 1 os",
-  os_version: "Bug 1 os version",
   wp_user_id: 1,
   dev_id: device_1.id,
+  manufacturer: device_1.manufacturer,
+  model: device_1.model,
+  os: device_1.operating_system,
+  os_version: device_1.os_version,
 };
 
 const bug_2: BugsParams = {
@@ -135,13 +135,13 @@ const bug_2: BugsParams = {
   status_reason: "Bug 2 status reason",
   application_section: "Bug 2 application section",
   note: "Bug 2 note",
-  manufacturer: "Bug 2 manufacturer",
-  model: "Bug 2 model",
-  os: "Bug 2 os",
-  os_version: "Bug 2 os version",
   wp_user_id: 1,
   is_favorite: 1,
   dev_id: device_1.id,
+  manufacturer: device_1.manufacturer,
+  model: device_1.model,
+  os: device_1.operating_system,
+  os_version: device_1.os_version,
 };
 
 const bug_media_1 = {
@@ -265,6 +265,23 @@ describe("GET /campaigns/{cid}/bugs", () => {
           }),
         ],
       })
+    );
+
+    // If smartphone, the bug should have manufacturer and model
+    response.body.items.forEach(
+      (
+        bug: StoplightOperations["get-campaigns-single-bug"]["responses"]["200"]["content"]["application/json"]
+      ) => {
+        expect(bug).toMatchObject(
+          expect.objectContaining({
+            device: expect.objectContaining({
+              manufacturer: device_1.manufacturer,
+              model: device_1.model,
+              type: "smartphone",
+            }),
+          })
+        );
+      }
     );
   });
 
@@ -423,12 +440,4 @@ describe("GET /campaigns/{cid}/bugs", () => {
       })
     );
   });
-
-  // Should return the correct severity_name based on the severity_id
-
-  // Should return the correct bug_type_name based on the bug_type_id
-
-  // Should return the correct bug_replicability_name based on the bug_replicability_id
-
-  // Should return the correct device type
 });

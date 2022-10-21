@@ -19,8 +19,6 @@ export const getBugDevice = async (
     throw { ...error, message: "GET_BUG_DEVICE_ERROR: invalid bug" };
   }
 
-  console.log(bug.form_factor);
-
   switch (bug.form_factor.toLocaleLowerCase()) {
     case "smartphone":
       return getSmartphone(bug);
