@@ -8,7 +8,6 @@ type BugWithMedia =
 export const getBugById = async (
   bugId: number
 ): Promise<BugWithMedia | false> => {
-  console.log("getBugById");
   const result = await db.query(
     db.format(
       `SELECT b.id,
