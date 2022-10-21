@@ -1,13 +1,18 @@
 /** OPENAPI-ROUTE: get-campaigns-cid-bugs */
 import { Context } from "openapi-backend";
 import {
+  DEFAULT_ORDER_BY_PARAMETER,
+  DEFAULT_ORDER_PARAMETER,
   ERROR_MESSAGE,
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
 } from "@src/utils/constants";
 import { getCampaign, getCampaignBugs } from "@src/utils/campaigns";
 import { getProjectById } from "@src/utils/projects";
-import { BugsOrder, BugsOrderBy } from "@src/utils/campaigns/getCampaignBugs";
+import {
+  BugsOrderByValues,
+  BugsOrderValues,
+} from "@src/utils/campaigns/getCampaignBugs";
 import { paginateItems } from "@src/utils/paginations";
 
 export default async (
@@ -22,28 +27,31 @@ export default async (
     error: true,
   } as StoplightComponents["schemas"]["Error"];
 
+  // TODO: check all request params with a util function
+
   let cid = parseInt(c.request.params.cid as string);
 
   const limit = c.request.query.limit
     ? parseInt(c.request.query.limit as string)
     : (LIMIT_QUERY_PARAM_DEFAULT as StoplightComponents["parameters"]["limit"]);
+
   const start = c.request.query.start
     ? parseInt(c.request.query.start as string)
     : (START_QUERY_PARAM_DEFAULT as StoplightComponents["parameters"]["start"]);
 
   const order =
     c.request.query.order &&
-    ["ASC", "DESC"].includes((c.request.query.order as string).toUpperCase())
-      ? ((c.request.query.order as string).toUpperCase() as BugsOrder)
-      : "ASC";
+    BugsOrderValues.includes((c.request.query.order as string).toUpperCase())
+      ? (c.request.query.order as string).toUpperCase()
+      : DEFAULT_ORDER_PARAMETER;
 
   const orderBy =
     c.request.query.orderBy &&
-    ["id", "company", "tokens"].includes(
+    BugsOrderByValues.includes(
       (c.request.query.orderBy as string).toLowerCase()
     )
-      ? ((c.request.query.orderBy as string).toLowerCase() as BugsOrderBy)
-      : "id";
+      ? (c.request.query.orderBy as string).toLowerCase()
+      : DEFAULT_ORDER_BY_PARAMETER;
 
   res.status_code = 200;
 
@@ -63,7 +71,14 @@ export default async (
     });
 
     // Get the campaign bugs
-    const bugs = await getCampaignBugs({ campaignId: cid });
+    const bugs = await getCampaignBugs({
+      campaignId: cid,
+      ...(order && { order }),
+      ...(orderBy && { orderBy }),
+      ...(req.query.filterBy !== undefined && {
+        filterBy: req.query.filterBy as { [key: string]: string | string[] },
+      }),
+    });
 
     if (bugs && bugs.length) {
       return await paginateItems({

@@ -88,6 +88,17 @@ const campaign_3 = {
   project_id: project_1.id,
 };
 
+const device_1: DeviceParams = {
+  id: 12,
+  manufacturer: "Apple",
+  model: "iPhone 13",
+  platform_id: 2,
+  id_profile: 61042,
+  os_version: "iOS 16 (16)",
+  operating_system: "iOS",
+  form_factor: "Smartphone",
+};
+
 const bug_1: BugsParams = {
   id: 1,
   internal_id: "BUG1",
@@ -107,17 +118,30 @@ const bug_1: BugsParams = {
   os: "Bug 1 os",
   os_version: "Bug 1 os version",
   wp_user_id: 1,
+  dev_id: device_1.id,
 };
 
-const device_1: DeviceParams = {
-  id: 12,
-  manufacturer: "Apple",
-  model: "iPhone 13",
-  platform_id: 2,
-  id_profile: 61042,
-  os_version: "iOS 16 (16)",
-  operating_system: "iOS",
-  form_factor: "Smartphone",
+const bug_2: BugsParams = {
+  id: 2,
+  internal_id: "BUG2",
+  message: "Bug 2 message",
+  description: "Bug 2 description",
+  expected_result: "Bug 2 expected result",
+  current_result: "Bug 2 current result",
+  campaign_id: campaign_1.id,
+  bug_type_id: 1,
+  bug_replicability_id: 1,
+  status_id: 1,
+  status_reason: "Bug 2 status reason",
+  application_section: "Bug 2 application section",
+  note: "Bug 2 note",
+  manufacturer: "Bug 2 manufacturer",
+  model: "Bug 2 model",
+  os: "Bug 2 os",
+  os_version: "Bug 2 os version",
+  wp_user_id: 1,
+  is_favorite: 1,
+  dev_id: device_1.id,
 };
 
 const bug_media_1 = {
@@ -153,6 +177,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
         await devices.mock();
 
         await bugs.insert(bug_1);
+        await bugs.insert(bug_2);
         await bugMedia.insert(bug_media_1);
         await bugSeverity.addDefaultItems();
         await bugReplicability.addDefaultItems();
@@ -227,11 +252,14 @@ describe("GET /campaigns/{cid}/bugs", () => {
     expect(response.body).toHaveProperty("size");
     expect(response.body).toHaveProperty("total");
 
-    expect(response.body.items).toHaveLength(1);
+    expect(response.body.items).toHaveLength(2);
 
     expect(response.body).toMatchObject(
       expect.objectContaining({
         items: [
+          expect.objectContaining({
+            id: bug_2.id,
+          }),
           expect.objectContaining({
             id: bug_1.id,
           }),
@@ -252,25 +280,149 @@ describe("GET /campaigns/{cid}/bugs", () => {
   // Should return an error if the start is not a number
   it("Should return an error if the start is not a number", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs?limit=1&start=abc`)
+      .get(`/campaigns/${campaign_1.id}/bugs?limit=10&start=abc`)
       .set("Authorization", "Bearer customer");
 
     expect(response.status).toBe(400);
   });
 
-  // Should return an error if the order is a not valid string
+  // Should order by the default order if the order is not valid or not provided
+  it("Should order by the default order if the order is not valid or not provided", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?limit=10&start=0&order=abc`)
+      .set("Authorization", "Bearer customer");
 
-  // Should return an error if the order is not valid
+    expect(response.status).toBe(200);
+
+    expect(response.body).toMatchObject(
+      expect.objectContaining({
+        items: [
+          expect.objectContaining({
+            id: bug_2.id,
+          }),
+          expect.objectContaining({
+            id: bug_1.id,
+          }),
+        ],
+      })
+    );
+  });
 
   // Should return the results ordered by the order parameter
+  it("Should return the results ordered by the order parameter", async () => {
+    // If orderBy is not specified, the default order is by id
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?limit=10&start=0&order=ASC`)
+      .set("Authorization", "Bearer customer");
 
-  // Should return an error if the orderBy is not valid
+    expect(response.status).toBe(200);
+
+    expect(response.body).toMatchObject(
+      expect.objectContaining({
+        items: [
+          expect.objectContaining({
+            id: bug_1.id,
+          }),
+          expect.objectContaining({
+            id: bug_2.id,
+          }),
+        ],
+      })
+    );
+  });
+
+  // Should order by the default orderBy if the orderBy is not valid or not provided
+  it("Should order by the default orderBy if the orderBy is not valid or not provided", async () => {
+    const response = await request(app)
+      .get(
+        `/campaigns/${campaign_1.id}/bugs?limit=10&start=0&order=ASC&orderBy=abc`
+      )
+      .set("Authorization", "Bearer customer");
+
+    expect(response.status).toBe(200);
+
+    expect(response.body).toMatchObject(
+      expect.objectContaining({
+        items: [
+          expect.objectContaining({
+            id: bug_1.id,
+          }),
+          expect.objectContaining({
+            id: bug_2.id,
+          }),
+        ],
+      })
+    );
+  });
 
   // Should return the results ordered by the orderBy parameter
+  it("Should return the results ordered by the orderBy parameter", async () => {
+    const response = await request(app)
+      .get(
+        `/campaigns/${campaign_1.id}/bugs?limit=10&start=0&order=DESC&orderBy=is_favorite`
+      )
+      .set("Authorization", "Bearer customer");
 
-  // Should return an error if the filterBy is not valid
+    expect(response.status).toBe(200);
+
+    expect(response.body).toMatchObject(
+      expect.objectContaining({
+        items: [
+          expect.objectContaining({
+            id: bug_2.id,
+          }),
+          expect.objectContaining({
+            id: bug_1.id,
+          }),
+        ],
+      })
+    );
+  });
+
+  // Should return the normal results if the filterBy is not accepted
+  it("Should return an error if the filterBy is not valid", async () => {
+    const response = await request(app)
+      .get(
+        `/campaigns/${campaign_1.id}/bugs?limit=10&start=0&filterBy[abc]=abc`
+      )
+      .set("Authorization", "Bearer customer");
+
+    expect(response.status).toBe(200);
+
+    expect(response.body).toMatchObject(
+      expect.objectContaining({
+        items: [
+          expect.objectContaining({
+            id: bug_2.id,
+          }),
+          expect.objectContaining({
+            id: bug_1.id,
+          }),
+        ],
+      })
+    );
+  });
 
   // Should return the results filtered by the filterBy parameter
+  it("Should return the results filtered by the filterBy parameter", async () => {
+    const response = await request(app)
+      .get(
+        `/campaigns/${campaign_1.id}/bugs?limit=10&start=0&filterBy[is_favorite]=1`
+      )
+      .set("Authorization", "Bearer customer");
+
+    expect(response.status).toBe(200);
+
+    expect(response.body).toMatchObject(
+      expect.objectContaining({
+        items: [
+          expect.objectContaining({
+            id: bug_2.id,
+          }),
+        ],
+      })
+    );
+  });
 
   // Should return the correct severity_name based on the severity_id
 

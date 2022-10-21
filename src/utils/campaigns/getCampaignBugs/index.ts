@@ -1,30 +1,112 @@
 import * as db from "@src/features/db";
+import { getBugDevice } from "@src/utils/bugs/getBugDevice";
+import {
+  DEFAULT_ORDER_BY_PARAMETER,
+  DEFAULT_ORDER_PARAMETER,
+} from "@src/utils/constants";
 
-export type BugsOrderBy =
-  | "id"
-  | "status_id"
-  | "severity_id"
-  | "created"
-  | "updated"
-  | "last_seen"
-  | "is_duplicated"
-  | "is_favorite";
-export type BugsOrder = "ASC" | "DESC";
+interface BugsFilterBy {
+  [key: string]: string | string[];
+}
+
+export const BugsOrderByValues = [
+  "id",
+  "status_id",
+  "severity_id",
+  "created",
+  "updated",
+  "last_seen",
+  "is_duplicated",
+  "is_favorite",
+];
+export const BugsOrderValues = ["ASC", "DESC"];
+export const BugsFilterByValues = [
+  "id",
+  "internal_id",
+  "campaign_id",
+  "is_duplicated",
+  "is_favorite",
+];
 
 export const getCampaignBugs = async ({
   campaignId,
+  order = DEFAULT_ORDER_PARAMETER,
+  orderBy = DEFAULT_ORDER_BY_PARAMETER,
+  filterBy,
 }: {
   campaignId: number;
+  order?: string;
+  orderBy?: string;
+  filterBy?: BugsFilterBy;
 }): Promise<StoplightComponents["schemas"]["Bug"][] | false> => {
-  const result = await db.query(
-    db.format(
-      `SELECT b.*
-          FROM wp_appq_evd_bug b 
-          WHERE b.campaign_id = ?
-          GROUP BY b.id`,
-      [campaignId]
-    )
-  );
+  const queryData: string[] = [];
+  queryData.push(campaignId.toString());
+
+  let query = `SELECT 
+    b.id,
+    b.internal_id,
+    b.campaign_id,
+    b.message     AS title,
+    b.description,
+    b.expected_result,
+    b.current_result,
+    b.status_id,
+    status.name   AS status_name,
+    s.name        AS severity,
+    t.name        AS type,
+    r.name        AS replicability,
+    b.created,
+    b.updated,
+    b.note,
+    device.form_factor,
+    device.pc_type,
+    b.manufacturer,
+    b.model,
+    b.os,
+    b.os_version,
+    b.application_section,
+    b.application_section_id,
+    b.is_duplicated,
+    b.duplicated_of_id,
+    b.is_favorite,
+    b.bug_replicability_id,
+    b.bug_type_id,
+    b.severity_id
+  FROM wp_appq_evd_bug b
+  JOIN wp_appq_evd_severity s ON (b.severity_id = s.id)
+  JOIN wp_appq_evd_bug_type t ON (b.bug_type_id = t.id)
+  JOIN wp_appq_evd_bug_replicability r ON (b.bug_replicability_id = r.id)
+  JOIN wp_appq_evd_bug_status status ON (b.status_id = status.id)
+  LEFT JOIN wp_crowd_appq_device device ON (b.dev_id = device.id)
+  WHERE b.campaign_id = ?`;
+
+  if (filterBy) {
+    let acceptedFilters = BugsFilterByValues.filter((f) =>
+      Object.keys(filterBy).includes(f)
+    );
+
+    // Check filters
+    if (acceptedFilters.length) {
+      acceptedFilters = acceptedFilters.map((k) => {
+        const v = filterBy[k];
+        if (typeof v === "string") {
+          queryData.push(v);
+          return `b.${k} = ?`;
+        } else if (Number.isInteger(v)) {
+          queryData.push(v.toString());
+          return `b.${k} = ?`;
+        }
+        return "";
+      });
+      query += " AND " + Object.values(acceptedFilters).join(" AND ");
+    }
+  }
+
+  query += ` ORDER BY b.${orderBy} ${order}`;
+
+  const formattedQuery = db.format(query, queryData);
+
+  const result = await db.query(formattedQuery);
 
   const bugs = result;
 
@@ -32,52 +114,51 @@ export const getCampaignBugs = async ({
     return false;
   }
 
-  return (await formattedBugs(bugs)) as StoplightComponents["schemas"]["Bug"][];
+  const formattedBugs = await formatBugs(bugs);
+
+  return formattedBugs as StoplightComponents["schemas"]["Bug"][];
 };
 
-const formattedBugs = async (bugs: any) => {
+const formatBugs = async (bugs: any) => {
   let results: any = [];
   for (const bug of bugs) {
+    // Get bug device
+    const device = await getBugDevice(bug);
+
     results.push({
       id: bug.id,
       internal_id: bug.internal_id,
       campaign_id: bug.campaign_id,
-      title: bug.message,
+      title: bug.title,
       step_by_step: bug.description,
       expected_result: bug.expected_result,
       current_result: bug.current_result,
       status: {
         id: bug.status_id,
-        name: bug.status_reason,
+        name: bug.status_name,
       },
       severity: {
         id: bug.severity_id,
-        name: "severity", // TODO: get severity name
+        name: bug.severity,
       },
       type: {
         id: bug.bug_type_id,
-        name: "bug type", // TODO: get bug type name
+        name: bug.type,
       },
       replicability: {
         id: bug.bug_replicability_id,
-        name: "replicability", // TODO: get replicability name
-      },
-      created: bug.created,
-      ...(bug.updated && { updated: bug.updated }),
-      ...(bug.note && { note: bug.note }),
-      device: {
-        manufacturer: bug.manufacturer,
-        model: bug.model,
-        os: bug.os,
-        os_version: bug.os_version,
-        type: "smartphone", // TODO: get device type name
+        name: bug.replicability,
       },
       application_section: {
         id: bug.application_section_id,
         title: bug.application_section,
       },
+      created: bug.created,
+      ...(bug.updated && { updated: bug.updated }),
+      note: bug.note,
+      device,
       ...(bug.duplicated_of_id && { duplicated_of_id: bug.duplicated_of_id }),
-      ...(bug.is_favorite && { is_favorite: bug.is_favorite }),
+      is_favorite: bug.is_favorite,
     });
   }
 
