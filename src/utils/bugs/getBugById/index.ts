@@ -1,4 +1,5 @@
 import * as db from "@src/features/db";
+import { getBugAdditional } from "../getBugAdditional";
 import { getBugDevice } from "../getBugDevice";
 import { getBugMedia } from "../getBugMedia";
 import { getBugTags } from "../getBugTags";
@@ -67,7 +68,8 @@ export const getBugById = async (
   // Get tags
   const tags = await getBugTags(bugId);
 
-  // Get bug additional fields (TODO)
+  // Get bug additional fields
+  const additional = await getBugAdditional(bugId);
 
   return {
     id: bug.id,
@@ -103,5 +105,6 @@ export const getBugById = async (
     device,
     media: media || [],
     tags: tags || [],
+    additional_fields: additional || [],
   };
 };

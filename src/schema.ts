@@ -1136,7 +1136,7 @@ export interface operations {
           "application/json": components["schemas"]["Bug"] & {
             media?: components["schemas"]["BugMedia"][];
             tags?: components["schemas"]["BugTag"][];
-            additional_fields?: unknown[];
+            additional_fields?: components["schemas"]["BugAdditionalField"][];
           };
         };
       };
