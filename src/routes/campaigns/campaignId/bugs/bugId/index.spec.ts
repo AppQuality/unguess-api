@@ -10,6 +10,9 @@ import bugReplicability from "@src/__mocks__/database/bug_replicability";
 import bugType from "@src/__mocks__/database/bug_type";
 import bugStatus from "@src/__mocks__/database/bug_status";
 import devices, { DeviceParams } from "@src/__mocks__/database/device";
+import tags from "@src/__mocks__/database/bug_tags";
+import additionalField from "@src/__mocks__/database/campaign_additional_field";
+import additionalFieldData from "@src/__mocks__/database/campaign_additional_field_data";
 
 const customer_1 = {
   id: 999,
@@ -163,6 +166,9 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
         await bugStatus.mock();
         await bugMedia.mock();
         await devices.mock();
+        await tags.mock();
+        await additionalField.mock();
+        await additionalFieldData.mock();
 
         await bugs.insert(bug_1);
         await bugs.insert(bug_2);
@@ -194,6 +200,9 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
         await bugStatus.dropMock();
         await bugMedia.dropMock();
         await devices.dropMock();
+        await tags.dropMock();
+        await additionalField.dropMock();
+        await additionalFieldData.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);
