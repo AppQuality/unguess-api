@@ -1,4 +1,5 @@
 import * as db from "@src/features/db";
+import { ERROR_MESSAGE } from "@src/utils/constants";
 import { getBugAdditional } from "../getBugAdditional";
 import { getBugDevice } from "../getBugDevice";
 import { getBugMedia } from "../getBugMedia";
@@ -7,9 +8,13 @@ import { getBugTags } from "../getBugTags";
 type BugWithMedia =
   StoplightOperations["get-campaigns-single-bug"]["responses"]["200"]["content"]["application/json"];
 
-export const getBugById = async (
-  bugId: number
-): Promise<BugWithMedia | false> => {
+export const getBugById = async (bugId: number): Promise<BugWithMedia> => {
+  const error = {
+    code: 500,
+    message: ERROR_MESSAGE,
+    error: true,
+  } as StoplightComponents["schemas"]["Error"];
+
   const result = await db.query(
     db.format(
       `SELECT b.id,
@@ -56,7 +61,7 @@ export const getBugById = async (
 
   // Check if bug exists
   if (!bug) {
-    return false;
+    throw { ...error, message: "GET_BUG_ERROR: invalid bug" };
   }
 
   // Get bug device
