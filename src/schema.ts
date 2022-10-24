@@ -506,6 +506,19 @@ export interface components {
       os_version?: string;
       type?: string;
     };
+    /** BugTag */
+    BugTag: {
+      id: number;
+      tag_id: number;
+      name: string;
+      slug: string;
+      bug_id: number;
+      campaign_id: number;
+      author_wp_id?: number;
+      author_tid?: number;
+      creation_date: string;
+      is_visible_to_customer?: number;
+    };
   };
   responses: {
     /** Example response */
