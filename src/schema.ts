@@ -517,7 +517,7 @@ export interface components {
       author_wp_id?: number;
       author_tid?: number;
       creation_date: string;
-      is_visible_to_customer?: string;
+      is_visible_to_customer?: number;
     };
     /**
      * BugAdditionalField

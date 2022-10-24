@@ -1642,7 +1642,7 @@ components:
         creation_date:
           type: string
         is_visible_to_customer:
-          type: string
+          type: integer
       required:
         - id
         - tag_id
