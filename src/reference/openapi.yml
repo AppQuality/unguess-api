@@ -398,9 +398,10 @@ paths:
               examples:
                 example-1:
                   value:
-                    id: 123
-                    name: New project name
+                    id: 0
+                    name: string
                     campaigns_count: 0
+                    workspaceId: 0
         '400':
           $ref: '#/components/responses/Error'
         '401':
@@ -428,7 +429,7 @@ paths:
             examples:
               example-1:
                 value:
-                  display_name: New project name
+                  display_name: string
   /campaigns:
     post:
       summary: Create campaign
@@ -671,6 +672,171 @@ paths:
         - $ref: '#/components/parameters/filterBy'
         - $ref: '#/components/parameters/order'
         - $ref: '#/components/parameters/orderBy'
+  '/campaigns/{cid}/bugs':
+    parameters:
+      - $ref: '#/components/parameters/cid'
+    get:
+      summary: Get Campaigns Bugs
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Bug'
+                  start:
+                    type: integer
+                  limit:
+                    type: integer
+                  size:
+                    type: integer
+                  total:
+                    type: integer
+              examples:
+                example-1:
+                  value:
+                    items:
+                      - id: 0
+                        internal_id: string
+                        campaign_id: 0
+                        title: string
+                        step_by_step: string
+                        expected_result: string
+                        current_result: string
+                        status:
+                          id: 0
+                          name: string
+                        severity:
+                          id: 0
+                          name: string
+                        type:
+                          id: 0
+                          name: string
+                        replicability:
+                          id: 0
+                          name: string
+                        created: '2019-08-24T14:15:22Z'
+                        updated: '2019-08-24T14:15:22Z'
+                        note: string
+                        device:
+                          desktop_type: Gaming PC
+                          os: Windows
+                          os_version: Windows 10 May 2021 Update (19043)
+                          type: desktop
+                        application_section:
+                          id: 0
+                          title: string
+                        duplicated_of_id: 0
+                        is_favorite: 0
+                    start: 0
+                    limit: 0
+                    size: 0
+                    total: 0
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-bugs
+      description: ''
+      security:
+        - JWT: []
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/order'
+        - $ref: '#/components/parameters/orderBy'
+        - $ref: '#/components/parameters/filterBy'
+  '/campaigns/{cid}/bugs/{bid}':
+    parameters:
+      - $ref: '#/components/parameters/cid'
+      - $ref: '#/components/parameters/bid'
+    get:
+      summary: Get Campaigns Single Bug
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Bug'
+                  - type: object
+                    properties:
+                      media:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/BugMedia'
+                      tags:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/BugTag'
+                      additional_fields:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/BugAdditionalField'
+              examples:
+                example-1:
+                  value:
+                    id: 0
+                    internal_id: string
+                    campaign_id: 0
+                    title: string
+                    step_by_step: string
+                    expected_result: string
+                    current_result: string
+                    status:
+                      id: 0
+                      name: string
+                    severity:
+                      id: 0
+                      name: string
+                    type:
+                      id: 0
+                      name: string
+                    replicability:
+                      id: 0
+                      name: string
+                    created: '2019-08-24T14:15:22Z'
+                    updated: '2019-08-24T14:15:22Z'
+                    note: string
+                    device:
+                      desktop_type: Gaming PC
+                      os: Windows
+                      os_version: Windows 10 May 2021 Update (19043)
+                      type: desktop
+                    application_section:
+                      id: 0
+                      title: string
+                    duplicated_of_id: 0
+                    is_favorite: 0
+                    media:
+                      - type:
+                          type: video
+                          extension: string
+                        url: 'http://example.com'
+                        creation_date: '2019-08-24'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-single-bug
+      security:
+        - JWT: []
 components:
   schemas:
     User:
@@ -1207,12 +1373,337 @@ components:
     Output:
       type: string
       title: Output
-      x-stoplight:
-        id: 319v4cufuqnsu
       enum:
         - bugs
         - media
       description: campaign output item
+    Bug:
+      title: Bug
+      type: object
+      properties:
+        id:
+          type: integer
+        internal_id:
+          type: string
+        campaign_id:
+          type: integer
+        title:
+          type: string
+        step_by_step:
+          type: string
+        expected_result:
+          type: string
+        current_result:
+          type: string
+        status:
+          $ref: '#/components/schemas/BugStatus'
+        severity:
+          $ref: '#/components/schemas/BugSeverity'
+        type:
+          $ref: '#/components/schemas/BugType'
+        replicability:
+          $ref: '#/components/schemas/BugReplicability'
+        created:
+          type: string
+        updated:
+          type: string
+        note:
+          type: string
+        device:
+          oneOf:
+            - $ref: '#/components/schemas/Smartphone'
+            - $ref: '#/components/schemas/Tablet'
+            - $ref: '#/components/schemas/Desktop'
+        application_section:
+          type: object
+          properties:
+            id:
+              type: integer
+            title:
+              type: string
+        duplicated_of_id:
+          type: integer
+        is_favorite:
+          type: integer
+      required:
+        - id
+        - internal_id
+        - campaign_id
+        - title
+        - step_by_step
+        - expected_result
+        - current_result
+        - status
+        - severity
+        - type
+        - replicability
+        - created
+        - device
+        - application_section
+    BugSeverity:
+      title: BugSeverity
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
+    BugType:
+      title: BugType
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
+    BugReplicability:
+      title: BugReplicability
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
+    BugStatus:
+      title: BugStatus
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
+    BugMedia:
+      title: BugMedia
+      type: object
+      properties:
+        type:
+          type: object
+          required:
+            - type
+            - extension
+          properties:
+            type:
+              type: string
+              enum:
+                - video
+                - image
+                - other
+            extension:
+              type: string
+        url:
+          type: string
+          format: uri
+        creation_date:
+          type: string
+      required:
+        - type
+        - url
+        - creation_date
+    Smartphone:
+      title: Smartphone
+      allOf:
+        - properties:
+            manufacturer:
+              type: string
+            model:
+              type: string
+            os:
+              type: string
+            os_version:
+              type: string
+            type:
+              type: string
+              enum:
+                - smartphone
+          required:
+            - manufacturer
+            - model
+            - os
+            - os_version
+            - type
+      x-examples:
+        example-1:
+          manufacturer: Samsung
+          model: Galaxy S22 Ultra
+          os: Android
+          os_version: '13'
+          type: smartphone
+      x-internal: true
+      type: object
+    Tablet:
+      title: Tablet
+      allOf:
+        - properties:
+            manufacturer:
+              type: string
+            model:
+              type: string
+            os:
+              type: string
+            os_version:
+              type: string
+            type:
+              type: string
+              enum:
+                - tablet
+          required:
+            - manufacturer
+            - model
+            - os
+            - os_version
+            - type
+      x-examples:
+        example-1:
+          manufacturer: Samsung
+          model: Galaxy Tab
+          os: Android
+          os_version: '12'
+          type: tablet
+      x-internal: true
+      type: object
+    Desktop:
+      title: Desktop
+      allOf:
+        - properties:
+            desktop_type:
+              type: string
+              enum:
+                - Desktop
+                - Gaming PC
+                - Notebook
+                - Tablet PC / Hybrid
+                - Ultrabook
+            os:
+              type: string
+            os_version:
+              type: string
+            type:
+              type: string
+              enum:
+                - desktop
+          required:
+            - desktop_type
+            - os
+            - os_version
+            - type
+      x-examples:
+        example-1:
+          desktop_type: Gaming PC
+          os: Windows
+          os_version: Windows 10 May 2021 Update (19043)
+          type: desktop
+      x-internal: true
+      type: object
+    GenericDevice:
+      title: Generic Device
+      type: object
+      properties:
+        os:
+          type: string
+        os_version:
+          type: string
+        type:
+          type: string
+      x-internal: true
+    BugTag:
+      title: BugTag
+      x-stoplight:
+        id: vart6bnw9c9fp
+      type: object
+      properties:
+        id:
+          type: integer
+        tag_id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        bug_id:
+          type: integer
+        campaign_id:
+          type: integer
+        author_wp_id:
+          type: integer
+        author_tid:
+          type: integer
+        creation_date:
+          type: string
+        is_visible_to_customer:
+          type: integer
+      required:
+        - id
+        - tag_id
+        - name
+        - slug
+        - bug_id
+        - campaign_id
+        - creation_date
+    BugAdditionalField:
+      title: BugAdditionalField
+      x-stoplight:
+        id: t3gizkq02kn25
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            value:
+              type: string
+          required:
+            - id
+            - name
+            - value
+        - oneOf:
+            - $ref: '#/components/schemas/BugAdditionalFieldRegex'
+            - $ref: '#/components/schemas/BugAdditionalFieldSelect'
+      description: 'Describe any additional info '
+    BugAdditionalFieldRegex:
+      title: BugAdditionalFieldRegex
+      x-stoplight:
+        id: t3gizkq02kn25
+      type: object
+      properties:
+        validation:
+          type: string
+        kind:
+          type: string
+          enum:
+            - regex
+      required:
+        - validation
+        - kind
+    BugAdditionalFieldSelect:
+      title: BugAdditionalFieldSelect
+      x-stoplight:
+        id: t3gizkq02kn25
+      type: object
+      properties:
+        options:
+          type: array
+          items:
+            type: string
+        kind:
+          type: string
+          enum:
+            - select
+      required:
+        - options
+        - kind
   securitySchemes:
     JWT:
       type: http
@@ -1281,6 +1772,13 @@ components:
       schema:
         type: number
       description: Campaign id
+    bid:
+      name: bid
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Defines an identifier for the bug object (BUG ID)
   requestBodies:
     Credentials:
       content:

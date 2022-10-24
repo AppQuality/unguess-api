@@ -1,8 +1,9 @@
-/** OPENAPI-ROUTE: get-campaign */
+/** OPENAPI-ROUTE: get-campaigns-single-bug */
 import { Context } from "openapi-backend";
 import { ERROR_MESSAGE } from "@src/utils/constants";
 import { getCampaign } from "@src/utils/campaigns";
 import { getProjectById } from "@src/utils/projects";
+import { getBugById } from "@src/utils/bugs";
 
 export default async (
   c: Context,
@@ -15,16 +16,21 @@ export default async (
     message: ERROR_MESSAGE,
     error: true,
   } as StoplightComponents["schemas"]["Error"];
-
-  let cid = parseInt(c.request.params.cid as string);
+  const campaign_id = parseInt(c.request.params.cid as string);
+  const bug_id = parseInt(c.request.params.bid as string);
 
   res.status_code = 200;
 
   try {
+    if (!campaign_id || !bug_id) {
+      error.code = 400;
+      throw error;
+    }
+
     // Check if the campaign exists
-    let campaign = await getCampaign({
-      campaignId: cid,
-      withOutputs: true,
+    const campaign = await getCampaign({
+      campaignId: campaign_id,
+      withOutputs: false,
     });
 
     if (!campaign) {
@@ -38,7 +44,9 @@ export default async (
       user: user,
     });
 
-    return campaign as StoplightComponents["schemas"]["CampaignWithOutput"];
+    const bug = await getBugById(bug_id);
+
+    return bug as StoplightOperations["get-campaigns-single-bug"]["responses"]["200"]["content"]["application/json"];
   } catch (e: any) {
     if (e.code) {
       error.code = e.code;
@@ -46,6 +54,10 @@ export default async (
     } else {
       error.code = 500;
       res.status_code = 500;
+    }
+
+    if (e.message) {
+      error.message = e.message;
     }
 
     return error;

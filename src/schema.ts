@@ -129,6 +129,26 @@ export interface paths {
     /** Retrieve all available use case templates */
     get: operations["get-templates"];
   };
+  "/campaigns/{cid}/bugs": {
+    get: operations["get-campaigns-cid-bugs"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+      };
+    };
+  };
+  "/campaigns/{cid}/bugs/{bid}": {
+    get: operations["get-campaigns-single-bug"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+        /** Defines an identifier for the bug object (BUG ID) */
+        bid: components["parameters"]["bid"];
+      };
+    };
+  };
 }
 
 export interface components {
@@ -390,6 +410,139 @@ export interface components {
      * @enum {string}
      */
     Output: "bugs" | "media";
+    /** Bug */
+    Bug: {
+      id: number;
+      internal_id: string;
+      campaign_id: number;
+      title: string;
+      step_by_step: string;
+      expected_result: string;
+      current_result: string;
+      status: components["schemas"]["BugStatus"];
+      severity: components["schemas"]["BugSeverity"];
+      type: components["schemas"]["BugType"];
+      replicability: components["schemas"]["BugReplicability"];
+      created: string;
+      updated?: string;
+      note?: string;
+      device:
+        | components["schemas"]["Smartphone"]
+        | components["schemas"]["Tablet"]
+        | components["schemas"]["Desktop"];
+      application_section: {
+        id?: number;
+        title?: string;
+      };
+      duplicated_of_id?: number;
+      is_favorite?: number;
+    };
+    /** BugSeverity */
+    BugSeverity: {
+      id: number;
+      name: string;
+    };
+    /** BugType */
+    BugType: {
+      id: number;
+      name: string;
+    };
+    /** BugReplicability */
+    BugReplicability: {
+      id: number;
+      name: string;
+    };
+    /** BugStatus */
+    BugStatus: {
+      id: number;
+      name: string;
+    };
+    /** BugMedia */
+    BugMedia: {
+      type: {
+        /** @enum {string} */
+        type: "video" | "image" | "other";
+        extension: string;
+      };
+      /** Format: uri */
+      url: string;
+      creation_date: string;
+    };
+    /** Smartphone */
+    Smartphone: {
+      manufacturer: string;
+      model: string;
+      os: string;
+      os_version: string;
+      /** @enum {string} */
+      type: "smartphone";
+    };
+    /** Tablet */
+    Tablet: {
+      manufacturer: string;
+      model: string;
+      os: string;
+      os_version: string;
+      /** @enum {string} */
+      type: "tablet";
+    };
+    /** Desktop */
+    Desktop: {
+      /** @enum {string} */
+      desktop_type:
+        | "Desktop"
+        | "Gaming PC"
+        | "Notebook"
+        | "Tablet PC / Hybrid"
+        | "Ultrabook";
+      os: string;
+      os_version: string;
+      /** @enum {string} */
+      type: "desktop";
+    };
+    /** Generic Device */
+    GenericDevice: {
+      os?: string;
+      os_version?: string;
+      type?: string;
+    };
+    /** BugTag */
+    BugTag: {
+      id: number;
+      tag_id: number;
+      name: string;
+      slug: string;
+      bug_id: number;
+      campaign_id: number;
+      author_wp_id?: number;
+      author_tid?: number;
+      creation_date: string;
+      is_visible_to_customer?: number;
+    };
+    /**
+     * BugAdditionalField
+     * @description Describe any additional info
+     */
+    BugAdditionalField: {
+      id: number;
+      name: string;
+      value: string;
+    } & (
+      | components["schemas"]["BugAdditionalFieldRegex"]
+      | components["schemas"]["BugAdditionalFieldSelect"]
+    );
+    /** BugAdditionalFieldRegex */
+    BugAdditionalFieldRegex: {
+      validation: string;
+      /** @enum {string} */
+      kind: "regex";
+    };
+    /** BugAdditionalFieldSelect */
+    BugAdditionalFieldSelect: {
+      options: string[];
+      /** @enum {string} */
+      kind: "select";
+    };
   };
   responses: {
     /** Example response */
@@ -416,6 +569,8 @@ export interface components {
     filterBy: unknown;
     /** @description Campaign id */
     cid: number;
+    /** @description Defines an identifier for the bug object (BUG ID) */
+    bid: string;
   };
   requestBodies: {
     Credentials: {
@@ -923,6 +1078,70 @@ export interface operations {
         };
       };
       400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  "get-campaigns-cid-bugs": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+      };
+      query: {
+        /** Limit pagination parameter */
+        limit?: components["parameters"]["limit"];
+        /** Start pagination parameter */
+        start?: components["parameters"]["start"];
+        /** Order value (ASC, DESC) */
+        order?: components["parameters"]["order"];
+        /** Order by accepted field */
+        orderBy?: components["parameters"]["orderBy"];
+        /** filterBy[<fieldName>]=<fieldValue> */
+        filterBy?: components["parameters"]["filterBy"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            items?: components["schemas"]["Bug"][];
+            start?: number;
+            limit?: number;
+            size?: number;
+            total?: number;
+          };
+        };
+      };
+      400: components["responses"]["Error"];
+      401: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  "get-campaigns-single-bug": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+        /** Defines an identifier for the bug object (BUG ID) */
+        bid: components["parameters"]["bid"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Bug"] & {
+            media?: components["schemas"]["BugMedia"][];
+            tags?: components["schemas"]["BugTag"][];
+            additional_fields?: components["schemas"]["BugAdditionalField"][];
+          };
+        };
+      };
+      400: components["responses"]["Error"];
+      401: components["responses"]["Error"];
       403: components["responses"]["Error"];
       500: components["responses"]["Error"];
     };

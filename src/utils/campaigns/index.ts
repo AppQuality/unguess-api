@@ -9,6 +9,7 @@ import { getCampaign } from "./getCampaign";
 import { getCampaignReports } from "./getCampaignReports";
 import { getCampaignFamily } from "./getCampaignFamily";
 import { getCampaignOutputs } from "./getCampaignOutputs";
+import { getCampaignBugs } from "./getCampaignBugs";
 
 export {
   checkCampaignRequest,
@@ -22,4 +23,5 @@ export {
   getCampaignReports,
   getCampaignFamily,
   getCampaignOutputs,
+  getCampaignBugs,
 };
