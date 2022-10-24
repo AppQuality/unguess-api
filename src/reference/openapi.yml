@@ -777,6 +777,14 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/BugMedia'
+                      tags:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/BugTag'
+                      additional_fields:
+                        type: array
+                        items:
+                          $ref: ''
               examples:
                 example-1:
                   value:
@@ -1643,6 +1651,59 @@ components:
         - bug_id
         - campaign_id
         - creation_date
+    BugAdditionalField:
+      title: BugAdditionalField
+      x-stoplight:
+        id: t3gizkq02kn25
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            value:
+              type: string
+          required:
+            - id
+            - name
+            - value
+        - oneOf:
+            - $ref: '#/components/schemas/BugAdditionalFieldRegex'
+            - $ref: '#/components/schemas/BugAdditionalFieldSelect'
+      description: 'Describe any additional info '
+    BugAdditionalFieldRegex:
+      title: BugAdditionalFieldRegex
+      x-stoplight:
+        id: t3gizkq02kn25
+      type: object
+      properties:
+        validation:
+          type: string
+        kind:
+          type: string
+          enum:
+            - regex
+      required:
+        - validation
+        - kind
+    BugAdditionalFieldSelect:
+      title: BugAdditionalFieldSelect
+      x-stoplight:
+        id: t3gizkq02kn25
+      type: object
+      properties:
+        options:
+          type: array
+          items:
+            type: string
+        kind:
+          type: string
+          enum:
+            - select
+      required:
+        - options
+        - kind
   securitySchemes:
     JWT:
       type: http
