@@ -506,6 +506,43 @@ export interface components {
       os_version?: string;
       type?: string;
     };
+    /** BugTag */
+    BugTag: {
+      id: number;
+      tag_id: number;
+      name: string;
+      slug: string;
+      bug_id: number;
+      campaign_id: number;
+      author_wp_id?: number;
+      author_tid?: number;
+      creation_date: string;
+      is_visible_to_customer?: number;
+    };
+    /**
+     * BugAdditionalField
+     * @description Describe any additional info
+     */
+    BugAdditionalField: {
+      id: number;
+      name: string;
+      value: string;
+    } & (
+      | components["schemas"]["BugAdditionalFieldRegex"]
+      | components["schemas"]["BugAdditionalFieldSelect"]
+    );
+    /** BugAdditionalFieldRegex */
+    BugAdditionalFieldRegex: {
+      validation: string;
+      /** @enum {string} */
+      kind: "regex";
+    };
+    /** BugAdditionalFieldSelect */
+    BugAdditionalFieldSelect: {
+      options: string[];
+      /** @enum {string} */
+      kind: "select";
+    };
   };
   responses: {
     /** Example response */
@@ -1098,6 +1135,8 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["Bug"] & {
             media?: components["schemas"]["BugMedia"][];
+            tags?: components["schemas"]["BugTag"][];
+            additional_fields?: components["schemas"]["BugAdditionalField"][];
           };
         };
       };

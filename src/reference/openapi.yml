@@ -706,7 +706,7 @@ paths:
                         internal_id: string
                         campaign_id: 0
                         title: string
-                        step-by-step: string
+                        step_by_step: string
                         expected_result: string
                         current_result: string
                         status:
@@ -777,6 +777,14 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/BugMedia'
+                      tags:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/BugTag'
+                      additional_fields:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/BugAdditionalField'
               examples:
                 example-1:
                   value:
@@ -784,7 +792,7 @@ paths:
                     internal_id: string
                     campaign_id: 0
                     title: string
-                    step-by-step: string
+                    step_by_step: string
                     expected_result: string
                     current_result: string
                     status:
@@ -1402,7 +1410,7 @@ components:
         note:
           type: string
         device:
-          anyOf:
+          oneOf:
             - $ref: '#/components/schemas/Smartphone'
             - $ref: '#/components/schemas/Tablet'
             - $ref: '#/components/schemas/Desktop'
@@ -1517,6 +1525,8 @@ components:
               type: string
             type:
               type: string
+              enum:
+                - smartphone
           required:
             - manufacturer
             - model
@@ -1546,6 +1556,8 @@ components:
               type: string
             type:
               type: string
+              enum:
+                - tablet
           required:
             - manufacturer
             - model
@@ -1579,6 +1591,8 @@ components:
               type: string
             type:
               type: string
+              enum:
+                - desktop
           required:
             - desktop_type
             - os
@@ -1603,6 +1617,93 @@ components:
         type:
           type: string
       x-internal: true
+    BugTag:
+      title: BugTag
+      x-stoplight:
+        id: vart6bnw9c9fp
+      type: object
+      properties:
+        id:
+          type: integer
+        tag_id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        bug_id:
+          type: integer
+        campaign_id:
+          type: integer
+        author_wp_id:
+          type: integer
+        author_tid:
+          type: integer
+        creation_date:
+          type: string
+        is_visible_to_customer:
+          type: integer
+      required:
+        - id
+        - tag_id
+        - name
+        - slug
+        - bug_id
+        - campaign_id
+        - creation_date
+    BugAdditionalField:
+      title: BugAdditionalField
+      x-stoplight:
+        id: t3gizkq02kn25
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            value:
+              type: string
+          required:
+            - id
+            - name
+            - value
+        - oneOf:
+            - $ref: '#/components/schemas/BugAdditionalFieldRegex'
+            - $ref: '#/components/schemas/BugAdditionalFieldSelect'
+      description: 'Describe any additional info '
+    BugAdditionalFieldRegex:
+      title: BugAdditionalFieldRegex
+      x-stoplight:
+        id: t3gizkq02kn25
+      type: object
+      properties:
+        validation:
+          type: string
+        kind:
+          type: string
+          enum:
+            - regex
+      required:
+        - validation
+        - kind
+    BugAdditionalFieldSelect:
+      title: BugAdditionalFieldSelect
+      x-stoplight:
+        id: t3gizkq02kn25
+      type: object
+      properties:
+        options:
+          type: array
+          items:
+            type: string
+        kind:
+          type: string
+          enum:
+            - select
+      required:
+        - options
+        - kind
   securitySchemes:
     JWT:
       type: http

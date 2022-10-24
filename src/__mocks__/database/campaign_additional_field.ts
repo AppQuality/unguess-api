@@ -26,7 +26,7 @@ class AdditionalFields extends Table<CampaingAdditionalFieldsParams> {
     "cp_id INTEGER NOT NULL",
     "slug VARCHAR(32)",
     "title VARCHAR(32)",
-    "type ENUM('regex', 'select') DEFAULT 'regex'",
+    "type VARCHAR(32) DEFAULT 'regex'",
     "validation VARCHAR(512)",
     "error_message VARCHAR(512)",
     "stats TINYINT(1) DEFAULT 1",

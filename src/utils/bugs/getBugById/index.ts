@@ -1,6 +1,8 @@
 import * as db from "@src/features/db";
+import { getBugAdditional } from "../getBugAdditional";
 import { getBugDevice } from "../getBugDevice";
 import { getBugMedia } from "../getBugMedia";
+import { getBugTags } from "../getBugTags";
 
 type BugWithMedia =
   StoplightOperations["get-campaigns-single-bug"]["responses"]["200"]["content"]["application/json"];
@@ -60,10 +62,14 @@ export const getBugById = async (
   // Get bug device
   const device = await getBugDevice(bug);
 
-  // Get bug additional fields (TODO)
-
   // Get bug media
   const media = await getBugMedia(bugId);
+
+  // Get tags
+  const tags = await getBugTags(bugId);
+
+  // Get bug additional fields
+  const additional = await getBugAdditional(bugId);
 
   return {
     id: bug.id,
@@ -98,5 +104,7 @@ export const getBugById = async (
     note: bug.note,
     device,
     media: media || [],
+    tags: tags || [],
+    additional_fields: additional || [],
   };
 };

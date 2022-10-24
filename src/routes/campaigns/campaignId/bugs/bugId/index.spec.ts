@@ -10,6 +10,9 @@ import bugReplicability from "@src/__mocks__/database/bug_replicability";
 import bugType from "@src/__mocks__/database/bug_type";
 import bugStatus from "@src/__mocks__/database/bug_status";
 import devices, { DeviceParams } from "@src/__mocks__/database/device";
+import tags from "@src/__mocks__/database/bug_tags";
+import additionalField from "@src/__mocks__/database/campaign_additional_field";
+import additionalFieldData from "@src/__mocks__/database/campaign_additional_field_data";
 
 const customer_1 = {
   id: 999,
@@ -140,6 +143,33 @@ const bug_media_1 = {
   uploaded: "2021-10-19 12:57:57.0",
 };
 
+const tag_1 = {
+  id: 1,
+  bug_id: bug_1.id,
+  display_name: "Tag visibile",
+  is_public: 1,
+};
+
+const tag_2 = {
+  id: 2,
+  bug_id: bug_1.id,
+  display_name: "Tag privato",
+  is_public: 0,
+};
+
+const field_1 = {
+  id: 123,
+  cp_id: bug_1.campaign_id,
+  title: "product_code",
+  validation: ".",
+};
+
+const field_1_data = {
+  bug_id: bug_1.id,
+  type_id: field_1.id,
+  value: "ENELXXX",
+};
+
 describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
@@ -163,12 +193,20 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
         await bugStatus.mock();
         await bugMedia.mock();
         await devices.mock();
+        await tags.mock();
+        await additionalField.mock();
+        await additionalFieldData.mock();
 
         await bugs.insert(bug_1);
         await bugs.insert(bug_2);
         await devices.insert(device_1);
         await devices.insert(device_2);
         await bugMedia.insert(bug_media_1);
+        await tags.insert(tag_1);
+        await tags.insert(tag_2);
+        await additionalField.insert(field_1);
+        await additionalFieldData.insert(field_1_data);
+
         await bugSeverity.addDefaultItems();
         await bugReplicability.addDefaultItems();
         await bugType.addDefaultItems();
@@ -194,6 +232,9 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
         await bugStatus.dropMock();
         await bugMedia.dropMock();
         await devices.dropMock();
+        await tags.dropMock();
+        await additionalField.dropMock();
+        await additionalFieldData.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -316,5 +357,42 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
     expect(response.status).toBe(200);
 
     expect(response.body.media).toEqual([]);
+  });
+
+  //Should return a list of tags if available
+  it("Should return all available additional fields", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer customer");
+    expect(response.status).toBe(200);
+
+    expect(response.body.additional_fields.length).toEqual(1);
+    expect(response.body.additional_fields).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: field_1.title,
+          value: field_1_data.value,
+          kind: "regex",
+        }),
+      ])
+    );
+  });
+
+  //Should return a list of tags if available
+  it("Should return a list of tags if available", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer customer");
+    expect(response.status).toBe(200);
+
+    expect(response.body.tags.length).toEqual(1);
+    expect(response.body.tags).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: tag_1.id,
+          name: tag_1.display_name,
+        }),
+      ])
+    );
   });
 });
