@@ -45,8 +45,8 @@ export const getBugAdditional = async (
 
   // Check if bug exists
   if (!results) {
-    return false;
+    return [];
   }
 
-  return results.map(prepareField) || [];
+  return results.map(prepareField);
 };

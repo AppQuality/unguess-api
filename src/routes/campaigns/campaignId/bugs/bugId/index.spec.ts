@@ -11,7 +11,9 @@ import bugType from "@src/__mocks__/database/bug_type";
 import bugStatus from "@src/__mocks__/database/bug_status";
 import devices, { DeviceParams } from "@src/__mocks__/database/device";
 import tags from "@src/__mocks__/database/bug_tags";
-import additionalField from "@src/__mocks__/database/campaign_additional_field";
+import additionalField, {
+  CampaingAdditionalFieldsParams,
+} from "@src/__mocks__/database/campaign_additional_field";
 import additionalFieldData from "@src/__mocks__/database/campaign_additional_field_data";
 
 const customer_1 = {
@@ -170,6 +172,20 @@ const field_1_data = {
   value: "ENELXXX",
 };
 
+const field_2: CampaingAdditionalFieldsParams = {
+  id: 124,
+  cp_id: bug_1.campaign_id,
+  title: "browser",
+  validation: "Chrome;Firefox",
+  type: "select",
+};
+
+const field_2_data = {
+  bug_id: bug_1.id,
+  type_id: field_2.id,
+  value: "Chrome",
+};
+
 describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
@@ -205,7 +221,9 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
         await tags.insert(tag_1);
         await tags.insert(tag_2);
         await additionalField.insert(field_1);
+        await additionalField.insert(field_2);
         await additionalFieldData.insert(field_1_data);
+        await additionalFieldData.insert(field_2_data);
 
         await bugSeverity.addDefaultItems();
         await bugReplicability.addDefaultItems();
@@ -360,25 +378,6 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   });
 
   //Should return a list of tags if available
-  it("Should return all available additional fields", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
-      .set("Authorization", "Bearer customer");
-    expect(response.status).toBe(200);
-
-    expect(response.body.additional_fields.length).toEqual(1);
-    expect(response.body.additional_fields).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          name: field_1.title,
-          value: field_1_data.value,
-          kind: "regex",
-        }),
-      ])
-    );
-  });
-
-  //Should return a list of tags if available
   it("Should return a list of tags if available", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
@@ -395,4 +394,51 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
       ])
     );
   });
+
+  //Should return a list of additional fields if available
+  it("Should return all available additional fields", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer customer");
+    expect(response.status).toBe(200);
+
+    expect(response.body.additional_fields.length).toEqual(2);
+  });
+
+  it("Should recognize regex additional fields", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer customer");
+    expect(response.status).toBe(200);
+
+    expect(response.body.additional_fields).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: field_1.title,
+          value: field_1_data.value,
+          kind: "regex",
+        }),
+      ])
+    );
+  });
+
+  it("Should recognize regex additional fields", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer customer");
+    expect(response.status).toBe(200);
+
+    expect(response.body.additional_fields).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: field_2.title,
+          value: field_2_data.value,
+          options: ["Chrome", "Firefox"],
+          kind: "select",
+        }),
+      ])
+    );
+  });
+
+  /** --- end of file */
 });
