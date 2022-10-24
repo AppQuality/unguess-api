@@ -517,7 +517,31 @@ export interface components {
       author_wp_id?: number;
       author_tid?: number;
       creation_date: string;
-      is_visible_to_customer?: number;
+      is_visible_to_customer?: string;
+    };
+    /**
+     * BugAdditionalField
+     * @description Describe any additional info
+     */
+    BugAdditionalField: {
+      id: number;
+      name: string;
+      value: string;
+    } & (
+      | components["schemas"]["BugAdditionalFieldRegex"]
+      | components["schemas"]["BugAdditionalFieldSelect"]
+    );
+    /** BugAdditionalFieldRegex */
+    BugAdditionalFieldRegex: {
+      validation: string;
+      /** @enum {string} */
+      kind: "regex";
+    };
+    /** BugAdditionalFieldSelect */
+    BugAdditionalFieldSelect: {
+      options: string[];
+      /** @enum {string} */
+      kind: "select";
     };
   };
   responses: {
@@ -1111,6 +1135,8 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["Bug"] & {
             media?: components["schemas"]["BugMedia"][];
+            tags?: components["schemas"]["BugTag"][];
+            additional_fields?: unknown[];
           };
         };
       };
