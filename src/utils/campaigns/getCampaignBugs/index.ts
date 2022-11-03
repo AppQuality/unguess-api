@@ -1,6 +1,7 @@
 import * as db from "@src/features/db";
 import { getBugDevice } from "@src/utils/bugs/getBugDevice";
 import { START_QUERY_PARAM_DEFAULT } from "@src/utils/constants";
+import { getTitleRule } from "@src/utils/campaigns/getTitleRule";
 
 interface GetCampaignBugsArgs {
   campaignId: number;
@@ -181,19 +182,4 @@ const formatBugs = async (bugs: any, campaignId: number) => {
   }
 
   return results;
-};
-
-const getTitleRule = async (campaignId: number) => {
-  const result = await db.query(
-    db.format(
-      `
-      SELECT meta_value 
-      FROM wp_appq_cp_meta 
-      WHERE campaign_id = ? 
-        AND meta_key = 'bug_title_rule' `,
-      [campaignId]
-    )
-  );
-
-  return result.length ? parseInt(result[0].meta_value) : 0;
 };
