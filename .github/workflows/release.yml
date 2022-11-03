@@ -1,0 +1,118 @@
+name: Create release
+
+on:
+  push:
+    tags:
+      - release-*
+
+env:
+  ECR_REPOSITORY: unguess-api
+  DEPLOY_PROD_BUCKET: unguess-app-staging-source
+  DEPLOY_PROD_KEY: unguess-app-api-staging-pipeline/source.zip
+  ASG_NAME: unguess-app-asg-unguess-app-api-production
+  PIPELINE: unguess-app-api-production-pipeline-pipeline
+
+jobs:
+  push-to-ecr:
+    name: Push Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Get tag name
+        shell: bash
+        run: |
+          TAG=${GITHUB_REF##*/}
+          echo "##[set-output name=tag;]$TAG"
+          echo "##[set-output name=ECR_REPOSITORY;]$ECR_REPOSITORY"
+        id: extract_tag
+
+      - name: Docker ECR
+        uses: kciter/aws-ecr-action@v2
+        with:
+          access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          account_id: ${{ secrets.AWS_ACCOUNT_ID }}
+          region: eu-west-1
+          repo: ${{ steps.extract_tag.outputs.ECR_REPOSITORY }}
+          tags: ${{ steps.extract_tag.outputs.tag }}
+
+  release-to-prod:
+    name: Release to production
+    needs: push-to-ecr
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Get tag name
+        shell: bash
+        run: |
+          TAG=${GITHUB_REF##*/}
+          echo "##[set-output name=tag;]$TAG"
+          echo "##[set-output name=ECR_REPOSITORY;]$ECR_REPOSITORY"
+          echo "##[set-output name=DEPLOY_BUCKET;]$DEPLOY_BUCKET"
+          echo "##[set-output name=DEPLOY_PROD_BUCKET;]$DEPLOY_PROD_BUCKET"
+          echo "##[set-output name=DEPLOY_PROD_KEY;]$DEPLOY_PROD_KEY"
+          echo "##[set-output name=ASG_NAME;]$ASG_NAME"
+          echo "##[set-output name=PIPELINE;]$PIPELINE"
+        id: extract_tag
+      - name: "Generate dist zip"
+        run: |
+          cd deployment
+          echo -n "${{ steps.extract_tag.outputs.ECR_REPOSITORY }}:${{steps.extract_tag.outputs.tag}}" > docker-image.txt
+          zip dist.zip *
+      - uses: zdurham/s3-upload-github-action@master
+        env:
+          S3_BUCKET: ${{ steps.extract_tag.outputs.DEPLOY_PROD_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: "eu-west-1"
+          FILE: ./deployment/dist.zip
+          S3_KEY: ${{ steps.extract_tag.outputs.DEPLOY_PROD_KEY }}
+      - name: configure AWS creds
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+      - name: Update asg capacity to 2
+        uses: AppQuality/update-desired-asg-instances@v1.0.0
+        id: update-asg
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: "eu-west-1"
+          ASG_NAME: ${{ steps.extract_tag.outputs.ASG_NAME }}
+          DESIRED_INSTANCES: 2
+          MAX_INSTANCES: 2
+      - name: Start CodePipeline
+        uses: moia-oss/aws-codepipeline-trigger@v1
+        with:
+          pipeline: ${{ steps.extract_tag.outputs.PIPELINE }}
+          wait: true
+      - name: Restore asg capacity
+        uses: AppQuality/update-desired-asg-instances@v1.0.0
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: "eu-west-1"
+          ASG_NAME: ${{ steps.extract_tag.outputs.ASG_NAME }}
+          DESIRED_INSTANCES: ${{ steps.update-asg.outputs.original_desired }}
+          MAX_INSTANCES: ${{ steps.update-asg.outputs.original_max }}
+      - name: Get deployment url
+        uses: AppQuality/get-codeploy-from-codepipeline@1.0.0
+        id: codedeploy
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: "eu-west-1"
+          PIPELINE_NAME: ${{ steps.extract_tag.outputs.PIPELINE }}
+      - name: Update release with deployment url
+        uses: tubone24/update_release@v1.0
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          body: "[![](https://img.shields.io/badge/AWS-Redeploy-blueviolet)](${{ steps.codedeploy.outputs.codedeploy_url }})"
+          isAppendBody: true
