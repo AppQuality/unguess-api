@@ -891,6 +891,10 @@ components:
           type: integer
         title:
           type: string
+        contextless_title:
+          type: string
+        context:
+          type: string
         step_by_step:
           type: string
         expected_result:
