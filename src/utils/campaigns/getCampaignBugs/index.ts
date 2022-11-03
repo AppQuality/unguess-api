@@ -118,22 +118,36 @@ export const getCampaignBugs = async (
     return false;
   }
 
-  const formattedBugs = await formatBugs(bugs);
+  const formattedBugs = await formatBugs(bugs, campaignId);
 
   return formattedBugs as StoplightComponents["schemas"]["Bug"][];
 };
 
-const formatBugs = async (bugs: any) => {
+const formatBugs = async (bugs: any, campaignId: number) => {
   let results: any = [];
+  const titleRuleIsActive = await getTitleRule(campaignId);
   for (const bug of bugs) {
     // Get bug device
     const device = await getBugDevice(bug);
+
+    const context =
+      titleRuleIsActive && bug.title.match(/\[(.*?)\]/)
+        ? bug.title.match(/\[(.*?)\]/)[1]
+        : undefined;
+    const contextless_title = context
+      ? bug.title
+          .split(bug.title.match(/\[(.*?)\]/)[0])
+          .pop()
+          .trim()
+      : undefined;
 
     results.push({
       id: bug.id,
       internal_id: bug.internal_id,
       campaign_id: bug.campaign_id,
       title: bug.title,
+      contextless_title: contextless_title,
+      context: context,
       step_by_step: bug.description,
       expected_result: bug.expected_result,
       current_result: bug.current_result,
@@ -167,4 +181,19 @@ const formatBugs = async (bugs: any) => {
   }
 
   return results;
+};
+
+const getTitleRule = async (campaignId: number) => {
+  const result = await db.query(
+    db.format(
+      `
+      SELECT meta_value 
+      FROM wp_appq_cp_meta 
+      WHERE campaign_id = ? 
+        AND meta_key = 'bug_title_rule' `,
+      [campaignId]
+    )
+  );
+
+  return result.length ? parseInt(result[0].meta_value) : 0;
 };

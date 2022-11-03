@@ -9,6 +9,7 @@ import bugSeverity from "@src/__mocks__/database/bug_severity";
 import bugReplicability from "@src/__mocks__/database/bug_replicability";
 import bugType from "@src/__mocks__/database/bug_type";
 import bugStatus from "@src/__mocks__/database/bug_status";
+import CampaignMeta from "@src/__mocks__/database/campaign_meta";
 import devices, { DeviceParams } from "@src/__mocks__/database/device";
 
 const customer_1 = {
@@ -102,7 +103,7 @@ const device_1: DeviceParams = {
 const bug_1: BugsParams = {
   id: 1,
   internal_id: "BUG1",
-  message: "Bug 1 message",
+  message: "[CONTEXT] Bug 1 message",
   description: "Bug 1 description",
   expected_result: "Bug 1 expected result",
   current_result: "Bug 1 current result",
@@ -169,7 +170,13 @@ describe("GET /campaigns/{cid}/bugs", () => {
           campaignTypes: [campaign_type_1],
           campaigns: [campaign_1, campaign_2, campaign_3],
         });
-
+        await CampaignMeta.mock();
+        await CampaignMeta.insert({
+          meta_id: 1,
+          campaign_id: campaign_1.id,
+          meta_key: "bug_title_rule",
+          meta_value: "1",
+        });
         await bugs.mock();
         await bugMedia.mock();
         await bugSeverity.mock();
@@ -207,6 +214,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
         await bugType.dropMock();
         await bugStatus.dropMock();
         await devices.dropMock();
+        await CampaignMeta.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -486,6 +494,31 @@ describe("GET /campaigns/{cid}/bugs", () => {
         items: [
           expect.objectContaining({
             id: bug_2.id,
+          }),
+        ],
+      })
+    );
+  });
+
+  it("Should return the context parameters for each bugs if title_rule is active and the bug has context", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs`)
+      .set("Authorization", "Bearer customer");
+
+    expect(response.body).toMatchObject(
+      expect.objectContaining({
+        items: [
+          expect.objectContaining({
+            id: bug_2.id,
+            campaign_id: campaign_1.id,
+            title: "Bug 2 message",
+          }),
+          expect.objectContaining({
+            id: bug_1.id,
+            campaign_id: campaign_1.id,
+            title: "[CONTEXT] Bug 1 message",
+            contextless_title: "Bug 1 message",
+            context: "CONTEXT",
           }),
         ],
       })
