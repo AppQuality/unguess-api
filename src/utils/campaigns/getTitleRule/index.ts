@@ -13,3 +13,16 @@ export const getTitleRule = async (campaignId: number): Promise<number> => {
   );
   return result.length ? parseInt(result[0].meta_value) : 0;
 };
+
+export const getFormattedContext = (
+  bugTitle: string
+): { context: string; contextless_title: string } | undefined => {
+  if (!bugTitle.match(/\[(.*?)\]/)) return undefined;
+
+  return {
+    context: bugTitle.match(/\[(.*?)\]/)![1],
+    contextless_title: bugTitle
+      .replace(bugTitle.match(/\[(.*?)\]/)![0], "")
+      .trim(),
+  };
+};
