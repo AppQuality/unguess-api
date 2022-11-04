@@ -1,4 +1,5 @@
 import * as db from "@src/features/db";
+import { getBugTitle, getTitleRule } from "@src/utils/campaigns";
 import { ERROR_MESSAGE } from "@src/utils/constants";
 import { getBugAdditional } from "../getBugAdditional";
 import { getBugDevice } from "../getBugDevice";
@@ -76,11 +77,18 @@ export const getBugById = async (bugId: number): Promise<BugWithMedia> => {
   // Get bug additional fields
   const additional = await getBugAdditional(bugId);
 
+  // Check bug title
+  const hasTitleRule = await getTitleRule(bug.campaign_id);
+  const bugTitle = getBugTitle({
+    bugTitle: bug.title,
+    hasTitleRule,
+  });
+
   return {
     id: bug.id,
     internal_id: bug.internal_id,
     campaign_id: bug.campaign_id,
-    title: bug.title,
+    title: bugTitle,
     step_by_step: bug.description,
     expected_result: bug.expected_result,
     current_result: bug.current_result,

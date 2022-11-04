@@ -1,6 +1,7 @@
 import * as db from "@src/features/db";
 import { getBugDevice } from "@src/utils/bugs/getBugDevice";
 import { START_QUERY_PARAM_DEFAULT } from "@src/utils/constants";
+import { getBugTitle, getTitleRule } from "@src/utils/campaigns/getTitleRule";
 
 interface GetCampaignBugsArgs {
   campaignId: number;
@@ -118,22 +119,29 @@ export const getCampaignBugs = async (
     return false;
   }
 
-  const formattedBugs = await formatBugs(bugs);
+  const formattedBugs = await formatBugs(bugs, campaignId);
 
   return formattedBugs as StoplightComponents["schemas"]["Bug"][];
 };
 
-const formatBugs = async (bugs: any) => {
+const formatBugs = async (bugs: any, campaignId: number) => {
   let results: any = [];
+  const titleRuleIsActive = await getTitleRule(campaignId);
+
   for (const bug of bugs) {
     // Get bug device
     const device = await getBugDevice(bug);
+
+    const bugTitle = getBugTitle({
+      bugTitle: bug.title,
+      hasTitleRule: titleRuleIsActive,
+    });
 
     results.push({
       id: bug.id,
       internal_id: bug.internal_id,
       campaign_id: bug.campaign_id,
-      title: bug.title,
+      title: bugTitle,
       step_by_step: bug.description,
       expected_result: bug.expected_result,
       current_result: bug.current_result,

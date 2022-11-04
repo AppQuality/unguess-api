@@ -15,7 +15,7 @@ import additionalField, {
   CampaingAdditionalFieldsParams,
 } from "@src/__mocks__/database/campaign_additional_field";
 import additionalFieldData from "@src/__mocks__/database/campaign_additional_field_data";
-
+import CampaignMeta from "@src/__mocks__/database/campaign_meta";
 const customer_1 = {
   id: 999,
   company: "Company 999",
@@ -106,7 +106,7 @@ const bug_1: BugsParams = {
   id: 12999,
   internal_id: "UG12999",
   wp_user_id: 1,
-  message: "Bug 12999 message",
+  message: "[CON-TEXT] - Bug 12-999 message",
   description: "Bug 12999 description",
   expected_result: "Bug 12999 expected result",
   current_result: "Bug 12999 actual result",
@@ -229,6 +229,13 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
         await bugReplicability.addDefaultItems();
         await bugType.addDefaultItems();
         await bugStatus.addDefaultItems();
+        await CampaignMeta.mock();
+        await CampaignMeta.insert({
+          meta_id: 1,
+          campaign_id: campaign_1.id,
+          meta_key: "bug_title_rule",
+          meta_value: "1",
+        });
       } catch (error) {
         console.error(error);
         reject(error);
@@ -253,6 +260,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
         await tags.dropMock();
         await additionalField.dropMock();
         await additionalFieldData.dropMock();
+        await CampaignMeta.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -419,6 +427,21 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
           kind: "regex",
         }),
       ])
+    );
+  });
+
+  it("Should return context parameters if title rule is active and bug title has context", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer customer");
+    expect(response.status).toBe(200);
+
+    expect(response.body.title).toEqual(
+      expect.objectContaining({
+        full: "[CON-TEXT] - Bug 12-999 message",
+        compact: "Bug 12-999 message",
+        context: "CON-TEXT",
+      })
     );
   });
 
