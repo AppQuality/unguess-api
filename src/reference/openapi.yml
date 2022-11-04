@@ -138,13 +138,16 @@ paths:
                   total:
                     type: integer
               examples:
-                example-1:
+                Example 1:
                   value:
                     items:
                       - id: 0
                         internal_id: string
                         campaign_id: 0
-                        title: string
+                        title:
+                          full: string
+                          compact: string
+                          context: string
                         step_by_step: string
                         expected_result: string
                         current_result: string
@@ -160,14 +163,15 @@ paths:
                         replicability:
                           id: 0
                           name: string
-                        created: '2019-08-24T14:15:22Z'
-                        updated: '2019-08-24T14:15:22Z'
+                        created: string
+                        updated: string
                         note: string
                         device:
-                          desktop_type: Gaming PC
-                          os: Windows
-                          os_version: Windows 10 May 2021 Update (19043)
-                          type: desktop
+                          manufacturer: string
+                          model: string
+                          os: string
+                          os_version: string
+                          type: smartphone
                         application_section:
                           id: 0
                           title: string
@@ -253,6 +257,26 @@ paths:
                   $ref: '#/components/schemas/Report'
       operationId: get-campaigns-reports
       description: Return all available report of a specific campaign
+      security:
+        - JWT: []
+  '/campaigns/{cid}/widgets/{wslug}':
+    parameters:
+      - $ref: '#/components/parameters/cid'
+      - $ref: '#/components/parameters/wslug'
+    get:
+      summary: Get Campaign widget data
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/WidgetBugsByUseCase'
+                  - $ref: '#/components/schemas/WidgetBugsByDevice'
+              examples: {}
+      operationId: get-campaigns-cid-widgets-wslug
       security:
         - JWT: []
   /projects:
@@ -1559,6 +1583,7 @@ components:
       required:
         - title
         - description
+      description: ''
     User:
       title: User
       type: object
@@ -1670,6 +1695,92 @@ components:
         - csm
       x-tags:
         - workspace
+    WidgetBugsByUseCase:
+      title: WidgetBugsByUseCase
+      x-stoplight:
+        id: tm59wsbormo47
+      type: object
+      x-examples:
+        Example 1:
+          data:
+            - title: Navigazione Sito
+              description: aasdasdsa
+              uniqueBugs: 10
+              bugs: 12
+            - title: HomePage
+              description: aasdasdsa
+              uniqueBugs: 1
+              bugs: 3
+            - title: Product List
+              description: lorem ipsum
+              uniqueBugs: 0
+              bugs: 0
+          kind: bugsByUseCase
+      description: Returns a list of use case with the number of bugs
+      properties:
+        data:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/UseCase'
+              - type: object
+                properties:
+                  bugs:
+                    type: integer
+                    description: Unique bugs
+                required:
+                  - bugs
+        kind:
+          type: string
+          enum:
+            - bugsByUseCase
+      required:
+        - data
+        - kind
+    WidgetBugsByDevice:
+      title: WidgetBugsByDevice
+      x-stoplight:
+        id: tm59wsbormo47
+      type: object
+      x-examples:
+        Example 1:
+          data:
+            - manufacturer: Samsung
+              model: Galaxy S22 Ultra
+              os: Android
+              os_version: '13'
+              type: smartphone
+              bugs: 12
+            - desktop_type: Gaming PC
+              os: Windows
+              os_version: Windows 10 May 2021 Update (19043)
+              type: desktop
+              bugs: 4
+          kind: bugsByUseCase
+      description: Returns a list of devices with the number of bugs
+      properties:
+        data:
+          type: array
+          items:
+            allOf:
+              - oneOf:
+                  - $ref: '#/components/schemas/Smartphone'
+                  - $ref: '#/components/schemas/Desktop'
+                  - $ref: '#/components/schemas/Tablet'
+              - type: object
+                properties:
+                  bugs:
+                    type: integer
+                    description: Unique bugs
+                required:
+                  - bugs
+        kind:
+          type: string
+          enum:
+            - bugsByDevice
+      required:
+        - data
+        - kind
   securitySchemes:
     JWT:
       type: http
@@ -1745,6 +1856,13 @@ components:
       schema:
         type: string
       description: Defines an identifier for the bug object (BUG ID)
+    wslug:
+      name: wslug
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Campaign widget slug
   requestBodies:
     Credentials:
       content:
