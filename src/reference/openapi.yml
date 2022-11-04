@@ -224,47 +224,7 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/BugAdditionalField'
-              examples:
-                example-1:
-                  value:
-                    id: 0
-                    internal_id: string
-                    campaign_id: 0
-                    title: string
-                    step_by_step: string
-                    expected_result: string
-                    current_result: string
-                    status:
-                      id: 0
-                      name: string
-                    severity:
-                      id: 0
-                      name: string
-                    type:
-                      id: 0
-                      name: string
-                    replicability:
-                      id: 0
-                      name: string
-                    created: '2019-08-24T14:15:22Z'
-                    updated: '2019-08-24T14:15:22Z'
-                    note: string
-                    device:
-                      desktop_type: Gaming PC
-                      os: Windows
-                      os_version: Windows 10 May 2021 Update (19043)
-                      type: desktop
-                    application_section:
-                      id: 0
-                      title: string
-                    duplicated_of_id: 0
-                    is_favorite: 0
-                    media:
-                      - type:
-                          type: video
-                          extension: string
-                        url: 'http://example.com'
-                        creation_date: '2019-08-24'
+              examples: {}
         '400':
           $ref: '#/components/responses/Error'
         '401':
@@ -890,11 +850,7 @@ components:
         campaign_id:
           type: integer
         title:
-          type: string
-        contextless_title:
-          type: string
-        context:
-          type: string
+          $ref: '#/components/schemas/BugTitle'
         step_by_step:
           type: string
         expected_result:
@@ -1708,6 +1664,22 @@ components:
         - csm
       x-tags:
         - workspace
+    BugTitle:
+      title: BugTitle
+      x-stoplight:
+        id: 3jzx6obnmhcna
+      type: object
+      properties:
+        full:
+          type: string
+        compact:
+          type: string
+          description: Bug title without context.
+        context:
+          type: string
+      required:
+        - full
+        - compact
   securitySchemes:
     JWT:
       type: http
