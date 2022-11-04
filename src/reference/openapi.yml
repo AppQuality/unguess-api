@@ -1049,6 +1049,22 @@ components:
         - bug_id
         - campaign_id
         - creation_date
+    BugTitle:
+      title: BugTitle
+      x-stoplight:
+        id: 3jzx6obnmhcna
+      type: object
+      properties:
+        full:
+          type: string
+        compact:
+          type: string
+          description: Bug title without context.
+        context:
+          type: string
+      required:
+        - full
+        - compact
     BugType:
       title: BugType
       type: object
@@ -1664,22 +1680,6 @@ components:
         - csm
       x-tags:
         - workspace
-    BugTitle:
-      title: BugTitle
-      x-stoplight:
-        id: 3jzx6obnmhcna
-      type: object
-      properties:
-        full:
-          type: string
-        compact:
-          type: string
-          description: Bug title without context.
-        context:
-          type: string
-      required:
-        - full
-        - compact
   securitySchemes:
     JWT:
       type: http
