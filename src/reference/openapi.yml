@@ -904,8 +904,6 @@ components:
         - application_section
     BugAdditionalField:
       title: BugAdditionalField
-      x-stoplight:
-        id: t3gizkq02kn25
       allOf:
         - type: object
           properties:
@@ -925,8 +923,6 @@ components:
       description: 'Describe any additional info '
     BugAdditionalFieldRegex:
       title: BugAdditionalFieldRegex
-      x-stoplight:
-        id: t3gizkq02kn25
       type: object
       properties:
         validation:
@@ -940,8 +936,6 @@ components:
         - kind
     BugAdditionalFieldSelect:
       title: BugAdditionalFieldSelect
-      x-stoplight:
-        id: t3gizkq02kn25
       type: object
       properties:
         options:
@@ -1017,8 +1011,6 @@ components:
         - name
     BugTag:
       title: BugTag
-      x-stoplight:
-        id: vart6bnw9c9fp
       type: object
       properties:
         id:
@@ -1051,8 +1043,6 @@ components:
         - creation_date
     BugTitle:
       title: BugTitle
-      x-stoplight:
-        id: 3jzx6obnmhcna
       type: object
       properties:
         full:
