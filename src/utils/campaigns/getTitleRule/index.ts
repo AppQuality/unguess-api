@@ -23,6 +23,7 @@ export const getFormattedContext = (
     context: bugTitle.match(/\[(.*?)\]/)![1],
     contextless_title: bugTitle
       .replace(bugTitle.match(/\[(.*?)\]/)![0], "")
+      .replace("-", "")
       .trim(),
   };
 };

@@ -106,7 +106,7 @@ const bug_1: BugsParams = {
   id: 12999,
   internal_id: "UG12999",
   wp_user_id: 1,
-  message: "[CONTEXT] Bug 12999 message",
+  message: "[CON-TEXT] - Bug 12-999 message",
   description: "Bug 12999 description",
   expected_result: "Bug 12999 expected result",
   current_result: "Bug 12999 actual result",
@@ -437,8 +437,9 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
 
     expect(response.body).toEqual(
       expect.objectContaining({
-        title: "[CONTEXT] Bug 12999 message",
-        contextless_title: "Bug 12999 message",
+        title: "[CON-TEXT] - Bug 12-999 message",
+        contextless_title: "Bug 12-999 message",
+        context: "CON-TEXT",
       })
     );
   });

@@ -103,7 +103,7 @@ const device_1: DeviceParams = {
 const bug_1: BugsParams = {
   id: 1,
   internal_id: "BUG1",
-  message: "[CONTEXT] Bug 1 message",
+  message: "[CON-TEXT] - Bug 1 super-message",
   description: "Bug 1 description",
   expected_result: "Bug 1 expected result",
   current_result: "Bug 1 current result",
@@ -516,9 +516,9 @@ describe("GET /campaigns/{cid}/bugs", () => {
           expect.objectContaining({
             id: bug_1.id,
             campaign_id: campaign_1.id,
-            title: "[CONTEXT] Bug 1 message",
-            contextless_title: "Bug 1 message",
-            context: "CONTEXT",
+            title: "[CON-TEXT] - Bug 1 super-message",
+            contextless_title: "Bug 1 super-message",
+            context: "CON-TEXT",
           }),
         ],
       })
