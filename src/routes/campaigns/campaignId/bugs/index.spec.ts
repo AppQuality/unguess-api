@@ -505,28 +505,17 @@ describe("GET /campaigns/{cid}/bugs", () => {
       .get(`/campaigns/${campaign_1.id}/bugs`)
       .set("Authorization", "Bearer customer");
 
-    expect(response.body).toMatchObject(
-      expect.objectContaining({
-        items: [
-          expect.objectContaining({
-            id: bug_2.id,
-            campaign_id: campaign_1.id,
-            title: {
-              full: bug_2.message,
-              compact: bug_2.message,
-            },
-          }),
-          expect.objectContaining({
-            id: bug_1.id,
-            campaign_id: campaign_1.id,
-            title: {
-              full: "[CON-TEXT] - Bug 1 super-message",
-              compact: "Bug 1 super-message",
-              context: "CON-TEXT",
-            },
-          }),
-        ],
-      })
-    );
+    expect(response.body.items[0].title).toEqual({
+      full: bug_2.message,
+      compact: bug_2.message,
+    });
+
+    expect(response.body.items[1].title).toEqual({
+      full: bug_1.message,
+      compact: "Bug 1 super-message",
+      context: "CON-TEXT",
+    });
   });
+
+  // --- End of file
 });

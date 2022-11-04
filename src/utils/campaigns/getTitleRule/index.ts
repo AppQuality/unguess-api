@@ -7,7 +7,7 @@ export const getTitleRule = async (campaignId: number): Promise<boolean> => {
       SELECT meta_value 
       FROM wp_appq_cp_meta 
       WHERE campaign_id = ? 
-        AND meta_key = 'bug_title_rule' `,
+        AND meta_key = 'bug_title_rule' AND meta_value = 1; `,
       [campaignId]
     )
   );

@@ -255,6 +255,13 @@ export interface components {
       creation_date: string;
       is_visible_to_customer?: number;
     };
+    /** BugTitle */
+    BugTitle: {
+      full: string;
+      /** @description Bug title without context. */
+      compact: string;
+      context?: string;
+    };
     /** BugType */
     BugType: {
       id: number;
@@ -542,13 +549,6 @@ export interface components {
       };
       /** @description express coins */
       coins?: number;
-    };
-    /** BugTitle */
-    BugTitle: {
-      full: string;
-      /** @description Bug title without context. */
-      compact: string;
-      context?: string;
     };
   };
   responses: {
