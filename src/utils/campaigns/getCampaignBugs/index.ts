@@ -1,10 +1,7 @@
 import * as db from "@src/features/db";
 import { getBugDevice } from "@src/utils/bugs/getBugDevice";
 import { START_QUERY_PARAM_DEFAULT } from "@src/utils/constants";
-import {
-  getFormattedContext,
-  getTitleRule,
-} from "@src/utils/campaigns/getTitleRule";
+import { getBugTitle, getTitleRule } from "@src/utils/campaigns/getTitleRule";
 
 interface GetCampaignBugsArgs {
   campaignId: number;
@@ -130,21 +127,21 @@ export const getCampaignBugs = async (
 const formatBugs = async (bugs: any, campaignId: number) => {
   let results: any = [];
   const titleRuleIsActive = await getTitleRule(campaignId);
+
   for (const bug of bugs) {
     // Get bug device
     const device = await getBugDevice(bug);
 
-    const formattedContext = getFormattedContext(bug.title);
+    const bugTitle = getBugTitle({
+      bugTitle: bug.title,
+      hasTitleRule: titleRuleIsActive,
+    });
 
     results.push({
       id: bug.id,
       internal_id: bug.internal_id,
       campaign_id: bug.campaign_id,
-      title: bug.title,
-      contextless_title: titleRuleIsActive
-        ? formattedContext?.contextless_title
-        : undefined,
-      context: titleRuleIsActive ? formattedContext?.context : undefined,
+      title: bugTitle,
       step_by_step: bug.description,
       expected_result: bug.expected_result,
       current_result: bug.current_result,

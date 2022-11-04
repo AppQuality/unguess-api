@@ -4,10 +4,6 @@ import { ERROR_MESSAGE } from "@src/utils/constants";
 import { getCampaign } from "@src/utils/campaigns";
 import { getProjectById } from "@src/utils/projects";
 import { getBugById } from "@src/utils/bugs";
-import {
-  getTitleRule,
-  getFormattedContext,
-} from "@src/utils/campaigns/getTitleRule";
 
 export default async (
   c: Context,
@@ -49,16 +45,8 @@ export default async (
     });
 
     const bug = await getBugById(bug_id);
-    const titleRuleIsActive = await getTitleRule(campaign_id);
 
-    const formattedContext = getFormattedContext(bug.title);
-    return {
-      ...bug,
-      contextless_title: titleRuleIsActive
-        ? formattedContext?.contextless_title
-        : undefined,
-      context: titleRuleIsActive ? formattedContext?.context : undefined,
-    } as StoplightOperations["get-campaigns-single-bug"]["responses"]["200"]["content"]["application/json"];
+    return bug as StoplightOperations["get-campaigns-single-bug"]["responses"]["200"]["content"]["application/json"];
   } catch (e: any) {
     if (e.code) {
       error.code = e.code;

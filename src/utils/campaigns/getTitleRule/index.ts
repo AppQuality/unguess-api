@@ -1,6 +1,6 @@
 import * as db from "@src/features/db";
 
-export const getTitleRule = async (campaignId: number): Promise<number> => {
+export const getTitleRule = async (campaignId: number): Promise<boolean> => {
   const result = await db.query(
     db.format(
       `
@@ -11,19 +11,33 @@ export const getTitleRule = async (campaignId: number): Promise<number> => {
       [campaignId]
     )
   );
-  return result.length ? parseInt(result[0].meta_value) : 0;
+  return !!result.length;
 };
 
-export const getFormattedContext = (
-  bugTitle: string
-): { context: string; contextless_title: string } | undefined => {
-  if (!bugTitle.match(/\[(.*?)\]/)) return undefined;
-
-  return {
-    context: bugTitle.match(/\[(.*?)\]/)![1],
-    contextless_title: bugTitle
-      .replace(bugTitle.match(/\[(.*?)\]/)![0], "")
-      .replace("-", "")
-      .trim(),
+export const getBugTitle = ({
+  bugTitle,
+  hasTitleRule,
+}: {
+  bugTitle: string;
+  hasTitleRule?: boolean;
+}): StoplightComponents["schemas"]["BugTitle"] => {
+  const formattedBugTitle = {
+    full: bugTitle,
+    compact: bugTitle,
   };
+
+  if (hasTitleRule) {
+    if (!bugTitle.match(/\[(.*?)\]/)) return formattedBugTitle;
+
+    return {
+      ...formattedBugTitle,
+      compact: bugTitle
+        .replace(bugTitle.match(/\[(.*?)\]/)![0], "")
+        .replace("-", "")
+        .trim(),
+      context: bugTitle.match(/\[(.*?)\]/)![1],
+    };
+  }
+
+  return formattedBugTitle;
 };

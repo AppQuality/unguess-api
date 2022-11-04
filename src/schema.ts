@@ -170,9 +170,7 @@ export interface components {
       id: number;
       internal_id: string;
       campaign_id: number;
-      title: string;
-      contextless_title?: string;
-      context?: string;
+      title: components["schemas"]["BugTitle"];
       step_by_step: string;
       expected_result: string;
       current_result: string;
@@ -544,6 +542,13 @@ export interface components {
       };
       /** @description express coins */
       coins?: number;
+    };
+    /** BugTitle */
+    BugTitle: {
+      full: string;
+      /** @description Bug title without context. */
+      compact: string;
+      context?: string;
     };
   };
   responses: {

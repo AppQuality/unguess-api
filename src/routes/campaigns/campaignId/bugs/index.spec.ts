@@ -511,14 +511,19 @@ describe("GET /campaigns/{cid}/bugs", () => {
           expect.objectContaining({
             id: bug_2.id,
             campaign_id: campaign_1.id,
-            title: "Bug 2 message",
+            title: {
+              full: bug_2.message,
+              compact: bug_2.message,
+            },
           }),
           expect.objectContaining({
             id: bug_1.id,
             campaign_id: campaign_1.id,
-            title: "[CON-TEXT] - Bug 1 super-message",
-            contextless_title: "Bug 1 super-message",
-            context: "CON-TEXT",
+            title: {
+              full: "[CON-TEXT] - Bug 1 super-message",
+              compact: "Bug 1 super-message",
+              context: "CON-TEXT",
+            },
           }),
         ],
       })

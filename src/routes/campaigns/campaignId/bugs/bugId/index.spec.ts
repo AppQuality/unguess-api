@@ -429,16 +429,17 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
       ])
     );
   });
+
   it("Should return context parameters if title rule is active and bug title has context", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer customer");
     expect(response.status).toBe(200);
 
-    expect(response.body).toEqual(
+    expect(response.body.title).toEqual(
       expect.objectContaining({
-        title: "[CON-TEXT] - Bug 12-999 message",
-        contextless_title: "Bug 12-999 message",
+        full: "[CON-TEXT] - Bug 12-999 message",
+        compact: "Bug 12-999 message",
         context: "CON-TEXT",
       })
     );
