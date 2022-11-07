@@ -259,10 +259,14 @@ paths:
       description: Return all available report of a specific campaign
       security:
         - JWT: []
-  '/campaigns/{cid}/widgets/{wslug}':
+  '/campaigns/{cid}/widgets':
     parameters:
-      - $ref: '#/components/parameters/cid'
-      - $ref: '#/components/parameters/wslug'
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: number
+        description: Campaign id
     get:
       summary: Get Campaign widget data
       tags: []
@@ -285,6 +289,8 @@ paths:
       operationId: get-campaigns-cid-widgets-wslug
       security:
         - JWT: []
+      parameters:
+        - $ref: '#/components/parameters/wslug'
   /projects:
     post:
       summary: Create a new project
@@ -1864,10 +1870,14 @@ components:
       description: Defines an identifier for the bug object (BUG ID)
     wslug:
       name: wslug
-      in: path
+      in: query
       required: true
       schema:
         type: string
+        enum:
+          - bugs-by-usecase
+          - bugs-by-device
+          - bugs-by-type
       description: Campaign widget slug
   requestBodies:
     Credentials:
