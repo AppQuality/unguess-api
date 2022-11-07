@@ -57,6 +57,15 @@ export interface paths {
       };
     };
   };
+  "/campaigns/{cid}/widgets": {
+    get: operations["get-campaigns-cid-widgets-wslug"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: number;
+      };
+    };
+  };
   "/projects": {
     post: operations["post-projects"];
   };
@@ -550,6 +559,34 @@ export interface components {
       /** @description express coins */
       coins?: number;
     };
+    /**
+     * WidgetBugsByUseCase
+     * @description Returns a list of use case with the number of bugs
+     */
+    WidgetBugsByUseCase: {
+      data: (components["schemas"]["UseCase"] & {
+        /** @description Unique bugs */
+        bugs: number;
+      })[];
+      /** @enum {string} */
+      kind: "bugsByUseCase";
+    };
+    /**
+     * WidgetBugsByDevice
+     * @description Returns a list of devices with the number of bugs
+     */
+    WidgetBugsByDevice: {
+      data: ((
+        | components["schemas"]["Smartphone"]
+        | components["schemas"]["Desktop"]
+        | components["schemas"]["Tablet"]
+      ) & {
+        /** @description Unique bugs */
+        bugs: number;
+      })[];
+      /** @enum {string} */
+      kind: "bugsByDevice";
+    };
   };
   responses: {
     /** Example response */
@@ -578,6 +615,8 @@ export interface components {
     cid: number;
     /** @description Defines an identifier for the bug object (BUG ID) */
     bid: string;
+    /** @description Campaign widget slug */
+    wslug: "bugs-by-usecase" | "bugs-by-device" | "bugs-by-type";
   };
   requestBodies: {
     Credentials: {
@@ -792,6 +831,31 @@ export interface operations {
           "application/json": components["schemas"]["Report"][];
         };
       };
+    };
+  };
+  "get-campaigns-cid-widgets-wslug": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: number;
+      };
+      query: {
+        /** Campaign widget slug */
+        wslug: components["parameters"]["wslug"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json":
+            | components["schemas"]["WidgetBugsByUseCase"]
+            | components["schemas"]["WidgetBugsByDevice"];
+        };
+      };
+      401: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
     };
   };
   "post-projects": {
