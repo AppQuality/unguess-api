@@ -1871,7 +1871,7 @@ components:
         type: string
       description: Defines an identifier for the bug object (BUG ID)
     wslug:
-      name: wslug
+      name: s
       in: query
       required: true
       schema:
