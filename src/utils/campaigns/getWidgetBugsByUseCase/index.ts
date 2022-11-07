@@ -1,6 +1,6 @@
 export const getWidgetBugsByUseCase = async (
   campaign: StoplightComponents["schemas"]["CampaignWithOutput"]
-): Promise<StoplightComponents["schemas"]["WidgetBugsByDevice"]> => {
+): Promise<StoplightComponents["schemas"]["WidgetBugsByUseCase"]> => {
   const error = {
     code: 400,
     message: "Something went wrong with bugs-by-use-case widget",

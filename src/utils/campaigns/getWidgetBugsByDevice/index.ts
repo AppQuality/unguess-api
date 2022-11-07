@@ -1,4 +1,6 @@
-export const getWidgetBugsByDevices = async (
+import { getCampaignBugs } from "../getCampaignBugs";
+
+export const getWidgetBugsByDevice = async (
   campaign: StoplightComponents["schemas"]["CampaignWithOutput"]
 ): Promise<StoplightComponents["schemas"]["WidgetBugsByDevice"]> => {
   const error = {
@@ -11,6 +13,13 @@ export const getWidgetBugsByDevices = async (
   if (!campaign.outputs || !campaign.outputs.includes("bugs")) {
     throw error;
   }
+
+  const bugs = await getCampaignBugs({
+    campaignId: campaign.id,
+    filterBy: {
+      is_duplicated: "0",
+    },
+  });
 
   throw {
     code: 501,

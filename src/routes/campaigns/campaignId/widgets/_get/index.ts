@@ -1,8 +1,12 @@
 /** OPENAPI-ROUTE: get-campaigns-cid-widgets-wslug */
-import { getCampaign, getWidgetBugsByUseCase } from "@src/utils/campaigns";
+import { Context } from "openapi-backend";
+import {
+  getCampaign,
+  getWidgetBugsByDevice,
+  getWidgetBugsByUseCase,
+} from "@src/utils/campaigns";
 import { ERROR_MESSAGE } from "@src/utils/constants";
 import { getProjectById } from "@src/utils/projects";
-import { Context } from "openapi-backend";
 
 export default async (
   c: Context,
@@ -18,7 +22,7 @@ export default async (
   } as StoplightComponents["schemas"]["Error"];
 
   const cid = parseInt(c.request.params.cid as string);
-  const widget = c.request.params.wslug as string;
+  const widget = c.request.query.s as string;
 
   try {
     if (!cid || !widget) {
@@ -38,8 +42,9 @@ export default async (
     if (!campaign) {
       throw {
         ...error,
-        code: 400,
-        message: "Campaign not found",
+        code: 403,
+        message:
+          "Campaign doesn't exist or you don't have permission to view it",
       };
     }
 
@@ -54,7 +59,7 @@ export default async (
       case "bugs-by-use-case":
         return await getWidgetBugsByUseCase(campaign);
       case "bugs-by-device":
-        return await getWidgetBugsByUseCase(campaign);
+        return await getWidgetBugsByDevice(campaign);
     }
 
     throw {

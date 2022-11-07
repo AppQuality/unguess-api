@@ -841,7 +841,7 @@ export interface operations {
       };
       query: {
         /** Campaign widget slug */
-        wslug: components["parameters"]["wslug"];
+        s: components["parameters"]["wslug"];
       };
     };
     responses: {

@@ -11,7 +11,7 @@ import { getCampaignFamily } from "./getCampaignFamily";
 import { getCampaignOutputs } from "./getCampaignOutputs";
 import { getCampaignBugs } from "./getCampaignBugs";
 import { getTitleRule, getBugTitle } from "./getTitleRule";
-import { getWidgetBugsByDevices } from "./getWidgetBugsByDevice";
+import { getWidgetBugsByDevice } from "./getWidgetBugsByDevice";
 import { getWidgetBugsByUseCase } from "./getWidgetBugsByUseCase";
 
 export {
@@ -29,6 +29,6 @@ export {
   getCampaignBugs,
   getTitleRule,
   getBugTitle,
-  getWidgetBugsByDevices,
+  getWidgetBugsByDevice,
   getWidgetBugsByUseCase,
 };
