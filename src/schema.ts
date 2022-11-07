@@ -853,6 +853,7 @@ export interface operations {
             | components["schemas"]["WidgetBugsByDevice"];
         };
       };
+      400: components["responses"]["Error"];
       401: components["responses"]["Error"];
       403: components["responses"]["Error"];
       500: components["responses"]["Error"];
