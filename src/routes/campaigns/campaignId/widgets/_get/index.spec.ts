@@ -4,7 +4,7 @@ import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { table as platformTable } from "@src/__mocks__/database/platforms";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 import userTaskMedia from "@src/__mocks__/database/user_task_media";
-import useCases from "@src/__mocks__/database/use_cases";
+import useCases, { UseCaseParams } from "@src/__mocks__/database/use_cases";
 import reports from "@src/__mocks__/database/report";
 import bugs, { BugsParams } from "@src/__mocks__/database/bugs";
 import bugMedia from "@src/__mocks__/database/bug_media";
@@ -88,6 +88,16 @@ const device_1: DeviceParams = {
   form_factor: "Smartphone",
 };
 
+const useCase1: UseCaseParams = {
+  id: 123,
+  title: "Use Case 1: Titolone (Web)",
+  content: "Use Case 1 description",
+  campaign_id: campaign_1.id,
+  simple_title: "Titolone",
+  prefix: "Use Case 1:",
+  info: "Web",
+};
+
 const bug_1: BugsParams = {
   id: 1,
   internal_id: "BUG1",
@@ -98,9 +108,10 @@ const bug_1: BugsParams = {
   campaign_id: campaign_1.id,
   bug_type_id: 1,
   bug_replicability_id: 1,
-  status_id: 1,
+  status_id: 2,
   status_reason: "Bug 1 status reason",
-  application_section: "Bug 1 application section",
+  application_section: useCase1.title,
+  application_section_id: useCase1.id,
   note: "Bug 1 note",
   wp_user_id: 1,
   dev_id: device_1.id,
@@ -109,6 +120,7 @@ const bug_1: BugsParams = {
   os: device_1.operating_system,
   os_version: device_1.os_version,
   severity_id: 1,
+  is_duplicated: 0,
 };
 
 const bug_2: BugsParams = {
@@ -121,9 +133,10 @@ const bug_2: BugsParams = {
   campaign_id: campaign_1.id,
   bug_type_id: 1,
   bug_replicability_id: 1,
-  status_id: 1,
+  status_id: 4,
   status_reason: "Bug 2 status reason",
-  application_section: "Bug 2 application section",
+  application_section: useCase1.title,
+  application_section_id: useCase1.id,
   note: "Bug 2 note",
   wp_user_id: 1,
   is_favorite: 1,
@@ -133,6 +146,7 @@ const bug_2: BugsParams = {
   os: device_1.operating_system,
   os_version: device_1.os_version,
   severity_id: 2,
+  is_duplicated: 0,
 };
 
 const bug_media_1 = {
@@ -169,7 +183,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
         await useCases.mock();
         await userTaskMedia.mock();
         await reports.mock();
-
+        await useCases.insert(useCase1);
         await bugs.insert(bug_1);
         await bugs.insert(bug_2);
         await bugMedia.insert(bug_media_1);
@@ -242,4 +256,49 @@ describe("GET /campaigns/{cid}/widgets", () => {
       .set("Authorization", "Bearer customer");
     expect(response.status).toBe(400);
   });
+
+  // It should answer 200 and return the bugs by device widget
+  it("Should answer 200 and return the bugs by use case widget", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-usecase`)
+      .set("Authorization", "Bearer customer");
+    expect(response.status).toBe(200);
+    expect(response.body.kind).toEqual("bugsByUseCase");
+
+    expect(response.body.data[0].title).toEqual(useCase1.simple_title);
+    expect(response.body.data[0].bugs).toEqual(2);
+  });
+
+  it("Should answer 200 and the usecase title must be used in absence of simple title", async () => {
+    const useCase2 = {
+      ...useCase1,
+      id: 124,
+      title: "Use case 2: another usecase",
+      campaign_id: campaign_1.id,
+      simple_title: "",
+      prefix: "",
+      info: "",
+    };
+
+    const bug_3 = {
+      ...bug_1,
+      id: 3,
+      application_section: useCase2.title,
+      application_section_id: useCase2.id,
+    };
+
+    await useCases.insert(useCase2);
+    await bugs.insert(bug_3);
+
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-usecase`)
+      .set("Authorization", "Bearer customer");
+    expect(response.status).toBe(200);
+    expect(response.body.kind).toEqual("bugsByUseCase");
+
+    expect(response.body.data[1].title).toEqual(useCase2.title);
+    expect(response.body.data[1].bugs).toEqual(1);
+  });
+
+  // --- end of tests ---
 });

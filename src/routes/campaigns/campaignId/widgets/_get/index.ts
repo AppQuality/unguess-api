@@ -24,6 +24,8 @@ export default async (
   const cid = parseInt(c.request.params.cid as string);
   const widget = c.request.query.s as string;
 
+  res.status_code = 200;
+
   try {
     if (!cid || !widget) {
       throw {
@@ -56,7 +58,7 @@ export default async (
 
     // Return requested widget
     switch (widget) {
-      case "bugs-by-use-case":
+      case "bugs-by-usecase":
         return await getWidgetBugsByUseCase(campaign);
       case "bugs-by-device":
         return await getWidgetBugsByDevice(campaign);
