@@ -73,6 +73,8 @@ export default async (
     // Get the campaign bugs
     const bugs = await getCampaignBugs({
       campaignId: cid,
+      showNeedReview:
+        user.role === "administrator" ? true : campaign.showNeedReview,
       limit,
       start,
       ...(order && { order }),
