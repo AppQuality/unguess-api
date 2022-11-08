@@ -8,22 +8,18 @@ export const format = (query: string, data: (string | number)[]) =>
 
 export const query = async (query: string, db: string): Promise<any> => {
   const myDb = db === "unguess" ? unguessDb : tryberDb;
-  try {
-    let data;
-    if (
-      query.includes("UPDATE") ||
-      query.includes("DELETE") ||
-      query.includes("INSERT")
-    ) {
-      data = await myDb.run(query);
-    } else {
-      data = await myDb.all(query);
-    }
-
-    return data;
-  } catch (error) {
-    throw error;
+  let data;
+  if (
+    query.includes("UPDATE") ||
+    query.includes("DELETE") ||
+    query.includes("INSERT")
+  ) {
+    data = await myDb.run(query);
+  } else {
+    data = await myDb.all(query);
   }
+
+  return data;
 };
 
 export const insert = (table: string, data: any, db: string): Promise<any> => {
