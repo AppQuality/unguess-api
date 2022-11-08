@@ -34,7 +34,7 @@ export const getBugMedia = async (
         extension: result.location.split(".").pop()?.toLowerCase() || "-",
       },
       url: result.location,
-      creation_date: result.uploaded,
+      creation_date: result.uploaded.toString(),
     });
   });
 
