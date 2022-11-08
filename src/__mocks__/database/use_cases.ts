@@ -12,6 +12,9 @@ type UseCaseParams = {
   position?: number;
   allow_media?: number;
   optimize_media?: number;
+  simple_title?: string;
+  info?: string;
+  prefix?: string;
 };
 
 const defaultItem: UseCaseParams = {
@@ -25,12 +28,15 @@ const defaultItem: UseCaseParams = {
   position: 0,
   allow_media: 0,
   optimize_media: 0,
+  simple_title: "",
+  info: "",
+  prefix: "",
 };
 class UseCases extends Table<UseCaseParams> {
   protected name = "wp_appq_campaign_task";
   protected columns = [
     "id INTEGER PRIMARY KEY AUTOINCREMENT",
-    "title VARCHAR(140)",
+    "title VARCHAR(512)",
     "content TEXT",
     "campaign_id INTEGER",
     "is_required INTEGER",
@@ -40,6 +46,9 @@ class UseCases extends Table<UseCaseParams> {
     "position INTEGER DEFAULT 0 NOT NULL",
     "allow_media INTEGER DEFAULT 0 NOT NULL",
     "optimize_media INTEGER DEFAULT 0 NOT NULL",
+    "simple_title VARCHAR(128) NOT NULL",
+    "info VARCHAR(256) NOT NULL",
+    "prefix VARCHAR(128) NOT NULL",
   ];
   constructor() {
     super(defaultItem);
