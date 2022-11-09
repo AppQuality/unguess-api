@@ -19,6 +19,9 @@ export const createUseCases = async (
     position: 0,
     allow_media: 0,
     optimize_media: 0,
+    simple_title: "",
+    info: "",
+    prefix: "",
   };
 
   const allowedFields = Object.keys(defaultUseCase);

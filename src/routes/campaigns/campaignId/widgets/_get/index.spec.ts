@@ -330,8 +330,6 @@ describe("GET /campaigns/{cid}/widgets", () => {
     expect(response.status).toBe(200);
     expect(response.body.kind).toEqual("bugsByDevice");
     expect(response.body.data[0].bugs).toEqual(2);
-
-    console.log(response.body.data[0].bugs);
   });
 
   it("Should answer 200 and return the bugs by device widget (with 2 device type)", async () => {
