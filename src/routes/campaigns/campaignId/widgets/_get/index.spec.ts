@@ -280,19 +280,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
     expect(response.status).toBe(400);
   });
 
-  // It should answer 200 and return the bugs by device widget
-  it("Should answer 200 and return the bugs by use case widget", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-usecase`)
-      .set("Authorization", "Bearer customer");
-    expect(response.status).toBe(200);
-    expect(response.body.kind).toEqual("bugsByUseCase");
-
-    expect(response.body.data[0].title).toEqual(useCase1.simple_title);
-    expect(response.body.data[0].bugs).toEqual(2);
-  });
-
-  it("Should answer 200 and the usecase title must be used in absence of simple title", async () => {
+  describe("Bugs by usecase", () => {
     const useCase2 = {
       ...useCase1,
       id: 124,
@@ -310,51 +298,95 @@ describe("GET /campaigns/{cid}/widgets", () => {
       application_section_id: useCase2.id,
     };
 
-    await useCases.insert(useCase2);
-    await bugs.insert(bug_3);
+    beforeAll(async () => {
+      return new Promise(async (resolve, reject) => {
+        try {
+          await useCases.insert(useCase2);
+          await bugs.insert(bug_3);
+        } catch (error) {
+          console.error(error);
+          reject(error);
+        }
 
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-usecase`)
-      .set("Authorization", "Bearer customer");
-    expect(response.status).toBe(200);
-    expect(response.body.kind).toEqual("bugsByUseCase");
+        resolve(true);
+      });
+    });
 
-    expect(response.body.data[1].title).toEqual(useCase2.title);
-    expect(response.body.data[1].bugs).toEqual(1);
+    afterAll(async () => {
+      return new Promise(async (resolve, reject) => {
+        try {
+          await useCases.delete([{ id: useCase2.id }]);
+          await bugs.delete([{ id: bug_3.id }]);
+        } catch (error) {
+          console.error(error);
+          reject(error);
+        }
+
+        resolve(true);
+      });
+    });
+
+    it("Should answer 200 and return the bugs by use case widget", async () => {
+      const response = await request(app)
+        .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-usecase`)
+        .set("Authorization", "Bearer customer");
+      expect(response.status).toBe(200);
+      expect(response.body.kind).toEqual("bugsByUseCase");
+
+      expect(response.body.data[0].title).toEqual(useCase1.simple_title);
+      expect(response.body.data[0].bugs).toEqual(2);
+    });
+
+    it("Should answer 200 and the usecase title must be used in absence of simple title", async () => {
+      const response = await request(app)
+        .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-usecase`)
+        .set("Authorization", "Bearer customer");
+      expect(response.status).toBe(200);
+      expect(response.body.kind).toEqual("bugsByUseCase");
+
+      expect(response.body.data[1].title).toEqual(useCase2.title);
+      expect(response.body.data[1].bugs).toEqual(1);
+    });
+
+    // --- End of describe "Bugs by usecase"
   });
 
-  it("Should answer 200 and return the bugs by device widget", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-device`)
-      .set("Authorization", "Bearer customer");
-    expect(response.status).toBe(200);
-    expect(response.body.kind).toEqual("bugsByDevice");
-    expect(response.body.data[0].bugs).toEqual(2);
-  });
+  describe("Bugs by device", () => {
+    it("Should answer 200 and return the bugs by device widget", async () => {
+      const response = await request(app)
+        .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-device`)
+        .set("Authorization", "Bearer customer");
+      expect(response.status).toBe(200);
+      expect(response.body.kind).toEqual("bugsByDevice");
+      expect(response.body.data[0].bugs).toEqual(2);
+    });
 
-  it("Should answer 200 and return the bugs by device widget (with 2 device type)", async () => {
-    //Update bug_2
-    await bugs.update(
-      [
-        {
-          dev_id: tablet.id,
-          manufacturer: tablet.manufacturer,
-          model: tablet.model,
-          os: tablet.operating_system,
-          os_version: tablet.os_version,
-        },
-      ],
-      [{ id: bug_2.id }]
-    );
+    it("Should answer 200 and return the bugs by device widget (with 2 device type)", async () => {
+      //Update bug_2
+      await bugs.update(
+        [
+          {
+            dev_id: tablet.id,
+            manufacturer: tablet.manufacturer,
+            model: tablet.model,
+            os: tablet.operating_system,
+            os_version: tablet.os_version,
+          },
+        ],
+        [{ id: bug_2.id }]
+      );
 
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-device`)
-      .set("Authorization", "Bearer customer");
-    expect(response.status).toBe(200);
+      const response = await request(app)
+        .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-device`)
+        .set("Authorization", "Bearer customer");
+      expect(response.status).toBe(200);
 
-    expect(response.body.kind).toEqual("bugsByDevice");
-    expect(response.body.data[0].bugs).toEqual(1);
-    expect(response.body.data[1].bugs).toEqual(1);
+      expect(response.body.kind).toEqual("bugsByDevice");
+      expect(response.body.data[0].bugs).toEqual(1);
+      expect(response.body.data[1].bugs).toEqual(1);
+    });
+
+    // --- End of describe "Bugs by device"
   });
 
   // --- end of tests ---

@@ -26,6 +26,11 @@ class Table<T> {
     return await db.run(`DELETE FROM ${this.name}`);
   }
 
+  async delete(where: (T | T[])[]) {
+    const WHERE = this._getWhere(where);
+    return await db.run(`DELETE FROM ${this.name} ${WHERE}`);
+  }
+
   _getWhere(where?: (T | T[])[]): string {
     let WHERE = "";
     if (where) {
