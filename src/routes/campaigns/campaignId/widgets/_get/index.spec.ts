@@ -154,7 +154,7 @@ const bug_2: BugsParams = {
   campaign_id: campaign_1.id,
   bug_type_id: 1,
   bug_replicability_id: 1,
-  status_id: 4,
+  status_id: 2,
   status_reason: "Bug 2 status reason",
   application_section: useCase1.title,
   application_section_id: useCase1.id,
@@ -365,9 +365,9 @@ describe("GET /campaigns/{cid}/widgets", () => {
       expect(response.status).toBe(200);
       expect(response.body.kind).toEqual("bugsByUseCase");
 
-      expect(response.body.data[2].usecase_id).toEqual(-1);
-      expect(response.body.data[2].title).toEqual("Not a specific use case");
-      expect(response.body.data[2].bugs).toEqual(1);
+      expect(response.body.data[1].usecase_id).toEqual(-1);
+      expect(response.body.data[1].title).toEqual("Not a specific use case");
+      expect(response.body.data[1].bugs).toEqual(1);
     });
 
     // --- End of describe "Bugs by usecase"

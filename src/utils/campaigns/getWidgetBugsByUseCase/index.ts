@@ -26,8 +26,6 @@ export const getWidgetBugsByUseCase = async (
     throw error;
   }
 
-  const allowedStatuses = "2, 4"; // TODO: get status ids from config
-
   const query = `SELECT
       count(b.id) as total,
       t.id,
@@ -51,7 +49,7 @@ export const getWidgetBugsByUseCase = async (
     group by
       t.id
     ORDER BY
-      total DESC;`;
+      total DESC, t.position ASC;`;
 
   const result = await db.query(db.format(query, [campaign.id]));
 

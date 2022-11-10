@@ -53,8 +53,9 @@ export const getWidgetBugsByDevice = async (
     b.severity_id
     from wp_appq_evd_bug b
       LEFT JOIN wp_crowd_appq_device device ON (b.dev_id = device.id)
+      JOIN wp_appq_evd_bug_status status ON (b.status_id = status.id)
     WHERE b.campaign_id = ?
-    AAND ${
+    AND ${
       campaign.showNeedReview
         ? `(status.name == 'Approved' OR status.name == 'Need Review')`
         : `status.name == 'Approved'`
