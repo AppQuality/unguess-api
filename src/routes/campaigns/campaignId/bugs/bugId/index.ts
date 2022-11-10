@@ -44,7 +44,10 @@ export default async (
       user: user,
     });
 
-    const bug = await getBugById(bug_id);
+    const bug = await getBugById({
+      bugId: bug_id,
+      showNeedReview: campaign.showNeedReview,
+    });
 
     return bug as StoplightOperations["get-campaigns-single-bug"]["responses"]["200"]["content"]["application/json"];
   } catch (e: any) {

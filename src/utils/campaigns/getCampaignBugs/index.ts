@@ -5,6 +5,7 @@ import { getBugTitle, getTitleRule } from "@src/utils/campaigns/getTitleRule";
 
 interface GetCampaignBugsArgs {
   campaignId: number;
+  showNeedReview: boolean;
   limit?: StoplightComponents["parameters"]["limit"];
   start?: StoplightComponents["parameters"]["start"];
   order?: string;
@@ -18,27 +19,51 @@ interface BugsFilterBy {
 
 export const BugsOrderByValues = [
   "id",
+  "internal_id",
+  "wp_user_id",
+  "campaign_id",
   "status_id",
+  "publish",
   "severity_id",
+  "bug_replicability_id",
+  "bug_type_id",
+  "dev_id",
+  "manufacturer",
+  "model",
+  "os",
+  "os_version",
+  "is_duplicated",
+  "duplicated_of_id",
+  "is_favorite",
   "created",
   "updated",
   "last_seen",
-  "is_duplicated",
-  "is_favorite",
 ];
 export const BugsOrderValues = ["ASC", "DESC"];
 export const BugsFilterByValues = [
   "id",
   "internal_id",
-  "campaign_id",
+  "wp_user_id",
+  "status_id",
+  "publish",
+  "severity_id",
+  "bug_replicability_id",
+  "bug_type_id",
+  "dev_id",
+  "manufacturer",
+  "model",
+  "os",
+  "os_version",
   "is_duplicated",
+  "duplicated_of_id",
   "is_favorite",
 ];
 
 export const getCampaignBugs = async (
   args: GetCampaignBugsArgs
 ): Promise<StoplightComponents["schemas"]["Bug"][] | false> => {
-  const { campaignId, limit, start, order, orderBy, filterBy } = args;
+  const { campaignId, showNeedReview, limit, start, order, orderBy, filterBy } =
+    args;
 
   const queryData: string[] = [];
   queryData.push(campaignId.toString());
@@ -79,7 +104,12 @@ export const getCampaignBugs = async (
   JOIN wp_appq_evd_bug_replicability r ON (b.bug_replicability_id = r.id)
   JOIN wp_appq_evd_bug_status status ON (b.status_id = status.id)
   LEFT JOIN wp_crowd_appq_device device ON (b.dev_id = device.id)
-  WHERE b.campaign_id = ?`;
+  WHERE b.campaign_id = ? 
+  AND ${
+    showNeedReview
+      ? `(status.name == 'Approved' OR status.name == 'Need Review')`
+      : `status.name == 'Approved'`
+  }`;
 
   if (filterBy) {
     let acceptedFilters = BugsFilterByValues.filter((f) =>
@@ -111,9 +141,7 @@ export const getCampaignBugs = async (
 
   const formattedQuery = db.format(query, queryData);
 
-  const result = await db.query(formattedQuery);
-
-  const bugs = result;
+  const bugs = await db.query(formattedQuery);
 
   if (!bugs) {
     return false;
@@ -130,7 +158,7 @@ const formatBugs = async (bugs: any, campaignId: number) => {
 
   for (const bug of bugs) {
     // Get bug device
-    const device = await getBugDevice(bug);
+    const device = getBugDevice(bug);
 
     const bugTitle = getBugTitle({
       bugTitle: bug.title,
@@ -165,8 +193,8 @@ const formatBugs = async (bugs: any, campaignId: number) => {
         id: bug.application_section_id,
         title: bug.application_section,
       },
-      created: bug.created,
-      ...(bug.updated && { updated: bug.updated }),
+      created: bug.created.toString(),
+      ...(bug.updated && { updated: bug.updated.toString() }),
       note: bug.note,
       device,
       ...(bug.duplicated_of_id && { duplicated_of_id: bug.duplicated_of_id }),

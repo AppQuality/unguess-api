@@ -25,12 +25,13 @@ class Table<T> {
   async clear() {
     return await db.run(`DELETE FROM ${this.name}`);
   }
-  async all(
-    params?: (keyof T)[],
-    where?: (T | T[])[],
-    limit?: number
-  ): Promise<T[]> {
-    const keys = params ? params.join(",") : "*";
+
+  async delete(where: (T | T[])[]) {
+    const WHERE = this._getWhere(where);
+    return await db.run(`DELETE FROM ${this.name} ${WHERE}`);
+  }
+
+  _getWhere(where?: (T | T[])[]): string {
     let WHERE = "";
     if (where) {
       const orQueries = where.map((item) => {
@@ -52,6 +53,36 @@ class Table<T> {
         )
         .join(" AND ")}`;
     }
+
+    return WHERE;
+  }
+
+  async update(params: T[], where: (T | T[])[]) {
+    const set = params
+      .map((item) => {
+        if (item && Object.keys(item).length > 0) {
+          const keys = Object.keys(item);
+          const values = Object.values(item);
+          return keys
+            .map((key, index) => `${key}='${values[index]}'`)
+            .join(", ");
+        }
+      })
+      .join();
+
+    const WHERE = this._getWhere(where);
+
+    return await db.run(`UPDATE ${this.name} SET ${set} ${WHERE}`);
+  }
+
+  async all(
+    params?: (keyof T)[],
+    where?: (T | T[])[],
+    limit?: number
+  ): Promise<T[]> {
+    const keys = params ? params.join(",") : "*";
+    const WHERE = this._getWhere(where);
+
     return await db.all(
       `SELECT ${keys} FROM ${this.name} ${WHERE} ${
         limit ? `LIMIT ${limit}` : ""

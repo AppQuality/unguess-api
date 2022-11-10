@@ -9,9 +9,15 @@ import { getBugTags } from "../getBugTags";
 type BugWithMedia =
   StoplightOperations["get-campaigns-single-bug"]["responses"]["200"]["content"]["application/json"];
 
-export const getBugById = async (bugId: number): Promise<BugWithMedia> => {
+export const getBugById = async ({
+  bugId,
+  showNeedReview,
+}: {
+  bugId: number;
+  showNeedReview?: boolean;
+}): Promise<BugWithMedia> => {
   const error = {
-    code: 500,
+    code: 400,
     message: ERROR_MESSAGE,
     error: true,
   } as StoplightComponents["schemas"]["Error"];
@@ -53,7 +59,11 @@ export const getBugById = async (bugId: number): Promise<BugWithMedia> => {
         JOIN wp_appq_evd_bug_replicability r ON (b.bug_replicability_id = r.id)
         JOIN wp_appq_evd_bug_status status ON (b.status_id = status.id)
         LEFT JOIN wp_crowd_appq_device device ON (b.dev_id = device.id)
-        WHERE b.id = ?;`,
+        WHERE b.id = ? AND ${
+          showNeedReview
+            ? `(status.name == 'Approved' OR status.name == 'Need Review')`
+            : `status.name == 'Approved'`
+        };`,
       [bugId]
     )
   );
@@ -62,11 +72,14 @@ export const getBugById = async (bugId: number): Promise<BugWithMedia> => {
 
   // Check if bug exists
   if (!bug) {
-    throw { ...error, message: "GET_BUG_ERROR: invalid bug" };
+    throw {
+      ...error,
+      message: "GET_BUG_ERROR: this bug doesn't exists or you cannot see it.",
+    };
   }
 
   // Get bug device
-  const device = await getBugDevice(bug);
+  const device = getBugDevice(bug);
 
   // Get bug media
   const media = await getBugMedia(bugId);
@@ -112,8 +125,8 @@ export const getBugById = async (bugId: number): Promise<BugWithMedia> => {
       id: bug.application_section_id,
       title: bug.application_section,
     },
-    created: bug.created,
-    updated: bug.updated,
+    created: bug.created.toString(),
+    updated: bug.updated.toString(),
     note: bug.note,
     device,
     media: media || [],

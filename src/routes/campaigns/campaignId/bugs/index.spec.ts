@@ -89,6 +89,21 @@ const campaign_3 = {
   project_id: project_1.id,
 };
 
+const campaign_4 = {
+  id: 4,
+  start_date: "2017-07-20 10:00:00",
+  end_date: "2017-07-20 10:00:00",
+  close_date: "2017-07-20 10:00:00",
+  title: "Campaign 4 title",
+  customer_title: "Campaign 4 customer title",
+  status_id: 1,
+  is_public: 1,
+  campaign_type_id: campaign_type_1.id,
+  campaign_type: -1,
+  project_id: project_1.id,
+  cust_bug_vis: 1,
+};
+
 const device_1: DeviceParams = {
   id: 12,
   manufacturer: "Apple",
@@ -110,7 +125,7 @@ const bug_1: BugsParams = {
   campaign_id: campaign_1.id,
   bug_type_id: 1,
   bug_replicability_id: 1,
-  status_id: 1,
+  status_id: 2,
   status_reason: "Bug 1 status reason",
   application_section: "Bug 1 application section",
   note: "Bug 1 note",
@@ -133,7 +148,7 @@ const bug_2: BugsParams = {
   campaign_id: campaign_1.id,
   bug_type_id: 1,
   bug_replicability_id: 1,
-  status_id: 1,
+  status_id: 2,
   status_reason: "Bug 2 status reason",
   application_section: "Bug 2 application section",
   note: "Bug 2 note",
@@ -145,6 +160,84 @@ const bug_2: BugsParams = {
   os: device_1.operating_system,
   os_version: device_1.os_version,
   severity_id: 2,
+};
+
+const bug_3: BugsParams = {
+  id: 3,
+  internal_id: "BUG3",
+  message: "Bug 3 message",
+  description: "Bug 3 description",
+  expected_result: "Bug 3 expected result",
+  current_result: "Bug 3 current result",
+  campaign_id: campaign_1.id,
+  bug_type_id: 1,
+  bug_replicability_id: 1,
+  status_id: 1,
+  status_reason: "Bug 3 status reason",
+  application_section: "Bug 3 application section",
+  note: "Bug 3 note",
+  wp_user_id: 1,
+  is_favorite: 1,
+  dev_id: device_1.id,
+  manufacturer: device_1.manufacturer,
+  model: device_1.model,
+  os: device_1.operating_system,
+  os_version: device_1.os_version,
+  severity_id: 2,
+};
+
+const bug_4: BugsParams = {
+  id: 4,
+  internal_id: "BUG4",
+  message: "Bug 4 message",
+  description: "Bug 4 description",
+  expected_result: "Bug 4 expected result",
+  current_result: "Bug 4 current result",
+  campaign_id: campaign_1.id,
+  bug_type_id: 1,
+  bug_replicability_id: 1,
+  status_id: 4,
+  status_reason: "Bug 4 status reason",
+  application_section: "Bug 4 application section",
+  note: "Bug 4 note",
+  wp_user_id: 1,
+  is_favorite: 1,
+  dev_id: device_1.id,
+  manufacturer: device_1.manufacturer,
+  model: device_1.model,
+  os: device_1.operating_system,
+  os_version: device_1.os_version,
+  severity_id: 2,
+};
+
+const bug_5: BugsParams = {
+  id: 5,
+  internal_id: "BUG5",
+  message: "Bug 5 message",
+  description: "Bug 5 description",
+  expected_result: "Bug 5 expected result",
+  current_result: "Bug 5 current result",
+  campaign_id: campaign_4.id,
+  bug_type_id: 1,
+  bug_replicability_id: 1,
+  status_id: 4,
+  status_reason: "Bug 5 status reason",
+  application_section: "Bug 5 application section",
+  note: "Bug 5 note",
+  wp_user_id: 1,
+  is_favorite: 1,
+  dev_id: device_1.id,
+  manufacturer: device_1.manufacturer,
+  model: device_1.model,
+  os: device_1.operating_system,
+  os_version: device_1.os_version,
+  severity_id: 2,
+};
+
+const bug_6_pending: BugsParams = {
+  ...bug_5,
+  id: 6,
+  status_id: 1, // pending
 };
 
 const bug_media_1 = {
@@ -168,7 +261,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
           projects: [project_1, project_2],
           userToProjects: [user_to_project_1],
           campaignTypes: [campaign_type_1],
-          campaigns: [campaign_1, campaign_2, campaign_3],
+          campaigns: [campaign_1, campaign_2, campaign_3, campaign_4],
         });
         await CampaignMeta.mock();
         await CampaignMeta.insert({
@@ -187,6 +280,10 @@ describe("GET /campaigns/{cid}/bugs", () => {
 
         await bugs.insert(bug_1);
         await bugs.insert(bug_2);
+        await bugs.insert(bug_3);
+        await bugs.insert(bug_4);
+        await bugs.insert(bug_5);
+        await bugs.insert(bug_6_pending);
         await bugMedia.insert(bug_media_1);
         await bugSeverity.addDefaultItems();
         await bugReplicability.addDefaultItems();
@@ -515,6 +612,72 @@ describe("GET /campaigns/{cid}/bugs", () => {
       compact: "Bug 1 super-message",
       context: "CON-TEXT",
     });
+  });
+
+  it("Should not return refused bugs", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs`)
+      .set("Authorization", "Bearer customer");
+
+    expect(response.body.items.length).toBe(2);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: bug_1.id }),
+        expect.objectContaining({ id: bug_2.id }),
+      ])
+    );
+  });
+
+  it("Should not return need review bugs if option is not enabled", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs`)
+      .set("Authorization", "Bearer customer");
+
+    expect(response.body.items.length).toBe(2);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: bug_1.id }),
+        expect.objectContaining({ id: bug_2.id }),
+      ])
+    );
+  });
+  it("Should return need review bugs if option is not enabled but user is admin", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs`)
+      .set("Authorization", "Bearer administrator");
+
+    expect(response.body.items.length).toBe(3);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: bug_1.id }),
+        expect.objectContaining({ id: bug_2.id }),
+        expect.objectContaining({ id: bug_4.id }),
+      ])
+    );
+  });
+
+  it("Should return need review bugs if option is enabled", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_4.id}/bugs`)
+      .set("Authorization", "Bearer customer");
+
+    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: bug_5.id })])
+    );
+  });
+
+  it("Should NOT return pending bugs", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_4.id}/bugs`)
+      .set("Authorization", "Bearer customer");
+
+    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: bug_6_pending.id }),
+      ])
+    );
   });
 
   // --- End of file

@@ -27,8 +27,6 @@ export default async (
     error: true,
   } as StoplightComponents["schemas"]["Error"];
 
-  // TODO: check all request params with a util function
-
   let cid = parseInt(c.request.params.cid as string);
 
   const limit = c.request.query.limit
@@ -73,6 +71,8 @@ export default async (
     // Get the campaign bugs
     const bugs = await getCampaignBugs({
       campaignId: cid,
+      showNeedReview:
+        user.role === "administrator" ? true : campaign.showNeedReview,
       limit,
       start,
       ...(order && { order }),
