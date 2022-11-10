@@ -567,6 +567,7 @@ export interface components {
       data: (components["schemas"]["UseCase"] & {
         /** @description Unique bugs */
         bugs: number;
+        usecase_id: number;
       })[];
       /** @enum {string} */
       kind: "bugsByUseCase";

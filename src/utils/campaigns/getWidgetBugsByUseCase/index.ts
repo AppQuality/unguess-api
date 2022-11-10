@@ -2,6 +2,7 @@ import * as db from "@src/features/db";
 
 interface bugsByUseCaseQueryResults {
   total: number;
+  id: number;
   title: string;
   content: string;
   simple_title: string;
@@ -27,6 +28,7 @@ export const getWidgetBugsByUseCase = async (
 
   const query = `SELECT
       count(b.id) as total,
+      t.id,
       t.title,
       t.content,
       t.simple_title,
@@ -34,7 +36,7 @@ export const getWidgetBugsByUseCase = async (
       t.prefix
     from
       wp_appq_evd_bug b
-      JOIN wp_appq_campaign_task t ON (t.id = b.application_section_id)
+      LEFT JOIN wp_appq_campaign_task t ON (t.id = b.application_section_id)
     where
       b.campaign_id = ?
       AND b.is_duplicated = 0
@@ -55,8 +57,12 @@ export const getWidgetBugsByUseCase = async (
   }
 
   const useCasesWithBugs = result.map((row: bugsByUseCaseQueryResults) => ({
-    title: row.simple_title.length ? row.simple_title : row.title,
-    description: row.content,
+    usecase_id: row.id ?? -1,
+    title:
+      row.simple_title && row.simple_title.length
+        ? row.simple_title
+        : row.title || "Not a specific use case",
+    description: row.content ?? "",
     bugs: row.total,
   }));
 
