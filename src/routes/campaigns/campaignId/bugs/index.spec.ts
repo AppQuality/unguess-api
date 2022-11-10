@@ -236,7 +236,7 @@ const bug_5: BugsParams = {
 
 const bug_6_pending: BugsParams = {
   ...bug_5,
-  id: bug_5.id + 1,
+  id: 6,
   status_id: 1, // pending
 };
 
