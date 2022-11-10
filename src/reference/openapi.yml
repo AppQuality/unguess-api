@@ -1089,7 +1089,9 @@ components:
           type: string
           description: Bug title without context.
         context:
-          type: string
+          type: array
+          items:
+            type: string
       required:
         - full
         - compact
