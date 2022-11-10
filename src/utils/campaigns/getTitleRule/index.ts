@@ -35,15 +35,14 @@ export const getBugTitle = ({
         .replace(bugTitle.match(/\[(.*?)\]/)![0], "")
         .replace("-", "")
         .trim(),
-      context: bugTitle.match(/\[(.*?)\]/)![1],
+      context: [bugTitle.match(/\[(.*?)\]/)![1]],
     };
     while (res.compact.match(/\[(.*?)\]/)) {
       const newContext = res.compact.match(/\[(.*?)\]/)![0].trim();
-      res.context = [res.context, res.compact.match(/\[(.*?)\]/)![1]].join(
-        " - "
-      );
+      res.context.push(res.compact.match(/\[(.*?)\]/)![1]);
       res.compact = res.compact.replace(newContext, "").trim();
     }
+    console.log(res);
     return res;
   }
 

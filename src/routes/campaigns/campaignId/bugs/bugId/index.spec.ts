@@ -446,7 +446,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
       expect.objectContaining({
         full: "[CON-TEXT][2ndContext] - Bug 12-999 message",
         compact: "Bug 12-999 message",
-        context: "CON-TEXT - 2ndContext",
+        context: ["CON-TEXT", "2ndContext"],
       })
     );
   });

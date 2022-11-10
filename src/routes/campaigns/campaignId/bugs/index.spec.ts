@@ -610,7 +610,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
     expect(response.body.items[1].title).toEqual({
       full: bug_1.message,
       compact: "Bug 1 super-message",
-      context: "CON-TEXT",
+      context: ["CON-TEXT"],
     });
   });
 
