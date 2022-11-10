@@ -28,21 +28,16 @@ export const getBugTitle = ({
 
   if (hasTitleRule) {
     if (!bugTitle.match(/\[(.*?)\]/)) return formattedBugTitle;
-
-    let res = {
+    return {
       ...formattedBugTitle,
       compact: bugTitle
-        .replace(bugTitle.match(/\[(.*?)\]/)![0], "")
+        .replace(bugTitle.match(/\[(.*?)\]/g)!?.join(""), "")
         .replace("-", "")
         .trim(),
-      context: [bugTitle.match(/\[(.*?)\]/)![1]],
+      context: bugTitle
+        .match(/\[(.*?)\]/g)
+        ?.map((item) => item.replace(/[\[\]]/g, "")),
     };
-    while (res.compact.match(/\[(.*?)\]/)) {
-      const newContext = res.compact.match(/\[(.*?)\]/)![0].trim();
-      res.context.push(res.compact.match(/\[(.*?)\]/)![1]);
-      res.compact = res.compact.replace(newContext, "").trim();
-    }
-    return res;
   }
 
   return formattedBugTitle;
