@@ -1742,8 +1742,11 @@ components:
                   bugs:
                     type: integer
                     description: Unique bugs
+                  usecase_id:
+                    type: number
                 required:
                   - bugs
+                  - usecase_id
         kind:
           type: string
           enum:
