@@ -5,6 +5,7 @@ import { getBugTitle, getTitleRule } from "@src/utils/campaigns/getTitleRule";
 
 interface GetCampaignBugsArgs {
   campaignId: number;
+  showNeedReview: boolean;
   limit?: StoplightComponents["parameters"]["limit"];
   start?: StoplightComponents["parameters"]["start"];
   order?: string;
@@ -38,7 +39,8 @@ export const BugsFilterByValues = [
 export const getCampaignBugs = async (
   args: GetCampaignBugsArgs
 ): Promise<StoplightComponents["schemas"]["Bug"][] | false> => {
-  const { campaignId, limit, start, order, orderBy, filterBy } = args;
+  const { campaignId, showNeedReview, limit, start, order, orderBy, filterBy } =
+    args;
 
   const queryData: string[] = [];
   queryData.push(campaignId.toString());
@@ -79,7 +81,12 @@ export const getCampaignBugs = async (
   JOIN wp_appq_evd_bug_replicability r ON (b.bug_replicability_id = r.id)
   JOIN wp_appq_evd_bug_status status ON (b.status_id = status.id)
   LEFT JOIN wp_crowd_appq_device device ON (b.dev_id = device.id)
-  WHERE b.campaign_id = ?`;
+  WHERE b.campaign_id = ? 
+  AND ${
+    showNeedReview
+      ? `(status.name != 'Refused')`
+      : `(status.name != 'Refused' AND status.name != 'Need Review')`
+  }`;
 
   if (filterBy) {
     let acceptedFilters = BugsFilterByValues.filter((f) =>
