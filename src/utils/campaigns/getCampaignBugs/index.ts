@@ -141,9 +141,7 @@ export const getCampaignBugs = async (
 
   const formattedQuery = db.format(query, queryData);
 
-  const result = await db.query(formattedQuery);
-
-  const bugs = result;
+  const bugs = await db.query(formattedQuery);
 
   if (!bugs) {
     return false;
