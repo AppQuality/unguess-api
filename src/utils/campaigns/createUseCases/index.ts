@@ -69,7 +69,7 @@ export const createUseCases = async (
       })
     );
   } catch (error) {
-    if (process.env && process.env.DEBUG) {
+    if (process.env && process.env.DEBUG && process.env.DEBUG === "1") {
       console.log("Something went wrong in uc creation: ", error);
     }
   }
