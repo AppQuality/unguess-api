@@ -11,7 +11,9 @@ interface bugsByUseCaseQueryResults {
 }
 
 export const getWidgetBugsByUseCase = async (
-  campaign: StoplightComponents["schemas"]["CampaignWithOutput"]
+  campaign: StoplightComponents["schemas"]["CampaignWithOutput"] & {
+    showNeedReview: boolean;
+  }
 ): Promise<StoplightComponents["schemas"]["WidgetBugsByUseCase"]> => {
   const error = {
     code: 400,
@@ -36,11 +38,16 @@ export const getWidgetBugsByUseCase = async (
       t.prefix
     from
       wp_appq_evd_bug b
+      JOIN wp_appq_evd_bug_status status ON (b.status_id = status.id) 
       LEFT JOIN wp_appq_campaign_task t ON (t.id = b.application_section_id)
     where
       b.campaign_id = ?
       AND b.is_duplicated = 0
-      AND b.status_id IN (${allowedStatuses})
+      AND ${
+        campaign.showNeedReview
+          ? `(status.name == 'Approved' OR status.name == 'Need Review')`
+          : `status.name == 'Approved'`
+      }
     group by
       t.id
     ORDER BY

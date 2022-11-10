@@ -137,6 +137,12 @@ const bug_2 = {
   os_version: device_2.os_version,
 };
 
+const bug_3_pending = {
+  ...bug_1,
+  id: 13001,
+  status_id: 1, // pending
+};
+
 const bug_media_1 = {
   id: 123,
   bug_id: bug_1.id,
@@ -215,6 +221,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
 
         await bugs.insert(bug_1);
         await bugs.insert(bug_2);
+        await bugs.insert(bug_3_pending);
         await devices.insert(device_1);
         await devices.insert(device_2);
         await bugMedia.insert(bug_media_1);
@@ -461,6 +468,13 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
         }),
       ])
     );
+  });
+
+  it("Should answer 400 if the bug requested is in a state not allowed", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_3_pending.id}`)
+      .set("Authorization", "Bearer customer");
+    expect(response.status).toBe(400);
   });
 
   /** --- end of file */

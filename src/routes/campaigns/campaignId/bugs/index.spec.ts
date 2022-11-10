@@ -234,6 +234,12 @@ const bug_5: BugsParams = {
   severity_id: 2,
 };
 
+const bug_6_pending: BugsParams = {
+  ...bug_5,
+  id: bug_5.id + 1,
+  status_id: 1, // pending
+};
+
 const bug_media_1 = {
   id: 123,
   bug_id: bug_1.id,
@@ -277,6 +283,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
         await bugs.insert(bug_3);
         await bugs.insert(bug_4);
         await bugs.insert(bug_5);
+        await bugs.insert(bug_6_pending);
         await bugMedia.insert(bug_media_1);
         await bugSeverity.addDefaultItems();
         await bugReplicability.addDefaultItems();
@@ -657,6 +664,19 @@ describe("GET /campaigns/{cid}/bugs", () => {
     expect(response.body.items.length).toBe(1);
     expect(response.body.items).toEqual(
       expect.arrayContaining([expect.objectContaining({ id: bug_5.id })])
+    );
+  });
+
+  it("Should NOT return pending bugs", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_4.id}/bugs`)
+      .set("Authorization", "Bearer customer");
+
+    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: bug_6_pending.id }),
+      ])
     );
   });
 
