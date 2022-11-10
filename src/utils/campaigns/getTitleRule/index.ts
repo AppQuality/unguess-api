@@ -42,7 +42,6 @@ export const getBugTitle = ({
       res.context.push(res.compact.match(/\[(.*?)\]/)![1]);
       res.compact = res.compact.replace(newContext, "").trim();
     }
-    console.log(res);
     return res;
   }
 
