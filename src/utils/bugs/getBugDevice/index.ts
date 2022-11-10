@@ -1,13 +1,12 @@
 import { ERROR_MESSAGE } from "@src/utils/constants";
 import { BugsParams } from "@src/__mocks__/database/bugs";
 
-export const getBugDevice = async (
+export const getBugDevice = (
   bug: BugsParams & { form_factor: string; pc_type: string }
-): Promise<
+):
   | StoplightComponents["schemas"]["Smartphone"]
   | StoplightComponents["schemas"]["Tablet"]
-  | StoplightComponents["schemas"]["Desktop"]
-> => {
+  | StoplightComponents["schemas"]["Desktop"] => {
   const error = {
     code: 500,
     message: ERROR_MESSAGE,

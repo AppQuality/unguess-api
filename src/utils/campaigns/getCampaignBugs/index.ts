@@ -137,7 +137,7 @@ const formatBugs = async (bugs: any, campaignId: number) => {
 
   for (const bug of bugs) {
     // Get bug device
-    const device = await getBugDevice(bug);
+    const device = getBugDevice(bug);
 
     const bugTitle = getBugTitle({
       bugTitle: bug.title,

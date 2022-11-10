@@ -66,7 +66,7 @@ export const getBugById = async (bugId: number): Promise<BugWithMedia> => {
   }
 
   // Get bug device
-  const device = await getBugDevice(bug);
+  const device = getBugDevice(bug);
 
   // Get bug media
   const media = await getBugMedia(bugId);
