@@ -103,6 +103,19 @@ const campaign_4 = {
   project_id: project_1.id,
   cust_bug_vis: 1,
 };
+const campaign_5 = {
+  id: 5,
+  start_date: "2017-07-20 10:00:00",
+  end_date: "2017-07-20 10:00:00",
+  close_date: "2017-07-20 10:00:00",
+  title: "Campaign 5 title - no title rule",
+  customer_title: "Campaign 5 customer title",
+  status_id: 1,
+  is_public: 1,
+  campaign_type_id: campaign_type_1.id,
+  campaign_type: -1,
+  project_id: project_1.id,
+};
 
 const device_1: DeviceParams = {
   id: 12,
@@ -240,6 +253,30 @@ const bug_6_pending: BugsParams = {
   status_id: 1, // pending
 };
 
+const bug_7: BugsParams = {
+  id: 7,
+  internal_id: "BUG7",
+  message: "Bug 7 message",
+  description: "Bug 7 description",
+  expected_result: "Bug 7 expected result",
+  current_result: "Bug 7 current result",
+  campaign_id: campaign_5.id,
+  bug_type_id: 1,
+  bug_replicability_id: 1,
+  status_id: 2,
+  status_reason: "Bug 7 status reason",
+  application_section: "Bug 7 application section",
+  note: "Bug 7 note - this is a bug with no context",
+  wp_user_id: 1,
+  is_favorite: 1,
+  dev_id: device_1.id,
+  manufacturer: device_1.manufacturer,
+  model: device_1.model,
+  os: device_1.operating_system,
+  os_version: device_1.os_version,
+  severity_id: 2,
+};
+
 const bug_media_1 = {
   id: 123,
   bug_id: bug_1.id,
@@ -261,7 +298,13 @@ describe("GET /campaigns/{cid}/bugs", () => {
           projects: [project_1, project_2],
           userToProjects: [user_to_project_1],
           campaignTypes: [campaign_type_1],
-          campaigns: [campaign_1, campaign_2, campaign_3, campaign_4],
+          campaigns: [
+            campaign_1,
+            campaign_2,
+            campaign_3,
+            campaign_4,
+            campaign_5,
+          ],
         });
         await CampaignMeta.mock();
         await CampaignMeta.insert({
@@ -284,6 +327,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
         await bugs.insert(bug_4);
         await bugs.insert(bug_5);
         await bugs.insert(bug_6_pending);
+        await bugs.insert(bug_7);
         await bugMedia.insert(bug_media_1);
         await bugSeverity.addDefaultItems();
         await bugReplicability.addDefaultItems();
@@ -641,6 +685,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
       ])
     );
   });
+
   it("Should return need review bugs if option is not enabled but user is admin", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs`)
@@ -678,6 +723,17 @@ describe("GET /campaigns/{cid}/bugs", () => {
         expect.objectContaining({ id: bug_6_pending.id }),
       ])
     );
+  });
+
+  it("Should bugs without context if title_rule is not active", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_5.id}/bugs`)
+      .set("Authorization", "Bearer customer");
+      console.log("CP5",response.body.items);
+    expect(response.body.items[0].title).toEqual({
+      full: bug_7.message,
+      compact: bug_7.message,
+    });
   });
 
   // --- End of file
