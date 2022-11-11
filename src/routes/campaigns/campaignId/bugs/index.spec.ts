@@ -714,7 +714,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
 
   it("Should NOT return pending bugs", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_4.id}/bugs`)
+      .get(`/campaigns/${campaign_5.id}/bugs`)
       .set("Authorization", "Bearer customer");
 
     expect(response.body.items.length).toBe(1);
