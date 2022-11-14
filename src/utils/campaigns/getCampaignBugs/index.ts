@@ -107,8 +107,8 @@ export const getCampaignBugs = async (
   WHERE b.campaign_id = ? 
   AND ${
     showNeedReview
-      ? `(status.name == 'Approved' OR status.name == 'Need Review')`
-      : `status.name == 'Approved'`
+      ? `(status.name = 'Approved' OR status.name = 'Need Review')`
+      : `status.name = 'Approved'`
   }`;
 
   if (filterBy) {
