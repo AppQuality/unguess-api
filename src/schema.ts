@@ -66,6 +66,16 @@ export interface paths {
       };
     };
   };
+  "/campaigns/{cid}/meta": {
+    /** Used to extra info about a selected campaign */
+    get: operations["get-campaigns-cid-meta"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: number;
+      };
+    };
+  };
   "/projects": {
     post: operations["post-projects"];
   };
@@ -588,6 +598,28 @@ export interface components {
       /** @enum {string} */
       kind: "bugsByDevice";
     };
+    /**
+     * WidgetCampaignProgress
+     * @description Used to show an overview about a specific campaign.
+     */
+    WidgetCampaignProgress: {
+      data: {
+        start_date: string;
+        end_date: string;
+        /**
+         * Format: float
+         * @description Percentage fixed rate of completion
+         * @enum {number}
+         */
+        usecase_completion: 12.5 | 37.5 | 62.5 | 87.5 | 100;
+        /** @description Number of hours from start_date */
+        time_elapsed: number;
+        /** @description Expected amount of hours required to complete the campaign */
+        expected_duration: number;
+      };
+      /** @enum {string} */
+      kind: "campaignProgress";
+    };
   };
   responses: {
     /** Example response */
@@ -617,7 +649,11 @@ export interface components {
     /** @description Defines an identifier for the bug object (BUG ID) */
     bid: string;
     /** @description Campaign widget slug */
-    wslug: "bugs-by-usecase" | "bugs-by-device" | "bugs-by-type";
+    wslug:
+      | "bugs-by-usecase"
+      | "bugs-by-device"
+      | "bugs-by-type"
+      | "cp-progress";
   };
   requestBodies: {
     Credentials: {
@@ -851,7 +887,33 @@ export interface operations {
         content: {
           "application/json":
             | components["schemas"]["WidgetBugsByUseCase"]
-            | components["schemas"]["WidgetBugsByDevice"];
+            | components["schemas"]["WidgetBugsByDevice"]
+            | components["schemas"]["WidgetCampaignProgress"];
+        };
+      };
+      400: components["responses"]["Error"];
+      401: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  /** Used to extra info about a selected campaign */
+  "get-campaigns-cid-meta": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Campaign"] & {
+            selected_testers: number;
+            /** @description Array of form factors */
+            allowed_devices: string[];
+          };
         };
       };
       400: components["responses"]["Error"];
