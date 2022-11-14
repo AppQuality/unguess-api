@@ -325,7 +325,35 @@ paths:
                     required:
                       - selected_testers
                       - allowed_devices
-              examples: {}
+              examples:
+                Example 1:
+                  value:
+                    id: 0
+                    start_date: string
+                    end_date: string
+                    close_date: string
+                    title: string
+                    customer_title: string
+                    is_public: 0
+                    bug_form: -1
+                    type:
+                      id: 0
+                      name: string
+                    family:
+                      id: 0
+                      name: string
+                    status:
+                      id: 0
+                      name: string
+                    project:
+                      id: 0
+                      name: string
+                    description: string
+                    base_bug_internal_id: string
+                    selected_testers: 16
+                    allowed_devices:
+                      - smartphone
+                      - tablet
         '400':
           $ref: '#/components/responses/Error'
         '401':
