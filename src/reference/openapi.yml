@@ -303,7 +303,7 @@ paths:
           type: number
         description: Campaign id
     get:
-      summary: Get Campaign widget data
+      summary: Get Campaign meta info
       tags: []
       responses:
         '200':
@@ -322,6 +322,9 @@ paths:
                         description: Array of form factors
                         items:
                           type: string
+                    required:
+                      - selected_testers
+                      - allowed_devices
               examples: {}
         '400':
           $ref: '#/components/responses/Error'
