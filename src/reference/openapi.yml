@@ -279,6 +279,7 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/WidgetBugsByUseCase'
                   - $ref: '#/components/schemas/WidgetBugsByDevice'
+                  - $ref: '#/components/schemas/WidgetCampaignProgress'
               examples: {}
         '400':
           $ref: '#/components/responses/Error'
@@ -1840,20 +1841,51 @@ components:
       required:
         - data
         - kind
-    CampaignProgress:
-      title: CampaignProgress
+    WidgetCampaignProgress:
+      title: WidgetCampaignProgress
       x-stoplight:
-        id: rvnxywx76xpr3
+        id: 5b2de85594c7e
       type: object
+      description: Used to show an overview about a specific campaign.
       properties:
-        start_date:
+        data:
+          type: object
+          required:
+            - start_date
+            - end_date
+            - usecase_completion
+            - time_elapsed
+            - expected_duration
+          properties:
+            start_date:
+              type: string
+            end_date:
+              type: string
+            usecase_completion:
+              type: number
+              minimum: 0
+              maximum: 100
+              format: float
+              enum:
+                - 12.5
+                - 37.5
+                - 62.5
+                - 87.5
+                - 100
+              description: Percentage fixed rate of completion
+            time_elapsed:
+              type: integer
+              description: Number of hours from start_date
+            expected_duration:
+              type: integer
+              description: Expected amount of hours required to complete the campaign
+        kind:
           type: string
-        end_date:
-          type: string
-        duration:
-          type: string
-        time_elapsed:
-          type: string
+          enum:
+            - campaignProgress
+      required:
+        - data
+        - kind
   securitySchemes:
     JWT:
       type: http
@@ -1939,6 +1971,7 @@ components:
           - bugs-by-usecase
           - bugs-by-device
           - bugs-by-type
+          - cp-progress
       description: Campaign widget slug
   requestBodies:
     Credentials:
