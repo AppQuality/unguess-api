@@ -293,6 +293,48 @@ paths:
         - JWT: []
       parameters:
         - $ref: '#/components/parameters/wslug'
+  '/campaigns/{cid}/meta':
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: number
+        description: Campaign id
+    get:
+      summary: Get Campaign widget data
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Campaign'
+                  - type: object
+                    properties:
+                      selected_testers:
+                        type: number
+                      allowed_devices:
+                        type: array
+                        description: Array of form factors
+                        items:
+                          type: string
+              examples: {}
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-meta
+      security:
+        - JWT: []
+      parameters: []
+      description: Used to extra info about a selected campaign
   /projects:
     post:
       summary: Create a new project
@@ -1798,6 +1840,20 @@ components:
       required:
         - data
         - kind
+    CampaignProgress:
+      title: CampaignProgress
+      x-stoplight:
+        id: rvnxywx76xpr3
+      type: object
+      properties:
+        start_date:
+          type: string
+        end_date:
+          type: string
+        duration:
+          type: string
+        time_elapsed:
+          type: string
   securitySchemes:
     JWT:
       type: http
