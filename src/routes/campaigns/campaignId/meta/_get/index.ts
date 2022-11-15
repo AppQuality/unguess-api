@@ -1,13 +1,13 @@
-/** OPENAPI-ROUTE: get-campaigns-cid-widgets-wslug */
+/** OPENAPI-ROUTE: get-campaigns-cid-meta */
 import { Context } from "openapi-backend";
 import {
   getCampaign,
+  getCampaignMeta,
   getWidgetBugsByDevice,
   getWidgetBugsByUseCase,
 } from "@src/utils/campaigns";
 import { ERROR_MESSAGE } from "@src/utils/constants";
 import { getProjectById } from "@src/utils/projects";
-import { getCampaignMeta } from "@src/utils/campaigns/getCampaignMeta";
 
 export default async (
   c: Context,
@@ -23,16 +23,15 @@ export default async (
   } as StoplightComponents["schemas"]["Error"];
 
   const cid = parseInt(c.request.params.cid as string);
-  const widget = c.request.query.s as string;
 
   res.status_code = 200;
 
   try {
-    if (!cid || !widget) {
+    if (!cid) {
       throw {
         ...error,
         code: 400,
-        message: "Missing campaign id or widget slug",
+        message: "Missing campaign id",
       };
     }
 
@@ -56,10 +55,12 @@ export default async (
       user: user,
     });
 
-    // Return requested widget
     const meta = await getCampaignMeta(campaign);
 
-    return meta;
+    return {
+      ...campaign,
+      ...meta,
+    };
   } catch (e: any) {
     res.status_code = e.code || 500;
     error.code = e.code || 500;
