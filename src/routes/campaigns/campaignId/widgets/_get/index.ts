@@ -57,9 +57,18 @@ export default async (
     });
 
     // Return requested widget
-    const meta = await getCampaignMeta(campaign);
+    switch (widget) {
+      case "bugs-by-usecase":
+        return await getWidgetBugsByUseCase(campaign);
+      case "bugs-by-device":
+        return await getWidgetBugsByDevice(campaign);
+    }
 
-    return meta;
+    throw {
+      ...error,
+      code: 401,
+      message: "The requested widget is not available or you don't have access",
+    };
   } catch (e: any) {
     res.status_code = e.code || 500;
     error.code = e.code || 500;
