@@ -4,6 +4,7 @@ import {
   getCampaign,
   getWidgetBugsByDevice,
   getWidgetBugsByUseCase,
+  getWidgetCampaignProgress,
 } from "@src/utils/campaigns";
 import { ERROR_MESSAGE } from "@src/utils/constants";
 import { getProjectById } from "@src/utils/projects";
@@ -62,6 +63,8 @@ export default async (
         return await getWidgetBugsByUseCase(campaign);
       case "bugs-by-device":
         return await getWidgetBugsByDevice(campaign);
+      case "cp-progress":
+        return await getWidgetCampaignProgress(campaign);
     }
 
     throw {

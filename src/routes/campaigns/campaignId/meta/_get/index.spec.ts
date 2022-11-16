@@ -3,16 +3,7 @@ import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { table as platformTable } from "@src/__mocks__/database/platforms";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
-import userTaskMedia from "@src/__mocks__/database/user_task_media";
 import useCases, { UseCaseParams } from "@src/__mocks__/database/use_cases";
-import reports from "@src/__mocks__/database/report";
-import bugs, { BugsParams } from "@src/__mocks__/database/bugs";
-import bugMedia from "@src/__mocks__/database/bug_media";
-import bugSeverity from "@src/__mocks__/database/bug_severity";
-import bugReplicability from "@src/__mocks__/database/bug_replicability";
-import bugType from "@src/__mocks__/database/bug_type";
-import bugStatus from "@src/__mocks__/database/bug_status";
-import devices, { DeviceParams } from "@src/__mocks__/database/device";
 import candidates from "@src/__mocks__/database/cp_has_candidate";
 
 const customer_1 = {
@@ -123,6 +114,11 @@ describe("GET /campaigns/{cid}/meta", () => {
           campaign_id: campaign_1.id,
           accepted: 1,
         });
+        await candidates.insert({
+          user_id: 35,
+          campaign_id: campaign_1.id,
+          accepted: 0,
+        });
 
         await useCases.insert(useCase1);
       } catch (error) {
@@ -178,7 +174,6 @@ describe("GET /campaigns/{cid}/meta", () => {
     expect(response.status).toBe(200);
 
     expect(response.body.selected_testers).toEqual(3);
-    expect(response.body.allowed_devices.length).toEqual(1);
   });
 
   it("Should return an empty array if there are no device configurations", async () => {

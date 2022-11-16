@@ -579,7 +579,11 @@ export interface components {
         bugs: number;
         usecase_id: number;
       })[];
-      /** @enum {string} */
+      /**
+       * @default bugsByUseCase
+       * @example bugsByUseCase
+       * @enum {string}
+       */
       kind: "bugsByUseCase";
     };
     /**
@@ -595,7 +599,11 @@ export interface components {
         /** @description Unique bugs */
         bugs: number;
       })[];
-      /** @enum {string} */
+      /**
+       * @default bugsByDevice
+       * @example bugsByDevice
+       * @enum {string}
+       */
       kind: "bugsByDevice";
     };
     /**
@@ -616,8 +624,12 @@ export interface components {
         time_elapsed: number;
         /** @description Expected amount of hours required to complete the campaign */
         expected_duration: number;
-      };
-      /** @enum {string} */
+      }[];
+      /**
+       * @default campaignProgress
+       * @example campaignProgress
+       * @enum {string}
+       */
       kind: "campaignProgress";
     };
   };
@@ -885,10 +897,11 @@ export interface operations {
       /** OK */
       200: {
         content: {
-          "application/json":
-            | components["schemas"]["WidgetBugsByUseCase"]
-            | components["schemas"]["WidgetBugsByDevice"]
-            | components["schemas"]["WidgetCampaignProgress"];
+          "application/json": Partial<
+            components["schemas"]["WidgetBugsByUseCase"]
+          > &
+            Partial<components["schemas"]["WidgetBugsByDevice"]> &
+            Partial<components["schemas"]["WidgetCampaignProgress"]>;
         };
       };
       400: components["responses"]["Error"];

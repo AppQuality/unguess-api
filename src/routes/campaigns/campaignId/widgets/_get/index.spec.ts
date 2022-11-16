@@ -13,6 +13,8 @@ import bugReplicability from "@src/__mocks__/database/bug_replicability";
 import bugType from "@src/__mocks__/database/bug_type";
 import bugStatus from "@src/__mocks__/database/bug_status";
 import devices, { DeviceParams } from "@src/__mocks__/database/device";
+import userTask, { UserTaskParams } from "@src/__mocks__/database/user_task";
+import candidates from "@src/__mocks__/database/cp_has_candidate";
 
 const customer_1 = {
   id: 999,
@@ -409,6 +411,104 @@ describe("GET /campaigns/{cid}/widgets", () => {
     });
 
     // --- End of describe "Bugs by device"
+  });
+
+  describe("Campaign progress", () => {
+    const useCase2 = {
+      ...useCase1,
+      id: 124,
+      title: "Use case 2: another usecase",
+      campaign_id: campaign_1.id,
+      simple_title: "",
+      prefix: "",
+      info: "",
+    };
+
+    const uT1: UserTaskParams = {
+      id: 1,
+      task_id: useCase1.id,
+      tester_id: 32,
+    };
+
+    const uT2: UserTaskParams = {
+      id: 2,
+      task_id: useCase2.id,
+      tester_id: 32,
+    };
+
+    const uT3: UserTaskParams = {
+      id: 3,
+      task_id: useCase1.id,
+      tester_id: 34,
+    };
+
+    const uT4: UserTaskParams = {
+      id: 4,
+      task_id: useCase2.id,
+      tester_id: 34,
+    };
+
+    beforeAll(async () => {
+      return new Promise(async (resolve, reject) => {
+        try {
+          await candidates.mock();
+          await userTask.mock();
+
+          await useCases.insert(useCase2);
+          await candidates.insert({
+            user_id: 32,
+            campaign_id: campaign_1.id,
+            accepted: 1,
+          });
+          await candidates.insert({
+            user_id: 33,
+            campaign_id: campaign_1.id,
+            accepted: 0,
+          });
+          await candidates.insert({
+            user_id: 34,
+            campaign_id: campaign_1.id,
+            accepted: 1,
+          });
+          await candidates.insert({
+            user_id: 35,
+            campaign_id: campaign_1.id,
+            accepted: 0,
+          });
+        } catch (error) {
+          console.error(error);
+          reject(error);
+        }
+
+        resolve(true);
+      });
+    });
+
+    afterAll(async () => {
+      return new Promise(async (resolve, reject) => {
+        try {
+          await useCases.delete([{ id: useCase2.id }]);
+          await candidates.dropMock();
+          await userTask.dropMock();
+        } catch (error) {
+          console.error(error);
+          reject(error);
+        }
+
+        resolve(true);
+      });
+    });
+
+    it("Should answer 200 and return the correct kind of widget", async () => {
+      const response = await request(app)
+        .get(`/campaigns/${campaign_1.id}/widgets?s=cp-progress`)
+        .set("Authorization", "Bearer customer");
+      console.log(response.body);
+      expect(response.status).toBe(200);
+      expect(response.body.kind).toEqual("cpProgress");
+    });
+
+    // --- End of describe "Campaign Progress Widget"
   });
 
   // --- end of tests ---
