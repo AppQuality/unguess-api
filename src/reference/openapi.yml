@@ -1291,91 +1291,15 @@ components:
         - status
         - project
     CampaignWithOutput:
-      title: Campaign
-      type: object
-      properties:
-        id:
-          type: integer
-        start_date:
-          type: string
-        end_date:
-          type: string
-        close_date:
-          type: string
-        title:
-          type: string
-        customer_title:
-          type: string
-        is_public:
-          type: number
-        bug_form:
-          type: number
-          minimum: -1
-          maximum: 1
-          description: |-
-            -1: no bug form;
-            0: only bug form;
-            1: bug form with bug parade';
-        type:
-          type: object
-          required:
-            - id
-            - name
+      title: CampaignWithOutput
+      allOf:
+        - $ref: '#/components/schemas/Campaign'
+        - type: object
           properties:
-            id:
-              type: number
-            name:
-              type: string
-        family:
-          type: object
-          required:
-            - id
-            - name
-          properties:
-            id:
-              type: number
-            name:
-              type: string
-        status:
-          type: object
-          required:
-            - id
-            - name
-          properties:
-            id:
-              type: number
-            name:
-              type: string
-        project:
-          type: object
-          required:
-            - id
-            - name
-          properties:
-            id:
-              type: number
-            name:
-              type: string
-        description:
-          type: string
-        base_bug_internal_id:
-          type: string
-        outputs:
-          type: array
-          items:
-            $ref: '#/components/schemas/Output'
-      required:
-        - id
-        - start_date
-        - end_date
-        - close_date
-        - title
-        - customer_title
-        - is_public
-        - type
-        - family
-        - status
-        - project
+            outputs:
+              type: array
+              items:
+                $ref: '#/components/schemas/Output'
     Coin:
       title: Coin
       type: object
