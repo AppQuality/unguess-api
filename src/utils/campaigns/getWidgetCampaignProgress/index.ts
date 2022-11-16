@@ -12,14 +12,14 @@ interface bugsByUseCaseQueryResults {
 
 // UC allowed responses 12.5 | 37.5 | 62.5 | 87.5
 
-const UC_PROGRESS_1 = { max: 25, value: 12.5 }; //  0%  - 24.99%
-const UC_PROGRESS_2 = { max: 50, value: 37.5 }; //  25% - 49.99%
-const UC_PROGRESS_3 = { max: 75, value: 62.5 }; //  50% - 74.99%
-const UC_PROGRESS_4 = { max: 100, value: 87.5 }; // 75% - 100%
+const UC_PROGRESS_1 = { max: 25, value: 12.5 as const }; //  0%  - 24.99%
+const UC_PROGRESS_2 = { max: 50, value: 37.5 as const }; //  25% - 49.99%
+const UC_PROGRESS_3 = { max: 75, value: 62.5 as const }; //  50% - 74.99%
+const UC_PROGRESS_4 = { max: 100, value: 87.5 as const }; // 75% - 100%
 
 const getWidgetUseCaseProgress = async (
   cp: StoplightComponents["schemas"]["CampaignWithOutput"]
-): Promise<number> => {
+): Promise<12.5 | 37.5 | 62.5 | 87.5 | 100> => {
   // Selected testers
   const testersQuery = `SELECT 
     p.id, 
@@ -32,7 +32,7 @@ const getWidgetUseCaseProgress = async (
   const testers = await db.query(db.format(testersQuery, [cp.id]));
 
   if (!testers.length) {
-    return 0;
+    return UC_PROGRESS_1.value;
   }
 
   const defaultGroups = {
@@ -102,38 +102,32 @@ const getWidgetUseCaseProgress = async (
 
 export const getWidgetCampaignProgress = async (
   campaign: StoplightComponents["schemas"]["CampaignWithOutput"]
-): Promise<
-  StoplightComponents["schemas"]["WidgetCampaignProgress"] & {
-    kind: "campaignProgress";
-  }
-> => {
-  const error = {
-    code: 400,
-    message: "Something went wrong with campaign-progress widget",
-    error: true,
-  } as StoplightComponents["schemas"]["Error"];
-
+): Promise<StoplightComponents["schemas"]["WidgetCampaignProgress"]> => {
   const useCaseProgress = await getWidgetUseCaseProgress(campaign);
 
   const startDate = new Date(campaign.start_date);
   const endDate = new Date(campaign.end_date);
+
+  const isDatesOK = startDate && endDate && startDate < endDate;
+
   const now = new Date();
 
-  const expDuration = endDate.getTime() - startDate.getTime();
-  const actDuration = now.getTime() - startDate.getTime();
+  const expDuration = isDatesOK ? endDate.getTime() - startDate.getTime() : 0;
+  const actDuration =
+    !isDatesOK || campaign.status.name === "completed"
+      ? expDuration
+      : now.getTime() - startDate.getTime();
 
-  return {
-    data: [
-      {
-        start_date: campaign.start_date,
-        end_date: campaign.end_date,
-        usecase_completion: useCaseProgress,
-        time_elapsed: actDuration,
-        expected_duration: expDuration,
-      },
-    ],
+  const response: StoplightComponents["schemas"]["WidgetCampaignProgress"] = {
+    data: {
+      start_date: campaign.start_date,
+      end_date: campaign.end_date,
+      usecase_completion: useCaseProgress,
+      time_elapsed: actDuration,
+      expected_duration: expDuration,
+    },
     kind: "campaignProgress",
-  } as StoplightComponents["schemas"]["WidgetCampaignProgress"] & {
-    kind: "campaignProgress";
   };
+
+  return response;
 };

@@ -1860,8 +1860,6 @@ components:
         - kind
     WidgetBugsByDevice:
       title: WidgetBugsByDevice
-      x-stoplight:
-        id: tm59wsbormo47
       type: object
       x-examples:
         Example 1:
@@ -1906,8 +1904,6 @@ components:
         - kind
     WidgetCampaignProgress:
       title: WidgetCampaignProgress
-      x-stoplight:
-        id: 5b2de85594c7e
       type: object
       description: Used to show an overview about a specific campaign.
       x-examples:
@@ -1922,6 +1918,12 @@ components:
       properties:
         data:
           type: object
+          required:
+            - start_date
+            - end_date
+            - usecase_completion
+            - time_elapsed
+            - expected_duration
           properties:
             start_date:
               type: string
@@ -1934,7 +1936,7 @@ components:
               format: float
               enum:
                 - 12.5
-                 - 37.5
+                - 37.5
                 - 62.5
                 - 87.5
                 - 100
@@ -1945,12 +1947,6 @@ components:
             expected_duration:
               type: integer
               description: Expected amount of hours required to complete the campaign
-              required:
-                - start_date
-                - end_date
-                - usecase_completion
-                - time_elapsed
-                - expected_duration
         kind:
           type: string
           enum:

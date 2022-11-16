@@ -15,6 +15,7 @@ import bugStatus from "@src/__mocks__/database/bug_status";
 import devices, { DeviceParams } from "@src/__mocks__/database/device";
 import userTask, { UserTaskParams } from "@src/__mocks__/database/user_task";
 import candidates from "@src/__mocks__/database/cp_has_candidate";
+import useCaseGroup from "@src/__mocks__/database/use_case_group";
 
 const customer_1 = {
   id: 999,
@@ -54,8 +55,8 @@ const campaign_type_1 = {
 const campaign_1 = {
   id: 1,
   start_date: "2017-07-20 10:00:00",
-  end_date: "2017-07-20 10:00:00",
-  close_date: "2017-07-20 10:00:00",
+  end_date: "2017-07-22 10:00:00",
+  close_date: "2017-07-23 10:00:00",
   title: "Campaign 2 title",
   customer_title: "Campaign 2 customer title",
   status_id: 1,
@@ -67,7 +68,7 @@ const campaign_1 = {
 
 const campaign_2 = {
   id: 2,
-  start_date: "2017-07-20 10:00:00",
+  start_date: "2017-07-21 10:00:00",
   end_date: "2017-07-20 10:00:00",
   close_date: "2017-07-20 10:00:00",
   title: "Campaign 998 title",
@@ -194,6 +195,12 @@ describe("GET /campaigns/{cid}/widgets", () => {
           userToProjects: [user_to_project_1],
           campaignTypes: [campaign_type_1],
           campaigns: [campaign_1, campaign_2],
+          profiles: [
+            { wp_user_id: 12, id: 32 },
+            { wp_user_id: 13, id: 33 },
+            { wp_user_id: 14, id: 34 },
+            { wp_user_id: 15, id: 35 },
+          ],
         });
 
         await bugs.mock();
@@ -453,25 +460,35 @@ describe("GET /campaigns/{cid}/widgets", () => {
         try {
           await candidates.mock();
           await userTask.mock();
+          await useCaseGroup.mock();
 
           await useCases.insert(useCase2);
+          await useCaseGroup.insert({
+            task_id: useCase1.id || 123,
+            group_id: 0,
+          });
+          await useCaseGroup.insert({
+            task_id: useCase2.id || 124,
+            group_id: 1,
+          });
+
           await candidates.insert({
-            user_id: 32,
+            user_id: 12,
             campaign_id: campaign_1.id,
             accepted: 1,
           });
           await candidates.insert({
-            user_id: 33,
+            user_id: 13,
             campaign_id: campaign_1.id,
             accepted: 0,
           });
           await candidates.insert({
-            user_id: 34,
+            user_id: 14,
             campaign_id: campaign_1.id,
             accepted: 1,
           });
           await candidates.insert({
-            user_id: 35,
+            user_id: 15,
             campaign_id: campaign_1.id,
             accepted: 0,
           });
@@ -490,6 +507,20 @@ describe("GET /campaigns/{cid}/widgets", () => {
           await useCases.delete([{ id: useCase2.id }]);
           await candidates.dropMock();
           await userTask.dropMock();
+          await useCaseGroup.dropMock();
+        } catch (error) {
+          console.error(error);
+          reject(error);
+        }
+
+        resolve(true);
+      });
+    });
+
+    afterEach(async () => {
+      return new Promise(async (resolve, reject) => {
+        try {
+          await userTask.clear();
         } catch (error) {
           console.error(error);
           reject(error);
@@ -503,9 +534,80 @@ describe("GET /campaigns/{cid}/widgets", () => {
       const response = await request(app)
         .get(`/campaigns/${campaign_1.id}/widgets?s=cp-progress`)
         .set("Authorization", "Bearer customer");
-      console.log(response.body);
       expect(response.status).toBe(200);
-      expect(response.body.kind).toEqual("cpProgress");
+      expect(response.body.kind).toEqual("campaignProgress");
+    });
+
+    it("Should return 12,5 as uc progress when the cp has a 0% of completions", async () => {
+      const response = await request(app)
+        .get(`/campaigns/${campaign_1.id}/widgets?s=cp-progress`)
+        .set("Authorization", "Bearer customer");
+      expect(response.status).toBe(200);
+      expect(response.body.data.usecase_completion).toEqual(12.5);
+    });
+
+    it("Should return 37,5 as uc progress when the cp has a 25% of completions", async () => {
+      await userTask.insert(uT1);
+
+      const response = await request(app)
+        .get(`/campaigns/${campaign_1.id}/widgets?s=cp-progress`)
+        .set("Authorization", "Bearer customer");
+      expect(response.status).toBe(200);
+      expect(response.body.data.usecase_completion).toEqual(37.5);
+    });
+
+    it("Should return 62,5 as uc progress when the cp has a 50% of completions", async () => {
+      await userTask.insert(uT1);
+      await userTask.insert(uT2);
+
+      const response = await request(app)
+        .get(`/campaigns/${campaign_1.id}/widgets?s=cp-progress`)
+        .set("Authorization", "Bearer customer");
+      expect(response.status).toBe(200);
+      expect(response.body.data.usecase_completion).toEqual(62.5);
+    });
+
+    it("Should return 87.5 as uc progress when the cp has a 75% of completions", async () => {
+      await userTask.insert(uT1);
+      await userTask.insert(uT2);
+      await userTask.insert(uT3);
+
+      const response = await request(app)
+        .get(`/campaigns/${campaign_1.id}/widgets?s=cp-progress`)
+        .set("Authorization", "Bearer customer");
+      expect(response.status).toBe(200);
+      expect(response.body.data.usecase_completion).toEqual(87.5);
+    });
+
+    it("Should return 87.5 as uc progress when the cp has a 100% of completions", async () => {
+      await userTask.insert(uT1);
+      await userTask.insert(uT2);
+      await userTask.insert(uT3);
+      await userTask.insert(uT4);
+
+      const response = await request(app)
+        .get(`/campaigns/${campaign_1.id}/widgets?s=cp-progress`)
+        .set("Authorization", "Bearer customer");
+      expect(response.status).toBe(200);
+      expect(response.body.data.usecase_completion).toEqual(87.5);
+    });
+
+    it("Should return 0 time_elapsed and 0 expected_duration when the startDate is greater than endDate", async () => {
+      const response = await request(app)
+        .get(`/campaigns/${campaign_2.id}/widgets?s=cp-progress`)
+        .set("Authorization", "Bearer administrator");
+      expect(response.status).toBe(200);
+      expect(response.body.data.time_elapsed).toEqual(0);
+      expect(response.body.data.expected_duration).toEqual(0);
+    });
+
+    it("Should return a number greater than 0 when the cp dates are correct", async () => {
+      const response = await request(app)
+        .get(`/campaigns/${campaign_1.id}/widgets?s=cp-progress`)
+        .set("Authorization", "Bearer customer");
+      expect(response.status).toBe(200);
+      expect(response.body.data.time_elapsed).toBeGreaterThan(0);
+      expect(response.body.data.expected_duration).toBeGreaterThan(0);
     });
 
     // --- End of describe "Campaign Progress Widget"

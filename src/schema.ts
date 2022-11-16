@@ -624,7 +624,7 @@ export interface components {
         time_elapsed: number;
         /** @description Expected amount of hours required to complete the campaign */
         expected_duration: number;
-      }[];
+      };
       /**
        * @default campaignProgress
        * @example campaignProgress
@@ -897,11 +897,10 @@ export interface operations {
       /** OK */
       200: {
         content: {
-          "application/json": Partial<
-            components["schemas"]["WidgetBugsByUseCase"]
-          > &
-            Partial<components["schemas"]["WidgetBugsByDevice"]> &
-            Partial<components["schemas"]["WidgetCampaignProgress"]>;
+          "application/json":
+            | components["schemas"]["WidgetBugsByUseCase"]
+            | components["schemas"]["WidgetBugsByDevice"]
+            | components["schemas"]["WidgetCampaignProgress"];
         };
       };
       400: components["responses"]["Error"];

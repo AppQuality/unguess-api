@@ -8,7 +8,6 @@ import {
 } from "@src/utils/campaigns";
 import { ERROR_MESSAGE } from "@src/utils/constants";
 import { getProjectById } from "@src/utils/projects";
-import { getCampaignMeta } from "@src/utils/campaigns/getCampaignMeta";
 
 export default async (
   c: Context,
@@ -40,6 +39,7 @@ export default async (
     // Check if the campaign exists
     const campaign = await getCampaign({
       campaignId: cid,
+      withOutputs: true,
     });
 
     if (!campaign) {
