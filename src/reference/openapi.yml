@@ -276,7 +276,7 @@ paths:
           content:
             application/json:
               schema:
-                oneOf:
+                anyOf:
                   - $ref: '#/components/schemas/WidgetBugsByUseCase'
                   - $ref: '#/components/schemas/WidgetBugsByDevice'
                   - $ref: '#/components/schemas/WidgetCampaignProgress'
@@ -1825,6 +1825,8 @@ components:
           type: string
           enum:
             - bugsByUseCase
+          default: bugsByUseCase
+          example: bugsByUseCase
       required:
         - data
         - kind
@@ -1869,6 +1871,8 @@ components:
           type: string
           enum:
             - bugsByDevice
+          example: bugsByDevice
+          default: bugsByDevice
       required:
         - data
         - kind
@@ -1881,23 +1885,17 @@ components:
       x-examples:
         Example 1:
           data:
-            start_date: string
-            end_date: string
-            usecase_completion: 12.5
-            time_elapsed: 0
-            expected_duration: 0
+            - start_date: string
+              end_date: string
+              usecase_completion: 12.5
+              time_elapsed: 0
+              expected_duration: 0
           kind: campaignProgress
       properties:
         data:
           type: array
           items:
             type: object
-            required:
-            - start_date
-            - end_date
-            - usecase_completion
-            - time_elapsed
-            - expected_duration
             properties:
               start_date:
                 type: string
@@ -1921,10 +1919,18 @@ components:
               expected_duration:
                 type: integer
                 description: Expected amount of hours required to complete the campaign
+            required:
+              - start_date
+              - end_date
+              - usecase_completion
+              - time_elapsed
+              - expected_duration
         kind:
           type: string
           enum:
             - campaignProgress
+          default: campaignProgress
+          example: campaignProgress
       required:
         - data
         - kind
