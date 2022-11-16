@@ -96,14 +96,14 @@ describe("GET /workspaces/{wid}/projects/{pid}", () => {
   it("Should answer 200 if logged in", async () => {
     const response = await request(app)
       .get(`/workspaces/${customer_1.id}/projects/${project_1.id}`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.status).toBe(200);
   });
 
   it("Should answer 403 if no workspaces are found", async () => {
     const response = await request(app)
       .get(`/workspaces/${customer_1.id}/projects/999999`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.body.code).toBe(403);
     expect(response.body.message).toBe(ERROR_MESSAGE);
   });
@@ -111,14 +111,14 @@ describe("GET /workspaces/{wid}/projects/{pid}", () => {
   it("Should answer 400 of the requested parameter is wrong", async () => {
     const response = await request(app)
       .get(`/workspaces/${customer_1.id}/projects/a`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.status).toBe(400);
   });
 
   it("Should answer with a project object", async () => {
     const response = await request(app)
       .get(`/workspaces/${customer_1.id}/projects/${project_1.id}`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.body).toMatchObject({
       id: project_1.id,
       name: project_1.display_name,
@@ -129,7 +129,7 @@ describe("GET /workspaces/{wid}/projects/{pid}", () => {
   it("Should answer with 403 if the user has not permission or if project is not found", async () => {
     const response = await request(app)
       .get(`/workspaces/${customer_1.id}/projects/3`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.status).toBe(403);
     expect(response.body.code).toBe(403);
     expect(response.body.message).toBe(ERROR_MESSAGE);

@@ -162,7 +162,7 @@ describe("GET /workspaces/{wid}/projects", () => {
   it("Should answer 200 if logged in", async () => {
     const response = await request(app)
       .get(`/workspaces/${customer_1.id}/projects`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.status).toBe(200);
   });
 
@@ -176,7 +176,7 @@ describe("GET /workspaces/{wid}/projects", () => {
   it("Should answer with only the visible projects", async () => {
     const response = await request(app)
       .get(`/workspaces/${customer_1.id}/projects`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(JSON.stringify(response.body)).toStrictEqual(
       JSON.stringify({
         items: [
@@ -204,7 +204,7 @@ describe("GET /workspaces/{wid}/projects", () => {
   it("Should answer with only one visible project because of limit 1", async () => {
     const response = await request(app)
       .get(`/workspaces/${customer_1.id}/projects?start=0&limit=1`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(JSON.stringify(response.body)).toStrictEqual(
       JSON.stringify({
         items: [
@@ -226,14 +226,14 @@ describe("GET /workspaces/{wid}/projects", () => {
   it("Should answer 400 if wid is a string", async () => {
     const response = await request(app)
       .get(`/workspaces/asd/projects`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.status).toBe(400);
   });
 
   it("Should return 403 if workspace is not found", async () => {
     const result = await request(app)
       .get(`/workspaces/9999/projects`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(result.body.code).toBe(403);
     expect(result.body.message).toBe(ERROR_MESSAGE);
   });
@@ -241,7 +241,7 @@ describe("GET /workspaces/{wid}/projects", () => {
   it("Should return a list of projects if customer is present and has some projects", async () => {
     const response = await request(app)
       .get(`/workspaces/${customer_1.id}/projects`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.status).toBe(200);
     expect(Array.isArray(response.body.items)).toBe(true);
     expect(response.body.items.length).toBeGreaterThan(0);
@@ -255,7 +255,7 @@ describe("GET /workspaces/{wid}/projects", () => {
   it("Should return only the projects that the user can see", async () => {
     const response = await request(app)
       .get(`/workspaces/${customer_1.id}/projects`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.status).toBe(200);
     expect(JSON.stringify(response.body)).toStrictEqual(
       JSON.stringify({
@@ -284,7 +284,7 @@ describe("GET /workspaces/{wid}/projects", () => {
   it("Should return only the projects that the user can see with the correct campaigns count", async () => {
     const response = await request(app)
       .get(`/workspaces/${customer_1.id}/projects`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.status).toBe(200);
     expect(JSON.stringify(response.body)).toStrictEqual(
       JSON.stringify({

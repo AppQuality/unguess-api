@@ -289,7 +289,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   it("Should answer 400 if campaign does not exist", async () => {
     const response = await request(app)
       .get(`/campaigns/999999/bugs/${bug_1.id}`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
     expect(response.status).toBe(400);
   });
 
@@ -297,7 +297,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   it("Should answer 403 if the user has no permissions to see the campaign", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_2.id}/bugs/${bug_1.id}`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
     expect(response.status).toBe(403);
   });
 
@@ -305,7 +305,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   it("Should answer 200 with the bug", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
 
     expect(response.body).toEqual(
@@ -337,14 +337,14 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   it("Should answer 400 if an invalid campaign id is provided", async () => {
     const response = await request(app)
       .get(`/campaigns/invalid/bugs/${bug_1.id}`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
     expect(response.status).toBe(400);
   });
 
   it("Should answer 400 if an invalid bug id is provided", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs/invalid`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
     expect(response.status).toBe(400);
   });
 
@@ -352,7 +352,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   it("Should return manufacturer and model if smartphone", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
 
     expect(response.body.device).toEqual(
@@ -367,7 +367,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   it("Should NOT return manufacturer and model if desktop, bug desktop_type", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs/${bug_2.id}`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
 
     expect(response.body.device.manufacture).toBeUndefined();
@@ -386,7 +386,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   it("Should return an empty array if the bug has no media", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs/${bug_2.id}`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
 
     expect(response.body.media).toEqual([]);
@@ -396,7 +396,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   it("Should return a list of tags if available", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
 
     expect(response.body.tags.length).toEqual(1);
@@ -414,7 +414,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   it("Should return all available additional fields", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
 
     expect(response.body.additional_fields.length).toEqual(2);
@@ -423,7 +423,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   it("Should recognize regex additional fields", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
 
     expect(response.body.additional_fields).toEqual(
@@ -440,7 +440,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   it("Should return context parameters if title rule is active and bug title has context", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
     expect(response.body.title).toEqual(
       expect.objectContaining({
@@ -454,7 +454,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   it("Should recognize regex additional fields", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
 
     expect(response.body.additional_fields).toEqual(
@@ -472,7 +472,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   it("Should answer 400 if the bug requested is in a state not allowed", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs/${bug_3_pending.id}`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
     expect(response.status).toBe(400);
   });
 

@@ -75,14 +75,14 @@ describe("GET /workspaces", () => {
   it("Should answer 200 if logged in", async () => {
     const response = await request(app)
       .get("/workspaces")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.status).toBe(200);
   });
 
   it("Should answer with an array of workspaces", async () => {
     const response = await request(app)
       .get("/workspaces")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(JSON.stringify(response.body)).toStrictEqual(
       JSON.stringify({
         items: [
@@ -112,7 +112,7 @@ describe("GET /workspaces", () => {
   it("Should answer with a paginated items of workspaces", async () => {
     const response = await request(app)
       .get("/workspaces?limit=1&start=0")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(JSON.stringify(response.body)).toStrictEqual(
       JSON.stringify({
         items: [
@@ -136,7 +136,7 @@ describe("GET /workspaces", () => {
   it("Should answer with an error if the limit is not a number", async () => {
     const response = await request(app)
       .get("/workspaces?limit=banana&start=0")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.status).toBe(400);
     expect(response.body.err[0].message).toBe("should be number");
   });
@@ -144,7 +144,7 @@ describe("GET /workspaces", () => {
   it("Should answer with an array of workspaces ordered by name", async () => {
     const response = await request(app)
       .get("/workspaces?orderBy=company&order=desc")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(JSON.stringify(response.body)).toStrictEqual(
       JSON.stringify({
         items: [

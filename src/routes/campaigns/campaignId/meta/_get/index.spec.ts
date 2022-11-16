@@ -155,7 +155,7 @@ describe("GET /campaigns/{cid}/meta", () => {
   it("Should answer 400 if campaign does not exist", async () => {
     const response = await request(app)
       .get(`/campaigns/999999/meta`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
     expect(response.status).toBe(403);
   });
 
@@ -163,14 +163,14 @@ describe("GET /campaigns/{cid}/meta", () => {
   it("Should answer 403 if the user has no permissions to see the campaign", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_2.id}/meta`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
     expect(response.status).toBe(403);
   });
 
   it("Should answer 200 and return the number of selected testers", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/meta`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
 
     expect(response.body.selected_testers).toEqual(3);
@@ -179,7 +179,7 @@ describe("GET /campaigns/{cid}/meta", () => {
   it("Should return an empty array if there are no device configurations", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/meta`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
 
     expect(response.body.allowed_devices.length).toEqual(0);
   });
@@ -187,9 +187,7 @@ describe("GET /campaigns/{cid}/meta", () => {
   it("Should return 0 if there are no selected testers", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_2.id}/meta`)
-      .set("Authorization", "Bearer administrator");
-
-    console.log(response.body);
+      .set("Authorization", "Bearer admin");
 
     expect(response.body.selected_testers).toEqual(0);
   });
@@ -197,9 +195,7 @@ describe("GET /campaigns/{cid}/meta", () => {
   it("Should return an array with form factor", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_2.id}/meta`)
-      .set("Authorization", "Bearer administrator");
-
-    console.log(response.body);
+      .set("Authorization", "Bearer admin");
 
     expect(response.body.allowed_devices.length).toEqual(2);
     expect(response.body.allowed_devices).toEqual(
