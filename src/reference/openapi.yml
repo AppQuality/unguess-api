@@ -279,7 +279,38 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/WidgetBugsByUseCase'
                   - $ref: '#/components/schemas/WidgetBugsByDevice'
-              examples: {}
+                  - $ref: '#/components/schemas/WidgetCampaignProgress'
+              examples:
+                Bugs by UseCase:
+                  value:
+                    data:
+                      - title: UC1 asd
+                        description: string
+                        bugs: 10
+                        usecase_id: 1220
+                    kind: bugsByUseCase
+                Example 2:
+                  value:
+                    data:
+                      - title: string
+                        description: string
+                        functionality:
+                          id: 0
+                          title: string
+                          description: string
+                          content: string
+                          category:
+                            id: 0
+                            name: string
+                          device_type: webapp
+                          locale: en
+                          image: 'http://example.com'
+                          requiresLogin: false
+                        logged: true
+                        link: string
+                        bugs: 0
+                        usecase_id: 0
+                    kind: bugsByUseCase
         '400':
           $ref: '#/components/responses/Error'
         '401':
@@ -293,6 +324,79 @@ paths:
         - JWT: []
       parameters:
         - $ref: '#/components/parameters/wslug'
+  '/campaigns/{cid}/meta':
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: number
+        description: Campaign id
+    get:
+      summary: Get Campaign meta info
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Campaign'
+                  - type: object
+                    properties:
+                      selected_testers:
+                        type: number
+                      allowed_devices:
+                        type: array
+                        description: Array of form factors
+                        items:
+                          type: string
+                    required:
+                      - selected_testers
+                      - allowed_devices
+              examples:
+                Example 1:
+                  value:
+                    id: 0
+                    start_date: string
+                    end_date: string
+                    close_date: string
+                    title: string
+                    customer_title: string
+                    is_public: 0
+                    bug_form: -1
+                    type:
+                      id: 0
+                      name: string
+                    family:
+                      id: 0
+                      name: string
+                    status:
+                      id: 0
+                      name: string
+                    project:
+                      id: 0
+                      name: string
+                    description: string
+                    base_bug_internal_id: string
+                    selected_testers: 16
+                    allowed_devices:
+                      - smartphone
+                      - tablet
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-meta
+      security:
+        - JWT: []
+      parameters: []
+      description: Used to extra info about a selected campaign
   /projects:
     post:
       summary: Create a new project
@@ -1711,8 +1815,6 @@ components:
         - workspace
     WidgetBugsByUseCase:
       title: WidgetBugsByUseCase
-      x-stoplight:
-        id: tm59wsbormo47
       type: object
       x-examples:
         Example 1:
@@ -1751,13 +1853,13 @@ components:
           type: string
           enum:
             - bugsByUseCase
+          default: bugsByUseCase
+          example: bugsByUseCase
       required:
         - data
         - kind
     WidgetBugsByDevice:
       title: WidgetBugsByDevice
-      x-stoplight:
-        id: tm59wsbormo47
       type: object
       x-examples:
         Example 1:
@@ -1773,7 +1875,7 @@ components:
               os_version: Windows 10 May 2021 Update (19043)
               type: desktop
               bugs: 4
-          kind: bugsByUseCase
+          kind: bugsByDevice
       description: Returns a list of devices with the number of bugs
       properties:
         data:
@@ -1795,6 +1897,62 @@ components:
           type: string
           enum:
             - bugsByDevice
+          example: bugsByDevice
+          default: bugsByDevice
+      required:
+        - data
+        - kind
+    WidgetCampaignProgress:
+      title: WidgetCampaignProgress
+      type: object
+      description: Used to show an overview about a specific campaign.
+      x-examples:
+        Example 1:
+          data:
+            start_date: string
+            end_date: string
+            usecase_completion: 12.5
+            time_elapsed: 0
+            expected_duration: 0
+          kind: campaignProgress
+      properties:
+        data:
+          type: object
+          required:
+            - start_date
+            - end_date
+            - usecase_completion
+            - time_elapsed
+            - expected_duration
+          properties:
+            start_date:
+              type: string
+            end_date:
+              type: string
+            usecase_completion:
+              type: number
+              minimum: 0
+              maximum: 100
+              format: float
+              enum:
+                - 12.5
+                - 37.5
+                - 62.5
+                - 87.5
+                - 100
+              description: Percentage fixed rate of completion
+            time_elapsed:
+              type: integer
+              description: Number of hours from start_date
+            expected_duration:
+              type: integer
+              description: Expected amount of hours required to complete the campaign
+        kind:
+          type: string
+          enum:
+            - campaignProgress
+          default: campaignProgress
+          example: campaignProgress
       required:
         - data
         - kind
@@ -1883,6 +2041,7 @@ components:
           - bugs-by-usecase
           - bugs-by-device
           - bugs-by-type
+          - cp-progress
       description: Campaign widget slug
   requestBodies:
     Credentials:

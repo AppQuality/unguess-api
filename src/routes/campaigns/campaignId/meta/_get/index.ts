@@ -1,10 +1,10 @@
-/** OPENAPI-ROUTE: get-campaigns-cid-widgets-wslug */
+/** OPENAPI-ROUTE: get-campaigns-cid-meta */
 import { Context } from "openapi-backend";
 import {
   getCampaign,
+  getCampaignMeta,
   getWidgetBugsByDevice,
   getWidgetBugsByUseCase,
-  getWidgetCampaignProgress,
 } from "@src/utils/campaigns";
 import { ERROR_MESSAGE } from "@src/utils/constants";
 import { getProjectById } from "@src/utils/projects";
@@ -23,23 +23,21 @@ export default async (
   } as StoplightComponents["schemas"]["Error"];
 
   const cid = parseInt(c.request.params.cid as string);
-  const widget = c.request.query.s as string;
 
   res.status_code = 200;
 
   try {
-    if (!cid || !widget) {
+    if (!cid) {
       throw {
         ...error,
         code: 400,
-        message: "Missing campaign id or widget slug",
+        message: "Missing campaign id",
       };
     }
 
     // Check if the campaign exists
     const campaign = await getCampaign({
       campaignId: cid,
-      withOutputs: true,
     });
 
     if (!campaign) {
@@ -57,20 +55,11 @@ export default async (
       user: user,
     });
 
-    // Return requested widget
-    switch (widget) {
-      case "bugs-by-usecase":
-        return await getWidgetBugsByUseCase(campaign);
-      case "bugs-by-device":
-        return await getWidgetBugsByDevice(campaign);
-      case "cp-progress":
-        return await getWidgetCampaignProgress(campaign);
-    }
+    const meta = await getCampaignMeta(campaign);
 
-    throw {
-      ...error,
-      code: 401,
-      message: "The requested widget is not available or you don't have access",
+    return {
+      ...campaign,
+      ...meta,
     };
   } catch (e: any) {
     res.status_code = e.code || 500;

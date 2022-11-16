@@ -10,7 +10,10 @@ export const getCampaign = async ({
   campaignId: number;
   withOutputs?: boolean;
 }): Promise<
-  | (StoplightComponents["schemas"]["Campaign"] & { showNeedReview: boolean })
+  | (StoplightComponents["schemas"]["Campaign"] & {
+      showNeedReview: boolean;
+      formFactors: string;
+    })
   | false
 > => {
   const result = await db.query(
@@ -28,6 +31,7 @@ export const getCampaign = async ({
       c.is_public,
       c.campaign_type_id,
       c.project_id,
+      c.form_factor as formFactors,
       c.customer_id,
       c.cust_bug_vis as showNeedReview,
       c.campaign_type AS bug_form,
@@ -95,5 +99,6 @@ export const getCampaign = async ({
     }),
     showNeedReview: campaign.showNeedReview === 1 ? true : false,
     ...(withOutputs && { outputs: outputs }),
+    formFactors: campaign.formFactors || "0",
   };
 };

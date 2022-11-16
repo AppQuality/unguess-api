@@ -13,6 +13,8 @@ import { getCampaignBugs } from "./getCampaignBugs";
 import { getTitleRule, getBugTitle } from "./getTitleRule";
 import { getWidgetBugsByDevice } from "./getWidgetBugsByDevice";
 import { getWidgetBugsByUseCase } from "./getWidgetBugsByUseCase";
+import { getCampaignMeta } from "./getCampaignMeta";
+import { getWidgetCampaignProgress } from "./getWidgetCampaignProgress";
 
 export {
   checkCampaignRequest,
@@ -31,4 +33,6 @@ export {
   getBugTitle,
   getWidgetBugsByDevice,
   getWidgetBugsByUseCase,
+  getCampaignMeta,
+  getWidgetCampaignProgress,
 };
