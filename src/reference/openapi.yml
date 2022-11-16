@@ -1878,38 +1878,49 @@ components:
         id: 5b2de85594c7e
       type: object
       description: Used to show an overview about a specific campaign.
+      x-examples:
+        Example 1:
+          data:
+            start_date: string
+            end_date: string
+            usecase_completion: 12.5
+            time_elapsed: 0
+            expected_duration: 0
+          kind: campaignProgress
       properties:
         data:
-          type: object
-          required:
+          type: array
+          items:
+            type: object
+            required:
             - start_date
             - end_date
             - usecase_completion
             - time_elapsed
             - expected_duration
-          properties:
-            start_date:
-              type: string
-            end_date:
-              type: string
-            usecase_completion:
-              type: number
-              minimum: 0
-              maximum: 100
-              format: float
-              enum:
-                - 12.5
-                - 37.5
-                - 62.5
-                - 87.5
-                - 100
-              description: Percentage fixed rate of completion
-            time_elapsed:
-              type: integer
-              description: Number of hours from start_date
-            expected_duration:
-              type: integer
-              description: Expected amount of hours required to complete the campaign
+            properties:
+              start_date:
+                type: string
+              end_date:
+                type: string
+              usecase_completion:
+                type: number
+                minimum: 0
+                maximum: 100
+                format: float
+                enum:
+                  - 12.5
+                  - 37.5
+                  - 62.5
+                  - 87.5
+                  - 100
+                description: Percentage fixed rate of completion
+              time_elapsed:
+                type: integer
+                description: Number of hours from start_date
+              expected_duration:
+                type: integer
+                description: Expected amount of hours required to complete the campaign
         kind:
           type: string
           enum:
