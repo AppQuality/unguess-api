@@ -130,7 +130,7 @@ describe("GET /campaigns/{cid}", () => {
   it("Should answer 400 if campaign does not exist", async () => {
     const response = await request(app)
       .get(`/campaigns/999999`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
     expect(response.status).toBe(400);
   });
 
@@ -138,7 +138,7 @@ describe("GET /campaigns/{cid}", () => {
   it("Should answer 403 if the user has no permissions to see the campaign", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_2.id}`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
     expect(response.status).toBe(403);
   });
 
@@ -146,7 +146,7 @@ describe("GET /campaigns/{cid}", () => {
   it("Should answer 200 with the campaign", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
     expect(response.body).toEqual(
       expect.objectContaining({
@@ -168,7 +168,7 @@ describe("GET /campaigns/{cid}", () => {
   it("Should have all the required fields", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual(

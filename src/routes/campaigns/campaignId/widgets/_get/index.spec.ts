@@ -269,7 +269,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
   it("Should answer 400 if campaign does not exist", async () => {
     const response = await request(app)
       .get(`/campaigns/999999/widgets`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
     expect(response.status).toBe(400);
   });
 
@@ -277,7 +277,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
   it("Should answer 403 if the user has no permissions to see the campaign", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_2.id}/widgets?s=bugs-by-device`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
     expect(response.status).toBe(403);
   });
 
@@ -285,7 +285,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
   it("Should answer 400 if the widget does not exist or has an invalid name", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/widgets?s=invalid`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
     expect(response.status).toBe(400);
   });
 
@@ -346,7 +346,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
     it("Should answer 200 and return the bugs by use case widget", async () => {
       const response = await request(app)
         .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-usecase`)
-        .set("Authorization", "Bearer customer");
+        .set("Authorization", "Bearer user");
       expect(response.status).toBe(200);
       expect(response.body.kind).toEqual("bugsByUseCase");
 
@@ -357,7 +357,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
     it("Should answer 200 and the usecase title must be used in absence of simple title", async () => {
       const response = await request(app)
         .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-usecase`)
-        .set("Authorization", "Bearer customer");
+        .set("Authorization", "Bearer user");
       expect(response.status).toBe(200);
       expect(response.body.kind).toEqual("bugsByUseCase");
 
@@ -370,7 +370,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
 
       const response = await request(app)
         .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-usecase`)
-        .set("Authorization", "Bearer customer");
+        .set("Authorization", "Bearer user");
       expect(response.status).toBe(200);
       expect(response.body.kind).toEqual("bugsByUseCase");
 
@@ -386,7 +386,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
     it("Should answer 200 and return the bugs by device widget", async () => {
       const response = await request(app)
         .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-device`)
-        .set("Authorization", "Bearer customer");
+        .set("Authorization", "Bearer user");
       expect(response.status).toBe(200);
       expect(response.body.kind).toEqual("bugsByDevice");
       expect(response.body.data[0].bugs).toEqual(2);
@@ -409,7 +409,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
 
       const response = await request(app)
         .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-device`)
-        .set("Authorization", "Bearer customer");
+        .set("Authorization", "Bearer user");
       expect(response.status).toBe(200);
 
       expect(response.body.kind).toEqual("bugsByDevice");
@@ -533,7 +533,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
     it("Should answer 200 and return the correct kind of widget", async () => {
       const response = await request(app)
         .get(`/campaigns/${campaign_1.id}/widgets?s=cp-progress`)
-        .set("Authorization", "Bearer customer");
+        .set("Authorization", "Bearer user");
       expect(response.status).toBe(200);
       expect(response.body.kind).toEqual("campaignProgress");
     });
@@ -541,7 +541,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
     it("Should return 12,5 as uc progress when the cp has a 0% of completions", async () => {
       const response = await request(app)
         .get(`/campaigns/${campaign_1.id}/widgets?s=cp-progress`)
-        .set("Authorization", "Bearer customer");
+        .set("Authorization", "Bearer user");
       expect(response.status).toBe(200);
       expect(response.body.data.usecase_completion).toEqual(12.5);
     });
@@ -551,7 +551,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
 
       const response = await request(app)
         .get(`/campaigns/${campaign_1.id}/widgets?s=cp-progress`)
-        .set("Authorization", "Bearer customer");
+        .set("Authorization", "Bearer user");
       expect(response.status).toBe(200);
       expect(response.body.data.usecase_completion).toEqual(37.5);
     });
@@ -562,7 +562,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
 
       const response = await request(app)
         .get(`/campaigns/${campaign_1.id}/widgets?s=cp-progress`)
-        .set("Authorization", "Bearer customer");
+        .set("Authorization", "Bearer user");
       expect(response.status).toBe(200);
       expect(response.body.data.usecase_completion).toEqual(62.5);
     });
@@ -574,7 +574,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
 
       const response = await request(app)
         .get(`/campaigns/${campaign_1.id}/widgets?s=cp-progress`)
-        .set("Authorization", "Bearer customer");
+        .set("Authorization", "Bearer user");
       expect(response.status).toBe(200);
       expect(response.body.data.usecase_completion).toEqual(87.5);
     });
@@ -587,7 +587,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
 
       const response = await request(app)
         .get(`/campaigns/${campaign_1.id}/widgets?s=cp-progress`)
-        .set("Authorization", "Bearer customer");
+        .set("Authorization", "Bearer user");
       expect(response.status).toBe(200);
       expect(response.body.data.usecase_completion).toEqual(87.5);
     });
@@ -595,7 +595,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
     it("Should return 0 time_elapsed and 0 expected_duration when the startDate is greater than endDate", async () => {
       const response = await request(app)
         .get(`/campaigns/${campaign_2.id}/widgets?s=cp-progress`)
-        .set("Authorization", "Bearer administrator");
+        .set("Authorization", "Bearer admin");
       expect(response.status).toBe(200);
       expect(response.body.data.time_elapsed).toEqual(0);
       expect(response.body.data.expected_duration).toEqual(0);
@@ -604,7 +604,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
     it("Should return a number greater than 0 when the cp dates are correct", async () => {
       const response = await request(app)
         .get(`/campaigns/${campaign_1.id}/widgets?s=cp-progress`)
-        .set("Authorization", "Bearer customer");
+        .set("Authorization", "Bearer user");
       expect(response.status).toBe(200);
       expect(response.body.data.time_elapsed).toBeGreaterThan(0);
       expect(response.body.data.expected_duration).toBeGreaterThan(0);

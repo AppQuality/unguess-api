@@ -376,7 +376,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
   it("Should fail if the campaign does not exist", async () => {
     const response = await request(app)
       .get(`/campaigns/999/bugs`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
 
     expect(response.status).toBe(400);
   });
@@ -385,7 +385,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
   it("Should fail if the user has no permission to see the campaign's project", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_2.id}/bugs`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
 
     expect(response.status).toBe(403);
   });
@@ -394,7 +394,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
   it("Should answer 200 with paginated bugs", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
 
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("items");
@@ -440,7 +440,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
   it("Should return Should return an empty items array if the campaign has not bugs", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_3.id}/bugs`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
 
     expect(response.body.items).toEqual([]);
   });
@@ -449,7 +449,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
   it("Should return an error if the limit is not a number", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs?limit=abc&start=0`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
 
     expect(response.status).toBe(400);
   });
@@ -458,7 +458,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
   it("Should return an error if the start is not a number", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs?limit=10&start=abc`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
 
     expect(response.status).toBe(400);
   });
@@ -467,7 +467,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
   it("Should return the items paginated by limit and start parameters", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs?limit=1&start=0`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
 
     expect(response.status).toBe(200);
 
@@ -486,7 +486,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
   it("Should order by the default order if the order is not valid or not provided", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs?limit=10&start=0&order=abc`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
 
     expect(response.status).toBe(200);
 
@@ -509,7 +509,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
     // If orderBy is not specified, the default order is by id
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs?limit=10&start=0&order=ASC`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
 
     expect(response.status).toBe(200);
 
@@ -533,7 +533,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
       .get(
         `/campaigns/${campaign_1.id}/bugs?limit=10&start=0&order=ASC&orderBy=abc`
       )
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
 
     expect(response.status).toBe(200);
 
@@ -557,7 +557,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
       .get(
         `/campaigns/${campaign_1.id}/bugs?limit=10&start=0&order=DESC&orderBy=is_favorite`
       )
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
 
     expect(response.status).toBe(200);
 
@@ -581,7 +581,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
       .get(
         `/campaigns/${campaign_1.id}/bugs?limit=10&start=0&filterBy[abc]=abc`
       )
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
 
     expect(response.status).toBe(200);
 
@@ -605,7 +605,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
       .get(
         `/campaigns/${campaign_1.id}/bugs?limit=10&start=0&filterBy[is_favorite]=1`
       )
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
 
     expect(response.status).toBe(200);
 
@@ -626,7 +626,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
       .get(
         `/campaigns/${campaign_1.id}/bugs?limit=10&start=0&orderBy=severity_id&order=ASC&filterBy[is_favorite]=1`
       )
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
 
     expect(response.status).toBe(200);
 
@@ -644,7 +644,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
   it("Should return the context parameters for each bugs if title_rule is active and the bug has context", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
 
     expect(response.body.items[0].title).toEqual({
       full: bug_2.message,
@@ -661,7 +661,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
   it("Should not return refused bugs", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
 
     expect(response.body.items.length).toBe(2);
     expect(response.body.items).toEqual(
@@ -675,7 +675,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
   it("Should not return need review bugs if option is not enabled", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
 
     expect(response.body.items.length).toBe(2);
     expect(response.body.items).toEqual(
@@ -689,7 +689,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
   it("Should return need review bugs if option is not enabled but user is admin", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs`)
-      .set("Authorization", "Bearer administrator");
+      .set("Authorization", "Bearer admin");
 
     expect(response.body.items.length).toBe(3);
     expect(response.body.items).toEqual(
@@ -704,7 +704,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
   it("Should return need review bugs if option is enabled", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_4.id}/bugs`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
 
     expect(response.body.items.length).toBe(1);
     expect(response.body.items).toEqual(
@@ -715,7 +715,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
   it("Should NOT return pending bugs", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_5.id}/bugs`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
 
     expect(response.body.items.length).toBe(1);
     expect(response.body.items).not.toEqual(
@@ -728,8 +728,8 @@ describe("GET /campaigns/{cid}/bugs", () => {
   it("Should bugs without context if title_rule is not active", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_5.id}/bugs`)
-      .set("Authorization", "Bearer customer");
-      console.log("CP5",response.body.items);
+      .set("Authorization", "Bearer user");
+    console.log("CP5", response.body.items);
     expect(response.body.items[0].title).toEqual({
       full: bug_7.message,
       compact: bug_7.message,

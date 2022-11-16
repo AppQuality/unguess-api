@@ -2,7 +2,7 @@ import profiles from "@src/__mocks__/database/seed/profiles.json";
 
 export default {
   verify: (token: string, secret: string) => {
-    if (token === "customer") {
+    if (token === "user") {
       return {
         ...profiles[0],
         role: "customer",
@@ -12,7 +12,7 @@ export default {
       };
     }
 
-    if (token === "administrator") {
+    if (token === "admin") {
       return {
         ...profiles[1],
         role: "administrator",

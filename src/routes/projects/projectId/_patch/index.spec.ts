@@ -126,14 +126,14 @@ describe("PATCH /projects/{pid}", () => {
   it("Should answer 400 if logged in but no body is provided", async () => {
     const response = await request(app)
       .patch(`/projects/${project_1.id}`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.status).toBe(400);
   });
 
   it("Should answer 403 if project is not found", async () => {
     const response = await request(app)
       .patch(`/projects/999999`)
-      .set("authorization", "Bearer customer")
+      .set("authorization", "Bearer user")
       .send({ display_name: "New name" });
     expect(response.status).toBe(403);
     expect(response.body.message).toBe(ERROR_MESSAGE);
@@ -142,7 +142,7 @@ describe("PATCH /projects/{pid}", () => {
   it("Should answer 403 if user is not part of the project", async () => {
     const response = await request(app)
       .patch(`/projects/${project_2.id}`)
-      .set("authorization", "Bearer customer")
+      .set("authorization", "Bearer user")
       .send({ display_name: "New name" });
     expect(response.status).toBe(403);
     expect(response.body.message).toBe(ERROR_MESSAGE);
@@ -151,7 +151,7 @@ describe("PATCH /projects/{pid}", () => {
   it("Should answer 400 if the body object doesn't contains required fields", async () => {
     const response = await request(app)
       .patch(`/projects/${project_1.id}`)
-      .set("authorization", "Bearer customer")
+      .set("authorization", "Bearer user")
       .send({ wrong_key: "New name" });
     expect(response.status).toBe(400);
   });
@@ -159,7 +159,7 @@ describe("PATCH /projects/{pid}", () => {
   it("Should answer 400 if the display_name has more than 64 characters", async () => {
     const response = await request(app)
       .patch(`/projects/${project_1.id}`)
-      .set("authorization", "Bearer customer")
+      .set("authorization", "Bearer user")
       .send({ display_name: "a".repeat(65) });
     expect(response.status).toBe(400);
   });
@@ -167,7 +167,7 @@ describe("PATCH /projects/{pid}", () => {
   it("Should answer 200 if a valid body is provided", async () => {
     const response = await request(app)
       .patch(`/projects/${project_1.id}`)
-      .set("authorization", "Bearer customer")
+      .set("authorization", "Bearer user")
       .send({ display_name: "New name" });
 
     expect(response.status).toBe(200);
@@ -176,7 +176,7 @@ describe("PATCH /projects/{pid}", () => {
   it("Should answer 200 with a project object with the new patched value", async () => {
     const response = await request(app)
       .patch(`/projects/${project_1.id}`)
-      .set("authorization", "Bearer customer")
+      .set("authorization", "Bearer user")
       .send({ display_name: "New name" });
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({
@@ -190,7 +190,7 @@ describe("PATCH /projects/{pid}", () => {
   it("Should answer 403 with an error if the project exist but is limited to other users of the same company", async () => {
     const response = await request(app)
       .patch(`/projects/${project_2.id}`)
-      .set("authorization", "Bearer customer")
+      .set("authorization", "Bearer user")
       .send({ display_name: "New name" });
     expect(response.body.code).toBe(403);
     expect(response.body.message).toBe(ERROR_MESSAGE);
