@@ -279,7 +279,7 @@ export interface components {
       full: string;
       /** @description Bug title without context. */
       compact: string;
-      context?: string;
+      context?: string[];
     };
     /** BugType */
     BugType: {

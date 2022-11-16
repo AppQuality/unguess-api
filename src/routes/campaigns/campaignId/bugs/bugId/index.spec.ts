@@ -106,7 +106,7 @@ const bug_1: BugsParams = {
   id: 12999,
   internal_id: "UG12999",
   wp_user_id: 1,
-  message: "[CON-TEXT] - Bug 12-999 message",
+  message: "[CON-TEXT][2ndContext] - Bug 12-999 message",
   description: "Bug 12999 description",
   expected_result: "Bug 12999 expected result",
   current_result: "Bug 12999 actual result",
@@ -442,12 +442,11 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
       .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer customer");
     expect(response.status).toBe(200);
-
     expect(response.body.title).toEqual(
       expect.objectContaining({
-        full: "[CON-TEXT] - Bug 12-999 message",
+        full: "[CON-TEXT][2ndContext] - Bug 12-999 message",
         compact: "Bug 12-999 message",
-        context: "CON-TEXT",
+        context: ["CON-TEXT", "2ndContext"],
       })
     );
   });
