@@ -729,7 +729,6 @@ describe("GET /campaigns/{cid}/bugs", () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_5.id}/bugs`)
       .set("Authorization", "Bearer user");
-    console.log("CP5", response.body.items);
     expect(response.body.items[0].title).toEqual({
       full: bug_7.message,
       compact: bug_7.message,

@@ -189,8 +189,6 @@ describe("GET /campaigns/{cid}/meta", () => {
       .get(`/campaigns/${campaign_2.id}/meta`)
       .set("Authorization", "Bearer admin");
 
-    console.log(response.body);
-
     expect(response.body.selected_testers).toEqual(0);
   });
 
@@ -198,8 +196,6 @@ describe("GET /campaigns/{cid}/meta", () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_2.id}/meta`)
       .set("Authorization", "Bearer admin");
-
-    console.log(response.body);
 
     expect(response.body.allowed_devices.length).toEqual(2);
     expect(response.body.allowed_devices).toEqual(
