@@ -276,11 +276,43 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
+                oneOf:
                   - $ref: '#/components/schemas/WidgetBugsByUseCase'
                   - $ref: '#/components/schemas/WidgetBugsByDevice'
                   - $ref: '#/components/schemas/WidgetCampaignProgress'
-              examples: {}
+              examples:
+                Bugs by UseCase:
+                  value:
+                    data:
+                      - title: UC1 asd
+                        description: string
+                        bugs: 10
+                        usecase_id: 1220
+                    kind: bugsByUseCase
+                Bugs by Device:
+                  value:
+                    data:
+                      - manufacturer: Samsung
+                        model: Galaxy S22 Ultra
+                        os: Android
+                        os_version: '13'
+                        type: smartphone
+                        bugs: 12
+                      - desktop_type: Gaming PC
+                        os: Windows
+                        os_version: Windows 10 May 2021 Update (19043)
+                        type: desktop
+                        bugs: 4
+                    kind: bugsByDevice
+                Campaign Progress:
+                  value:
+                    data:
+                      - start_date: string
+                        end_date: string
+                        usecase_completion: 12.5
+                        time_elapsed: 0
+                        expected_duration: 0
+                    kind: campaignProgress
         '400':
           $ref: '#/components/responses/Error'
         '401':
@@ -1785,8 +1817,6 @@ components:
         - workspace
     WidgetBugsByUseCase:
       title: WidgetBugsByUseCase
-      x-stoplight:
-        id: tm59wsbormo47
       type: object
       x-examples:
         Example 1:
