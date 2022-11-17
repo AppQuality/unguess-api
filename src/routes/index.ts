@@ -52,7 +52,11 @@ class Routes {
         return await route(c, req, res);
       } catch (e) {
         debugMessage((e as OpenapiError).message);
-        res.status_code = 500;
+        if (typeof (e as OpenapiError).code === "number") {
+          res.status_code = (e as OpenapiError).code;
+        } else {
+          res.status_code = 500;
+        }
         return {
           message: (e as OpenapiError).message,
           code: (e as OpenapiError).code || 500,
