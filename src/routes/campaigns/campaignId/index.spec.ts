@@ -87,7 +87,6 @@ describe("GET /campaigns/{cid}", () => {
 
         //Outputs
         await bugs.mock();
-        await useCases.mock();
         await userTaskMedia.mock();
         await reports.mock();
       } catch (error) {

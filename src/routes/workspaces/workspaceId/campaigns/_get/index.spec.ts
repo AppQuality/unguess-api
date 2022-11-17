@@ -138,7 +138,6 @@ describe("GET /workspaces/{wid}/campaigns", () => {
 
         //Outputs
         await bugs.mock();
-        await useCases.mock();
         await userTaskMedia.mock();
       } catch (e) {
         console.error(e);

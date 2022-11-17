@@ -150,7 +150,6 @@ describe("GET /workspaces/{wid}/projects/{pid}/campaigns", () => {
 
         //Outputs
         await bugs.mock();
-        await useCases.mock();
         await userTaskMedia.mock();
       } catch (error) {
         console.error(error);

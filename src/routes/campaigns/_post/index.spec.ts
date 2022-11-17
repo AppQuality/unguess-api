@@ -196,10 +196,6 @@ describe("POST /campaigns", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await platformTable.create();
-        await UseCase.mock();
-        await useCaseGroup.mock();
-
         await dbAdapter.add({
           companies: [customer_1, customer_2],
           userToCustomers: [user_to_customer_1, user_to_customer_2],

@@ -206,7 +206,6 @@ describe("GET /campaigns/{cid}/widgets", () => {
         await bugType.mock();
         await bugStatus.mock();
         await devices.mock();
-        await useCases.mock();
         await userTaskMedia.mock();
         await reports.mock();
         await useCases.insert(useCase1);
