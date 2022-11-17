@@ -35,6 +35,10 @@ import campaignOutputs from "./cp_outputs_view";
 import { table as expressTable, data as expressData } from "./express";
 import defaultUsers from "@src/__mocks__/database/seed/users.json";
 
+import UseCase from "@src/__mocks__/database/use_cases";
+import useCaseGroup from "@src/__mocks__/database/use_case_group";
+import { table as platformTable } from "@src/__mocks__/database/platforms";
+
 interface dataObject {
   profiles?: Array<any>;
   companies?: Array<any>;
@@ -77,6 +81,10 @@ export const adapter = {
 
     // Views
     await campaignOutputs.mock();
+
+    await platformTable.create();
+    await UseCase.mock();
+    await useCaseGroup.mock();
   },
   drop: async () => {
     await profileTable.drop();
@@ -101,6 +109,10 @@ export const adapter = {
 
     // Views
     await campaignOutputs.dropMock();
+
+    await platformTable.drop();
+    await UseCase.dropMock();
+    await useCaseGroup.dropMock();
   },
 
   clear: async () => {
@@ -123,6 +135,10 @@ export const adapter = {
     await coinsTable.clear();
     await coinsTransactionsTable.clear();
     await expressTable.clear();
+
+    await platformTable.clear();
+    await UseCase.clear();
+    await useCaseGroup.clear();
   },
   add: async ({
     profiles = [],

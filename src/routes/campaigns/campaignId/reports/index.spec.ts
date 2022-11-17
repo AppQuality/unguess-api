@@ -1,7 +1,6 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { table as platformTable } from "@src/__mocks__/database/platforms";
 import Reports from "@src/__mocks__/database/report";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 
@@ -113,9 +112,6 @@ describe("GET /campaigns/{cid}/reports", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.clear();
-        await platformTable.create();
-
         await dbAdapter.add({
           companies: [customer_1],
           userToCustomers: [user_to_customer_1],
@@ -142,7 +138,6 @@ describe("GET /campaigns/{cid}/reports", () => {
   afterAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await platformTable.drop();
         await Reports.dropMock();
       } catch (error) {
         console.error(error);

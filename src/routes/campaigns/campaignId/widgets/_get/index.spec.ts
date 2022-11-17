@@ -1,7 +1,6 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { table as platformTable } from "@src/__mocks__/database/platforms";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 import userTaskMedia from "@src/__mocks__/database/user_task_media";
 import useCases, { UseCaseParams } from "@src/__mocks__/database/use_cases";
@@ -185,8 +184,6 @@ describe("GET /campaigns/{cid}/widgets", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await platformTable.create();
-
         await dbAdapter.add({
           companies: [customer_1],
           userToCustomers: [user_to_customer_1],
@@ -236,7 +233,6 @@ describe("GET /campaigns/{cid}/widgets", () => {
     return new Promise(async (resolve, reject) => {
       try {
         await dbAdapter.clear();
-        await platformTable.drop();
         await bugs.dropMock();
         await bugMedia.dropMock();
         await bugSeverity.dropMock();
@@ -459,7 +455,6 @@ describe("GET /campaigns/{cid}/widgets", () => {
         try {
           await candidates.mock();
           await userTask.mock();
-          await useCaseGroup.mock();
 
           await useCases.insert(useCase2);
           await useCaseGroup.insert({
@@ -506,7 +501,6 @@ describe("GET /campaigns/{cid}/widgets", () => {
           await useCases.delete([{ id: useCase2.id }]);
           await candidates.dropMock();
           await userTask.dropMock();
-          await useCaseGroup.dropMock();
         } catch (error) {
           console.error(error);
           reject(error);

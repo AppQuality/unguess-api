@@ -1,7 +1,6 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { table as platformTable } from "@src/__mocks__/database/platforms";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 import useCases, { UseCaseParams } from "@src/__mocks__/database/use_cases";
 import candidates from "@src/__mocks__/database/cp_has_candidate";
@@ -85,8 +84,6 @@ describe("GET /campaigns/{cid}/meta", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await platformTable.create();
-
         await dbAdapter.add({
           companies: [customer_1],
           userToCustomers: [user_to_customer_1],

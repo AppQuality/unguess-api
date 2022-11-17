@@ -1,7 +1,6 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { table as platformTable } from "@src/__mocks__/database/platforms";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 import bugs, { BugsParams } from "@src/__mocks__/database/bugs";
 import bugMedia from "@src/__mocks__/database/bug_media";
@@ -196,9 +195,6 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.clear();
-        await platformTable.create();
-
         await dbAdapter.add({
           companies: [customer_1],
           userToCustomers: [user_to_customer_1],
@@ -255,7 +251,6 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   afterAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await platformTable.drop();
         await bugs.dropMock();
         await bugSeverity.dropMock();
         await bugReplicability.dropMock();

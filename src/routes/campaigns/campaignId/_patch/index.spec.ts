@@ -1,7 +1,6 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { table as platformTable } from "@src/__mocks__/database/platforms";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 
 const customer_1 = {
@@ -75,8 +74,6 @@ describe("PATCH /campaigns", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await platformTable.create();
-
         await dbAdapter.add({
           companies: [customer_1],
           userToCustomers: [user_to_customer_1],
@@ -85,20 +82,6 @@ describe("PATCH /campaigns", () => {
           campaignTypes: [campaign_type_1],
           campaigns: [campaign_1, campaign_2],
         });
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.clear();
-        await platformTable.drop();
       } catch (error) {
         console.error(error);
         reject(error);
