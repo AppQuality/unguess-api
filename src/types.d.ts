@@ -14,6 +14,7 @@ declare global {
   }
   interface OpenapiError extends Error {
     status_code: number;
+    code?: number;
   }
 
   type UserType = {

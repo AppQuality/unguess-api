@@ -320,39 +320,8 @@ export interface components {
       description?: string;
       base_bug_internal_id?: string;
     };
-    /** Campaign */
-    CampaignWithOutput: {
-      id: number;
-      start_date: string;
-      end_date: string;
-      close_date: string;
-      title: string;
-      customer_title: string;
-      is_public: number;
-      /**
-       * @description -1: no bug form;
-       * 0: only bug form;
-       * 1: bug form with bug parade';
-       */
-      bug_form?: number;
-      type: {
-        id: number;
-        name: string;
-      };
-      family: {
-        id: number;
-        name: string;
-      };
-      status: {
-        id: number;
-        name: string;
-      };
-      project: {
-        id: number;
-        name: string;
-      };
-      description?: string;
-      base_bug_internal_id?: string;
+    /** CampaignWithOutput */
+    CampaignWithOutput: components["schemas"]["Campaign"] & {
       outputs?: components["schemas"]["Output"][];
     };
     /**
@@ -632,6 +601,23 @@ export interface components {
        */
       kind: "campaignProgress";
     };
+    /**
+     * WidgetCampaignUniqueBugs
+     * @description Used to show an overview of unique bugs and its trent
+     */
+    WidgetCampaignUniqueBugs: {
+      data: {
+        unique?: number;
+        total?: number;
+        trend?: number;
+      };
+      /**
+       * @default campaignUniqueBugs
+       * @example campaignUniqueBugs
+       * @enum {string}
+       */
+      kind: "campaignUniqueBugs";
+    };
   };
   responses: {
     /** Example response */
@@ -665,7 +651,8 @@ export interface components {
       | "bugs-by-usecase"
       | "bugs-by-device"
       | "bugs-by-type"
-      | "cp-progress";
+      | "cp-progress"
+      | "unique-bugs";
   };
   requestBodies: {
     Credentials: {
