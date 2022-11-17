@@ -38,6 +38,7 @@ import defaultUsers from "@src/__mocks__/database/seed/users.json";
 import UseCase from "@src/__mocks__/database/use_cases";
 import useCaseGroup from "@src/__mocks__/database/use_case_group";
 import { table as platformTable } from "@src/__mocks__/database/platforms";
+import bugs from "@src/__mocks__/database/bugs";
 
 interface dataObject {
   profiles?: Array<any>;
@@ -85,6 +86,7 @@ export const adapter = {
     await platformTable.create();
     await UseCase.mock();
     await useCaseGroup.mock();
+    await bugs.mock();
   },
   drop: async () => {
     await profileTable.drop();
@@ -113,6 +115,7 @@ export const adapter = {
     await platformTable.drop();
     await UseCase.dropMock();
     await useCaseGroup.dropMock();
+    await bugs.dropMock();
   },
 
   clear: async () => {
@@ -139,6 +142,7 @@ export const adapter = {
     await platformTable.clear();
     await UseCase.clear();
     await useCaseGroup.clear();
+    await bugs.clear();
   },
   add: async ({
     profiles = [],

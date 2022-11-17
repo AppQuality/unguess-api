@@ -199,7 +199,6 @@ describe("GET /campaigns/{cid}/widgets", () => {
           ],
         });
 
-        await bugs.mock();
         await bugMedia.mock();
         await bugSeverity.mock();
         await bugReplicability.mock();
@@ -232,7 +231,6 @@ describe("GET /campaigns/{cid}/widgets", () => {
     return new Promise(async (resolve, reject) => {
       try {
         await dbAdapter.clear();
-        await bugs.dropMock();
         await bugMedia.dropMock();
         await bugSeverity.dropMock();
         await bugReplicability.dropMock();

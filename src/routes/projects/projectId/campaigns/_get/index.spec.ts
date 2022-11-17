@@ -148,7 +148,6 @@ describe("GET /projects/{pid}/campaigns", () => {
         });
 
         //Outputs
-        await bugs.mock();
         await userTaskMedia.mock();
       } catch (error) {
         console.error(error);
@@ -165,7 +164,6 @@ describe("GET /projects/{pid}/campaigns", () => {
         await dbAdapter.clear();
 
         //Outputs
-        await bugs.dropMock();
         await useCases.dropMock();
         await userTaskMedia.dropMock();
       } catch (error) {

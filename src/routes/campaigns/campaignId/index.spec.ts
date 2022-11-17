@@ -2,7 +2,6 @@ import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
-import bugs from "@src/__mocks__/database/bugs";
 import userTaskMedia from "@src/__mocks__/database/user_task_media";
 import useCases from "@src/__mocks__/database/use_cases";
 import reports from "@src/__mocks__/database/report";
@@ -86,7 +85,6 @@ describe("GET /campaigns/{cid}", () => {
         });
 
         //Outputs
-        await bugs.mock();
         await userTaskMedia.mock();
         await reports.mock();
       } catch (error) {
@@ -103,7 +101,6 @@ describe("GET /campaigns/{cid}", () => {
       try {
         await dbAdapter.drop();
         //Outputs
-        await bugs.dropMock();
         await useCases.dropMock();
         await userTaskMedia.dropMock();
         await reports.dropMock();

@@ -137,7 +137,6 @@ describe("GET /workspaces/{wid}/campaigns", () => {
         });
 
         //Outputs
-        await bugs.mock();
         await userTaskMedia.mock();
       } catch (e) {
         console.error(e);
@@ -152,7 +151,6 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       try {
         await dbAdapter.clear();
         //Outputs
-        await bugs.dropMock();
         await useCases.dropMock();
         await userTaskMedia.dropMock();
       } catch (error) {
