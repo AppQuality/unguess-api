@@ -61,8 +61,6 @@ describe("GET /projects/{pid}", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.create();
-
         await dbAdapter.add({
           projects: [project_1, project_2, project_3],
           userToProjects: [user_to_project_1, user_to_project_2],
@@ -70,18 +68,6 @@ describe("GET /projects/{pid}", () => {
           companies: [customer_1],
           userToCustomers: [user_to_customer_1],
         });
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.drop();
       } catch (error) {
         console.error(error);
         reject(error);

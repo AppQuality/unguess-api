@@ -113,7 +113,7 @@ describe("GET /campaigns/{cid}/reports", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.create();
+        await dbAdapter.clear();
         await platformTable.create();
 
         await dbAdapter.add({
@@ -142,7 +142,6 @@ describe("GET /campaigns/{cid}/reports", () => {
   afterAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.drop();
         await platformTable.drop();
         await Reports.dropMock();
       } catch (error) {

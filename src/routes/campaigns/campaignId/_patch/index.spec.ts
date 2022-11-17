@@ -75,7 +75,6 @@ describe("PATCH /campaigns", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.create();
         await platformTable.create();
 
         await dbAdapter.add({
@@ -98,7 +97,7 @@ describe("PATCH /campaigns", () => {
   afterAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.drop();
+        await dbAdapter.clear();
         await platformTable.drop();
       } catch (error) {
         console.error(error);

@@ -185,7 +185,6 @@ describe("GET /campaigns/{cid}/widgets", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.create();
         await platformTable.create();
 
         await dbAdapter.add({
@@ -236,7 +235,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
   afterAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.drop();
+        await dbAdapter.clear();
         await platformTable.drop();
         await bugs.dropMock();
         await bugMedia.dropMock();

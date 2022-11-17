@@ -17,6 +17,9 @@ export const table = {
   drop: async () => {
     await db.dropTable("wp_appq_user_to_project");
   },
+  clear: async () => {
+    await db.run("DELETE FROM wp_appq_user_to_project");
+  },
 };
 
 const data: {

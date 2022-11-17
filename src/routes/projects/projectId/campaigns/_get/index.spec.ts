@@ -132,8 +132,6 @@ describe("GET /projects/{pid}/campaigns", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.create();
-
         await dbAdapter.add({
           campaigns: [campaign_1, campaign_2, campaign_3],
           profiles: [customer_profile_1],
@@ -165,7 +163,7 @@ describe("GET /projects/{pid}/campaigns", () => {
   afterAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.drop();
+        await dbAdapter.clear();
 
         //Outputs
         await bugs.dropMock();

@@ -196,7 +196,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.create();
+        await dbAdapter.clear();
         await platformTable.create();
 
         await dbAdapter.add({
@@ -255,7 +255,6 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   afterAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.drop();
         await platformTable.drop();
         await bugs.dropMock();
         await bugSeverity.dropMock();

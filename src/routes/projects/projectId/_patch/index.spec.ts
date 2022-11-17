@@ -60,8 +60,6 @@ describe("PATCH /projects/{pid}", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.create();
-
         await dbAdapter.add({
           userToProjects: [user_to_project_1, user_to_project_2],
           campaigns: [campaign_1],
@@ -77,16 +75,7 @@ describe("PATCH /projects/{pid}", () => {
     });
   });
   afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.drop();
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
+    await dbAdapter.clear();
   });
 
   beforeEach(async () => {

@@ -196,7 +196,6 @@ describe("POST /campaigns", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.create();
         await platformTable.create();
         await UseCase.mock();
         await useCaseGroup.mock();
@@ -227,7 +226,7 @@ describe("POST /campaigns", () => {
   afterAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.drop();
+        await dbAdapter.clear();
         await platformTable.drop();
         await UseCase.dropMock();
         await useCaseGroup.dropMock();

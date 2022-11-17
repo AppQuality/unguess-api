@@ -19,6 +19,9 @@ export const table = {
   drop: async () => {
     await db.dropTable("wp_ug_express");
   },
+  clear: async () => {
+    await db.run("DELETE FROM wp_ug_express");
+  },
 };
 
 const data: {

@@ -67,8 +67,6 @@ describe("GET /workspaces/{wid}/coins", () => {
   beforeAll(async () => {
     return new Promise(async (res, rej) => {
       try {
-        await dbAdapter.create();
-
         await dbAdapter.add({
           profiles: [customer_profile_1],
           companies: [customer_1, customer_2, customer_3],
@@ -80,19 +78,6 @@ describe("GET /workspaces/{wid}/coins", () => {
         rej(e);
       }
       res(true);
-    });
-  });
-
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.drop();
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
     });
   });
 

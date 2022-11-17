@@ -16,6 +16,9 @@ export const table = {
   drop: async () => {
     await db.dropTable(tableName);
   },
+  clear: async () => {
+    await db.run(`DELETE FROM ${tableName}`);
+  },
 };
 
 type WpUsersParams = {

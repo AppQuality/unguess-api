@@ -102,6 +102,28 @@ export const adapter = {
     // Views
     await campaignOutputs.dropMock();
   },
+
+  clear: async () => {
+    await profileTable.clear();
+    await customerTable.clear();
+    await projectTable.clear();
+    await campaignTable.clear();
+    await campaignTypeTable.clear();
+    await userToCustomerTable.clear();
+    await userToProjectTable.clear();
+    await userTable.clear();
+    await customerTable.clear();
+    await userTableUG.clear();
+
+    //Features Tables
+    await featuresTable.clear();
+    await userToFeaturesTable.clear();
+
+    // Express Tables
+    await coinsTable.clear();
+    await coinsTransactionsTable.clear();
+    await expressTable.clear();
+  },
   add: async ({
     profiles = [],
     companies = [],

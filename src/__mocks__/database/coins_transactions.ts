@@ -29,6 +29,9 @@ export const table = {
   drop: async () => {
     await db.dropTable("wp_ug_coins_transactions");
   },
+  clear: async () => {
+    await db.run("DELETE FROM wp_ug_coins_transactions");
+  },
 };
 
 const data: {
