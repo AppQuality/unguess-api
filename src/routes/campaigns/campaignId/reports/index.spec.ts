@@ -121,24 +121,9 @@ describe("GET /campaigns/{cid}/reports", () => {
           campaigns: [campaign_1, campaign_2, campaign_3],
         });
 
-        await Reports.mock();
-
         await Reports.insert(report_1);
         await Reports.insert(report_2);
         await Reports.insert(report_3);
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await Reports.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -346,7 +331,6 @@ describe("GET /campaigns/{cid}/reports", () => {
     beforeAll(async () => {
       return new Promise(async (resolve, reject) => {
         try {
-          await Reports.clear();
           await Reports.insert({
             ...report_1,
             id: 4,

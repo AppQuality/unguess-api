@@ -3,7 +3,6 @@ import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 import useCases from "@src/__mocks__/database/use_cases";
-import reports from "@src/__mocks__/database/report";
 
 const customer_1 = {
   id: 999,
@@ -84,7 +83,6 @@ describe("GET /campaigns/{cid}", () => {
         });
 
         //Outputs
-        await reports.mock();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -100,7 +98,6 @@ describe("GET /campaigns/{cid}", () => {
         await dbAdapter.drop();
         //Outputs
         await useCases.dropMock();
-        await reports.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);
