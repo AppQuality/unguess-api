@@ -7,8 +7,8 @@ import {
   LIMIT_QUERY_PARAM_DEFAULT,
 } from "@src/utils/constants";
 import bugs from "@src/__mocks__/database/bugs";
-import userTaskMedia from "@src/__mocks__/database/user_task_media";
 import useCases from "@src/__mocks__/database/use_cases";
+import userTaskMedia from "@src/__mocks__/database/user_task_media";
 
 const customer_1 = {
   id: 1,
@@ -137,7 +137,6 @@ describe("GET /workspaces/{wid}/campaigns", () => {
         });
 
         //Outputs
-        await userTaskMedia.mock();
       } catch (e) {
         console.error(e);
         rej(e);
@@ -152,7 +151,6 @@ describe("GET /workspaces/{wid}/campaigns", () => {
         await dbAdapter.clear();
         //Outputs
         await useCases.dropMock();
-        await userTaskMedia.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);

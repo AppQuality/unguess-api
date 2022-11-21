@@ -2,7 +2,6 @@ import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
-import userTaskMedia from "@src/__mocks__/database/user_task_media";
 import useCases, { UseCaseParams } from "@src/__mocks__/database/use_cases";
 import reports from "@src/__mocks__/database/report";
 import bugs, { BugsParams } from "@src/__mocks__/database/bugs";
@@ -205,7 +204,6 @@ describe("GET /campaigns/{cid}/widgets", () => {
         await bugType.mock();
         await bugStatus.mock();
         await devices.mock();
-        await userTaskMedia.mock();
         await reports.mock();
         await useCases.insert(useCase1);
         await bugs.insert(bug_1);
@@ -237,8 +235,6 @@ describe("GET /campaigns/{cid}/widgets", () => {
         await bugType.dropMock();
         await bugStatus.dropMock();
         await devices.dropMock();
-        await useCases.dropMock();
-        await userTaskMedia.dropMock();
         await reports.dropMock();
       } catch (error) {
         console.error(error);

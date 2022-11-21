@@ -7,8 +7,8 @@ import {
   EXPERIENTIAL_CAMPAIGN_TYPE_ID,
 } from "@src/utils/constants";
 import bugs from "@src/__mocks__/database/bugs";
-import userTaskMedia from "@src/__mocks__/database/user_task_media";
 import useCases from "@src/__mocks__/database/use_cases";
+import userTaskMedia from "@src/__mocks__/database/user_task_media";
 
 const customer_profile_1 = {
   id: 1,
@@ -147,9 +147,6 @@ describe("GET /workspaces/{wid}/projects/{pid}/campaigns", () => {
           ],
           campaignTypes: [campaign_type_1],
         });
-
-        //Outputs
-        await userTaskMedia.mock();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -165,7 +162,6 @@ describe("GET /workspaces/{wid}/projects/{pid}/campaigns", () => {
         await dbAdapter.clear();
         //Outputs
         await useCases.dropMock();
-        await userTaskMedia.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);
