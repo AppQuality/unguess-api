@@ -8,6 +8,9 @@ import {
 } from "@src/utils/campaigns";
 import { ERROR_MESSAGE } from "@src/utils/constants";
 import { getProjectById } from "@src/utils/projects";
+import getCampaignBugsTrend from "./uniqueBugsWidget/getCampaignBugsTrend";
+import updateTrend from "./uniqueBugsWidget/updateTrend";
+import getCampaignBugSituation from "./uniqueBugsWidget/getCampaignBugSituation";
 
 export default async (
   c: Context,
@@ -23,8 +26,17 @@ export default async (
   } as StoplightComponents["schemas"]["Error"];
 
   const cid = parseInt(c.request.params.cid as string);
-  const widget = c.request.query.s as string;
+  const widget = c.request.query
+    .s as StoplightComponents["parameters"]["wslug"];
+  const shouldUpdateTrend = c.request.query.hasOwnProperty("updateTrend");
 
+  if (widget !== "unique-bugs" && shouldUpdateTrend) {
+    res.status_code = 422;
+    throw {
+      message: "Invalid query parameter",
+      code: 422,
+    };
+  }
   res.status_code = 200;
 
   try {
@@ -50,7 +62,6 @@ export default async (
           "Campaign doesn't exist or you don't have permission to view it",
       };
     }
-
     // Check if user has permission to access the campaign
     await getProjectById({
       projectId: campaign.project.id,
@@ -65,6 +76,25 @@ export default async (
         return await getWidgetBugsByDevice(campaign);
       case "cp-progress":
         return await getWidgetCampaignProgress(campaign);
+      case "unique-bugs":
+        const { unique, total } = await getCampaignBugSituation(campaign);
+
+        const trend = await getCampaignBugsTrend({
+          campaignId: campaign.id,
+          userId: user.id,
+          unique,
+        });
+        if (shouldUpdateTrend) {
+          await updateTrend({
+            campaignId: campaign.id,
+            userId: user.id,
+            unique,
+          });
+        }
+        return {
+          data: { unique, total, trend },
+          kind: "campaignUniqueBugs",
+        };
     }
 
     throw {
@@ -74,9 +104,9 @@ export default async (
     };
   } catch (e: any) {
     res.status_code = e.code || 500;
-    error.code = e.code || 500;
+    error.code = typeof e.code === "number" ? e.code : 500;
     error.message = e.message || ERROR_MESSAGE;
 
-    return error;
+    throw error;
   }
 };

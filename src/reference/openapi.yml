@@ -281,6 +281,7 @@ paths:
                   - $ref: '#/components/schemas/WidgetBugsByUseCase'
                   - $ref: '#/components/schemas/WidgetBugsByDevice'
                   - $ref: '#/components/schemas/WidgetCampaignProgress'
+                  - $ref: '#/components/schemas/WidgetCampaignUniqueBugs'
               examples:
                 Bugs by UseCase:
                   value:
@@ -325,6 +326,11 @@ paths:
         - JWT: []
       parameters:
         - $ref: '#/components/parameters/wslug'
+        - schema:
+            type: boolean
+          in: query
+          name: updateTrend
+          description: should update bug trend after request resolves?
   '/campaigns/{cid}/meta':
     parameters:
       - name: cid
@@ -1897,6 +1903,10 @@ components:
       properties:
         data:
           type: object
+          required:
+            - unique
+            - total
+            - trend
           properties:
             unique:
               type: number
