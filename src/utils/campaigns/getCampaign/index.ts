@@ -1,6 +1,5 @@
 import * as db from "@src/features/db";
 import { getCampaignFamily } from "../getCampaignFamily";
-import { getCampaignOutputs } from "../getCampaignOutputs";
 import { getCampaignStatus } from "../getCampaignStatus";
 
 export const getCampaign = async ({
@@ -37,16 +36,10 @@ export const getCampaign = async ({
       c.campaign_type AS bug_form,
       ct.name AS campaign_type_name,
       ct.type AS campaign_family_id,
-      ${withOutputs ? "o.bugs, o.media," : ""}
       p.display_name 
       FROM wp_appq_evd_campaign c 
       JOIN wp_appq_project p ON c.project_id = p.id 
       JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id
-      ${
-        withOutputs
-          ? "LEFT JOIN campaigns_outputs o ON (o.campaign_id = c.id)"
-          : ""
-      }
       WHERE c.id = ?
       GROUP BY c.id`,
       [campaignId]
@@ -64,9 +57,6 @@ export const getCampaign = async ({
   const campaign_family = getCampaignFamily({
     familyId: campaign.campaign_family_id,
   });
-
-  // Get campaign outputs
-  const outputs = withOutputs ? getCampaignOutputs(campaign) : false;
 
   return {
     id: campaign.id,
@@ -98,7 +88,55 @@ export const getCampaign = async ({
       base_bug_internal_id: campaign.base_bug_internal_id,
     }),
     showNeedReview: campaign.showNeedReview === 1 ? true : false,
-    ...(withOutputs && { outputs: outputs }),
+    ...(withOutputs && {
+      outputs: await getCampaignOutputs(campaign),
+    }),
     formFactors: campaign.formFactors || "0",
   };
 };
+
+async function getCampaignOutputs(campaign: {
+  id: number;
+  showNeedReview: boolean;
+}) {
+  let outputs: ("media" | "bugs")[] = [];
+
+  if (await hasBugs()) {
+    outputs.push("bugs");
+  }
+
+  if (await hasMedia()) {
+    outputs.push("media");
+  }
+  return outputs;
+
+  async function hasBugs() {
+    const bugs = await db.query(
+      db.format(
+        `SELECT COUNT(id) as total 
+        FROM wp_appq_evd_bug 
+        WHERE campaign_id = ?
+        AND ${
+          campaign.showNeedReview
+            ? "(status_id = 2 OR status_id = 4)"
+            : "status_id = 2"
+        }`,
+        [campaign.id]
+      )
+    );
+    return bugs.length && bugs[0].total > 0;
+  }
+
+  async function hasMedia() {
+    const media = await db.query(
+      db.format(
+        `SELECT COUNT(t.id) as total
+          FROM wp_appq_campaign_task t 
+          JOIN wp_appq_user_task_media m ON (m.campaign_task_id = t.id)
+          WHERE t.campaign_id = ?`,
+        [campaign.id]
+      )
+    );
+    return media.length && media[0].total > 0;
+  }
+}
