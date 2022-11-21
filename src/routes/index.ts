@@ -52,8 +52,12 @@ class Routes {
         return await route(c, req, res);
       } catch (e) {
         debugMessage((e as OpenapiError).message);
-        if (typeof (e as OpenapiError).code === "number") {
-          res.status_code = (e as OpenapiError).code;
+        const code =
+          typeof (e as OpenapiError).code === "number"
+            ? (e as OpenapiError).code
+            : undefined;
+        if (code) {
+          res.status_code = code;
         } else {
           res.status_code = 500;
         }
