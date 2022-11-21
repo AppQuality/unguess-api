@@ -204,11 +204,6 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
           campaigns: [campaign_1, campaign_2],
         });
 
-        await bugs.mock();
-        await bugSeverity.mock();
-        await bugReplicability.mock();
-        await bugType.mock();
-        await bugStatus.mock();
         await bugMedia.mock();
         await devices.mock();
         await tags.mock();
@@ -251,11 +246,6 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   afterAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await bugs.dropMock();
-        await bugSeverity.dropMock();
-        await bugReplicability.dropMock();
-        await bugType.dropMock();
-        await bugStatus.dropMock();
         await bugMedia.dropMock();
         await devices.dropMock();
         await tags.dropMock();

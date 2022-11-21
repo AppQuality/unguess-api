@@ -41,6 +41,10 @@ import { table as platformTable } from "@src/__mocks__/database/platforms";
 import bugs from "@src/__mocks__/database/bugs";
 import userTaskMedia from "@src/__mocks__/database/user_task_media";
 import reports from "@src/__mocks__/database/report";
+import bugSeverity from "@src/__mocks__/database/bug_severity";
+import bugReplicability from "@src/__mocks__/database/bug_replicability";
+import bugType from "@src/__mocks__/database/bug_type";
+import bugStatus from "@src/__mocks__/database/bug_status";
 
 interface dataObject {
   profiles?: Array<any>;
@@ -91,6 +95,10 @@ export const adapter = {
     await bugs.mock();
     await userTaskMedia.mock();
     await reports.mock();
+    await bugSeverity.mock();
+    await bugReplicability.mock();
+    await bugType.mock();
+    await bugStatus.mock();
   },
   drop: async () => {
     await profileTable.drop();
@@ -123,6 +131,10 @@ export const adapter = {
     await bugs.dropMock();
     await userTaskMedia.dropMock();
     await reports.dropMock();
+    await bugSeverity.dropMock();
+    await bugReplicability.dropMock();
+    await bugType.dropMock();
+    await bugStatus.dropMock();
   },
 
   clear: async () => {

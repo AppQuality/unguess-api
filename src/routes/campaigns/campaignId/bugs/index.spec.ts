@@ -310,10 +310,6 @@ describe("GET /campaigns/{cid}/bugs", () => {
           meta_value: "1",
         });
         await bugMedia.mock();
-        await bugSeverity.mock();
-        await bugReplicability.mock();
-        await bugType.mock();
-        await bugStatus.mock();
         await devices.mock();
 
         await bugs.insert(bug_1);
@@ -343,10 +339,6 @@ describe("GET /campaigns/{cid}/bugs", () => {
       try {
         await dbAdapter.clear();
         await bugMedia.dropMock();
-        await bugSeverity.dropMock();
-        await bugReplicability.dropMock();
-        await bugType.dropMock();
-        await bugStatus.dropMock();
         await devices.dropMock();
         await CampaignMeta.dropMock();
       } catch (error) {

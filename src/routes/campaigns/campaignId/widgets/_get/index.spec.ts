@@ -199,10 +199,6 @@ describe("GET /campaigns/{cid}/widgets", () => {
         });
 
         await bugMedia.mock();
-        await bugSeverity.mock();
-        await bugReplicability.mock();
-        await bugType.mock();
-        await bugStatus.mock();
         await devices.mock();
         await reports.mock();
         await useCases.insert(useCase1);
@@ -230,10 +226,6 @@ describe("GET /campaigns/{cid}/widgets", () => {
       try {
         await dbAdapter.clear();
         await bugMedia.dropMock();
-        await bugSeverity.dropMock();
-        await bugReplicability.dropMock();
-        await bugType.dropMock();
-        await bugStatus.dropMock();
         await devices.dropMock();
         await reports.dropMock();
       } catch (error) {
