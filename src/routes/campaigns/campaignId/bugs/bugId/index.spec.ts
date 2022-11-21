@@ -8,8 +8,8 @@ import bugSeverity from "@src/__mocks__/database/bug_severity";
 import bugReplicability from "@src/__mocks__/database/bug_replicability";
 import bugType from "@src/__mocks__/database/bug_type";
 import bugStatus from "@src/__mocks__/database/bug_status";
-import devices, { DeviceParams } from "@src/__mocks__/database/device";
 import tags from "@src/__mocks__/database/bug_tags";
+import devices, { DeviceParams } from "@src/__mocks__/database/device";
 import additionalField, {
   CampaingAdditionalFieldsParams,
 } from "@src/__mocks__/database/campaign_additional_field";
@@ -204,7 +204,6 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
           campaigns: [campaign_1, campaign_2],
         });
 
-        await tags.mock();
         await bugs.insert(bug_1);
         await bugs.insert(bug_2);
         await bugs.insert(bug_3_pending);
@@ -222,27 +221,12 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
         await bugReplicability.addDefaultItems();
         await bugType.addDefaultItems();
         await bugStatus.addDefaultItems();
-        await CampaignMeta.mock();
         await CampaignMeta.insert({
           meta_id: 1,
           campaign_id: campaign_1.id,
           meta_key: "bug_title_rule",
           meta_value: "1",
         });
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await tags.dropMock();
-        await CampaignMeta.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);

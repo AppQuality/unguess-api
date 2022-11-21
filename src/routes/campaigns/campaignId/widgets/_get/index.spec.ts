@@ -419,9 +419,6 @@ describe("GET /campaigns/{cid}/widgets", () => {
     beforeAll(async () => {
       return new Promise(async (resolve, reject) => {
         try {
-          await candidates.mock();
-          await userTask.mock();
-
           await useCases.insert(useCase2);
           await useCaseGroup.insert({
             task_id: useCase1.id || 123,
@@ -462,18 +459,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
     });
 
     afterAll(async () => {
-      return new Promise(async (resolve, reject) => {
-        try {
-          await useCases.delete([{ id: useCase2.id }]);
-          await candidates.dropMock();
-          await userTask.dropMock();
-        } catch (error) {
-          console.error(error);
-          reject(error);
-        }
-
-        resolve(true);
-      });
+      await useCases.delete([{ id: useCase2.id }]);
     });
 
     afterEach(async () => {

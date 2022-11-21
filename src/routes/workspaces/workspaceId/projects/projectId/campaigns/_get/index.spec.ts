@@ -156,21 +156,6 @@ describe("GET /workspaces/{wid}/projects/{pid}/campaigns", () => {
     });
   });
 
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.clear();
-        //Outputs
-        await useCases.dropMock();
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
   it("Should answer 200 if logged in", async () => {
     const response = await request(app)
       .get(`/workspaces/${customer_1.id}/projects/${project_1.id}/campaigns`)

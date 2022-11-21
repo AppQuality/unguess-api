@@ -92,21 +92,6 @@ describe("GET /campaigns/{cid}", () => {
     });
   });
 
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.drop();
-        //Outputs
-        await useCases.dropMock();
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
   // It should answer 403 if user is not logged in
   it("Should answer 403 if user is not logged in", async () => {
     const response = await request(app).get(`/campaigns/${campaign_1.id}`);

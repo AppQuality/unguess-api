@@ -49,6 +49,13 @@ import bugMedia from "@src/__mocks__/database/bug_media";
 import devices from "@src/__mocks__/database/device";
 import additionalField from "@src/__mocks__/database/campaign_additional_field";
 import additionalFieldData from "@src/__mocks__/database/campaign_additional_field_data";
+import candidates from "@src/__mocks__/database/cp_has_candidate";
+import CampaignMeta from "@src/__mocks__/database/campaign_meta";
+import tags from "@src/__mocks__/database/bug_tags";
+
+import Templates from "@src/__mocks__/database/templates";
+import Category from "@src/__mocks__/database/template_categories";
+import userTask from "@src/__mocks__/database/user_task";
 
 interface dataObject {
   profiles?: Array<any>;
@@ -107,6 +114,12 @@ export const adapter = {
     await devices.mock();
     await additionalField.mock();
     await additionalFieldData.mock();
+    await candidates.mock();
+    await CampaignMeta.mock();
+    await Templates.mock();
+    await Category.mock();
+    await tags.mock();
+    await userTask.mock();
   },
   drop: async () => {
     await profileTable.drop();
@@ -147,6 +160,12 @@ export const adapter = {
     await devices.dropMock();
     await additionalField.dropMock();
     await additionalFieldData.dropMock();
+    await candidates.dropMock();
+    await CampaignMeta.dropMock();
+    await tags.dropMock();
+    await userTask.dropMock();
+    await Templates.dropMock();
+    await Category.dropMock();
   },
 
   clear: async () => {

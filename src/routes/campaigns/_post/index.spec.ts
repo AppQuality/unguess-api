@@ -219,22 +219,6 @@ describe("POST /campaigns", () => {
     });
   });
 
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.clear();
-        await platformTable.drop();
-        await UseCase.dropMock();
-        await useCaseGroup.dropMock();
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
   beforeEach(async () => {
     await UseCase.clear();
     await useCaseGroup.clear();

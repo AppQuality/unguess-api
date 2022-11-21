@@ -8,9 +8,6 @@ describe("GET /templates", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        Templates.mock();
-        Category.mock();
-
         Category.insert({
           id: 1,
           name: "Category 1",
@@ -48,20 +45,6 @@ describe("GET /templates", () => {
           locale: "it",
           image: "https://placehold.it/300x300",
         });
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        Templates.dropMock();
-        Category.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);

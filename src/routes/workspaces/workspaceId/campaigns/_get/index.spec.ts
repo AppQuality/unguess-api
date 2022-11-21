@@ -145,21 +145,6 @@ describe("GET /workspaces/{wid}/campaigns", () => {
     });
   });
 
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.clear();
-        //Outputs
-        await useCases.dropMock();
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
   it("Should return 403 status if user is not logged in", async () => {
     const response = await request(app).get("/workspaces/1/campaigns");
     expect(response.status).toBe(403);

@@ -302,7 +302,6 @@ describe("GET /campaigns/{cid}/bugs", () => {
             campaign_5,
           ],
         });
-        await CampaignMeta.mock();
         await CampaignMeta.insert({
           meta_id: 1,
           campaign_id: campaign_1.id,
@@ -323,20 +322,6 @@ describe("GET /campaigns/{cid}/bugs", () => {
         await bugType.addDefaultItems();
         await bugStatus.addDefaultItems();
         await devices.insert(device_1);
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.clear();
-        await CampaignMeta.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);

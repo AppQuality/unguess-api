@@ -93,7 +93,6 @@ describe("GET /campaigns/{cid}/meta", () => {
           campaigns: [campaign_1, campaign_2],
         });
 
-        await candidates.mock();
         await candidates.insert({
           user_id: 32,
           campaign_id: campaign_1.id,
@@ -116,20 +115,6 @@ describe("GET /campaigns/{cid}/meta", () => {
         });
 
         await useCases.insert(useCase1);
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.clear();
-        await candidates.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);
