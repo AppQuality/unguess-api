@@ -7,7 +7,7 @@
     "coverage": "npm run test -- --coverage --runInBand",
     "test": "rimraf *.db && tsnd -T node_modules/jest/bin/jest.js --runInBand",
     "test:ls": "npm run test -- --json",
-    "test:watch": "rimraf *.db && tsnd -T node_modules/jest/bin/jest.js --watch --maxWorkers=50%",
+    "test:watch": "rimraf *.db && tsnd -T node_modules/jest/bin/jest.js --watch --runInBand",
     "clean": "rimraf dist",
     "transpile": "tsc --noEmit false && tscpaths -p tsconfig.json -s ./src -o ./dist",
     "copy-reference": "copyfiles -f src/reference/* dist/reference/",

@@ -138,7 +138,7 @@ paths:
                   total:
                     type: integer
               examples:
-                Example 1:
+                example-1:
                   value:
                     items:
                       - id: 0
@@ -147,7 +147,8 @@ paths:
                         title:
                           full: string
                           compact: string
-                          context: string
+                          context:
+                            - string
                         step_by_step: string
                         expected_result: string
                         current_result: string
@@ -1882,6 +1883,36 @@ components:
       required:
         - data
         - kind
+    WidgetCampaignUniqueBugs:
+      title: WidgetCampaignUniqueBugs
+      type: object
+      description: Used to show an overview of unique bugs and its trent
+      x-examples:
+        example-1:
+          data:
+            unique: 10
+            total: 15
+            trend: -2
+          kind: campaignUniqueBugs
+      properties:
+        data:
+          type: object
+          properties:
+            unique:
+              type: number
+            total:
+              type: number
+            trend:
+              type: number
+        kind:
+          type: string
+          default: campaignUniqueBugs
+          example: campaignUniqueBugs
+          enum:
+            - campaignUniqueBugs
+      required:
+        - data
+        - kind
   securitySchemes:
     JWT:
       type: http
@@ -1968,6 +1999,7 @@ components:
           - bugs-by-device
           - bugs-by-type
           - cp-progress
+          - unique-bugs
       description: Campaign widget slug
   requestBodies:
     Credentials:

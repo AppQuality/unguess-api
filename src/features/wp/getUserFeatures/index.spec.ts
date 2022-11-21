@@ -18,7 +18,6 @@ describe("wp/getUserFeatures", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.create();
         await dbAdapter.add({
           unguess_users: defaultUsers,
           features: [feature1, feature2],
@@ -39,19 +38,6 @@ describe("wp/getUserFeatures", () => {
         });
       } catch (error) {
         console.log(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.drop();
-      } catch (error) {
-        console.error(error);
         reject(error);
       }
 

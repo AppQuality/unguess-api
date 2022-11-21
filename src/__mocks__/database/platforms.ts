@@ -21,6 +21,9 @@ export const table = {
   drop: async () => {
     await db.dropTable("wp_appq_evd_platform");
   },
+  clear: async () => {
+    await db.run("DELETE FROM wp_appq_evd_platform");
+  },
 };
 
 const data: {

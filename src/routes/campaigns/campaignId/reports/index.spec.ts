@@ -1,7 +1,6 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { table as platformTable } from "@src/__mocks__/database/platforms";
 import Reports from "@src/__mocks__/database/report";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 
@@ -113,9 +112,6 @@ describe("GET /campaigns/{cid}/reports", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.create();
-        await platformTable.create();
-
         await dbAdapter.add({
           companies: [customer_1],
           userToCustomers: [user_to_customer_1],
@@ -125,26 +121,9 @@ describe("GET /campaigns/{cid}/reports", () => {
           campaigns: [campaign_1, campaign_2, campaign_3],
         });
 
-        await Reports.mock();
-
         await Reports.insert(report_1);
         await Reports.insert(report_2);
         await Reports.insert(report_3);
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.drop();
-        await platformTable.drop();
-        await Reports.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -352,7 +331,6 @@ describe("GET /campaigns/{cid}/reports", () => {
     beforeAll(async () => {
       return new Promise(async (resolve, reject) => {
         try {
-          await Reports.clear();
           await Reports.insert({
             ...report_1,
             id: 4,

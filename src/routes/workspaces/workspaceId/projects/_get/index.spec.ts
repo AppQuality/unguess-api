@@ -122,8 +122,6 @@ describe("GET /workspaces/{wid}/projects", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.create();
-
         await dbAdapter.add({
           campaigns: [campaign_1, campaign_2, campaign_3],
           profiles: [customer_profile_1],
@@ -137,19 +135,6 @@ describe("GET /workspaces/{wid}/projects", () => {
             user_to_project_4,
           ],
         });
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.drop();
       } catch (error) {
         console.error(error);
         reject(error);

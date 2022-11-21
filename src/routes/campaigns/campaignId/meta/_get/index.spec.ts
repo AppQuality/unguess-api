@@ -1,7 +1,6 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { table as platformTable } from "@src/__mocks__/database/platforms";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 import useCases, { UseCaseParams } from "@src/__mocks__/database/use_cases";
 import candidates from "@src/__mocks__/database/cp_has_candidate";
@@ -85,9 +84,6 @@ describe("GET /campaigns/{cid}/meta", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.create();
-        await platformTable.create();
-
         await dbAdapter.add({
           companies: [customer_1],
           userToCustomers: [user_to_customer_1],
@@ -97,8 +93,6 @@ describe("GET /campaigns/{cid}/meta", () => {
           campaigns: [campaign_1, campaign_2],
         });
 
-        await candidates.mock();
-        await useCases.mock();
         await candidates.insert({
           user_id: 32,
           campaign_id: campaign_1.id,
@@ -121,21 +115,6 @@ describe("GET /campaigns/{cid}/meta", () => {
         });
 
         await useCases.insert(useCase1);
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.drop();
-        await candidates.dropMock();
-        await useCases.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);

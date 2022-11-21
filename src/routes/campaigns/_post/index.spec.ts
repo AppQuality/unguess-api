@@ -196,11 +196,6 @@ describe("POST /campaigns", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.create();
-        await platformTable.create();
-        await UseCase.mock();
-        await useCaseGroup.mock();
-
         await dbAdapter.add({
           companies: [customer_1, customer_2],
           userToCustomers: [user_to_customer_1, user_to_customer_2],
@@ -215,22 +210,6 @@ describe("POST /campaigns", () => {
         await platformData.addItem(AndroidPhone);
         await platformData.addItem(iOSPhone);
         await platformData.addItem(WindowsPC);
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.drop();
-        await platformTable.drop();
-        await UseCase.dropMock();
-        await useCaseGroup.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);

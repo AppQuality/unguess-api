@@ -83,8 +83,6 @@ describe("getWorkspace", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.create();
-
         await dbAdapter.add({
           companies: [customer_1, customer_2, customer_3],
           userToCustomers: [
@@ -94,19 +92,6 @@ describe("getWorkspace", () => {
           ],
           coins: [coins_package_1],
         });
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.drop();
       } catch (error) {
         console.error(error);
         reject(error);

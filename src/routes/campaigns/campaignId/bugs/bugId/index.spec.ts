@@ -1,7 +1,6 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { table as platformTable } from "@src/__mocks__/database/platforms";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 import bugs, { BugsParams } from "@src/__mocks__/database/bugs";
 import bugMedia from "@src/__mocks__/database/bug_media";
@@ -9,8 +8,8 @@ import bugSeverity from "@src/__mocks__/database/bug_severity";
 import bugReplicability from "@src/__mocks__/database/bug_replicability";
 import bugType from "@src/__mocks__/database/bug_type";
 import bugStatus from "@src/__mocks__/database/bug_status";
-import devices, { DeviceParams } from "@src/__mocks__/database/device";
 import tags from "@src/__mocks__/database/bug_tags";
+import devices, { DeviceParams } from "@src/__mocks__/database/device";
 import additionalField, {
   CampaingAdditionalFieldsParams,
 } from "@src/__mocks__/database/campaign_additional_field";
@@ -196,9 +195,6 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.create();
-        await platformTable.create();
-
         await dbAdapter.add({
           companies: [customer_1],
           userToCustomers: [user_to_customer_1],
@@ -207,17 +203,6 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
           campaignTypes: [campaign_type_1],
           campaigns: [campaign_1, campaign_2],
         });
-
-        await bugs.mock();
-        await bugSeverity.mock();
-        await bugReplicability.mock();
-        await bugType.mock();
-        await bugStatus.mock();
-        await bugMedia.mock();
-        await devices.mock();
-        await tags.mock();
-        await additionalField.mock();
-        await additionalFieldData.mock();
 
         await bugs.insert(bug_1);
         await bugs.insert(bug_2);
@@ -236,38 +221,12 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
         await bugReplicability.addDefaultItems();
         await bugType.addDefaultItems();
         await bugStatus.addDefaultItems();
-        await CampaignMeta.mock();
         await CampaignMeta.insert({
           meta_id: 1,
           campaign_id: campaign_1.id,
           meta_key: "bug_title_rule",
           meta_value: "1",
         });
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.drop();
-        await platformTable.drop();
-        await bugs.dropMock();
-        await bugSeverity.dropMock();
-        await bugReplicability.dropMock();
-        await bugType.dropMock();
-        await bugStatus.dropMock();
-        await bugMedia.dropMock();
-        await devices.dropMock();
-        await tags.dropMock();
-        await additionalField.dropMock();
-        await additionalFieldData.dropMock();
-        await CampaignMeta.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);

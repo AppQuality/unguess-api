@@ -1,9 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { table as platformTable } from "@src/__mocks__/database/platforms";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
-import userTaskMedia from "@src/__mocks__/database/user_task_media";
 import useCases, { UseCaseParams } from "@src/__mocks__/database/use_cases";
 import reports from "@src/__mocks__/database/report";
 import bugs, { BugsParams } from "@src/__mocks__/database/bugs";
@@ -185,9 +183,6 @@ describe("GET /campaigns/{cid}/widgets", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.create();
-        await platformTable.create();
-
         await dbAdapter.add({
           companies: [customer_1],
           userToCustomers: [user_to_customer_1],
@@ -203,16 +198,6 @@ describe("GET /campaigns/{cid}/widgets", () => {
           ],
         });
 
-        await bugs.mock();
-        await bugMedia.mock();
-        await bugSeverity.mock();
-        await bugReplicability.mock();
-        await bugType.mock();
-        await bugStatus.mock();
-        await devices.mock();
-        await useCases.mock();
-        await userTaskMedia.mock();
-        await reports.mock();
         await useCases.insert(useCase1);
         await bugs.insert(bug_1);
         await bugs.insert(bug_2);
@@ -224,30 +209,6 @@ describe("GET /campaigns/{cid}/widgets", () => {
         await devices.insert(device_1);
         await devices.insert(tablet);
         await devices.insert(desktop);
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.drop();
-        await platformTable.drop();
-        await bugs.dropMock();
-        await bugMedia.dropMock();
-        await bugSeverity.dropMock();
-        await bugReplicability.dropMock();
-        await bugType.dropMock();
-        await bugStatus.dropMock();
-        await devices.dropMock();
-        await useCases.dropMock();
-        await userTaskMedia.dropMock();
-        await reports.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -458,10 +419,6 @@ describe("GET /campaigns/{cid}/widgets", () => {
     beforeAll(async () => {
       return new Promise(async (resolve, reject) => {
         try {
-          await candidates.mock();
-          await userTask.mock();
-          await useCaseGroup.mock();
-
           await useCases.insert(useCase2);
           await useCaseGroup.insert({
             task_id: useCase1.id || 123,
@@ -502,19 +459,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
     });
 
     afterAll(async () => {
-      return new Promise(async (resolve, reject) => {
-        try {
-          await useCases.delete([{ id: useCase2.id }]);
-          await candidates.dropMock();
-          await userTask.dropMock();
-          await useCaseGroup.dropMock();
-        } catch (error) {
-          console.error(error);
-          reject(error);
-        }
-
-        resolve(true);
-      });
+      await useCases.delete([{ id: useCase2.id }]);
     });
 
     afterEach(async () => {
