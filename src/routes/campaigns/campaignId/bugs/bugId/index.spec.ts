@@ -204,8 +204,6 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
           campaigns: [campaign_1, campaign_2],
         });
 
-        await bugMedia.mock();
-        await devices.mock();
         await tags.mock();
         await additionalField.mock();
         await additionalFieldData.mock();
@@ -246,8 +244,6 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   afterAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await bugMedia.dropMock();
-        await devices.dropMock();
         await tags.dropMock();
         await additionalField.dropMock();
         await additionalFieldData.dropMock();

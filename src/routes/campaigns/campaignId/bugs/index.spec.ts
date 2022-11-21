@@ -309,8 +309,6 @@ describe("GET /campaigns/{cid}/bugs", () => {
           meta_key: "bug_title_rule",
           meta_value: "1",
         });
-        await bugMedia.mock();
-        await devices.mock();
 
         await bugs.insert(bug_1);
         await bugs.insert(bug_2);
@@ -338,8 +336,6 @@ describe("GET /campaigns/{cid}/bugs", () => {
     return new Promise(async (resolve, reject) => {
       try {
         await dbAdapter.clear();
-        await bugMedia.dropMock();
-        await devices.dropMock();
         await CampaignMeta.dropMock();
       } catch (error) {
         console.error(error);

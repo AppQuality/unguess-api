@@ -45,6 +45,8 @@ import bugSeverity from "@src/__mocks__/database/bug_severity";
 import bugReplicability from "@src/__mocks__/database/bug_replicability";
 import bugType from "@src/__mocks__/database/bug_type";
 import bugStatus from "@src/__mocks__/database/bug_status";
+import bugMedia from "@src/__mocks__/database/bug_media";
+import devices from "@src/__mocks__/database/device";
 
 interface dataObject {
   profiles?: Array<any>;
@@ -99,6 +101,8 @@ export const adapter = {
     await bugReplicability.mock();
     await bugType.mock();
     await bugStatus.mock();
+    await bugMedia.mock();
+    await devices.mock();
   },
   drop: async () => {
     await profileTable.drop();
@@ -135,6 +139,8 @@ export const adapter = {
     await bugReplicability.dropMock();
     await bugType.dropMock();
     await bugStatus.dropMock();
+    await bugMedia.dropMock();
+    await devices.dropMock();
   },
 
   clear: async () => {
