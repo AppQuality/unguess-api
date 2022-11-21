@@ -47,6 +47,8 @@ import bugType from "@src/__mocks__/database/bug_type";
 import bugStatus from "@src/__mocks__/database/bug_status";
 import bugMedia from "@src/__mocks__/database/bug_media";
 import devices from "@src/__mocks__/database/device";
+import additionalField from "@src/__mocks__/database/campaign_additional_field";
+import additionalFieldData from "@src/__mocks__/database/campaign_additional_field_data";
 
 interface dataObject {
   profiles?: Array<any>;
@@ -103,6 +105,8 @@ export const adapter = {
     await bugStatus.mock();
     await bugMedia.mock();
     await devices.mock();
+    await additionalField.mock();
+    await additionalFieldData.mock();
   },
   drop: async () => {
     await profileTable.drop();
@@ -141,6 +145,8 @@ export const adapter = {
     await bugStatus.dropMock();
     await bugMedia.dropMock();
     await devices.dropMock();
+    await additionalField.dropMock();
+    await additionalFieldData.dropMock();
   },
 
   clear: async () => {

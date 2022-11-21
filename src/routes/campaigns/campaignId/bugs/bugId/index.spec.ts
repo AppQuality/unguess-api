@@ -205,9 +205,6 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
         });
 
         await tags.mock();
-        await additionalField.mock();
-        await additionalFieldData.mock();
-
         await bugs.insert(bug_1);
         await bugs.insert(bug_2);
         await bugs.insert(bug_3_pending);
@@ -245,8 +242,6 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
     return new Promise(async (resolve, reject) => {
       try {
         await tags.dropMock();
-        await additionalField.dropMock();
-        await additionalFieldData.dropMock();
         await CampaignMeta.dropMock();
       } catch (error) {
         console.error(error);

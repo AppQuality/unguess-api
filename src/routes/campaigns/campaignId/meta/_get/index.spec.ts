@@ -94,7 +94,6 @@ describe("GET /campaigns/{cid}/meta", () => {
         });
 
         await candidates.mock();
-        await useCases.mock();
         await candidates.insert({
           user_id: 32,
           campaign_id: campaign_1.id,
@@ -131,7 +130,6 @@ describe("GET /campaigns/{cid}/meta", () => {
       try {
         await dbAdapter.clear();
         await candidates.dropMock();
-        await useCases.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);
