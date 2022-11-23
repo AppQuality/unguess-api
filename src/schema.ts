@@ -311,7 +311,8 @@ export interface components {
       };
       status: {
         id: number;
-        name: string;
+        /** @enum {string} */
+        name: "incoming" | "running" | "completed";
       };
       project: {
         id: number;
