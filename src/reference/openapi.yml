@@ -1267,6 +1267,10 @@ components:
               type: number
             name:
               type: string
+              enum:
+                - incoming
+                - running
+                - completed
         project:
           type: object
           required:
