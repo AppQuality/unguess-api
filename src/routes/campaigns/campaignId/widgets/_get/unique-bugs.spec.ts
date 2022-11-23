@@ -2,7 +2,12 @@ import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import bugs from "@src/__mocks__/database/bugs";
+import uniqueBugsRead from "@src/__mocks__/database/customer_unique_bug_read";
+import isGracePeriodPassed from "./uniqueBugsWidget/isGracePeriodPassed";
 
+jest.mock("./uniqueBugsWidget/isGracePeriodPassed", () =>
+  jest.fn().mockImplementation(() => true)
+);
 describe("GET /campaigns/{cid}/widgets - unique bugs", () => {
   beforeAll(async () => {
     await dbAdapter.add({
@@ -81,6 +86,10 @@ describe("GET /campaigns/{cid}/widgets - unique bugs", () => {
     });
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+    uniqueBugsRead.clear();
+  });
   it("Should answer 403 if user is not logged in", async () => {
     const response = await request(app).get(
       `/campaigns/1/widgets?s=unique-bugs`
@@ -145,6 +154,12 @@ describe("GET /campaigns/{cid}/widgets - unique bugs", () => {
   });
 
   it("Should return update trend if requested", async () => {
+    jest.mock("./uniqueBugsWidget/isGracePeriodPassed", () => {
+      return {
+        __esModule: true,
+        default: jest.fn(() => true),
+      };
+    });
     const nonUpdatingResponse = await request(app)
       .get(`/campaigns/1/widgets?s=unique-bugs`)
       .set("Authorization", "Bearer user");
@@ -170,5 +185,20 @@ describe("GET /campaigns/{cid}/widgets - unique bugs", () => {
     expect(nonUpdatingResponse.body.data).toHaveProperty("total", 0);
     expect(nonUpdatingResponse.body.data).toHaveProperty("unique", 0);
     expect(nonUpdatingResponse.body.data).toHaveProperty("trend", 0);
+  });
+
+  it("Should not update trend if grace period is not past", async () => {
+    const mockedisGracePeriodPassed = jest.mocked(isGracePeriodPassed, true);
+    mockedisGracePeriodPassed.mockRestore();
+    const responseBeforeUpdate = await request(app)
+      .get(`/campaigns/1/widgets?s=unique-bugs&updateTrend=true`)
+      .set("Authorization", "Bearer user");
+    expect(responseBeforeUpdate.body).toHaveProperty("data");
+    expect(responseBeforeUpdate.body.data).toHaveProperty("trend", 1);
+    const responseAfterUpdate = await request(app)
+      .get(`/campaigns/1/widgets?s=unique-bugs&updateTrend=true`)
+      .set("Authorization", "Bearer user");
+    expect(responseAfterUpdate.body).toHaveProperty("data");
+    expect(responseAfterUpdate.body.data).toHaveProperty("trend", 1);
   });
 });

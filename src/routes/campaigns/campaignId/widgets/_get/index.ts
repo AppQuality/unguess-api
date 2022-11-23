@@ -11,6 +11,7 @@ import { getProjectById } from "@src/utils/projects";
 import getCampaignBugsTrend from "./uniqueBugsWidget/getCampaignBugsTrend";
 import updateTrend from "./uniqueBugsWidget/updateTrend";
 import getCampaignBugSituation from "./uniqueBugsWidget/getCampaignBugSituation";
+import isGracePeriodPassed from "./uniqueBugsWidget/isGracePeriodPassed";
 
 export default async (
   c: Context,
@@ -84,7 +85,13 @@ export default async (
           userId: user.id,
           unique,
         });
-        if (shouldUpdateTrend) {
+        if (
+          shouldUpdateTrend &&
+          (await isGracePeriodPassed({
+            campaignId: campaign.id,
+            userId: user.id,
+          }))
+        ) {
           await updateTrend({
             campaignId: campaign.id,
             userId: user.id,
