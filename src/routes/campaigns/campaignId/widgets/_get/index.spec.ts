@@ -3,7 +3,6 @@ import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 import useCases, { UseCaseParams } from "@src/__mocks__/database/use_cases";
-import reports from "@src/__mocks__/database/report";
 import bugs, { BugsParams } from "@src/__mocks__/database/bugs";
 import bugMedia from "@src/__mocks__/database/bug_media";
 import bugSeverity from "@src/__mocks__/database/bug_severity";

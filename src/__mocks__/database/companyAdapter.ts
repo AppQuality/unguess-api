@@ -56,6 +56,7 @@ import tags from "@src/__mocks__/database/bug_tags";
 import Templates from "@src/__mocks__/database/templates";
 import Category from "@src/__mocks__/database/template_categories";
 import userTask from "@src/__mocks__/database/user_task";
+import customerUniqueBugsRead from "@src/__mocks__/database/customer_unique_bug_read";
 
 interface dataObject {
   profiles?: Array<any>;
@@ -120,6 +121,7 @@ export const adapter = {
     await Category.mock();
     await tags.mock();
     await userTask.mock();
+    await customerUniqueBugsRead.mock();
   },
   drop: async () => {
     await profileTable.drop();
@@ -166,6 +168,7 @@ export const adapter = {
     await userTask.dropMock();
     await Templates.dropMock();
     await Category.dropMock();
+    await customerUniqueBugsRead.dropMock();
   },
 
   clear: async () => {

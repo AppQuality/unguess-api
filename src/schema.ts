@@ -607,9 +607,9 @@ export interface components {
      */
     WidgetCampaignUniqueBugs: {
       data: {
-        unique?: number;
-        total?: number;
-        trend?: number;
+        unique: number;
+        total: number;
+        trend: number;
       };
       /**
        * @default campaignUniqueBugs
@@ -878,6 +878,8 @@ export interface operations {
       query: {
         /** Campaign widget slug */
         s: components["parameters"]["wslug"];
+        /** should update bug trend after request resolves? */
+        updateTrend?: boolean;
       };
     };
     responses: {
@@ -887,7 +889,8 @@ export interface operations {
           "application/json":
             | components["schemas"]["WidgetBugsByUseCase"]
             | components["schemas"]["WidgetBugsByDevice"]
-            | components["schemas"]["WidgetCampaignProgress"];
+            | components["schemas"]["WidgetCampaignProgress"]
+            | components["schemas"]["WidgetCampaignUniqueBugs"];
         };
       };
       400: components["responses"]["Error"];
