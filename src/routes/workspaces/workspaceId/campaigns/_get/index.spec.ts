@@ -475,6 +475,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
         campaign_id: campaign_1.id,
         message: "Bug 1",
         wp_user_id: 1,
+        status_id: 2,
       });
 
       const response = await request(app)
@@ -502,6 +503,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
         campaign_id: campaign_1.id,
         message: "Bug 1",
         wp_user_id: 1,
+        status_id: 2,
       });
 
       await useCases.insert({

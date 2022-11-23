@@ -141,13 +141,10 @@ export default async (
         c.customer_id,
         ct.name AS campaign_type_name,
         ct.type AS campaign_family_id,
-        p.display_name,
-        o.bugs, 
-        o.media
+        p.display_name
       FROM wp_appq_evd_campaign c 
       JOIN wp_appq_project p ON c.project_id = p.id 
       LEFT JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id 
-      LEFT JOIN campaigns_outputs o ON (o.campaign_id = c.id)
       WHERE p.id IN (${userProjectsID})
       ${AND}
       GROUP BY c.id
@@ -156,6 +153,12 @@ export default async (
     `;
 
     const campaigns = await db.query(query);
+
+    const campaignIds = campaigns
+      .map((c: { id: number }) => db.format("?", [c.id]))
+      .join(",");
+    const bugCounts = await getBugCounts(campaignIds);
+    const mediaCounts = await getMediaCounts(campaignIds);
 
     const countQuery = `SELECT COUNT(*) as count FROM wp_appq_evd_campaign c JOIN wp_appq_project p ON c.project_id = p.id WHERE p.id IN (${userProjectsID})`;
     let total = await db.query(countQuery);
@@ -171,7 +174,11 @@ export default async (
         familyId: campaign.campaign_family_id,
       });
 
-      const outputs = getCampaignOutputs(campaign);
+      let outputs: ("media" | "bugs")[] = [];
+      if (bugCounts[campaign.id] && bugCounts[campaign.id] > 0)
+        outputs.push("bugs");
+      if (mediaCounts[campaign.id] && mediaCounts[campaign.id] > 0)
+        outputs.push("media");
 
       preparedCampaignResponse.push({
         id: campaign.id,
@@ -223,3 +230,48 @@ export default async (
     return error;
   }
 };
+
+async function getMediaCounts(campaignIds: any) {
+  const data = await db.query(`
+    SELECT campaign_id,COUNT(t.id) as total
+          FROM wp_appq_campaign_task t 
+          JOIN wp_appq_user_task_media m ON (m.campaign_task_id = t.id)
+          WHERE t.campaign_id IN (${campaignIds})`);
+  const results: { [key: number]: number } = {};
+  for (const id of campaignIds.split(",")) {
+    results[id] = 0;
+    const item = data.find(
+      (d: { campaign_id: number }) => d.campaign_id === parseInt(id)
+    );
+    if (item) {
+      results[id] = item.total;
+    }
+  }
+  return results;
+}
+
+async function getBugCounts(campaignIds: any) {
+  const data = await db.query(`SELECT campaign_id,
+    SUM(CASE WHEN b.status_id = 2 THEN 1 ELSE 0 END) as approvedBugs,
+    SUM(CASE WHEN b.status_id = 4 THEN 1 ELSE 0 END) as reviewBugs,
+    c.cust_bug_vis                                   as showNeedReview
+FROM wp_appq_evd_bug b
+      JOIN wp_appq_evd_campaign c ON (c.id = b.campaign_id)
+WHERE campaign_id IN (${campaignIds})
+GROUP BY campaign_id;
+    `);
+  const results: { [key: number]: number } = {};
+  for (const id of campaignIds.split(",")) {
+    results[id] = 0;
+    const item = data.find(
+      (d: { campaign_id: number }) => d.campaign_id === parseInt(id)
+    );
+    if (item) {
+      results[id] = item.approvedBugs;
+      if (item.showNeedReview === 1) {
+        results[id] += item.reviewBugs;
+      }
+    }
+  }
+  return results;
+}
