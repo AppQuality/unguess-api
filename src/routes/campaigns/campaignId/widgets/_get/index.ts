@@ -82,19 +82,19 @@ export default async (
 
         const trend = await getCampaignBugsTrend({
           campaignId: campaign.id,
-          userId: user.id,
+          userId: user.unguess_wp_user_id,
           unique,
         });
         if (
           shouldUpdateTrend &&
           (await isGracePeriodPassed({
             campaignId: campaign.id,
-            userId: user.id,
+            userId: user.unguess_wp_user_id,
           }))
         ) {
           await updateTrend({
             campaignId: campaign.id,
-            userId: user.id,
+            userId: user.unguess_wp_user_id,
             unique,
           });
         }
