@@ -19,7 +19,7 @@ async function updateTrend({
     ),
     "unguess"
   );
-  const now = new Date().getTime().toString();
+  const now = new Date().getTime();
   if (trend.length > 0) {
     await db.query(
       db.format(

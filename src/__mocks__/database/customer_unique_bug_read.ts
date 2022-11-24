@@ -4,7 +4,7 @@ type CustomerUniqueBugsReadParams = {
   wp_user_id?: number;
   campaign_id?: number;
   bugs_read?: number;
-  update_time?: string;
+  update_time?: number;
 };
 
 const defaultItem: CustomerUniqueBugsReadParams = {
@@ -18,7 +18,7 @@ class CustomerUniqueBugsRead extends Table<CustomerUniqueBugsReadParams> {
     "wp_user_id INTEGER(11) NOT NULL",
     "campaign_id INTEGER(11) NOT NULL",
     "bugs_read INTEGER(11) NOT NULL",
-    "update_time TIMESTAMP NOT NULL",
+    "update_time INTEGER(11) NOT NULL",
   ];
   constructor() {
     super(defaultItem);
