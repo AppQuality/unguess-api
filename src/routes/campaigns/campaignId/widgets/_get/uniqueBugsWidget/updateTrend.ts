@@ -24,7 +24,7 @@ async function updateTrend({
     await db.query(
       db.format(
         `UPDATE wp_appq_unique_bug_read 
-                    SET bugs_read = ? , update_time = ?
+                    SET bugs_read = ? , update_time = FROM_UNIXTIME(? * 0.01)
                     WHERE campaign_id = ? AND wp_user_id = ?
                   `,
         [unique, now, campaignId, userId]
@@ -36,7 +36,7 @@ async function updateTrend({
       db.format(
         `INSERT INTO wp_appq_unique_bug_read 
                     (bugs_read, update_time, campaign_id, wp_user_id) 
-                    VALUES (?, ?, ?, ?)
+                    VALUES (?, FROM_UNIXTIME(? * 0.01), ?, ?)
                   `,
         [unique, now, campaignId, userId]
       ),

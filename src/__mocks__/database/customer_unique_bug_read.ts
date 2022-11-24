@@ -18,7 +18,7 @@ class CustomerUniqueBugsRead extends Table<CustomerUniqueBugsReadParams> {
     "wp_user_id INTEGER(11) NOT NULL",
     "campaign_id INTEGER(11) NOT NULL",
     "bugs_read INTEGER(11) NOT NULL",
-    "update_time INTEGER(11) NOT NULL",
+    "update_time TIMESTAMP NOT NULL",
   ];
   constructor() {
     super(defaultItem);
