@@ -1,6 +1,6 @@
 import * as db from "@src/features/db";
 
-interface UseCaseProgress {
+export interface UseCaseProgress {
   groups: { [x: number]: number };
   usecases: {
     id: number;

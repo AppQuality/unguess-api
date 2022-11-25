@@ -1,14 +1,46 @@
 import * as db from "@src/features/db";
+import { formatUseCaseProgress } from "../getWidgetCampaignProgress/formatProgress";
+import {
+  getUseCaseProgress,
+  UseCaseProgress,
+} from "../getWidgetCampaignProgress/getUseCaseProgress";
 
 interface bugsByUseCaseQueryResults {
   total: number;
   id: number;
+  group_id: number;
   title: string;
   content: string;
   simple_title: string;
   info: string;
   prefix: string;
 }
+
+const getSingleUseCaseCompletion = ({
+  progress,
+  usecase_id,
+  group_id,
+}: {
+  progress: UseCaseProgress;
+  usecase_id: number;
+  group_id: number;
+}) => {
+  const { groups, usecases } = progress;
+
+  if (!usecases.length || !groups[0] || !groups[group_id]) {
+    return formatUseCaseProgress();
+  }
+
+  const usecase = usecases.find(
+    (useCase: { id: number; completions: number }) => useCase.id === usecase_id
+  );
+
+  if (!usecase || !usecase.completions) {
+    return formatUseCaseProgress();
+  }
+
+  return formatUseCaseProgress((usecase.completions / groups[group_id]) * 100);
+};
 
 export const getWidgetBugsByUseCase = async (
   campaign: StoplightComponents["schemas"]["CampaignWithOutput"] & {
@@ -30,6 +62,7 @@ export const getWidgetBugsByUseCase = async (
       count(b.id) as total,
       t.id,
       t.title,
+      t.group_id,
       t.content,
       t.simple_title,
       t.info,
@@ -61,6 +94,8 @@ export const getWidgetBugsByUseCase = async (
     };
   }
 
+  const progress = await getUseCaseProgress(campaign.id);
+
   const useCasesWithBugs = result.map((row: bugsByUseCaseQueryResults) => ({
     usecase_id: row.id ?? -1,
     title:
@@ -69,6 +104,13 @@ export const getWidgetBugsByUseCase = async (
         : row.title || "Not a specific use case",
     description: row.content ?? "",
     bugs: row.total,
+    ...(row.id && {
+      usecase_completion: getSingleUseCaseCompletion({
+        progress,
+        usecase_id: row.id,
+        group_id: row.group_id,
+      }),
+    }),
   }));
 
   return {

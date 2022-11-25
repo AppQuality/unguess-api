@@ -547,6 +547,8 @@ export interface components {
         /** @description Unique bugs */
         bugs: number;
         usecase_id: number;
+        /** Format: float */
+        usecase_completion?: number;
       })[];
       /**
        * @default bugsByUseCase
@@ -565,6 +567,7 @@ export interface components {
         | components["schemas"]["Desktop"]
         | components["schemas"]["Tablet"]
       ) & {
+        unique_bugs: number;
         /** @description Unique bugs */
         bugs: number;
       })[];
