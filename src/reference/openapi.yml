@@ -1785,7 +1785,6 @@ components:
                 required:
                   - bugs
                   - usecase_id
-                  - usecase_completion
         kind:
           type: string
           enum:
