@@ -133,7 +133,7 @@ async function getCampaignOutputs(campaign: {
         `SELECT COUNT(t.id) as total
           FROM wp_appq_campaign_task t 
           JOIN wp_appq_user_task_media m ON (m.campaign_task_id = t.id)
-          WHERE t.campaign_id = ?`,
+          WHERE t.campaign_id = ? AND m.status = 2`,
         [campaign.id]
       )
     );

@@ -477,6 +477,12 @@ describe("GET /workspaces/{wid}/campaigns", () => {
         wp_user_id: 1,
         status_id: 2,
       });
+      await userTaskMedia.insert({
+        id: 789,
+        campaign_task_id: 456,
+        location: "http://image1.com",
+        status: 0,
+      });
 
       const response = await request(app)
         .get(`/workspaces/1/campaigns`)
@@ -517,6 +523,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
         id: 789,
         campaign_task_id: 456,
         location: "http://image1.com",
+        status: 2,
       });
 
       const response = await request(app)
