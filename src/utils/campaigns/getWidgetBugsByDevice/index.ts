@@ -7,8 +7,8 @@ type device =
   | StoplightComponents["schemas"]["Smartphone"]
   | StoplightComponents["schemas"]["Tablet"];
 
-type deviceFromBug = device & { deviceKey: string };
-type widgetDataType = device & { bugs: number };
+type deviceFromBug = device & { deviceKey: string; isUniqueBug: boolean };
+type widgetDataType = device & { bugs: number; unique_bugs: number };
 
 export const getWidgetBugsByDevice = async (
   campaign: StoplightComponents["schemas"]["CampaignWithOutput"] & {
@@ -76,6 +76,7 @@ export const getWidgetBugsByDevice = async (
       const device = getBugDevice(bug);
       return {
         ...device,
+        isUniqueBug: bug.is_duplicated === 0,
         deviceKey: Object.values(device).join(""), // Used to group devices
       };
     }
@@ -87,17 +88,22 @@ export const getWidgetBugsByDevice = async (
       acc: {
         [key: string]: widgetDataType;
       },
-      { deviceKey, ...device }: deviceFromBug
+      { deviceKey, isUniqueBug, ...device }: deviceFromBug
     ) => {
       const key: string = deviceKey;
       if (!acc[key]) {
         acc[key] = {
           ...device,
           bugs: 0,
+          unique_bugs: 0,
         };
       }
 
       acc[key].bugs += 1;
+
+      if (isUniqueBug) {
+        acc[key].unique_bugs += 1;
+      }
 
       return acc;
     },

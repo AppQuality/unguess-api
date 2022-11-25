@@ -180,41 +180,32 @@ const bug_media_1 = {
 
 describe("GET /campaigns/{cid}/widgets", () => {
   beforeAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.add({
-          companies: [customer_1],
-          userToCustomers: [user_to_customer_1],
-          projects: [project_1, project_2],
-          userToProjects: [user_to_project_1],
-          campaignTypes: [campaign_type_1],
-          campaigns: [campaign_1, campaign_2],
-          profiles: [
-            { wp_user_id: 12, id: 32 },
-            { wp_user_id: 13, id: 33 },
-            { wp_user_id: 14, id: 34 },
-            { wp_user_id: 15, id: 35 },
-          ],
-        });
-
-        await useCases.insert(useCase1);
-        await bugs.insert(bug_1);
-        await bugs.insert(bug_2);
-        await bugMedia.insert(bug_media_1);
-        await bugSeverity.addDefaultItems();
-        await bugReplicability.addDefaultItems();
-        await bugType.addDefaultItems();
-        await bugStatus.addDefaultItems();
-        await devices.insert(device_1);
-        await devices.insert(tablet);
-        await devices.insert(desktop);
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
+    await dbAdapter.add({
+      companies: [customer_1],
+      userToCustomers: [user_to_customer_1],
+      projects: [project_1, project_2],
+      userToProjects: [user_to_project_1],
+      campaignTypes: [campaign_type_1],
+      campaigns: [campaign_1, campaign_2],
+      profiles: [
+        { wp_user_id: 12, id: 32 },
+        { wp_user_id: 13, id: 33 },
+        { wp_user_id: 14, id: 34 },
+        { wp_user_id: 15, id: 35 },
+      ],
     });
+
+    await useCases.insert(useCase1);
+    await bugs.insert(bug_1);
+    await bugs.insert(bug_2);
+    await bugMedia.insert(bug_media_1);
+    await bugSeverity.addDefaultItems();
+    await bugReplicability.addDefaultItems();
+    await bugType.addDefaultItems();
+    await bugStatus.addDefaultItems();
+    await devices.insert(device_1);
+    await devices.insert(tablet);
+    await devices.insert(desktop);
   });
 
   // It should answer 403 if user is not logged in
@@ -267,40 +258,66 @@ describe("GET /campaigns/{cid}/widgets", () => {
       application_section_id: useCase2.id,
     };
 
-    const bug_without_usecase = {
+    const bug_4 = {
       ...bug_1,
       id: 4,
+      application_section: useCase2.title,
+      application_section_id: useCase2.id,
+    };
+
+    const bug_5 = {
+      ...bug_1,
+      id: 5,
+      application_section: useCase2.title,
+      application_section_id: useCase2.id,
+    };
+
+    const bug_without_usecase = {
+      ...bug_1,
+      id: 6,
       application_section: "asd",
       application_section_id: -1,
     };
 
-    beforeAll(async () => {
-      return new Promise(async (resolve, reject) => {
-        try {
-          await useCases.insert(useCase2);
-          await bugs.insert(bug_3);
-        } catch (error) {
-          console.error(error);
-          reject(error);
-        }
+    const uT1: UserTaskParams = {
+      id: 1,
+      task_id: useCase1.id,
+      tester_id: 32,
+    };
 
-        resolve(true);
+    //UC1: 2bugs, UC2: 3bugs, UC-1: 1bug
+    beforeAll(async () => {
+      await useCases.insert(useCase2);
+      await bugs.insert(bug_3);
+      await bugs.insert(bug_4);
+      await bugs.insert(bug_5);
+      await bugs.insert(bug_without_usecase);
+
+      await useCaseGroup.insert({
+        task_id: useCase1.id || 123,
+        group_id: 0,
+      });
+      await useCaseGroup.insert({
+        task_id: useCase2.id || 124,
+        group_id: 1,
+      });
+
+      await candidates.insert({
+        user_id: 12,
+        campaign_id: campaign_1.id,
+        accepted: 1,
       });
     });
 
     afterAll(async () => {
-      return new Promise(async (resolve, reject) => {
-        try {
-          await useCases.delete([{ id: useCase2.id }]);
-          await bugs.delete([{ id: bug_3.id }]);
-          await bugs.delete([{ id: bug_without_usecase.id }]);
-        } catch (error) {
-          console.error(error);
-          reject(error);
-        }
-
-        resolve(true);
-      });
+      await useCases.delete([{ id: useCase2.id }]);
+      await bugs.delete([{ id: bug_3.id }]);
+      await bugs.delete([{ id: bug_4.id }]);
+      await bugs.delete([{ id: bug_5.id }]);
+      await bugs.delete([{ id: bug_without_usecase.id }]);
+      await userTask.clear();
+      await candidates.clear();
+      await useCaseGroup.clear();
     });
 
     it("Should answer 200 and return the bugs by use case widget", async () => {
@@ -310,8 +327,8 @@ describe("GET /campaigns/{cid}/widgets", () => {
       expect(response.status).toBe(200);
       expect(response.body.kind).toEqual("bugsByUseCase");
 
-      expect(response.body.data[0].title).toEqual(useCase1.simple_title);
-      expect(response.body.data[0].bugs).toEqual(2);
+      expect(response.body.data[1].title).toEqual(useCase1.simple_title);
+      expect(response.body.data[1].bugs).toEqual(2);
     });
 
     it("Should answer 200 and the usecase title must be used in absence of simple title", async () => {
@@ -321,35 +338,89 @@ describe("GET /campaigns/{cid}/widgets", () => {
       expect(response.status).toBe(200);
       expect(response.body.kind).toEqual("bugsByUseCase");
 
-      expect(response.body.data[1].title).toEqual(useCase2.title);
-      expect(response.body.data[1].bugs).toEqual(1);
+      expect(response.body.data[0].title).toEqual(useCase2.title);
+      expect(response.body.data[0].bugs).toEqual(3);
+    });
+
+    it("Should answer 200 and returns the usecase completion of 12.5", async () => {
+      const response = await request(app)
+        .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-usecase`)
+        .set("Authorization", "Bearer user");
+      expect(response.status).toBe(200);
+      expect(response.body.data[0].usecase_completion).toEqual(12.5);
+    });
+
+    it("Should answer 200 and returns the usecase completion of 87.5", async () => {
+      await userTask.insert(uT1);
+      await userTask.insert({ ...uT1, id: 2 });
+
+      const response = await request(app)
+        .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-usecase`)
+        .set("Authorization", "Bearer user");
+      expect(response.status).toBe(200);
+
+      expect(response.body.data[1].usecase_completion).toEqual(87.5);
     });
 
     it("Should answer 200 and returns bugs even without any usecase specified", async () => {
-      await bugs.insert(bug_without_usecase);
-
       const response = await request(app)
         .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-usecase`)
         .set("Authorization", "Bearer user");
       expect(response.status).toBe(200);
       expect(response.body.kind).toEqual("bugsByUseCase");
 
-      expect(response.body.data[1].usecase_id).toEqual(-1);
-      expect(response.body.data[1].title).toEqual("Not a specific use case");
-      expect(response.body.data[1].bugs).toEqual(1);
+      expect(response.body.data[2].usecase_id).toEqual(-1);
+      expect(response.body.data[2].title).toEqual("Not a specific use case");
+      expect(response.body.data[2].bugs).toEqual(1);
+    });
+
+    it("Should NOT returns the usecase completion for the 'not a specific usecase'", async () => {
+      const response = await request(app)
+        .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-usecase`)
+        .set("Authorization", "Bearer user");
+      expect(response.status).toBe(200);
+      expect(response.body.kind).toEqual("bugsByUseCase");
+
+      expect(response.body.data[2].title).toEqual("Not a specific use case");
+      expect(response.body.data[2].usecase_completion).toBeUndefined();
     });
 
     // --- End of describe "Bugs by usecase"
   });
 
   describe("Bugs by device", () => {
+    const bug_3 = {
+      ...bug_1,
+      id: 1234,
+      is_duplicated: 1,
+      duplicated_of_id: 3,
+    };
+
+    beforeAll(async () => {
+      await bugs.insert(bug_3);
+    });
+
+    afterAll(async () => {
+      await bugs.delete([{ id: bug_3.id }]);
+    });
+
     it("Should answer 200 and return the bugs by device widget", async () => {
       const response = await request(app)
         .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-device`)
         .set("Authorization", "Bearer user");
       expect(response.status).toBe(200);
       expect(response.body.kind).toEqual("bugsByDevice");
-      expect(response.body.data[0].bugs).toEqual(2);
+      expect(response.body.data[0].bugs).toEqual(3);
+    });
+
+    it("Should answer 200 and return a counter for unique_bugs", async () => {
+      const response = await request(app)
+        .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-device`)
+        .set("Authorization", "Bearer user");
+      expect(response.status).toBe(200);
+      expect(response.body.kind).toEqual("bugsByDevice");
+      expect(response.body.data[0].unique_bugs).toEqual(2);
+      expect(response.body.data[0].bugs).toEqual(3);
     });
 
     it("Should answer 200 and return the bugs by device widget (with 2 device type)", async () => {
@@ -373,7 +444,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
       expect(response.status).toBe(200);
 
       expect(response.body.kind).toEqual("bugsByDevice");
-      expect(response.body.data[0].bugs).toEqual(1);
+      expect(response.body.data[0].bugs).toEqual(2);
       expect(response.body.data[1].bugs).toEqual(1);
     });
 
@@ -416,44 +487,35 @@ describe("GET /campaigns/{cid}/widgets", () => {
     };
 
     beforeAll(async () => {
-      return new Promise(async (resolve, reject) => {
-        try {
-          await useCases.insert(useCase2);
-          await useCaseGroup.insert({
-            task_id: useCase1.id || 123,
-            group_id: 0,
-          });
-          await useCaseGroup.insert({
-            task_id: useCase2.id || 124,
-            group_id: 1,
-          });
+      await useCases.insert(useCase2);
+      await useCaseGroup.insert({
+        task_id: useCase1.id || 123,
+        group_id: 0,
+      });
+      await useCaseGroup.insert({
+        task_id: useCase2.id || 124,
+        group_id: 1,
+      });
 
-          await candidates.insert({
-            user_id: 12,
-            campaign_id: campaign_1.id,
-            accepted: 1,
-          });
-          await candidates.insert({
-            user_id: 13,
-            campaign_id: campaign_1.id,
-            accepted: 0,
-          });
-          await candidates.insert({
-            user_id: 14,
-            campaign_id: campaign_1.id,
-            accepted: 1,
-          });
-          await candidates.insert({
-            user_id: 15,
-            campaign_id: campaign_1.id,
-            accepted: 0,
-          });
-        } catch (error) {
-          console.error(error);
-          reject(error);
-        }
-
-        resolve(true);
+      await candidates.insert({
+        user_id: 12,
+        campaign_id: campaign_1.id,
+        accepted: 1,
+      });
+      await candidates.insert({
+        user_id: 13,
+        campaign_id: campaign_1.id,
+        accepted: 0,
+      });
+      await candidates.insert({
+        user_id: 14,
+        campaign_id: campaign_1.id,
+        accepted: 1,
+      });
+      await candidates.insert({
+        user_id: 15,
+        campaign_id: campaign_1.id,
+        accepted: 0,
       });
     });
 
@@ -462,16 +524,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
     });
 
     afterEach(async () => {
-      return new Promise(async (resolve, reject) => {
-        try {
-          await userTask.clear();
-        } catch (error) {
-          console.error(error);
-          reject(error);
-        }
-
-        resolve(true);
-      });
+      await userTask.clear();
     });
 
     it("Should answer 200 and return the correct kind of widget", async () => {
