@@ -3,10 +3,9 @@ import uniqueBugsRead from "@src/__mocks__/database/customer_unique_bug_read";
 
 describe("isGracePeriodPassed", () => {
   beforeAll(() => {
-    const yesterday = new Date().setDate(new Date().getDate() - 1);
+    const yesterday = new Date(new Date().setDate(new Date().getDate() - 1));
     const now = new Date();
-    const formatDateTime = (t: Date | number) =>
-      new Date(t).getTime().toString();
+    const formatDateTime = (t: Date | number) => new Date(t).getTime();
 
     uniqueBugsRead.insert({
       campaign_id: 1,

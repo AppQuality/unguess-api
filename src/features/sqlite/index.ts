@@ -6,6 +6,7 @@ export default (dbname: "unguess" | "tryber") => {
       ? new sqlite3(dbname + ".db", { verbose: console.log })
       : new sqlite3(dbname + ".db");
   db.function("NOW", () => "datetime('now')");
+  db.function("FROM_UNIXTIME", (value: string) => value);
   db.function("CONCAT", { varargs: true }, (...args: string[]) =>
     args.join("")
   );

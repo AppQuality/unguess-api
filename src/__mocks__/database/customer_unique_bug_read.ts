@@ -4,7 +4,7 @@ type CustomerUniqueBugsReadParams = {
   wp_user_id?: number;
   campaign_id?: number;
   bugs_read?: number;
-  update_time?: string;
+  update_time?: number;
 };
 
 const defaultItem: CustomerUniqueBugsReadParams = {
