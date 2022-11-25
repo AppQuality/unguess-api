@@ -399,7 +399,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
       expect(response.body.data[2].bugs).toEqual(1);
     });
 
-    it("Should answer 200 and NOT returns the usecase for the group 'not a specific usecase'", async () => {
+    it("Should NOT returns the usecase completion for the 'not a specific usecase'", async () => {
       const response = await request(app)
         .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-usecase`)
         .set("Authorization", "Bearer user");
