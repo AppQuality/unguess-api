@@ -1779,9 +1779,13 @@ components:
                     description: Unique bugs
                   usecase_id:
                     type: number
+                  usecase_completion:
+                    type: number
+                    format: float
                 required:
                   - bugs
                   - usecase_id
+                  - usecase_completion
         kind:
           type: string
           enum:
@@ -1821,10 +1825,13 @@ components:
                   - $ref: '#/components/schemas/Tablet'
               - type: object
                 properties:
+                  unique_bugs:
+                    type: integer
                   bugs:
                     type: integer
                     description: Unique bugs
                 required:
+                  - unique_bugs
                   - bugs
         kind:
           type: string
