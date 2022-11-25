@@ -57,8 +57,8 @@ export const getWidgetBugsByDevice = async (
     WHERE b.campaign_id = ?
     AND ${
       campaign.showNeedReview
-        ? `(status.name == 'Approved' OR status.name == 'Need Review')`
-        : `status.name == 'Approved'`
+        ? `(status.name = 'Approved' OR status.name = 'Need Review')`
+        : `status.name = 'Approved'`
     }`;
 
   const bugs = await db.query(db.format(query, [campaign.id]));

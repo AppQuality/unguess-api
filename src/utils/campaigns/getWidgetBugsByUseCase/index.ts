@@ -43,8 +43,8 @@ export const getWidgetBugsByUseCase = async (
       AND b.is_duplicated = 0
       AND ${
         campaign.showNeedReview
-          ? `(status.name == 'Approved' OR status.name == 'Need Review')`
-          : `status.name == 'Approved'`
+          ? `(status.name = 'Approved' OR status.name = 'Need Review')`
+          : `status.name = 'Approved'`
       }
     group by
       t.id
