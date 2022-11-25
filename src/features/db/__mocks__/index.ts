@@ -3,10 +3,12 @@ import mysql from "mysql";
 
 const unguessDb = sqlite("unguess");
 const tryberDb = sqlite("tryber");
-export const format = (query: string, data: (string | number)[]) =>
-  mysql.format(query.replace(/"/g, "'"), data);
+export const format = (query: string, data: (string | number)[]) => {
+  return mysql.format(query.replace(/"/g, "'"), data);
+};
 
 export const query = async (query: string, db: string): Promise<any> => {
+  if (query.includes("==")) throw new Error("Using == in query");
   const myDb = db === "unguess" ? unguessDb : tryberDb;
   let data;
   if (
