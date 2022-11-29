@@ -1926,8 +1926,6 @@ components:
               duplicates: 2
           kind: bugsByDuplicates
       description: Returns the most 10 reported bugs ordered by numberd of duplicates
-      x-stoplight:
-        id: 09f9320d16cb2
       properties:
         data:
           type: array
