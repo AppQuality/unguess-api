@@ -676,7 +676,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
       expect(response.body.data.length).toEqual(3);
     });
 
-    it("Should order bugs by the number of duplicates", async () => {
+    it("Should sort bugs by the number of duplicates", async () => {
       const response = await request(app)
         .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-duplicates`)
         .set("Authorization", "Bearer user");
@@ -684,7 +684,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
       expect(response.body.data[0].duplicates).toEqual(2);
     });
 
-    it("Should order bugs by the last seen if the number of duplicates is the same", async () => {
+    it("Should sort bugs by the last seen if the number of duplicates is the same", async () => {
       const response = await request(app)
         .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-duplicates`)
         .set("Authorization", "Bearer user");
@@ -693,7 +693,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
       expect(response.body.data[2].id).toEqual(bug_2.id);
     });
 
-    it("Should return raise an error if there are no duplicates", async () => {
+    it("Should raise an error if there are no duplicates", async () => {
       const response = await request(app)
         .get(`/campaigns/${campaign_2.id}/widgets?s=bugs-by-duplicates`)
         .set("Authorization", "Bearer admin");
