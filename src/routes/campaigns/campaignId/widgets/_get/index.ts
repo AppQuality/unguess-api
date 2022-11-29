@@ -3,6 +3,7 @@ import { Context } from "openapi-backend";
 import {
   getCampaign,
   getWidgetBugsByDevice,
+  getWidgetBugsByDuplicates,
   getWidgetBugsByUseCase,
   getWidgetCampaignProgress,
 } from "@src/utils/campaigns";
@@ -77,6 +78,8 @@ export default async (
         return await getWidgetBugsByDevice(campaign);
       case "cp-progress":
         return await getWidgetCampaignProgress(campaign);
+      case "bugs-by-duplicates":
+        return await getWidgetBugsByDuplicates(campaign);
       case "unique-bugs":
         const { unique, total } = await getCampaignBugSituation(campaign);
 
