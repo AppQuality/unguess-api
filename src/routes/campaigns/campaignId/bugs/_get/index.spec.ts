@@ -10,6 +10,7 @@ import bugType from "@src/__mocks__/database/bug_type";
 import bugStatus from "@src/__mocks__/database/bug_status";
 import CampaignMeta from "@src/__mocks__/database/campaign_meta";
 import devices, { DeviceParams } from "@src/__mocks__/database/device";
+import bugsReadStatus from "@src/__mocks__/database/bug_read_status";
 
 const customer_1 = {
   id: 999,
@@ -322,6 +323,8 @@ describe("GET /campaigns/{cid}/bugs", () => {
         await bugType.addDefaultItems();
         await bugStatus.addDefaultItems();
         await devices.insert(device_1);
+
+        await bugsReadStatus.insert({ wp_id: 1, bug_id: bug_2.id });
       } catch (error) {
         console.error(error);
         reject(error);
@@ -699,6 +702,15 @@ describe("GET /campaigns/{cid}/bugs", () => {
       full: bug_7.message,
       compact: bug_7.message,
     });
+  });
+
+  // Should return only unread bugs
+  it("Should return only unread bugs if filterBy has unread filter", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[unread]=true`)
+      .set("Authorization", "Bearer user");
+
+    expect(response.body.items.length).toBe(1);
   });
 
   // --- End of file
