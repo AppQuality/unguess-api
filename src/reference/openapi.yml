@@ -282,6 +282,7 @@ paths:
                   - $ref: '#/components/schemas/WidgetBugsByDevice'
                   - $ref: '#/components/schemas/WidgetCampaignProgress'
                   - $ref: '#/components/schemas/WidgetCampaignUniqueBugs'
+                  - $ref: '#/components/schemas/WidgetBugsByDuplicates'
               examples:
                 Bugs by UseCase:
                   value:
@@ -1841,6 +1842,111 @@ components:
       required:
         - data
         - kind
+    WidgetBugsByDuplicates:
+      title: WidgetBugsByDuplicates
+      type: object
+      x-examples:
+        Example 1:
+          data:
+            - id: 31562
+              internal_id: string
+              campaign_id: 0
+              title:
+                full: string
+                compact: string
+                context:
+                  - string
+              step_by_step: string
+              expected_result: string
+              current_result: string
+              status:
+                id: 0
+                name: string
+              severity:
+                id: 0
+                name: string
+              type:
+                id: 0
+                name: string
+              replicability:
+                id: 0
+                name: string
+              created: string
+              updated: string
+              note: string
+              device:
+                manufacturer: string
+                model: string
+                os: string
+                os_version: string
+                type: smartphone
+              application_section:
+                id: 0
+                title: string
+              duplicated_of_id: 0
+              is_favorite: 0
+              duplicates: 4
+            - id: 1450
+              internal_id: string
+              campaign_id: 0
+              title:
+                full: string
+                compact: string
+                context:
+                  - string
+              step_by_step: string
+              expected_result: string
+              current_result: string
+              status:
+                id: 0
+                name: string
+              severity:
+                id: 0
+                name: string
+              type:
+                id: 0
+                name: string
+              replicability:
+                id: 0
+                name: string
+              created: string
+              updated: string
+              note: string
+              device:
+                manufacturer: string
+                model: string
+                os: string
+                os_version: string
+                type: smartphone
+              application_section:
+                id: 0
+                title: string
+              duplicated_of_id: 0
+              is_favorite: 0
+              duplicates: 2
+          kind: bugsByDuplicates
+      description: Returns the most 10 reported bugs ordered by numberd of duplicates
+      x-stoplight:
+        id: 09f9320d16cb2
+      properties:
+        data:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/Bug'
+              - type: object
+                properties:
+                  duplicates:
+                    type: integer
+                required:
+                  - duplicates
+        kind:
+          type: string
+          enum:
+            - bugsByDuplicates
+      required:
+        - data
+        - kind
     WidgetCampaignProgress:
       title: WidgetCampaignProgress
       type: object
@@ -2013,9 +2119,9 @@ components:
         enum:
           - bugs-by-usecase
           - bugs-by-device
-          - bugs-by-type
           - cp-progress
           - unique-bugs
+          - bugs-by-duplicates
       description: Campaign widget slug
   requestBodies:
     Credentials:

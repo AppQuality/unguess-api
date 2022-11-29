@@ -579,6 +579,17 @@ export interface components {
       kind: "bugsByDevice";
     };
     /**
+     * WidgetBugsByDuplicates
+     * @description Returns the most 10 reported bugs ordered by numberd of duplicates
+     */
+    WidgetBugsByDuplicates: {
+      data: (components["schemas"]["Bug"] & {
+        duplicates: number;
+      })[];
+      /** @enum {string} */
+      kind: "bugsByDuplicates";
+    };
+    /**
      * WidgetCampaignProgress
      * @description Used to show an overview about a specific campaign.
      */
@@ -653,9 +664,9 @@ export interface components {
     wslug:
       | "bugs-by-usecase"
       | "bugs-by-device"
-      | "bugs-by-type"
       | "cp-progress"
-      | "unique-bugs";
+      | "unique-bugs"
+      | "bugs-by-duplicates";
   };
   requestBodies: {
     Credentials: {
@@ -893,7 +904,8 @@ export interface operations {
             | components["schemas"]["WidgetBugsByUseCase"]
             | components["schemas"]["WidgetBugsByDevice"]
             | components["schemas"]["WidgetCampaignProgress"]
-            | components["schemas"]["WidgetCampaignUniqueBugs"];
+            | components["schemas"]["WidgetCampaignUniqueBugs"]
+            | components["schemas"]["WidgetBugsByDuplicates"];
         };
       };
       400: components["responses"]["Error"];

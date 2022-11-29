@@ -2,7 +2,6 @@ import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
-import useCases from "@src/__mocks__/database/use_cases";
 
 const customer_1 = {
   id: 999,
