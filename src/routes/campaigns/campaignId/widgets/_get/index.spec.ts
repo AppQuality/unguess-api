@@ -344,6 +344,19 @@ describe("GET /campaigns/{cid}/widgets", () => {
       expect(response.body.data[0].bugs).toEqual(3);
     });
 
+    it("Should answer 200 and returns the minimum usecase completion when there are no usecase", async () => {
+      await bugs.insert({ ...bug_5, id: 7, campaign_id: campaign_2.id });
+
+      const response = await request(app)
+        .get(`/campaigns/${campaign_2.id}/widgets?s=bugs-by-usecase`)
+        .set("Authorization", "Bearer admin");
+
+      expect(response.status).toBe(200);
+      expect(response.body.data[0].usecase_completion).toEqual(12.5);
+
+      await bugs.delete([{ id: 7 }]);
+    });
+
     it("Should answer 200 and returns the usecase completion of 12.5", async () => {
       const response = await request(app)
         .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-usecase`)
