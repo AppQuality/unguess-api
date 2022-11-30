@@ -19,27 +19,41 @@ interface bugsByUseCaseQueryResults {
 const getSingleUseCaseCompletion = ({
   progress,
   usecase_id,
-  group_id,
 }: {
   progress: UseCaseProgress;
   usecase_id: number;
-  group_id: number;
 }) => {
   const { groups, usecases } = progress;
 
-  if (!usecases.length || !groups[0] || !groups[group_id]) {
+  if (!usecases.length || !groups[0]) {
     return formatUseCaseProgress();
   }
 
-  const usecase = usecases.find(
+  const usecase = usecases.filter(
     (useCase: { id: number; completions: number }) => useCase.id === usecase_id
   );
 
-  if (!usecase || !usecase.completions) {
+  if (!usecase.length) {
     return formatUseCaseProgress();
   }
 
-  return formatUseCaseProgress((usecase.completions / groups[group_id]) * 100);
+  /*
+   * Even when a usecase is associated to multiple groups,
+   * the completion is calculated as the number of entries in user_task table.
+   */
+  const completions = usecase[0].completions;
+
+  const expectedCompletions = usecase.reduce(
+    (acc: number, useCase: { group_id: number }) => {
+      if (useCase.group_id in groups) {
+        acc += groups[useCase.group_id];
+      }
+      return acc;
+    },
+    0
+  );
+
+  return formatUseCaseProgress((completions / expectedCompletions) * 100);
 };
 
 export const getWidgetBugsByUseCase = async (
@@ -62,7 +76,6 @@ export const getWidgetBugsByUseCase = async (
       count(b.id) as total,
       t.id,
       t.title,
-      t.group_id,
       t.content,
       t.simple_title,
       t.info,
@@ -108,7 +121,6 @@ export const getWidgetBugsByUseCase = async (
       usecase_completion: getSingleUseCaseCompletion({
         progress,
         usecase_id: row.id,
-        group_id: row.group_id,
       }),
     }),
   }));

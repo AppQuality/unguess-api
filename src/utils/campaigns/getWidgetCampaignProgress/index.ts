@@ -16,10 +16,19 @@ const getWidgetUseCaseProgress = async (
     actual: 0,
   };
 
-  usecases.forEach((useCase: { group_id: number; completions: number }) => {
-    completion.expected += groups[useCase.group_id];
-    completion.actual += useCase.completions;
-  });
+  const uniqueUseCases: { id: number }[] = [];
+  usecases.forEach(
+    (useCase: { id: number; group_id: number; completions: number }) => {
+      const useCaseIndex = uniqueUseCases.findIndex(
+        (uc) => uc.id === useCase.id
+      );
+      completion.expected += groups[useCase.group_id];
+      if (useCaseIndex === -1) {
+        // We have to consider the effective number of completion, no matter the number of groups
+        completion.actual += useCase.completions;
+      }
+    }
+  );
 
   if (completion.expected === 0 || completion.actual === 0)
     return formatUseCaseProgress();
