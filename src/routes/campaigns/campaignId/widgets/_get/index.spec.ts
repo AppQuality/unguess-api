@@ -142,6 +142,7 @@ const bug_1: BugsParams = {
   os_version: device_1.os_version,
   severity_id: 1,
   is_duplicated: 0,
+  last_seen: "2022-10-23T11:42:42.000+02:00",
 };
 
 const bug_2: BugsParams = {
@@ -168,6 +169,7 @@ const bug_2: BugsParams = {
   os_version: device_1.os_version,
   severity_id: 2,
   is_duplicated: 0,
+  last_seen: "2022-10-23T12:42:42.000+02:00",
 };
 
 const bug_media_1 = {
@@ -608,6 +610,95 @@ describe("GET /campaigns/{cid}/widgets", () => {
     });
 
     // --- End of describe "Campaign Progress Widget"
+  });
+
+  describe("Bugs by duplicates", () => {
+    const duplicated_bug = {
+      ...bug_1,
+      id: 1234,
+      is_duplicated: 1,
+      duplicated_of_id: bug_1.id,
+    };
+
+    const duplicated_bug_2 = {
+      ...bug_1,
+      id: 1235,
+      is_duplicated: 1,
+      duplicated_of_id: bug_1.id,
+    };
+
+    const duplicated_bug_3 = {
+      ...bug_1,
+      id: 1236,
+      is_duplicated: 1,
+      duplicated_of_id: bug_2.id,
+    };
+
+    const bug_3 = {
+      ...bug_1,
+      id: 5678,
+      message: "Bug 3",
+      note: "bug with only 1 duplicates but the most recent",
+      campaign_id: campaign_1.id,
+      last_seen: "2022-10-23T15:42:42.000+02:00",
+    };
+
+    const duplicated_bug_4 = {
+      ...bug_1,
+      id: 1237,
+      is_duplicated: 1,
+      duplicated_of_id: bug_3.id,
+    };
+
+    beforeAll(async () => {
+      await bugs.insert(bug_3);
+      await bugs.insert(duplicated_bug);
+      await bugs.insert(duplicated_bug_2);
+      await bugs.insert(duplicated_bug_3);
+      await bugs.insert(duplicated_bug_4);
+    });
+
+    afterAll(async () => {
+      await bugs.delete([{ id: duplicated_bug.id }]);
+      await bugs.delete([{ id: duplicated_bug_2.id }]);
+      await bugs.delete([{ id: duplicated_bug_3.id }]);
+      await bugs.delete([{ id: duplicated_bug_4.id }]);
+      await bugs.delete([{ id: bug_3.id }]);
+    });
+
+    // Should return only bugs with duplicates
+    it("Should return only bugs with duplicates", async () => {
+      const response = await request(app)
+        .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-duplicates`)
+        .set("Authorization", "Bearer user");
+      expect(response.status).toBe(200);
+      expect(response.body.kind).toEqual("bugsByDuplicates");
+      expect(response.body.data.length).toEqual(3);
+    });
+
+    it("Should sort bugs by the number of duplicates", async () => {
+      const response = await request(app)
+        .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-duplicates`)
+        .set("Authorization", "Bearer user");
+      expect(response.status).toBe(200);
+      expect(response.body.data[0].duplicates).toEqual(2);
+    });
+
+    it("Should sort bugs by the last seen if the number of duplicates is the same", async () => {
+      const response = await request(app)
+        .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-duplicates`)
+        .set("Authorization", "Bearer user");
+      expect(response.status).toBe(200);
+      expect(response.body.data[1].id).toEqual(bug_3.id);
+      expect(response.body.data[2].id).toEqual(bug_2.id);
+    });
+
+    it("Should raise an error if there are no duplicates", async () => {
+      const response = await request(app)
+        .get(`/campaigns/${campaign_2.id}/widgets?s=bugs-by-duplicates`)
+        .set("Authorization", "Bearer admin");
+      expect(response.status).toBe(400);
+    });
   });
 
   // --- end of tests ---

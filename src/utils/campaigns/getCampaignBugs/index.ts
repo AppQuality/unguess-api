@@ -5,6 +5,7 @@ import { getBugTitle, getTitleRule } from "@src/utils/campaigns/getTitleRule";
 
 interface GetCampaignBugsArgs {
   campaignId: number;
+  user: UserType;
   showNeedReview: boolean;
   limit?: StoplightComponents["parameters"]["limit"];
   start?: StoplightComponents["parameters"]["start"];
@@ -62,8 +63,19 @@ export const BugsFilterByValues = [
 export const getCampaignBugs = async (
   args: GetCampaignBugsArgs
 ): Promise<StoplightComponents["schemas"]["Bug"][] | false> => {
-  const { campaignId, showNeedReview, limit, start, order, orderBy, filterBy } =
-    args;
+  const {
+    campaignId,
+    showNeedReview,
+    limit,
+    start,
+    order,
+    orderBy,
+    filterBy,
+    user,
+  } = args;
+
+  const onlyUnread =
+    filterBy && filterBy["unread"] && filterBy["unread"] === "true";
 
   const queryData: string[] = [];
   queryData.push(campaignId.toString());
@@ -104,7 +116,13 @@ export const getCampaignBugs = async (
   JOIN wp_appq_evd_bug_replicability r ON (b.bug_replicability_id = r.id)
   JOIN wp_appq_evd_bug_status status ON (b.status_id = status.id)
   LEFT JOIN wp_crowd_appq_device device ON (b.dev_id = device.id)
+  ${
+    onlyUnread
+      ? `LEFT JOIN wp_appq_bug_read_status read ON (read.bug_id = b.id AND read.is_read = 1 AND read.wp_id = ${user.tryber_wp_user_id})`
+      : ""
+  }
   WHERE b.campaign_id = ? 
+  ${onlyUnread ? "AND read.id IS NULL" : ""}
   AND ${
     showNeedReview
       ? `(status.name = 'Approved' OR status.name = 'Need Review')`

@@ -15,6 +15,7 @@ import { getWidgetBugsByDevice } from "./getWidgetBugsByDevice";
 import { getWidgetBugsByUseCase } from "./getWidgetBugsByUseCase";
 import { getCampaignMeta } from "./getCampaignMeta";
 import { getWidgetCampaignProgress } from "./getWidgetCampaignProgress";
+import { getWidgetBugsByDuplicates } from "./getWidgetBugsByDuplicates";
 
 export {
   checkCampaignRequest,
@@ -35,4 +36,5 @@ export {
   getWidgetBugsByUseCase,
   getCampaignMeta,
   getWidgetCampaignProgress,
+  getWidgetBugsByDuplicates,
 };
