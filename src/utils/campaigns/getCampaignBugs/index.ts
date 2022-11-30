@@ -118,11 +118,11 @@ export const getCampaignBugs = async (
   LEFT JOIN wp_crowd_appq_device device ON (b.dev_id = device.id)
   ${
     onlyUnread
-      ? `LEFT JOIN wp_appq_bug_read_status read ON (read.bug_id = b.id AND read.is_read = 1 AND read.wp_id = ${user.tryber_wp_user_id})`
+      ? `LEFT JOIN wp_appq_bug_read_status rs ON (rs.bug_id = b.id AND rs.is_read = 1 AND rs.wp_id = ${user.tryber_wp_user_id})`
       : ""
   }
   WHERE b.campaign_id = ? 
-  ${onlyUnread ? "AND read.id IS NULL" : ""}
+  ${onlyUnread ? "AND rs.id IS NULL" : ""}
   AND ${
     showNeedReview
       ? `(status.name = 'Approved' OR status.name = 'Need Review')`
