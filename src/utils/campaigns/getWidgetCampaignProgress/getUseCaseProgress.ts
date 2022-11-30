@@ -19,7 +19,7 @@ export const getUseCaseProgress = async (
       FROM wp_crowd_appq_has_candidate c
              JOIN wp_appq_evd_profile p ON (p.wp_user_id = c.user_id)
       WHERE c.campaign_id = ?
-      AND accepted = 1 GROUP BY p.id`;
+      AND accepted = 1 GROUP BY p.id, c.group_id`;
 
   const testers = await db.query(db.format(testersQuery, [campaign_id]));
 
@@ -59,7 +59,7 @@ export const getUseCaseProgress = async (
         LEFT JOIN wp_appq_user_task t ON (t.task_id = uc.id AND t.is_completed = 1)
         JOIN wp_appq_campaign_task_group g ON (g.task_id = uc.id)
       WHERE uc.campaign_id = ?
-      group by uc.id`;
+      group by uc.id, g.group_id`;
 
   const uc = await db.query(db.format(ucQuery, [campaign_id]));
 
