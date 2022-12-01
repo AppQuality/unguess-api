@@ -111,10 +111,13 @@ export const getWidgetBugsByUseCase = async (
 
   const useCasesWithBugs = result.map((row: bugsByUseCaseQueryResults) => ({
     usecase_id: row.id ?? -1,
-    title:
-      row.simple_title && row.simple_title.length
-        ? row.simple_title
-        : row.title || "Not a specific use case",
+    title: {
+      full: row.title || "Not a specific use case",
+      simple:
+        row.simple_title && row.simple_title.length
+          ? row.simple_title
+          : undefined,
+    },
     description: row.content ?? "",
     bugs: row.total,
     ...(row.id && {

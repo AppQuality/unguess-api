@@ -543,13 +543,18 @@ export interface components {
      * @description Returns a list of use case with the number of bugs
      */
     WidgetBugsByUseCase: {
-      data: (components["schemas"]["UseCase"] & {
-        /** @description Unique bugs */
+      data: {
+        title: {
+          full: string;
+          simple?: string;
+          prefix?: string;
+          info?: string;
+        };
+        description: string;
+        uniqueBugs?: number;
         bugs: number;
-        usecase_id: number;
-        /** Format: float */
         usecase_completion?: number;
-      })[];
+      }[];
       /**
        * @default bugsByUseCase
        * @example bugsByUseCase
@@ -705,6 +710,7 @@ export interface components {
           base_bug_internal_id?: string;
           express_slug: string;
           use_cases?: components["schemas"]["UseCase"][];
+          ""?: string;
         };
       };
     };

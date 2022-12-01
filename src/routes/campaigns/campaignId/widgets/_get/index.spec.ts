@@ -329,18 +329,25 @@ describe("GET /campaigns/{cid}/widgets", () => {
       expect(response.status).toBe(200);
       expect(response.body.kind).toEqual("bugsByUseCase");
 
-      expect(response.body.data[1].title).toEqual(useCase1.simple_title);
+      expect(response.body.data[1].title).toHaveProperty(
+        "simple",
+        useCase1.simple_title
+      );
       expect(response.body.data[1].bugs).toEqual(2);
     });
 
-    it("Should answer 200 and the usecase title must be used in absence of simple title", async () => {
+    it("Should answer 200 with the full title and no simple title if is not present", async () => {
       const response = await request(app)
         .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-usecase`)
         .set("Authorization", "Bearer user");
       expect(response.status).toBe(200);
       expect(response.body.kind).toEqual("bugsByUseCase");
 
-      expect(response.body.data[0].title).toEqual(useCase2.title);
+      expect(response.body.data[0].title).toHaveProperty(
+        "full",
+        useCase2.title
+      );
+      expect(response.body.data[0].title).not.toHaveProperty("simple");
       expect(response.body.data[0].bugs).toEqual(3);
     });
 
@@ -385,7 +392,10 @@ describe("GET /campaigns/{cid}/widgets", () => {
       expect(response.body.kind).toEqual("bugsByUseCase");
 
       expect(response.body.data[2].usecase_id).toEqual(-1);
-      expect(response.body.data[2].title).toEqual("Not a specific use case");
+      expect(response.body.data[2].title).toHaveProperty(
+        "full",
+        "Not a specific use case"
+      );
       expect(response.body.data[2].bugs).toEqual(1);
     });
 
@@ -396,8 +406,11 @@ describe("GET /campaigns/{cid}/widgets", () => {
       expect(response.status).toBe(200);
       expect(response.body.kind).toEqual("bugsByUseCase");
 
-      expect(response.body.data[2].title).toEqual("Not a specific use case");
-      expect(response.body.data[2].usecase_completion).toBeUndefined();
+      expect(response.body.data[2].title).toHaveProperty(
+        "full",
+        "Not a specific use case"
+      );
+      expect(response.body.data[2]).not.toHaveProperty("usecase_completion");
     });
 
     // --- End of describe "Bugs by usecase"

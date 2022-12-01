@@ -287,32 +287,12 @@ paths:
                 Bugs by UseCase:
                   value:
                     data:
-                      - title: UC1 asd
+                      - title:
+                          full: UC1 asd
                         description: string
                         bugs: 10
+                        uniqueBugs: 8
                         usecase_id: 1220
-                    kind: bugsByUseCase
-                Example 2:
-                  value:
-                    data:
-                      - title: string
-                        description: string
-                        functionality:
-                          id: 0
-                          title: string
-                          description: string
-                          content: string
-                          category:
-                            id: 0
-                            name: string
-                          device_type: webapp
-                          locale: en
-                          image: 'http://example.com'
-                          requiresLogin: false
-                        logged: true
-                        link: string
-                        bugs: 0
-                        usecase_id: 0
                     kind: bugsByUseCase
         '400':
           $ref: '#/components/responses/Error'
@@ -1753,15 +1733,18 @@ components:
       x-examples:
         Example 1:
           data:
-            - title: Navigazione Sito
+            - title:
+                full: Navigazione Sito
               description: aasdasdsa
               uniqueBugs: 10
               bugs: 12
-            - title: HomePage
+            - title:
+                full: Homepage
               description: aasdasdsa
               uniqueBugs: 1
               bugs: 3
-            - title: Product List
+            - title:
+                full: Product List
               description: lorem ipsum
               uniqueBugs: 0
               bugs: 0
@@ -1771,21 +1754,33 @@ components:
         data:
           type: array
           items:
-            allOf:
-              - $ref: '#/components/schemas/UseCase'
-              - type: object
-                properties:
-                  bugs:
-                    type: integer
-                    description: Unique bugs
-                  usecase_id:
-                    type: number
-                  usecase_completion:
-                    type: number
-                    format: float
+            type: object
+            properties:
+              title:
+                type: object
                 required:
-                  - bugs
-                  - usecase_id
+                  - full
+                properties:
+                  full:
+                    type: string
+                  simple:
+                    type: string
+                  prefix:
+                    type: string
+                  info:
+                    type: string
+              description:
+                type: string
+              uniqueBugs:
+                type: number
+              bugs:
+                type: number
+              usecase_completion:
+                type: number
+            required:
+              - title
+              - description
+              - bugs
         kind:
           type: string
           enum:
@@ -2199,6 +2194,8 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/UseCase'
+              '':
+                type: string
             required:
               - title
               - start_date
