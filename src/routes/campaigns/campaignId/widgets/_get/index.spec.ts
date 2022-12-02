@@ -336,6 +336,16 @@ describe("GET /campaigns/{cid}/widgets", () => {
       expect(response.body.data[1].bugs).toEqual(2);
     });
 
+    it("Should answer 200 with the usecase id", async () => {
+      const response = await request(app)
+        .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-usecase`)
+        .set("Authorization", "Bearer user");
+      expect(response.status).toBe(200);
+      expect(response.body.kind).toEqual("bugsByUseCase");
+
+      expect(response.body.data[0].usecase_id).toEqual(useCase2.id);
+    });
+
     it("Should answer 200 with the full title and no simple title if is not present", async () => {
       const response = await request(app)
         .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-usecase`)

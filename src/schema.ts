@@ -554,6 +554,7 @@ export interface components {
         uniqueBugs?: number;
         bugs: number;
         usecase_completion?: number;
+        usecase_id: number;
       }[];
       /**
        * @default bugsByUseCase
