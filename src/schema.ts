@@ -543,13 +543,19 @@ export interface components {
      * @description Returns a list of use case with the number of bugs
      */
     WidgetBugsByUseCase: {
-      data: (components["schemas"]["UseCase"] & {
-        /** @description Unique bugs */
+      data: {
+        title: {
+          full: string;
+          simple?: string;
+          prefix?: string;
+          info?: string;
+        };
+        description: string;
+        uniqueBugs?: number;
         bugs: number;
-        usecase_id: number;
-        /** Format: float */
         usecase_completion?: number;
-      })[];
+        usecase_id: number;
+      }[];
       /**
        * @default bugsByUseCase
        * @example bugsByUseCase
