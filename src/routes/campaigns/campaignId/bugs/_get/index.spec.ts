@@ -11,6 +11,7 @@ import bugStatus from "@src/__mocks__/database/bug_status";
 import CampaignMeta from "@src/__mocks__/database/campaign_meta";
 import devices, { DeviceParams } from "@src/__mocks__/database/device";
 import bugsReadStatus from "@src/__mocks__/database/bug_read_status";
+import usecases, { UseCaseParams } from "@src/__mocks__/database/use_cases";
 
 const customer_1 = {
   id: 999,
@@ -175,6 +176,18 @@ const bug_2: BugsParams = {
   severity_id: 2,
 };
 
+const usecase_with_meta: UseCaseParams = {
+  id: 1,
+  title: "UseCase 1: titolone",
+  simple_title: "titolone",
+  prefix: "UseCase 1",
+};
+
+const usecase_without_meta: UseCaseParams = {
+  id: 2,
+  title: "UseCase 2: titolone",
+};
+
 const bug_3: BugsParams = {
   id: 3,
   internal_id: "BUG3",
@@ -187,7 +200,8 @@ const bug_3: BugsParams = {
   bug_replicability_id: 1,
   status_id: 1,
   status_reason: "Bug 3 status reason",
-  application_section: "Bug 3 application section",
+  application_section: usecase_without_meta.title,
+  application_section_id: usecase_without_meta.id,
   note: "Bug 3 note",
   wp_user_id: 1,
   is_favorite: 1,
@@ -211,7 +225,8 @@ const bug_4: BugsParams = {
   bug_replicability_id: 1,
   status_id: 4,
   status_reason: "Bug 4 status reason",
-  application_section: "Bug 4 application section",
+  application_section: usecase_with_meta.title,
+  application_section_id: usecase_with_meta.id,
   note: "Bug 4 note",
   wp_user_id: 1,
   is_favorite: 1,
@@ -323,6 +338,8 @@ describe("GET /campaigns/{cid}/bugs", () => {
         await bugType.addDefaultItems();
         await bugStatus.addDefaultItems();
         await devices.insert(device_1);
+        await usecases.insert(usecase_with_meta);
+        await usecases.insert(usecase_without_meta);
 
         await bugsReadStatus.insert({ wp_id: 1, bug_id: bug_2.id });
       } catch (error) {
@@ -667,6 +684,20 @@ describe("GET /campaigns/{cid}/bugs", () => {
         expect.objectContaining({ id: bug_2.id }),
         expect.objectContaining({ id: bug_4.id }),
       ])
+    );
+  });
+
+  it("Should return the usecase simple title if available", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs`)
+      .set("Authorization", "Bearer admin");
+    expect(response.body.items[0].application_section).toEqual(
+      expect.objectContaining({
+        id: usecase_with_meta.id,
+        title: usecase_with_meta.title,
+        simple_title: usecase_with_meta.simple_title,
+        prefix: usecase_with_meta.prefix,
+      })
     );
   });
 

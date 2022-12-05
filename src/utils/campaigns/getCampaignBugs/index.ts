@@ -104,6 +104,9 @@ export const getCampaignBugs = async (
     b.os_version,
     b.application_section,
     b.application_section_id,
+    uc.title as uc_title,
+    uc.simple_title as uc_simple_title,
+    uc.prefix as uc_prefix,
     b.is_duplicated,
     b.duplicated_of_id,
     b.is_favorite,
@@ -116,6 +119,7 @@ export const getCampaignBugs = async (
   JOIN wp_appq_evd_bug_replicability r ON (b.bug_replicability_id = r.id)
   JOIN wp_appq_evd_bug_status status ON (b.status_id = status.id)
   LEFT JOIN wp_crowd_appq_device device ON (b.dev_id = device.id)
+  LEFT JOIN wp_appq_campaign_task uc ON (uc.id = b.application_section_id)
   ${
     onlyUnread
       ? `LEFT JOIN wp_appq_bug_read_status rs ON (rs.bug_id = b.id AND rs.is_read = 1 AND rs.wp_id = ${user.tryber_wp_user_id})`
@@ -170,6 +174,21 @@ export const getCampaignBugs = async (
   return formattedBugs as StoplightComponents["schemas"]["Bug"][];
 };
 
+const getBugUseCase = (bug: {
+  application_section: string;
+  application_section_id: number;
+  uc_title?: string;
+  uc_simple_title?: string;
+  uc_prefix?: string;
+}) => {
+  return {
+    id: bug.application_section_id,
+    title: bug.uc_title ?? bug.application_section,
+    ...(bug.uc_simple_title && { simple_title: bug.uc_simple_title }),
+    ...(bug.uc_prefix && { prefix: bug.uc_prefix }),
+  };
+};
+
 const formatBugs = async (bugs: any, campaignId: number) => {
   let results: any = [];
   const titleRuleIsActive = await getTitleRule(campaignId);
@@ -182,6 +201,8 @@ const formatBugs = async (bugs: any, campaignId: number) => {
       bugTitle: bug.title,
       hasTitleRule: titleRuleIsActive,
     });
+
+    const useCase = getBugUseCase(bug);
 
     results.push({
       id: bug.id,
@@ -207,10 +228,7 @@ const formatBugs = async (bugs: any, campaignId: number) => {
         id: bug.bug_replicability_id,
         name: bug.replicability,
       },
-      application_section: {
-        id: bug.application_section_id,
-        title: bug.application_section,
-      },
+      application_section: useCase,
       created: bug.created.toString(),
       ...(bug.updated && { updated: bug.updated.toString() }),
       note: bug.note,
