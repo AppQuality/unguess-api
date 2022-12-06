@@ -19,6 +19,9 @@ export const createUseCases = async (
     position: 0,
     allow_media: 0,
     optimize_media: 0,
+    simple_title: "",
+    info: "",
+    prefix: "",
   };
 
   const allowedFields = Object.keys(defaultUseCase);
@@ -66,7 +69,7 @@ export const createUseCases = async (
       })
     );
   } catch (error) {
-    if (process.env && process.env.DEBUG) {
+    if (process.env && process.env.DEBUG && process.env.DEBUG === "1") {
       console.log("Something went wrong in uc creation: ", error);
     }
   }

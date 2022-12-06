@@ -196,11 +196,6 @@ describe("POST /campaigns", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.create();
-        await platformTable.create();
-        await UseCase.mock();
-        await useCaseGroup.mock();
-
         await dbAdapter.add({
           companies: [customer_1, customer_2],
           userToCustomers: [user_to_customer_1, user_to_customer_2],
@@ -215,22 +210,6 @@ describe("POST /campaigns", () => {
         await platformData.addItem(AndroidPhone);
         await platformData.addItem(iOSPhone);
         await platformData.addItem(WindowsPC);
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.drop();
-        await platformTable.drop();
-        await UseCase.dropMock();
-        await useCaseGroup.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -255,7 +234,7 @@ describe("POST /campaigns", () => {
   it("Should answer 400 if the request body doesn't have campaign request schema required fields", async () => {
     const response = await request(app)
       .post("/campaigns")
-      .set("Authorization", "Bearer customer")
+      .set("Authorization", "Bearer user")
       .send({
         start_date: "2020-01-01",
         end_date: "2020-01-01",
@@ -269,7 +248,7 @@ describe("POST /campaigns", () => {
   it("Should answer 403 if the user is not part of the project", async () => {
     const response = await request(app)
       .post("/campaigns")
-      .set("Authorization", "Bearer customer")
+      .set("Authorization", "Bearer user")
       .send({
         ...campaign_request_1,
         platforms: [AndroidPhoneBody, WindowsPCBody],
@@ -281,7 +260,7 @@ describe("POST /campaigns", () => {
   it("Should answer 403 if the project doesn't exist", async () => {
     const response = await request(app)
       .post("/campaigns")
-      .set("Authorization", "Bearer customer")
+      .set("Authorization", "Bearer user")
       .send({
         ...campaign_request_1,
         platforms: [AndroidPhoneBody, WindowsPCBody],
@@ -293,7 +272,7 @@ describe("POST /campaigns", () => {
   it("Should answer 200 with a campaign object", async () => {
     const response = await request(app)
       .post("/campaigns")
-      .set("Authorization", "Bearer customer")
+      .set("Authorization", "Bearer user")
       .send({
         ...campaign_request_1,
         platforms: [AndroidPhoneBody, WindowsPCBody],
@@ -331,7 +310,7 @@ describe("POST /campaigns", () => {
   it("Should have description and internal_id filled", async () => {
     const response = await request(app)
       .post("/campaigns")
-      .set("Authorization", "Bearer customer")
+      .set("Authorization", "Bearer user")
       .send({
         ...campaign_request_1,
         platforms: [AndroidPhoneBody, WindowsPCBody],
@@ -347,7 +326,7 @@ describe("POST /campaigns", () => {
   it("A coins transaction should be created after campaign creation", async () => {
     const response = await request(app)
       .post("/campaigns")
-      .set("Authorization", "Bearer customer")
+      .set("Authorization", "Bearer user")
       .send({
         ...campaign_request_1,
         platforms: [AndroidPhoneBody, WindowsPCBody],
@@ -377,7 +356,7 @@ describe("POST /campaigns", () => {
   it("Should create a campaign if the workspace has no coins but the express has cost 0", async () => {
     const response = await request(app)
       .post("/campaigns")
-      .set("Authorization", "Bearer customer")
+      .set("Authorization", "Bearer user")
       .send({
         ...campaign_request_2,
         express_slug: express_2.slug,
@@ -408,7 +387,7 @@ describe("POST /campaigns", () => {
   it("Should create the use cases if some are provided", async () => {
     const response = await request(app)
       .post("/campaigns")
-      .set("Authorization", "Bearer customer")
+      .set("Authorization", "Bearer user")
       .send({
         ...campaign_request_2,
         express_slug: express_2.slug,
@@ -427,7 +406,7 @@ describe("POST /campaigns", () => {
   it("Should raise an error if one or more use case are malformed", async () => {
     const response = await request(app)
       .post("/campaigns")
-      .set("Authorization", "Bearer customer")
+      .set("Authorization", "Bearer user")
       .send({
         ...campaign_request_2,
         express_slug: express_2.slug,
@@ -444,7 +423,7 @@ describe("POST /campaigns", () => {
   it("Should not create use case if campaign is malformed", async () => {
     const response = await request(app)
       .post("/campaigns")
-      .set("Authorization", "Bearer customer")
+      .set("Authorization", "Bearer user")
       .send({
         ...campaign_request_2,
         express_slug: "pippo",
@@ -461,7 +440,7 @@ describe("POST /campaigns", () => {
   it("Should return an error if the use cases provided doesn't contains all required fields", async () => {
     const response = await request(app)
       .post("/campaigns")
-      .set("Authorization", "Bearer customer")
+      .set("Authorization", "Bearer user")
       .send({
         ...campaign_request_2,
         express_slug: express_2.slug,
@@ -480,7 +459,7 @@ describe("POST /campaigns", () => {
   it("Should create the campaign and the usecase with an experiential cp provided", async () => {
     const response = await request(app)
       .post("/campaigns")
-      .set("Authorization", "Bearer customer")
+      .set("Authorization", "Bearer user")
       .send({
         title: "PROVA - NON RUNNARE",
         start_date: "2022-08-12 13:05:18",
@@ -518,7 +497,7 @@ describe("POST /campaigns", () => {
   it("Should create the use cases also with a custom functionality", async () => {
     const response = await request(app)
       .post("/campaigns")
-      .set("Authorization", "Bearer customer")
+      .set("Authorization", "Bearer user")
       .send({
         ...campaign_request_2,
         express_slug: express_2.slug,
@@ -547,7 +526,7 @@ describe("POST /campaigns", () => {
   it("Should create the use cases if some are provided with a default group definition", async () => {
     const response = await request(app)
       .post("/campaigns")
-      .set("Authorization", "Bearer customer")
+      .set("Authorization", "Bearer user")
       .send({
         ...campaign_request_2,
         express_slug: express_2.slug,
@@ -576,7 +555,7 @@ describe("POST /campaigns", () => {
   it("Should answer 200 with a campaign object with bug form enabled if provided", async () => {
     const response = await request(app)
       .post("/campaigns")
-      .set("Authorization", "Bearer customer")
+      .set("Authorization", "Bearer user")
       .send({
         ...campaign_request_1,
         has_bug_form: 1,
@@ -589,7 +568,7 @@ describe("POST /campaigns", () => {
   it("Should answer 200 with a campaign object with bug parade enabled if provided", async () => {
     const response = await request(app)
       .post("/campaigns")
-      .set("Authorization", "Bearer customer")
+      .set("Authorization", "Bearer user")
       .send({
         ...campaign_request_1,
         has_bug_form: 1,
@@ -603,7 +582,7 @@ describe("POST /campaigns", () => {
   it("Should answer 400 if a campaign object is provided with bug parade enabled and bug form disabled", async () => {
     const response = await request(app)
       .post("/campaigns")
-      .set("Authorization", "Bearer customer")
+      .set("Authorization", "Bearer user")
       .send({
         ...campaign_request_1,
         has_bug_form: 0,

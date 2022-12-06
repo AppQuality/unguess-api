@@ -11,7 +11,7 @@ module.exports = {
   }),
   testMatch: ["**/?(*.)+(spec|test).[jt]s?(x)"],
   setupFiles: ["<rootDir>/src/__mocks__/setup.ts"],
-  //   setupFilesAfterEnv: ["<rootDir>/src/__mocks__/globalSetup.ts"],
+  setupFilesAfterEnv: ["<rootDir>/src/__mocks__/globalSetup.ts"],
   preset: "ts-jest",
   testEnvironment: "node",
   testTimeout: 15000,

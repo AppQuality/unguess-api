@@ -1,7 +1,6 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { table as platformTable } from "@src/__mocks__/database/platforms";
 import Reports from "@src/__mocks__/database/report";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 
@@ -113,9 +112,6 @@ describe("GET /campaigns/{cid}/reports", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.create();
-        await platformTable.create();
-
         await dbAdapter.add({
           companies: [customer_1],
           userToCustomers: [user_to_customer_1],
@@ -125,26 +121,9 @@ describe("GET /campaigns/{cid}/reports", () => {
           campaigns: [campaign_1, campaign_2, campaign_3],
         });
 
-        await Reports.mock();
-
         await Reports.insert(report_1);
         await Reports.insert(report_2);
         await Reports.insert(report_3);
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.drop();
-        await platformTable.drop();
-        await Reports.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -166,7 +145,7 @@ describe("GET /campaigns/{cid}/reports", () => {
   it("Should answer 200 with an array of reports", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/reports`)
-      .set("Authorization", `Bearer customer`);
+      .set("Authorization", `Bearer user`);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual([
@@ -185,7 +164,7 @@ describe("GET /campaigns/{cid}/reports", () => {
   it("Should fail if the campaign does not exist", async () => {
     const response = await request(app)
       .get(`/campaigns/999999/reports`)
-      .set("Authorization", `Bearer customer`);
+      .set("Authorization", `Bearer user`);
 
     expect(response.status).toBe(400);
   });
@@ -194,7 +173,7 @@ describe("GET /campaigns/{cid}/reports", () => {
   it("Should fail if the user has no permission to see the campaign's project", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_2.id}/reports`)
-      .set("Authorization", `Bearer customer`);
+      .set("Authorization", `Bearer user`);
 
     expect(response.status).toBe(403);
   });
@@ -203,7 +182,7 @@ describe("GET /campaigns/{cid}/reports", () => {
   it("Should filter out reports that have not url", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/reports`)
-      .set("Authorization", `Bearer customer`);
+      .set("Authorization", `Bearer user`);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual([
@@ -222,7 +201,7 @@ describe("GET /campaigns/{cid}/reports", () => {
   it("Should return update_date in returned reports if present", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/reports`)
-      .set("Authorization", `Bearer customer`);
+      .set("Authorization", `Bearer user`);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual(
@@ -240,7 +219,7 @@ describe("GET /campaigns/{cid}/reports", () => {
   it("Should return the file_type if recognized", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/reports`)
-      .set("Authorization", `Bearer customer`);
+      .set("Authorization", `Bearer user`);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual(
@@ -261,7 +240,7 @@ describe("GET /campaigns/{cid}/reports", () => {
   it("Should not return the file_type if not recognized and should return the domain name", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/reports`)
-      .set("Authorization", `Bearer customer`);
+      .set("Authorization", `Bearer user`);
 
     expect(response.status).toBe(200);
     expect(response.body[1].file_type.type).toBe("link");
@@ -273,7 +252,7 @@ describe("GET /campaigns/{cid}/reports", () => {
   it("Should return an empty array if no reports are found", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_3.id}/reports`)
-      .set("Authorization", `Bearer customer`);
+      .set("Authorization", `Bearer user`);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual([]);
@@ -319,7 +298,7 @@ describe("GET /campaigns/{cid}/reports", () => {
     it("Should return the file_type if recognized", async () => {
       const response = await request(app)
         .get(`/campaigns/${campaign_1.id}/reports`)
-        .set("Authorization", `Bearer customer`);
+        .set("Authorization", `Bearer user`);
 
       expect(response.status).toBe(200);
       expect(response.body.length).toBe(2);
@@ -352,7 +331,6 @@ describe("GET /campaigns/{cid}/reports", () => {
     beforeAll(async () => {
       return new Promise(async (resolve, reject) => {
         try {
-          await Reports.clear();
           await Reports.insert({
             ...report_1,
             id: 4,
@@ -394,7 +372,7 @@ describe("GET /campaigns/{cid}/reports", () => {
     it("Should return the file_type if recognized", async () => {
       const response = await request(app)
         .get(`/campaigns/${campaign_1.id}/reports`)
-        .set("Authorization", `Bearer customer`);
+        .set("Authorization", `Bearer user`);
 
       expect(response.status).toBe(200);
       expect(response.body.length).toBe(3);
@@ -472,7 +450,7 @@ describe("GET /campaigns/{cid}/reports", () => {
     it("Should return the file_type if recognized", async () => {
       const response = await request(app)
         .get(`/campaigns/${campaign_1.id}/reports`)
-        .set("Authorization", `Bearer customer`);
+        .set("Authorization", `Bearer user`);
 
       expect(response.status).toBe(200);
       expect(response.body.length).toBe(2);
@@ -565,7 +543,7 @@ describe("GET /campaigns/{cid}/reports", () => {
     it("Should return the file_type if recognized", async () => {
       const response = await request(app)
         .get(`/campaigns/${campaign_1.id}/reports`)
-        .set("Authorization", `Bearer customer`);
+        .set("Authorization", `Bearer user`);
 
       expect(response.status).toBe(200);
       expect(response.body.length).toBe(6);

@@ -25,10 +25,14 @@ export const table = {
       "form_factor varchar(256) default '0'",
       "page_preview_id int(11)",
       "page_manual_id int(11)",
+      "cust_bug_vis int(1) default '0'",
     ]);
   },
   drop: async () => {
     await db.dropTable("wp_appq_evd_campaign");
+  },
+  clear: async () => {
+    await db.run("DELETE FROM wp_appq_evd_campaign");
   },
 };
 
@@ -49,6 +53,7 @@ data.basicCampaign = async (params) => {
     campaign_type_id: 1,
     project_id: 1,
     customer_id: 2,
+    cust_bug_vis: 0,
     ...params,
   };
   await db.insert("wp_appq_evd_campaign", item);

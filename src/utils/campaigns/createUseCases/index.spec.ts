@@ -24,32 +24,6 @@ const UseCase1: StoplightComponents["schemas"]["UseCase"] = {
 };
 
 describe("createUseCases", () => {
-  beforeAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await UseCase.mock();
-      } catch (error) {
-        console.log(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await UseCase.dropMock();
-      } catch (error) {
-        console.log(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
   afterEach(async () => {
     await UseCase.clear();
   });

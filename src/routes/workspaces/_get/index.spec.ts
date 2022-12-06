@@ -39,25 +39,10 @@ describe("GET /workspaces", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.create();
-
         await dbAdapter.add({
           companies: [customer_1, customer_2, customer_3],
           userToCustomers: [user_to_customer_1, user_to_customer_2],
         });
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.drop();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -75,14 +60,14 @@ describe("GET /workspaces", () => {
   it("Should answer 200 if logged in", async () => {
     const response = await request(app)
       .get("/workspaces")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.status).toBe(200);
   });
 
   it("Should answer with an array of workspaces", async () => {
     const response = await request(app)
       .get("/workspaces")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(JSON.stringify(response.body)).toStrictEqual(
       JSON.stringify({
         items: [
@@ -112,7 +97,7 @@ describe("GET /workspaces", () => {
   it("Should answer with a paginated items of workspaces", async () => {
     const response = await request(app)
       .get("/workspaces?limit=1&start=0")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(JSON.stringify(response.body)).toStrictEqual(
       JSON.stringify({
         items: [
@@ -136,7 +121,7 @@ describe("GET /workspaces", () => {
   it("Should answer with an error if the limit is not a number", async () => {
     const response = await request(app)
       .get("/workspaces?limit=banana&start=0")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.status).toBe(400);
     expect(response.body.err[0].message).toBe("should be number");
   });
@@ -144,7 +129,7 @@ describe("GET /workspaces", () => {
   it("Should answer with an array of workspaces ordered by name", async () => {
     const response = await request(app)
       .get("/workspaces?orderBy=company&order=desc")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(JSON.stringify(response.body)).toStrictEqual(
       JSON.stringify({
         items: [

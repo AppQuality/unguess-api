@@ -3,9 +3,6 @@ import * as db from "@src/features/db";
 export const checkPlatforms = async (
   platforms: StoplightComponents["requestBodies"]["Campaign"]["content"]["application/json"]["platforms"]
 ): Promise<boolean> => {
-  // Check request
-  if (!Array.isArray(platforms)) return false;
-
   // Check for each platform if os exists
   let platformExists = true;
   for (let platform of platforms) {

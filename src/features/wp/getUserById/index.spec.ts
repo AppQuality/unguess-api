@@ -6,7 +6,6 @@ describe("wp/getUserById", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.create();
         await dbAdapter.add({
           unguess_users: defaultUsers,
         });
@@ -22,7 +21,7 @@ describe("wp/getUserById", () => {
   afterAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.drop();
+        await dbAdapter.clear();
       } catch (error) {
         console.error(error);
         reject(error);

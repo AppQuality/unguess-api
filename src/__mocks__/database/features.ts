@@ -18,6 +18,9 @@ export const table = {
   drop: async () => {
     await db.dropTable("wp_ug_features");
   },
+  clear: async () => {
+    await db.run("DELETE FROM wp_ug_features");
+  },
 };
 
 const data: {

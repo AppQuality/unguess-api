@@ -27,25 +27,11 @@ describe("GET /workspaces/{wid}", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.create();
-
         await dbAdapter.add({
           profiles: [customer_profile_1],
           companies: [customer_1],
           userToCustomers: [user_to_customer_1],
         });
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.drop();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -63,28 +49,28 @@ describe("GET /workspaces/{wid}", () => {
   it("Should answer 200 if logged in", async () => {
     const response = await request(app)
       .get(`/workspaces/${customer_1.id}`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.status).toBe(200);
   });
 
   it("Should answer 403 if no workspaces are found", async () => {
     const response = await request(app)
       .get("/workspaces/99999")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.status).toBe(403);
   });
 
   it("Should answer 400 of the requested parameter is wrong", async () => {
     const response = await request(app)
       .get("/workspaces/banana")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.status).toBe(400);
   });
 
   it("Should answer with a workspace object", async () => {
     const response = await request(app)
       .get(`/workspaces/${customer_1.id}`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.status).toBe(200);
     expect(JSON.stringify(response.body)).toBe(
       JSON.stringify({

@@ -7,8 +7,8 @@ import {
   LIMIT_QUERY_PARAM_DEFAULT,
 } from "@src/utils/constants";
 import bugs from "@src/__mocks__/database/bugs";
-import userTaskMedia from "@src/__mocks__/database/user_task_media";
 import useCases from "@src/__mocks__/database/use_cases";
+import userTaskMedia from "@src/__mocks__/database/user_task_media";
 
 const customer_1 = {
   id: 1,
@@ -127,8 +127,6 @@ describe("GET /workspaces/{wid}/campaigns", () => {
   beforeAll(async () => {
     return new Promise(async (res, rej) => {
       try {
-        await dbAdapter.create();
-
         await dbAdapter.add({
           campaigns: [campaign_1, campaign_2, campaign_3],
           profiles: [customer_profile_1],
@@ -139,31 +137,11 @@ describe("GET /workspaces/{wid}/campaigns", () => {
         });
 
         //Outputs
-        await bugs.mock();
-        await useCases.mock();
-        await userTaskMedia.mock();
       } catch (e) {
         console.error(e);
         rej(e);
       }
       res(true);
-    });
-  });
-
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.drop();
-        //Outputs
-        await bugs.dropMock();
-        await useCases.dropMock();
-        await userTaskMedia.dropMock();
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
     });
   });
 
@@ -175,21 +153,21 @@ describe("GET /workspaces/{wid}/campaigns", () => {
   it("Should return 200 status if user is logged in", async () => {
     const response = await request(app)
       .get("/workspaces/1/campaigns")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.status).toBe(200);
   });
 
   it("Should return 400 if the request parameter has a bad format", async () => {
     const response = await request(app)
       .get("/workspaces/banana/campaigns")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.status).toBe(400);
   });
 
   it("Should return 403 if the customer is not found", async () => {
     const response = await request(app)
       .get("/workspaces/999898978/campaigns")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.body.code).toBe(403);
     expect(response.body.message).toBe(ERROR_MESSAGE);
   });
@@ -197,21 +175,21 @@ describe("GET /workspaces/{wid}/campaigns", () => {
   it("Should return an array of 1 elements because of limit = 1", async () => {
     const response = await request(app)
       .get("/workspaces/2/campaigns?limit=1&start=0")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.body.items).toHaveLength(1);
   });
 
   it("Should return an array of 1 element because start is set to 1", async () => {
     const response = await request(app)
       .get("/workspaces/2/campaigns?limit=1&start=1")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.body.items).toHaveLength(1);
   });
 
   it("Should return an error 400 if the limit is not a number", async () => {
     const response = await request(app)
       .get("/workspaces/2/campaigns?limit=asd&start=1")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.status).toBe(400);
     expect(response.body.err[0].message).toBe("should be number");
   });
@@ -219,7 +197,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
   it("Should return the campaigns with a defined paginations structure", async () => {
     const response = await request(app)
       .get("/workspaces/1/campaigns")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
 
     expect(response.body.items).toHaveLength(1);
     expect(response.body.start).toBe(0);
@@ -231,7 +209,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
   it("Should return an array of campaigns", async () => {
     const response = await request(app)
       .get("/workspaces/1/campaigns")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
 
     expect(response.body.items).toHaveLength(1);
     expect(response.body.items).toEqual(
@@ -270,7 +248,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
   it("Should return an array of campaigns with 2 elements because no limit or start are in the request", async () => {
     const response = await request(app)
       .get("/workspaces/2/campaigns")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(Array.isArray(response.body.items)).toBeTruthy();
     expect(response.body.items).toEqual(
       expect.arrayContaining([
@@ -338,7 +316,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
   it("Should return 400 because the order parameter is wrong", async () => {
     const response = await request(app)
       .get("/workspaces/1/campaigns?order=banana")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.body.code).toBe(400);
     expect(response.body.message).toBe(ERROR_MESSAGE);
   });
@@ -346,7 +324,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
   it("Should return 400 because the orderBy parameter is wrong", async () => {
     const response = await request(app)
       .get("/workspaces/1/campaigns?orderBy=BANANA")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.body.code).toBe(400);
     expect(response.body.message).toBe(ERROR_MESSAGE);
   });
@@ -354,7 +332,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
   it("Should return 400 because the order parameter is wrong but the orderBy is valid", async () => {
     const response = await request(app)
       .get("/workspaces/1/campaigns?order=DESC&orderBy=banana")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.body.code).toBe(400);
     expect(response.body.message).toBe(ERROR_MESSAGE);
   });
@@ -362,7 +340,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
   it("Should return an array of campaigns with 2 elements in reverse order", async () => {
     const response = await request(app)
       .get("/workspaces/2/campaigns?order=DESC&orderBy=start_date")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(Array.isArray(response.body.items)).toBeTruthy();
     expect(response.body.items).toEqual(
       expect.arrayContaining([
@@ -427,7 +405,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
   it("Should return 400 because the filterBy parameter is not allowed", async () => {
     const response = await request(app)
       .get("/workspaces/1/campaigns?filterBy[banana]=banana")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.body.code).toBe(400);
     expect(response.body.message).toBe(ERROR_MESSAGE);
   });
@@ -435,14 +413,14 @@ describe("GET /workspaces/{wid}/campaigns", () => {
   it("Should return 200 because the filterBy parameter has the right format", async () => {
     const response = await request(app)
       .get("/workspaces/1/campaigns?filterBy[title]=Campagnetta Provetta ")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.status).toBe(200);
   });
 
   it("Should return an empty array because no data is found with this value", async () => {
     const response = await request(app)
       .get("/workspaces/1/campaigns?filterBy[title]=banana")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(JSON.stringify(response.body)).toStrictEqual(
       JSON.stringify({ items: [], start: 0, limit: 0, size: 0, total: 0 })
     );
@@ -451,7 +429,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
   it("Should return one element using title", async () => {
     const response = await request(app)
       .get("/workspaces/2/campaigns?filterBy[title]=Campagnetta della banana")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.body.items).toHaveLength(1);
   });
 
@@ -460,21 +438,21 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       .get(
         "/workspaces/2/campaigns?filterBy[project_name]=Nome del progetto abbastanza figo"
       )
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.body.items).toHaveLength(2);
   });
 
   it("Should return an array with one element using only a part of the title", async () => {
     const response = await request(app)
       .get("/workspaces/2/campaigns?filterBy[title]=della banana")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.body.items).toHaveLength(1);
   });
 
   it("Should return an array of containing only the campaign 3 if a limit is provided with a specific order", async () => {
     const response = await request(app)
       .get("/workspaces/2/campaigns?order=DESC&orderBy=start_date&limit=1")
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
 
     expect(response.body.items).toHaveLength(1);
     expect(response.body.items[0].id).toBe(campaign_3.id);
@@ -497,11 +475,18 @@ describe("GET /workspaces/{wid}/campaigns", () => {
         campaign_id: campaign_1.id,
         message: "Bug 1",
         wp_user_id: 1,
+        status_id: 2,
+      });
+      await userTaskMedia.insert({
+        id: 789,
+        campaign_task_id: 456,
+        location: "http://image1.com",
+        status: 0,
       });
 
       const response = await request(app)
         .get(`/workspaces/1/campaigns`)
-        .set("authorization", "Bearer customer");
+        .set("authorization", "Bearer user");
 
       expect(response.status).toBe(200);
       expect(Array.isArray(response.body.items)).toBe(true);
@@ -524,6 +509,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
         campaign_id: campaign_1.id,
         message: "Bug 1",
         wp_user_id: 1,
+        status_id: 2,
       });
 
       await useCases.insert({
@@ -537,11 +523,12 @@ describe("GET /workspaces/{wid}/campaigns", () => {
         id: 789,
         campaign_task_id: 456,
         location: "http://image1.com",
+        status: 2,
       });
 
       const response = await request(app)
         .get(`/workspaces/1/campaigns`)
-        .set("authorization", "Bearer customer");
+        .set("authorization", "Bearer user");
 
       expect(response.status).toBe(200);
       expect(Array.isArray(response.body.items)).toBe(true);

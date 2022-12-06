@@ -29,25 +29,10 @@ describe("POST /projects", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.create();
-
         await dbAdapter.add({
           companies: [customer_1],
           userToCustomers: [user_to_customer_1],
         });
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.drop();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -67,7 +52,7 @@ describe("POST /projects", () => {
   it("Should answer 400 if the request body doesn't have project request schema required fields", async () => {
     const response = await request(app)
       .post("/projects")
-      .set("Authorization", "Bearer customer")
+      .set("Authorization", "Bearer user")
       .send({
         name: "Project 1",
       });
@@ -77,7 +62,7 @@ describe("POST /projects", () => {
   it("Should answer 403 if the user is not related to the requested workspace", async () => {
     const response = await request(app)
       .post("/projects")
-      .set("Authorization", "Bearer customer")
+      .set("Authorization", "Bearer user")
       .send({
         ...project_request_1,
         customer_id: 2,
@@ -88,7 +73,7 @@ describe("POST /projects", () => {
   it("Should answer 403 if the workspace doesn't exist", async () => {
     const response = await request(app)
       .post("/projects")
-      .set("Authorization", "Bearer customer")
+      .set("Authorization", "Bearer user")
       .send({
         ...project_request_1,
         customer_id: 999999,
@@ -99,7 +84,7 @@ describe("POST /projects", () => {
   it("Should answer 200 with a project object", async () => {
     const response = await request(app)
       .post("/projects")
-      .set("Authorization", "Bearer customer")
+      .set("Authorization", "Bearer user")
       .send({
         ...project_request_1,
       });

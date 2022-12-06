@@ -2,12 +2,12 @@ name: Push image to ECR
 
 on:
   push:
-    branches: [ master, develop ]
+    branches:
+      - "*"
   workflow_dispatch:
 
 jobs:
   build:
-    
     runs-on: ubuntu-latest
 
     steps:
@@ -36,7 +36,7 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@aaf69d68aa3fb14c1d5a6be9ac61fe15b48453a2
-      
+
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
         env:
@@ -44,9 +44,9 @@ jobs:
           ECR_REPOSITORY: unguess-api
           IMAGE_TAG: ${{ steps.extract_branch.outputs.tag }}
         run: |
-            # Build a docker container and
-            # push it to ECR so that it can
-            # be deployed to ECS.
-            docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-            docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-            echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          # Build a docker container and
+          # push it to ECR so that it can
+          # be deployed to ECS.
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"

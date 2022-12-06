@@ -61,8 +61,6 @@ describe("GET /projects/{pid}", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.create();
-
         await dbAdapter.add({
           projects: [project_1, project_2, project_3],
           userToProjects: [user_to_project_1, user_to_project_2],
@@ -70,18 +68,6 @@ describe("GET /projects/{pid}", () => {
           companies: [customer_1],
           userToCustomers: [user_to_customer_1],
         });
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.drop();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -99,14 +85,14 @@ describe("GET /projects/{pid}", () => {
   it("Should answer 200 if logged in", async () => {
     const response = await request(app)
       .get(`/projects/${project_1.id}`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.status).toBe(200);
   });
 
   it("Should answer 403 if project is not found", async () => {
     const response = await request(app)
       .get(`/projects/999999`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.body.code).toBe(403);
     expect(response.body.message).toBe(ERROR_MESSAGE);
   });
@@ -114,14 +100,14 @@ describe("GET /projects/{pid}", () => {
   it("Should answer 400 of the requested parameter is wrong", async () => {
     const response = await request(app)
       .get(`/projects/a`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.status).toBe(400);
   });
 
   it("Should answer with a project object", async () => {
     const response = await request(app)
       .get(`/projects/${project_1.id}`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
 
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({
@@ -135,7 +121,7 @@ describe("GET /projects/{pid}", () => {
   it("Should answer with a project object if not associated with any customer but is an admin", async () => {
     const response = await request(app)
       .get(`/projects/${project_3.id}`)
-      .set("authorization", "Bearer administrator");
+      .set("authorization", "Bearer admin");
 
     expect(response.body).toMatchObject({
       id: project_3.id,
@@ -148,7 +134,7 @@ describe("GET /projects/{pid}", () => {
   it("Should answer with an error if not associated with any customer and is NOT an admin", async () => {
     const response = await request(app)
       .get(`/projects/${project_3.id}`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
 
     expect(response.status).toBe(403);
   });
@@ -157,7 +143,7 @@ describe("GET /projects/{pid}", () => {
   it("Should answer with an error if the project exist but is limited to other users of the same company", async () => {
     const response = await request(app)
       .get(`/projects/${project_2.id}`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.body.code).toBe(403);
     expect(response.body.message).toBe(ERROR_MESSAGE);
   });

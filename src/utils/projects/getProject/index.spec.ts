@@ -55,8 +55,6 @@ describe("getProject", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.create();
-
         await dbAdapter.add({
           companies: [customer_1],
           campaigns: [campaign_1],
@@ -64,19 +62,6 @@ describe("getProject", () => {
           userToProjects: [user_to_project_1, user_to_project_2],
           userToCustomers: [user_to_customer_1],
         });
-      } catch (error) {
-        console.log(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.drop();
       } catch (error) {
         console.log(error);
         reject(error);

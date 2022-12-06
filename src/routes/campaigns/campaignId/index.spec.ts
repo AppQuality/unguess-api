@@ -1,12 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { table as platformTable } from "@src/__mocks__/database/platforms";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
-import bugs from "@src/__mocks__/database/bugs";
-import userTaskMedia from "@src/__mocks__/database/user_task_media";
-import useCases from "@src/__mocks__/database/use_cases";
-import reports from "@src/__mocks__/database/report";
 
 const customer_1 = {
   id: 999,
@@ -76,7 +71,6 @@ describe("GET /campaigns/{cid}", () => {
     return new Promise(async (resolve, reject) => {
       try {
         await dbAdapter.create();
-        await platformTable.create();
 
         await dbAdapter.add({
           companies: [customer_1],
@@ -88,29 +82,6 @@ describe("GET /campaigns/{cid}", () => {
         });
 
         //Outputs
-        await bugs.mock();
-        await useCases.mock();
-        await userTaskMedia.mock();
-        await reports.mock();
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.drop();
-        await platformTable.drop();
-        //Outputs
-        await bugs.dropMock();
-        await useCases.dropMock();
-        await userTaskMedia.dropMock();
-        await reports.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -130,7 +101,7 @@ describe("GET /campaigns/{cid}", () => {
   it("Should answer 400 if campaign does not exist", async () => {
     const response = await request(app)
       .get(`/campaigns/999999`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
     expect(response.status).toBe(400);
   });
 
@@ -138,7 +109,7 @@ describe("GET /campaigns/{cid}", () => {
   it("Should answer 403 if the user has no permissions to see the campaign", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_2.id}`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
     expect(response.status).toBe(403);
   });
 
@@ -146,7 +117,7 @@ describe("GET /campaigns/{cid}", () => {
   it("Should answer 200 with the campaign", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
     expect(response.body).toEqual(
       expect.objectContaining({
@@ -168,7 +139,7 @@ describe("GET /campaigns/{cid}", () => {
   it("Should have all the required fields", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}`)
-      .set("Authorization", "Bearer customer");
+      .set("Authorization", "Bearer user");
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual(

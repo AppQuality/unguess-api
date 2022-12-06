@@ -35,6 +35,30 @@ import campaignOutputs from "./cp_outputs_view";
 import { table as expressTable, data as expressData } from "./express";
 import defaultUsers from "@src/__mocks__/database/seed/users.json";
 
+import UseCase from "@src/__mocks__/database/use_cases";
+import useCaseGroup from "@src/__mocks__/database/use_case_group";
+import { table as platformTable } from "@src/__mocks__/database/platforms";
+import bugs from "@src/__mocks__/database/bugs";
+import userTaskMedia from "@src/__mocks__/database/user_task_media";
+import reports from "@src/__mocks__/database/report";
+import bugSeverity from "@src/__mocks__/database/bug_severity";
+import bugReplicability from "@src/__mocks__/database/bug_replicability";
+import bugType from "@src/__mocks__/database/bug_type";
+import bugStatus from "@src/__mocks__/database/bug_status";
+import bugMedia from "@src/__mocks__/database/bug_media";
+import devices from "@src/__mocks__/database/device";
+import additionalField from "@src/__mocks__/database/campaign_additional_field";
+import additionalFieldData from "@src/__mocks__/database/campaign_additional_field_data";
+import candidates from "@src/__mocks__/database/cp_has_candidate";
+import CampaignMeta from "@src/__mocks__/database/campaign_meta";
+import tags from "@src/__mocks__/database/bug_tags";
+
+import Templates from "@src/__mocks__/database/templates";
+import Category from "@src/__mocks__/database/template_categories";
+import userTask from "@src/__mocks__/database/user_task";
+import customerUniqueBugsRead from "@src/__mocks__/database/customer_unique_bug_read";
+import bugsReadStatus from "@src/__mocks__/database/bug_read_status";
+
 interface dataObject {
   profiles?: Array<any>;
   companies?: Array<any>;
@@ -77,6 +101,29 @@ export const adapter = {
 
     // Views
     await campaignOutputs.mock();
+
+    await platformTable.create();
+    await UseCase.mock();
+    await useCaseGroup.mock();
+    await bugs.mock();
+    await userTaskMedia.mock();
+    await reports.mock();
+    await bugSeverity.mock();
+    await bugReplicability.mock();
+    await bugType.mock();
+    await bugStatus.mock();
+    await bugMedia.mock();
+    await devices.mock();
+    await additionalField.mock();
+    await additionalFieldData.mock();
+    await candidates.mock();
+    await CampaignMeta.mock();
+    await Templates.mock();
+    await Category.mock();
+    await tags.mock();
+    await userTask.mock();
+    await customerUniqueBugsRead.mock();
+    await bugsReadStatus.mock();
   },
   drop: async () => {
     await profileTable.drop();
@@ -101,6 +148,57 @@ export const adapter = {
 
     // Views
     await campaignOutputs.dropMock();
+
+    await platformTable.drop();
+    await UseCase.dropMock();
+    await useCaseGroup.dropMock();
+    await userTaskMedia.dropMock();
+    await bugs.dropMock();
+    await userTaskMedia.dropMock();
+    await reports.dropMock();
+    await bugSeverity.dropMock();
+    await bugReplicability.dropMock();
+    await bugType.dropMock();
+    await bugStatus.dropMock();
+    await bugMedia.dropMock();
+    await devices.dropMock();
+    await additionalField.dropMock();
+    await additionalFieldData.dropMock();
+    await candidates.dropMock();
+    await CampaignMeta.dropMock();
+    await tags.dropMock();
+    await userTask.dropMock();
+    await Templates.dropMock();
+    await Category.dropMock();
+    await customerUniqueBugsRead.dropMock();
+    await bugsReadStatus.dropMock();
+  },
+
+  clear: async () => {
+    await profileTable.clear();
+    await customerTable.clear();
+    await projectTable.clear();
+    await campaignTable.clear();
+    await campaignTypeTable.clear();
+    await userToCustomerTable.clear();
+    await userToProjectTable.clear();
+    await userTable.clear();
+    await customerTable.clear();
+    await userTableUG.clear();
+
+    //Features Tables
+    await featuresTable.clear();
+    await userToFeaturesTable.clear();
+
+    // Express Tables
+    await coinsTable.clear();
+    await coinsTransactionsTable.clear();
+    await expressTable.clear();
+
+    await platformTable.clear();
+    await UseCase.clear();
+    await useCaseGroup.clear();
+    await bugs.clear();
   },
   add: async ({
     profiles = [],

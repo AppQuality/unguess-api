@@ -1,7 +1,6 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { table as platformTable } from "@src/__mocks__/database/platforms";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 
 const customer_1 = {
@@ -75,9 +74,6 @@ describe("PATCH /campaigns", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.create();
-        await platformTable.create();
-
         await dbAdapter.add({
           companies: [customer_1],
           userToCustomers: [user_to_customer_1],
@@ -86,20 +82,6 @@ describe("PATCH /campaigns", () => {
           campaignTypes: [campaign_type_1],
           campaigns: [campaign_1, campaign_2],
         });
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.drop();
-        await platformTable.drop();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -122,7 +104,7 @@ describe("PATCH /campaigns", () => {
   it("should answer 400 if no body is sent", async () => {
     const response = await request(app)
       .patch(`/campaigns/${campaign_1.id}`)
-      .set("Authorization", "Bearer customer")
+      .set("Authorization", "Bearer user")
       .send();
     expect(response.status).toBe(400);
   });
@@ -131,7 +113,7 @@ describe("PATCH /campaigns", () => {
   it("Should return 200 with the updated campaign", async () => {
     const response = await request(app)
       .patch(`/campaigns/${campaign_1.id}`)
-      .set("Authorization", "Bearer customer")
+      .set("Authorization", "Bearer user")
       .send({
         customer_title: campaign_patch_request.customer_title,
       });
@@ -149,7 +131,7 @@ describe("PATCH /campaigns", () => {
   it("Should fail if the customer_title is an empty string", async () => {
     const response = await request(app)
       .patch(`/campaigns/${campaign_1.id}`)
-      .set("Authorization", `Bearer customer`)
+      .set("Authorization", `Bearer user`)
       .send({
         customer_title: "",
       });
@@ -161,7 +143,7 @@ describe("PATCH /campaigns", () => {
   it("Should execute correctly if the customer_title contains a single quote (or more)", async () => {
     const response = await request(app)
       .patch(`/campaigns/${campaign_1.id}`)
-      .set("Authorization", `Bearer customer`)
+      .set("Authorization", `Bearer user`)
       .send({
         customer_title: campaign_1.customer_title + " 'PATCHED'",
       });
@@ -179,7 +161,7 @@ describe("PATCH /campaigns", () => {
   it("Should execute correctly if the customer_title contains a double quote (or more)", async () => {
     const response = await request(app)
       .patch(`/campaigns/${campaign_1.id}`)
-      .set("Authorization", `Bearer customer`)
+      .set("Authorization", `Bearer user`)
       .send({
         customer_title: campaign_1.customer_title + ' "PATCHED"',
       });
@@ -197,7 +179,7 @@ describe("PATCH /campaigns", () => {
   it("Should execute correctly if the customer_title contains a backslash (or more)", async () => {
     const response = await request(app)
       .patch(`/campaigns/${campaign_1.id}`)
-      .set("Authorization", `Bearer customer`)
+      .set("Authorization", `Bearer user`)
       .send({
         customer_title: campaign_1.customer_title + " PATCHED\\",
       });
@@ -215,7 +197,7 @@ describe("PATCH /campaigns", () => {
   it("Should execute correctly if the customer_title contains a comma (or more)", async () => {
     const response = await request(app)
       .patch(`/campaigns/${campaign_1.id}`)
-      .set("Authorization", `Bearer customer`)
+      .set("Authorization", `Bearer user`)
       .send({
         customer_title: campaign_1.customer_title + ", PATCHED",
       });
@@ -227,7 +209,7 @@ describe("PATCH /campaigns", () => {
   it("Should execute correctly if the customer_title contains an xss attack", async () => {
     const response = await request(app)
       .patch(`/campaigns/${campaign_1.id}`)
-      .set("Authorization", `Bearer customer`)
+      .set("Authorization", `Bearer user`)
       .send({
         customer_title:
           campaign_1.customer_title + " <script>alert('PATCHED')</script>",
@@ -248,7 +230,7 @@ describe("PATCH /campaigns", () => {
   it("Should fail if the campaign does not exist", async () => {
     const response = await request(app)
       .patch(`/campaigns/9999999`)
-      .set("Authorization", `Bearer customer`)
+      .set("Authorization", `Bearer user`)
       .send({
         customer_title: campaign_patch_request.customer_title,
       });
@@ -260,7 +242,7 @@ describe("PATCH /campaigns", () => {
   it("Should fail if the user has no permission to see the campaign's project", async () => {
     const response = await request(app)
       .patch(`/campaigns/${campaign_2.id}`)
-      .set("Authorization", `Bearer customer`)
+      .set("Authorization", `Bearer user`)
       .send({
         customer_title: campaign_2.customer_title + " PATCHED",
       });
@@ -272,7 +254,7 @@ describe("PATCH /campaigns", () => {
   it("Should fail if the customer_title is too long", async () => {
     const response = await request(app)
       .patch(`/campaigns/${campaign_1.id}`)
-      .set("Authorization", `Bearer customer`)
+      .set("Authorization", `Bearer user`)
       .send({
         customer_title: "a".repeat(257), // varchar(256)
       });

@@ -80,8 +80,6 @@ describe("updateWorkspaceCoinsTransaction", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.create();
-
         await dbAdapter.add({
           campaigns: [campaign_1],
           profiles: [customer_profile_1],
@@ -91,19 +89,6 @@ describe("updateWorkspaceCoinsTransaction", () => {
           userToCustomers: [user_to_customer_1],
           coins: [coins_1],
         });
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.drop();
       } catch (error) {
         console.error(error);
         reject(error);

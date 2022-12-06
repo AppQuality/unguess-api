@@ -7,8 +7,8 @@ import {
   LIMIT_QUERY_PARAM_DEFAULT,
 } from "@src/utils/constants";
 import bugs from "@src/__mocks__/database/bugs";
-import userTaskMedia from "@src/__mocks__/database/user_task_media";
 import useCases from "@src/__mocks__/database/use_cases";
+import userTaskMedia from "@src/__mocks__/database/user_task_media";
 
 const customer_profile_1 = {
   id: 1,
@@ -132,8 +132,6 @@ describe("GET /projects/{pid}/campaigns", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.create();
-
         await dbAdapter.add({
           campaigns: [campaign_1, campaign_2, campaign_3],
           profiles: [customer_profile_1],
@@ -150,27 +148,6 @@ describe("GET /projects/{pid}/campaigns", () => {
         });
 
         //Outputs
-        await bugs.mock();
-        await useCases.mock();
-        await userTaskMedia.mock();
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
-
-  afterAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.drop();
-
-        //Outputs
-        await bugs.dropMock();
-        await useCases.dropMock();
-        await userTaskMedia.dropMock();
       } catch (error) {
         console.error(error);
         reject(error);
@@ -183,7 +160,7 @@ describe("GET /projects/{pid}/campaigns", () => {
   it("Should answer 200 if logged in", async () => {
     const response = await request(app)
       .get(`/workspaces/${customer_1.id}/projects/${project_1.id}/campaigns`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.status).toBe(200);
   });
 
@@ -197,14 +174,14 @@ describe("GET /projects/{pid}/campaigns", () => {
   it("Should answer 400 if pid is a string", async () => {
     const response = await request(app)
       .get(`/workspaces/${customer_1.id}/projects/asd/campaigns`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.status).toBe(400);
   });
 
   it("Should return 403 if project is not found", async () => {
     const response = await request(app)
       .get(`/workspaces/${customer_1.id}/projects/999/campaigns`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.body.code).toBe(403);
     expect(response.body.message).toBe(ERROR_MESSAGE);
   });
@@ -212,7 +189,7 @@ describe("GET /projects/{pid}/campaigns", () => {
   it("Should return a list of campaigns if project is present", async () => {
     const response = await request(app)
       .get(`/projects/${project_1.id}/campaigns`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.status).toBe(200);
     expect(Array.isArray(response.body.items)).toBe(true);
     expect(response.body.items.length).toBeGreaterThan(0);
@@ -236,7 +213,7 @@ describe("GET /projects/{pid}/campaigns", () => {
   it("Should return a list formatted for pagination", async () => {
     const response = await request(app)
       .get(`/projects/${project_1.id}/campaigns`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
 
     expect(response.body).toStrictEqual({
       items: [
@@ -306,7 +283,7 @@ describe("GET /projects/{pid}/campaigns", () => {
   it("Should return a campaign if limit is 1", async () => {
     const response = await request(app)
       .get(`/projects/${project_1.id}/campaigns?limit=1`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.status).toBe(200);
     expect(Array.isArray(response.body.items)).toBe(true);
     expect(response.body.items.length).toBe(1);
@@ -316,7 +293,7 @@ describe("GET /projects/{pid}/campaigns", () => {
   it("Should return a list of campaigns if no limit is specified", async () => {
     const response = await request(app)
       .get(`/projects/${project_1.id}/campaigns`)
-      .set("authorization", "Bearer customer");
+      .set("authorization", "Bearer user");
     expect(response.status).toBe(200);
     expect(Array.isArray(response.body.items)).toBe(true);
     expect(response.body.items).toHaveLength(2); //campaign_1 and campaign_2
@@ -354,7 +331,7 @@ describe("GET /projects/{pid}/campaigns", () => {
 
       const response = await request(app)
         .get(`/projects/${project_1.id}/campaigns?limit=1`)
-        .set("authorization", "Bearer customer");
+        .set("authorization", "Bearer user");
 
       expect(response.status).toBe(200);
       expect(Array.isArray(response.body.items)).toBe(true);
@@ -394,7 +371,7 @@ describe("GET /projects/{pid}/campaigns", () => {
 
       const response = await request(app)
         .get(`/projects/${project_1.id}/campaigns?limit=1`)
-        .set("authorization", "Bearer customer");
+        .set("authorization", "Bearer user");
 
       expect(response.status).toBe(200);
       expect(Array.isArray(response.body.items)).toBe(true);

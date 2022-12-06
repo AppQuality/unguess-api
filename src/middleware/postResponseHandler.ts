@@ -10,7 +10,7 @@ export default (c: Context, req: Request, res: OpenapiResponse) => {
     );
 
     if (valid.errors) {
-      if (process.env && process.env.DEBUG) {
+      if (process.env && process.env.DEBUG && process.env.DEBUG === "1") {
         console.log(c.response);
         console.log(valid.errors);
       }

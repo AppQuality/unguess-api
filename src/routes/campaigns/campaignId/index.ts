@@ -1,7 +1,7 @@
 /** OPENAPI-ROUTE: get-campaign */
 import { Context } from "openapi-backend";
 import { ERROR_MESSAGE } from "@src/utils/constants";
-import { getCampaign, getCampaignOutputs } from "@src/utils/campaigns";
+import { getCampaign } from "@src/utils/campaigns";
 import { getProjectById } from "@src/utils/projects";
 
 export default async (
