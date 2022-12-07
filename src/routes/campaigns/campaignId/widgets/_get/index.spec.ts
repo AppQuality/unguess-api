@@ -109,6 +109,16 @@ const desktop: DeviceParams = {
   pc_type: "Notebook",
 };
 
+const desktop_2: DeviceParams = {
+  id: 1235,
+  platform_id: 8,
+  id_profile: 47337,
+  os_version: "Windows 11",
+  operating_system: "Windows",
+  form_factor: "Desktop",
+  pc_type: "Notebook",
+};
+
 const useCase1: UseCaseParams = {
   id: 123,
   title: "Use Case 1: Titolone (Web)",
@@ -208,6 +218,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
     await devices.insert(device_1);
     await devices.insert(tablet);
     await devices.insert(desktop);
+    await devices.insert(desktop_2);
   });
 
   // It should answer 403 if user is not logged in
@@ -484,6 +495,31 @@ describe("GET /campaigns/{cid}/widgets", () => {
       expect(response.body.kind).toEqual("bugsByDevice");
       expect(response.body.data[0].bugs).toEqual(2);
       expect(response.body.data[1].bugs).toEqual(1);
+    });
+
+    it("Should answer 200 and return the bugs by device widget (with desktop)", async () => {
+      //Update bug_2
+      await bugs.update(
+        [
+          {
+            dev_id: desktop_2.id,
+            manufacturer: desktop_2.manufacturer,
+            model: desktop_2.model,
+            os: desktop_2.operating_system,
+            os_version: desktop_2.os_version,
+          },
+        ],
+        [{ id: bug_2.id }]
+      );
+
+      const response = await request(app)
+        .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-device`)
+        .set("Authorization", "Bearer user");
+      expect(response.status).toBe(200);
+
+      expect(response.body.kind).toEqual("bugsByDevice");
+      expect(response.body.data[1].bugs).toEqual(1);
+      expect(response.body.data[1].type).toEqual("desktop");
     });
 
     // --- End of describe "Bugs by device"

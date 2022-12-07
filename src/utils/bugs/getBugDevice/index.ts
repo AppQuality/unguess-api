@@ -33,7 +33,7 @@ export const getBugDevice = (
 };
 
 const getSmartphone = (
-  bug: BugsParams & { form_factor: string; pc_type: string }
+  bug: BugsParams & { form_factor: string }
 ): StoplightComponents["schemas"]["Smartphone"] => ({
   manufacturer: bug.manufacturer || "-",
   model: bug.model || "-",
@@ -43,7 +43,7 @@ const getSmartphone = (
 });
 
 const getTablet = (
-  bug: BugsParams & { form_factor: string; pc_type: string }
+  bug: BugsParams & { form_factor: string }
 ): StoplightComponents["schemas"]["Tablet"] => ({
   manufacturer: bug.manufacturer || "-",
   model: bug.model || "-",
