@@ -25,6 +25,8 @@ export const getBugDevice = (
       return getTablet(bug);
     case "desktop":
       return getDesktop(bug);
+    case "pc":
+      return getDesktop(bug);
     default:
       return getGenericDevice(bug);
   }
