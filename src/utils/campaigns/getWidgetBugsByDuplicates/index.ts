@@ -62,7 +62,9 @@ const formatBugs = async (bugs: any, campaignId: number) => {
       },
       application_section: {
         id: bug.application_section_id,
-        title: bug.application_section,
+        title: bug.uc_title ?? bug.application_section,
+        ...(bug.uc_simple_title && { simple_title: bug.uc_simple_title }),
+        ...(bug.uc_prefix && { prefix: bug.uc_prefix }),
       },
       created: bug.created.toString(),
       ...(bug.updated && { updated: bug.updated.toString() }),
@@ -118,6 +120,9 @@ export const getWidgetBugsByDuplicates = async (
     b.os_version,
     b.application_section,
     b.application_section_id,
+    uc.title as uc_title,
+    uc.simple_title as uc_simple_title,
+    uc.prefix as uc_prefix,
     b.is_duplicated,
     b.duplicated_of_id,
     b.is_favorite,
@@ -131,6 +136,7 @@ export const getWidgetBugsByDuplicates = async (
     JOIN wp_appq_evd_bug_replicability r ON (child.bug_replicability_id = r.id)
     JOIN wp_appq_evd_bug_status status ON (child.status_id = status.id)
     LEFT JOIN wp_crowd_appq_device device ON (child.dev_id = device.id)
+    LEFT JOIN wp_appq_campaign_task uc ON (uc.id = b.application_section_id)
     WHERE child.campaign_id = ? 
     and child.is_duplicated = 1
     AND ${

@@ -735,6 +735,22 @@ describe("GET /campaigns/{cid}/widgets", () => {
         .set("Authorization", "Bearer admin");
       expect(response.status).toBe(400);
     });
+
+    it("Should return usecase meta if available", async () => {
+      const response = await request(app)
+        .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-duplicates`)
+        .set("Authorization", "Bearer user");
+      expect(response.status).toBe(200);
+
+      const usecase = response.body.data[0];
+
+      expect(usecase.application_section).toEqual({
+        id: useCase1.id,
+        title: useCase1.title,
+        simple_title: useCase1.simple_title,
+        prefix: useCase1.prefix,
+      });
+    });
   });
 
   // --- end of tests ---
