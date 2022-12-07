@@ -23,7 +23,7 @@ export const getBugDevice = (
       return getSmartphone(bug);
     case "tablet":
       return getTablet(bug);
-    case "desktop":
+    case "pc":
       return getDesktop(bug);
     default:
       return getGenericDevice(bug);
@@ -31,7 +31,7 @@ export const getBugDevice = (
 };
 
 const getSmartphone = (
-  bug: BugsParams & { form_factor: string; pc_type: string }
+  bug: BugsParams & { form_factor: string }
 ): StoplightComponents["schemas"]["Smartphone"] => ({
   manufacturer: bug.manufacturer || "-",
   model: bug.model || "-",
@@ -41,7 +41,7 @@ const getSmartphone = (
 });
 
 const getTablet = (
-  bug: BugsParams & { form_factor: string; pc_type: string }
+  bug: BugsParams & { form_factor: string }
 ): StoplightComponents["schemas"]["Tablet"] => ({
   manufacturer: bug.manufacturer || "-",
   model: bug.model || "-",

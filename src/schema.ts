@@ -207,6 +207,8 @@ export interface components {
       application_section: {
         id?: number;
         title?: string;
+        simple_title?: string;
+        prefix_title?: string;
       };
       duplicated_of_id?: number;
       is_favorite?: number;
