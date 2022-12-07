@@ -23,8 +23,6 @@ export const getBugDevice = (
       return getSmartphone(bug);
     case "tablet":
       return getTablet(bug);
-    case "desktop":
-      return getDesktop(bug);
     case "pc":
       return getDesktop(bug);
     default:
