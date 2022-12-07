@@ -7,8 +7,8 @@ on:
 
 env:
   ECR_REPOSITORY: unguess-api
-  DEPLOY_PROD_BUCKET: unguess-app-staging-source
-  DEPLOY_PROD_KEY: unguess-app-api-staging-pipeline/source.zip
+  DEPLOY_PROD_BUCKET: unguess-app-production-source
+  DEPLOY_PROD_KEY: unguess-app-api-production-pipeline/source.zip
   ASG_NAME: unguess-app-asg-unguess-app-api-production
   PIPELINE: unguess-app-api-production-pipeline-pipeline
 
