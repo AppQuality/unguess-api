@@ -1013,6 +1013,10 @@ components:
               type: integer
             title:
               type: string
+            simple_title:
+              type: string
+            prefix_title:
+              type: string
         duplicated_of_id:
           type: integer
         is_favorite:

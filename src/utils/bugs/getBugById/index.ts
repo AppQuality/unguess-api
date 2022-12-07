@@ -45,8 +45,11 @@ export const getBugById = async ({
       b.model,
       b.os,
       b.os_version,
-      b.application_section,
       b.application_section_id,
+      b.application_section,
+      uc.title as uc_title,
+      uc.simple_title as uc_simple_title,
+      uc.prefix as uc_prefix,
       b.is_duplicated,
       b.duplicated_of_id,
       b.is_favorite,
@@ -59,6 +62,7 @@ export const getBugById = async ({
         JOIN wp_appq_evd_bug_replicability r ON (b.bug_replicability_id = r.id)
         JOIN wp_appq_evd_bug_status status ON (b.status_id = status.id)
         LEFT JOIN wp_crowd_appq_device device ON (b.dev_id = device.id)
+        LEFT JOIN wp_appq_campaign_task uc ON (uc.id = b.application_section_id)
         WHERE b.id = ? AND ${
           showNeedReview
             ? `(status.name = 'Approved' OR status.name = 'Need Review')`
@@ -123,7 +127,9 @@ export const getBugById = async ({
     },
     application_section: {
       id: bug.application_section_id,
-      title: bug.application_section,
+      title: bug.uc_title ?? bug.application_section,
+      ...(bug.uc_simple_title && { simple_title: bug.uc_simple_title }),
+      ...(bug.uc_prefix && { prefix: bug.uc_prefix }),
     },
     created: bug.created.toString(),
     updated: bug.updated.toString(),
