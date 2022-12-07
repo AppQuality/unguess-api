@@ -15,6 +15,8 @@ import additionalField, {
 } from "@src/__mocks__/database/campaign_additional_field";
 import additionalFieldData from "@src/__mocks__/database/campaign_additional_field_data";
 import CampaignMeta from "@src/__mocks__/database/campaign_meta";
+import useCases, { UseCaseParams } from "@src/__mocks__/database/use_cases";
+
 const customer_1 = {
   id: 999,
   company: "Company 999",
@@ -101,6 +103,13 @@ const device_2: DeviceParams = {
   pc_type: "Notebook",
 };
 
+const usecase_1: UseCaseParams = {
+  id: 1,
+  title: "Use Case 1: something to do here",
+  simple_title: "something to do here",
+  prefix: "Use Case 1:",
+};
+
 const bug_1: BugsParams = {
   id: 12999,
   internal_id: "UG12999",
@@ -117,8 +126,8 @@ const bug_1: BugsParams = {
   severity_id: 1,
   bug_replicability_id: 1,
   bug_type_id: 1,
-  application_section_id: 1,
-  application_section: "Application section 1",
+  application_section_id: usecase_1.id,
+  application_section: usecase_1.title,
   note: "Bug 12999 notes",
   manufacturer: device_1.manufacturer,
   model: device_1.model,
@@ -134,6 +143,8 @@ const bug_2 = {
   model: device_2.model,
   os: device_2.operating_system,
   os_version: device_2.os_version,
+  application_section_id: 0,
+  application_section: "Not a specific usecase",
 };
 
 const bug_3_pending = {
@@ -216,6 +227,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
         await additionalField.insert(field_2);
         await additionalFieldData.insert(field_1_data);
         await additionalFieldData.insert(field_2_data);
+        await useCases.insert(usecase_1);
 
         await bugSeverity.addDefaultItems();
         await bugReplicability.addDefaultItems();
@@ -433,6 +445,33 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
       .get(`/campaigns/${campaign_1.id}/bugs/${bug_3_pending.id}`)
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(400);
+  });
+
+  it("Should answer 200 and usecase meta details if available", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user");
+
+    expect(response.status).toBe(200);
+    expect(response.body.application_section).toEqual({
+      id: usecase_1.id,
+      title: usecase_1.title,
+      simple_title: usecase_1.simple_title,
+      prefix: usecase_1.prefix,
+    });
+  });
+
+  it("Should not return usecase meta when there are none", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_2.id}`)
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(200);
+
+    const usecase = response.body.application_section;
+
+    expect(usecase.title).toEqual(bug_2.application_section);
+    expect(usecase.simple_title).toBeUndefined();
+    expect(usecase.prefix).toBeUndefined();
   });
 
   /** --- end of file */
