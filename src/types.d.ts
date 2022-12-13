@@ -32,4 +32,17 @@ declare global {
   interface StoplightOperations extends operations {}
   interface StoplightComponents extends components {}
   interface StoplightPaths extends paths {}
+
+  type PartialRecord<K extends keyof any, T> = {
+    [P in K]?: T;
+  };
+
+  type RouteClassTypes = Record<"response", any> &
+    PartialRecord<"body" | "parameters" | "query", any>;
+
+  type RouteClassConfiguration = {
+    context: Context;
+    request: OpenapiRequest;
+    response: OpenapiResponse;
+  };
 }

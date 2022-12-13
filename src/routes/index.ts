@@ -82,7 +82,11 @@ class Routes {
       } catch (e) {
         debugMessage((e as OpenapiError).message);
         response.status_code = 500;
-        return { message: (e as OpenapiError).message };
+        return {
+          message: (e as OpenapiError).message,
+          code: (e as OpenapiError).code || 500,
+          error: true,
+        };
       }
     };
   }
