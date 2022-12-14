@@ -23,7 +23,7 @@ export const updateWorkspaceCoins = async ({
 }: UpdateWorkspaceCoinsArgs): Promise<
   StoplightComponents["schemas"]["Coin"][]
 > => {
-  let error = {
+  const error = {
     message: ERROR_MESSAGE + " with workspace coins",
     error: true,
   } as StoplightComponents["schemas"]["Error"];
@@ -39,48 +39,40 @@ export const updateWorkspaceCoins = async ({
   });
 
   // Check if no packages are available
-  if (!packages.length) {
-    throw { ...error, code: 400 };
-  }
+  if (!packages.length) throw { ...error, code: 400 };
+
+  if (cost === 0) return [];
 
   // Double check if at least one package has enough coins amount in case of cost != 1 (already filtered in getWorkspaceCoins)
-  if ((await getTotalCoins(packages)) < cost) {
-    throw { ...error, code: 400 };
-  }
+  const totalCoins = packages.reduce((acc, pack) => acc + pack.amount, 0);
+  if (totalCoins < cost) throw { ...error, code: 400 };
 
   // Update packages starting from the oldest one
-  let sql =
-    "UPDATE wp_ug_coins SET amount = ?, updated_on = CURRENT_TIMESTAMP WHERE id = ?";
   let remainingCost = cost;
-  // Update packages
   const updatedPackages = [];
+
   for (const pack of packages) {
+    const newAmount =
+      pack.amount - remainingCost > 0 ? pack.amount - remainingCost : 0;
+    remainingCost =
+      remainingCost - pack.amount > 0 ? remainingCost - pack.amount : 0;
+
+    await db.query(
+      db.format(
+        `UPDATE wp_ug_coins
+        SET amount = ?, updated_on = CURRENT_TIMESTAMP 
+        WHERE id = ?`,
+        [newAmount, pack.id]
+      ),
+      "unguess"
+    );
+
+    updatedPackages.push({
+      ...pack,
+      amount: newAmount,
+    });
+
     if (remainingCost === 0) break;
-
-    if (pack.amount >= cost) {
-      const newAmount = pack.amount - remainingCost;
-      remainingCost = 0;
-
-      // Execute transaction
-      const coinsQuery = db.format(sql, [newAmount, pack.id]);
-      await db.query(coinsQuery, "unguess");
-
-      updatedPackages.push({
-        ...pack,
-        amount: newAmount,
-      });
-    } else {
-      remainingCost -= pack.amount;
-
-      // Execute transaction
-      const coinsQuery = db.format(sql, [0, pack.id]);
-      await db.query(coinsQuery, "unguess");
-
-      updatedPackages.push({
-        ...pack,
-        amount: 0,
-      });
-    }
   }
 
   return updatedPackages;

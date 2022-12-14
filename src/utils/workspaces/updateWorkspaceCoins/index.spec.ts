@@ -11,9 +11,11 @@ const customer_2 = {
 const customer_3 = {
   id: 3,
 };
-
 const customer_4 = {
   id: 4,
+};
+const customer_5 = {
+  id: 5,
 };
 
 const coins_1 = {
@@ -61,10 +63,44 @@ const coins_5 = {
   updated_on: "2022-06-24 12:51:23",
 };
 
+const coins_6 = {
+  id: 6,
+  customer_id: customer_5.id,
+  amount: 3,
+  price: 0,
+  created_on: "2022-04-10 11:34:22",
+  updated_on: "2022-06-24 12:51:23",
+};
+const coins_7 = {
+  id: 7,
+  customer_id: customer_5.id,
+  amount: 2,
+  price: 0,
+  created_on: "2022-05-10 11:34:22",
+  updated_on: "2022-06-24 12:51:23",
+};
+const coins_8 = {
+  id: 8,
+  customer_id: customer_5.id,
+  amount: 2,
+  price: 0,
+  created_on: "2022-05-10 11:34:22",
+  updated_on: "2022-06-24 12:51:23",
+};
+
 describe("updateWorkspaceCoins", () => {
   beforeEach(async () => {
     await dbAdapter.add({
-      coins: [coins_1, coins_2, coins_3, coins_4, coins_5],
+      coins: [
+        coins_1,
+        coins_2,
+        coins_3,
+        coins_4,
+        coins_5,
+        coins_6,
+        coins_7,
+        coins_8,
+      ],
     });
   });
 
@@ -176,5 +212,14 @@ describe("updateWorkspaceCoins", () => {
     });
 
     expect(packages).toEqual([]);
+  });
+
+  it("Should remove coins from multiple package correctly", async () => {
+    const packages = await updateWorkspaceCoins({
+      workspaceId: customer_5.id,
+      cost: 5,
+    });
+
+    expect(packages.length).toBe(2);
   });
 });
