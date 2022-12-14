@@ -1,10 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import {
-  table as platformTable,
-  data as platformData,
-} from "@src/__mocks__/database/platforms";
+import { data as platformData } from "@src/__mocks__/database/platforms";
 import {
   DEFAULT_EXPRESS_COST,
   DT_DESKTOP,
@@ -17,6 +14,7 @@ import {
   getWorkspaceCoinsTransactions,
 } from "@src/utils/workspaces";
 
+import sqlite from "@src/features/sqlite";
 import UseCase from "@src/__mocks__/database/use_cases";
 import useCaseGroup from "@src/__mocks__/database/use_case_group";
 
@@ -364,23 +362,16 @@ describe("POST /campaigns", () => {
       });
     expect(response.status).toBe(200);
 
-    // Check if transaction exists
-    const transaction = await getWorkspaceCoinsTransactions({
-      workspaceId: campaign_request_2.customer_id,
-      campaignId: response.body.id,
-    });
+    const tryberDb = sqlite("tryber");
+    const campaigns = await tryberDb.all(
+      `SELECT * FROM wp_appq_evd_campaign WHERE id = ${response.body.id}`
+    );
 
-    // Check if cost is correct
-    const cost = await getExpressCost({
-      slug: campaign_request_2.express_slug,
-    });
-
-    expect(transaction).toEqual([
-      expect.objectContaining({
-        campaign_id: response.body.id,
-        quantity: cost,
-      }),
-    ]);
+    expect(campaigns.length).toBe(1);
+    expect(campaigns[0]).toHaveProperty(
+      "project_id",
+      campaign_request_2.project_id
+    );
   });
 
   // Should create the use cases if some are provided
