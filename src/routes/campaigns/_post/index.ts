@@ -66,15 +66,13 @@ export default async (
       throw { ...error, message: "coins issues", code: 403 };
 
     // Deduct express coin(s) if express is not free (has cost)
-    let coinsPackageId;
+    let updatedCoinsPackages: StoplightComponents["schemas"]["Coin"][] = [];
+
     if (cost) {
-      const updatedCoinsPackages = await updateWorkspaceCoins({
+      updatedCoinsPackages = await updateWorkspaceCoins({
         workspaceId: workspace.id,
         cost: cost,
       });
-
-      const updatedCoinsPackage = updatedCoinsPackages[0];
-      coinsPackageId = updatedCoinsPackage.id;
     }
 
     if (request_body.use_cases) {
@@ -85,13 +83,17 @@ export default async (
     let campaign = await createCampaign(validated_request_body);
 
     // Insert coins transaction
-    await updateWorkspaceCoinsTransaction({
-      workspaceId: workspace.id,
-      user: user,
-      quantity: cost,
-      campaignId: campaign.id,
-      ...(cost && { coinsPackageId: coinsPackageId }),
-    });
+    if (updatedCoinsPackages.length) {
+      for (const pack of updatedCoinsPackages) {
+        await updateWorkspaceCoinsTransaction({
+          workspaceId: workspace.id,
+          user: user,
+          quantity: cost,
+          campaignId: campaign.id,
+          ...(cost && { coinsPackageId: pack.id }),
+        });
+      }
+    }
 
     // Update useCase setting cp id
     if (request_body.use_cases?.length) {
@@ -114,14 +116,13 @@ export default async (
 
     return campaign as StoplightComponents["schemas"]["Campaign"];
   } catch (e: any) {
-    if (e.code) {
+    if (e.code && typeof e.code === "number") {
       error.code = e.code;
       res.status_code = e.code;
     } else {
       error.code = 500;
       res.status_code = 500;
     }
-
     return error;
   }
 };

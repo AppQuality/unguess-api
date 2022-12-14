@@ -23,7 +23,7 @@ export const updateWorkspaceCoins = async ({
 }: UpdateWorkspaceCoinsArgs): Promise<
   StoplightComponents["schemas"]["Coin"][]
 > => {
-  let error = {
+  const error = {
     message: ERROR_MESSAGE + " with workspace coins",
     error: true,
   } as StoplightComponents["schemas"]["Error"];
@@ -32,61 +32,48 @@ export const updateWorkspaceCoins = async ({
   if (workspaceId == null || workspaceId <= 0) throw { ...error, code: 400 };
 
   // Retrieve coins packages
-  const oldPackages = await getWorkspaceCoins({
+  const packages = await getWorkspaceCoins({
     workspaceId,
     orderBy: "created_on",
     order: "ASC",
   });
 
   // Check if no packages are available
-  if (!oldPackages.length) {
-    throw { ...error, code: 400 };
-  }
+  if (!packages.length) throw { ...error, code: 400 };
+
+  if (cost === 0) return [];
 
   // Double check if at least one package has enough coins amount in case of cost != 1 (already filtered in getWorkspaceCoins)
-  if ((await getTotalCoins(oldPackages)) < cost) {
-    throw { ...error, code: 400 };
-  }
+  const totalCoins = packages.reduce((acc, pack) => acc + pack.amount, 0);
+  if (totalCoins < cost) throw { ...error, code: 400 };
 
   // Update packages starting from the oldest one
-  let sql =
-    "UPDATE wp_ug_coins SET amount = ?, updated_on = CURRENT_TIMESTAMP WHERE id = ?";
   let remainingCost = cost;
-  oldPackages.map(async (package_) => {
-    if (remainingCost === 0) return package_;
+  const updatedPackages = [];
 
-    if (package_.amount >= cost) {
-      const newAmount = package_.amount - remainingCost;
-      remainingCost = 0;
+  for (const pack of packages) {
+    const newAmount =
+      pack.amount - remainingCost > 0 ? pack.amount - remainingCost : 0;
+    remainingCost =
+      remainingCost - pack.amount > 0 ? remainingCost - pack.amount : 0;
 
-      // Execute transaction
-      const coinsQuery = db.format(sql, [newAmount, package_.id]);
-      await db.query(coinsQuery, "unguess");
+    await db.query(
+      db.format(
+        `UPDATE wp_ug_coins
+        SET amount = ?, updated_on = CURRENT_TIMESTAMP 
+        WHERE id = ?`,
+        [newAmount, pack.id]
+      ),
+      "unguess"
+    );
 
-      return {
-        ...package_,
-        amount: newAmount,
-      };
-    } else {
-      remainingCost -= package_.amount;
+    updatedPackages.push({
+      ...pack,
+      amount: newAmount,
+    });
 
-      // Execute transaction
-      const coinsQuery = db.format(sql, [0, package_.id]);
-      await db.query(coinsQuery, "unguess");
+    if (remainingCost === 0) break;
+  }
 
-      return {
-        ...package_,
-        amount: 0,
-      };
-    }
-  });
-
-  // Retrieve new coins packages
-  const newPackages = await getWorkspaceCoins({
-    workspaceId,
-    orderBy: "updated_on",
-    order: "DESC",
-  });
-
-  return newPackages;
+  return updatedPackages;
 };
