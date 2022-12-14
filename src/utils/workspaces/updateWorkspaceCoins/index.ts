@@ -32,19 +32,19 @@ export const updateWorkspaceCoins = async ({
   if (workspaceId == null || workspaceId <= 0) throw { ...error, code: 400 };
 
   // Retrieve coins packages
-  const oldPackages = await getWorkspaceCoins({
+  const packages = await getWorkspaceCoins({
     workspaceId,
     orderBy: "created_on",
     order: "ASC",
   });
 
   // Check if no packages are available
-  if (!oldPackages.length) {
+  if (!packages.length) {
     throw { ...error, code: 400 };
   }
 
   // Double check if at least one package has enough coins amount in case of cost != 1 (already filtered in getWorkspaceCoins)
-  if ((await getTotalCoins(oldPackages)) < cost) {
+  if ((await getTotalCoins(packages)) < cost) {
     throw { ...error, code: 400 };
   }
 
@@ -52,41 +52,36 @@ export const updateWorkspaceCoins = async ({
   let sql =
     "UPDATE wp_ug_coins SET amount = ?, updated_on = CURRENT_TIMESTAMP WHERE id = ?";
   let remainingCost = cost;
-  oldPackages.map(async (package_) => {
-    if (remainingCost === 0) return package_;
+  // Update packages
+  const updatedPackages = [];
+  for (const pack of packages) {
+    if (remainingCost === 0) break;
 
-    if (package_.amount >= cost) {
-      const newAmount = package_.amount - remainingCost;
+    if (pack.amount >= cost) {
+      const newAmount = pack.amount - remainingCost;
       remainingCost = 0;
 
       // Execute transaction
-      const coinsQuery = db.format(sql, [newAmount, package_.id]);
+      const coinsQuery = db.format(sql, [newAmount, pack.id]);
       await db.query(coinsQuery, "unguess");
 
-      return {
-        ...package_,
+      updatedPackages.push({
+        ...pack,
         amount: newAmount,
-      };
+      });
     } else {
-      remainingCost -= package_.amount;
+      remainingCost -= pack.amount;
 
       // Execute transaction
-      const coinsQuery = db.format(sql, [0, package_.id]);
+      const coinsQuery = db.format(sql, [0, pack.id]);
       await db.query(coinsQuery, "unguess");
 
-      return {
-        ...package_,
+      updatedPackages.push({
+        ...pack,
         amount: 0,
-      };
+      });
     }
-  });
+  }
 
-  // Retrieve new coins packages
-  const newPackages = await getWorkspaceCoins({
-    workspaceId,
-    orderBy: "updated_on",
-    order: "DESC",
-  });
-
-  return newPackages;
+  return updatedPackages;
 };
