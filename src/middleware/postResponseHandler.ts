@@ -1,7 +1,7 @@
 import { Context } from "openapi-backend";
 import process from "process";
 
-export default (c: Context, req: Request, res: OpenapiResponse) => {
+export default (c: Context, req: OpenapiRequest, res: OpenapiResponse) => {
   if (!res.skip_post_response_handler) {
     const valid = c.api.validateResponse(
       c.response,

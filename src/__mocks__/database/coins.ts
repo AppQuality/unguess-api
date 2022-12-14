@@ -1,8 +1,6 @@
-import sqlite3 from "@src/features/sqlite";
+import Table from "./table";
 
-const db = sqlite3("unguess");
-
-interface coin {
+interface CoinParams {
   id?: number;
   customer_id: number;
   amount: number;
@@ -13,37 +11,28 @@ interface coin {
   notes?: string;
 }
 
-export const table = {
-  create: async () => {
-    await db.createTable("wp_ug_coins", [
-      "id INTEGER PRIMARY KEY AUTOINCREMENT",
-      "customer_id int(11) NOT NULL",
-      "amount int(11) NOT NULL DEFAULT 0",
-      "agreement_id int(11) NULL",
-      "price float(6, 2) NOT NULL DEFAULT 0.00",
-      "created_on timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP",
-      "updated_on timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP",
-      "notes varchar(255) NULL",
-    ]);
-  },
-  drop: async () => {
-    await db.dropTable("wp_ug_coins");
-  },
-  clear: async () => {
-    await db.run("DELETE FROM wp_ug_coins");
-  },
+const defaultItem: CoinParams = {
+  customer_id: 0,
+  amount: 0,
 };
 
-const data: {
-  [key: string]: (params?: coin) => Promise<{ [key: string]: any }>;
-} = {};
+class Coins extends Table<CoinParams> {
+  protected name = "wp_ug_coins";
+  protected columns = [
+    "id INTEGER PRIMARY KEY AUTOINCREMENT",
+    "customer_id int(11) NOT NULL",
+    "amount int(11) NOT NULL DEFAULT 0",
+    "agreement_id int(11) NULL",
+    "price float(6, 2) NOT NULL DEFAULT 0.00",
+    "created_on timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP",
+    "updated_on timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP",
+    "notes varchar(255) NULL",
+  ];
+  constructor() {
+    super(defaultItem);
+  }
+}
 
-data.basicItem = async (params) => {
-  const item = {
-    ...params,
-  };
-  await db.insert("wp_ug_coins", item);
-  return item;
-};
-
-export { data };
+const coins = new Coins();
+export default coins;
+export type { CoinParams };

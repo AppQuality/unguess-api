@@ -26,7 +26,7 @@ import {
   data as userToFeaturesData,
 } from "./userToFeatures";
 
-import { table as coinsTable, data as coinsData } from "./coins";
+import Coins from "./coins";
 import {
   table as coinsTransactionsTable,
   data as coinsTransactionsData,
@@ -95,7 +95,7 @@ export const adapter = {
     await userToFeaturesTable.create();
 
     // Express Tables
-    await coinsTable.create();
+    await Coins.mock();
     await coinsTransactionsTable.create();
     await expressTable.create();
 
@@ -142,7 +142,7 @@ export const adapter = {
     await userToFeaturesTable.drop();
 
     // Express Tables
-    await coinsTable.drop();
+    await Coins.dropMock();
     await coinsTransactionsTable.drop();
     await expressTable.drop();
 
@@ -191,7 +191,7 @@ export const adapter = {
     await userToFeaturesTable.clear();
 
     // Express Tables
-    await coinsTable.clear();
+    await Coins.clear();
     await coinsTransactionsTable.clear();
     await expressTable.clear();
 
@@ -260,7 +260,7 @@ export const adapter = {
 
     coins.length &&
       coins.forEach(async (coin) => {
-        await coinsData.basicItem(coin);
+        await Coins.insert(coin);
       });
 
     transactions.length &&
