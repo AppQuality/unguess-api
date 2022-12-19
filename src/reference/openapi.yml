@@ -265,6 +265,8 @@ paths:
                     limit: 0
                     size: 0
                     total: 0
+        '403':
+          $ref: '#/components/responses/Error'
       operationId: get-campaigns-cid-bug-types
       description: ''
       security:
