@@ -674,7 +674,7 @@ export interface components {
     /** @description filterBy[<fieldName>]=<fieldValue> */
     filterBy: unknown;
     /** @description Campaign id */
-    cid: number;
+    cid: string;
     /** @description Defines an identifier for the bug object (BUG ID) */
     bid: string;
     /** @description Campaign widget slug */
