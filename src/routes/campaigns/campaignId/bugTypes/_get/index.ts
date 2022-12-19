@@ -31,13 +31,11 @@ export default class Route extends UserRoute<{
     }
     try {
       // Check if user has permission to edit the campaign
-      console.log(campaign.project.id);
       await getProjectById({
         projectId: campaign.project.id,
         user: this.getUser(),
       });
     } catch (e) {
-      console.log(e);
       this.setError(403, {
         message: ERROR_MESSAGE,
       } as OpenapiError);
