@@ -36,6 +36,15 @@ export interface paths {
       };
     };
   };
+  "/campaigns/{cid}/bugTypes": {
+    get: operations["get-campaigns-cid-bug-types"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: number;
+      };
+    };
+  };
   "/campaigns/{cid}/bugs/{bid}": {
     get: operations["get-campaigns-single-bug"];
     parameters: {
@@ -846,6 +855,22 @@ export interface operations {
       401: components["responses"]["Error"];
       403: components["responses"]["Error"];
       500: components["responses"]["Error"];
+    };
+  };
+  "get-campaigns-cid-bug-types": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["BugType"][];
+        };
+      };
     };
   };
   "get-campaigns-single-bug": {
