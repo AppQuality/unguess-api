@@ -209,7 +209,7 @@ paths:
           type: number
         description: Campaign id
     get:
-      summary: Get Campaigns Bugs
+      summary: Get Campaigns BugTypes
       tags: []
       responses:
         '200':
