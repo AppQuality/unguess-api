@@ -202,12 +202,7 @@ paths:
         - $ref: "#/components/parameters/filterBy"
   "/campaigns/{cid}/bugTypes":
     parameters:
-      - name: cid
-        in: path
-        required: true
-        schema:
-          type: string
-        description: Campaign id
+      - $ref: "#/components/parameters/cid"
     get:
       summary: Get Campaigns BugTypes
       tags: []
