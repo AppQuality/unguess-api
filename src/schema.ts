@@ -41,7 +41,7 @@ export interface paths {
     parameters: {
       path: {
         /** Campaign id */
-        cid: number;
+        cid: string;
       };
     };
   };
@@ -861,7 +861,7 @@ export interface operations {
     parameters: {
       path: {
         /** Campaign id */
-        cid: number;
+        cid: string;
       };
     };
     responses: {
@@ -871,6 +871,9 @@ export interface operations {
           "application/json": components["schemas"]["BugType"][];
         };
       };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
     };
   };
   "get-campaigns-single-bug": {
