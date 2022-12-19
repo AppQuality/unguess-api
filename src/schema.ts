@@ -41,7 +41,7 @@ export interface paths {
     parameters: {
       path: {
         /** Campaign id */
-        cid: string;
+        cid: components["parameters"]["cid"];
       };
     };
   };
@@ -674,7 +674,7 @@ export interface components {
     /** @description filterBy[<fieldName>]=<fieldValue> */
     filterBy: unknown;
     /** @description Campaign id */
-    cid: number;
+    cid: string;
     /** @description Defines an identifier for the bug object (BUG ID) */
     bid: string;
     /** @description Campaign widget slug */
@@ -861,7 +861,7 @@ export interface operations {
     parameters: {
       path: {
         /** Campaign id */
-        cid: string;
+        cid: components["parameters"]["cid"];
       };
     };
     responses: {
