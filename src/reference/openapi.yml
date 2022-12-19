@@ -206,7 +206,7 @@ paths:
         in: path
         required: true
         schema:
-          type: number
+          type: string
         description: Campaign id
     get:
       summary: Get Campaigns BugTypes
