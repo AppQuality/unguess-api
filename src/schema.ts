@@ -36,6 +36,15 @@ export interface paths {
       };
     };
   };
+  "/campaigns/{cid}/bugTypes": {
+    get: operations["get-campaigns-cid-bug-types"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+      };
+    };
+  };
   "/campaigns/{cid}/bugs/{bid}": {
     get: operations["get-campaigns-single-bug"];
     parameters: {
@@ -665,7 +674,7 @@ export interface components {
     /** @description filterBy[<fieldName>]=<fieldValue> */
     filterBy: unknown;
     /** @description Campaign id */
-    cid: number;
+    cid: string;
     /** @description Defines an identifier for the bug object (BUG ID) */
     bid: string;
     /** @description Campaign widget slug */
@@ -844,6 +853,25 @@ export interface operations {
       };
       400: components["responses"]["Error"];
       401: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  "get-campaigns-cid-bug-types": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["BugType"][];
+        };
+      };
+      400: components["responses"]["Error"];
       403: components["responses"]["Error"];
       500: components["responses"]["Error"];
     };

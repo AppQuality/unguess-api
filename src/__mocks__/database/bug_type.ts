@@ -33,6 +33,13 @@ class Types extends Table<BugTypeParams> {
     });
 
     await this.insert({
+      id: 2,
+      name: "Deprecated",
+      description: "",
+      is_enabled: 0,
+    });
+
+    await this.insert({
       id: 3,
       name: "Graphic",
       description:
