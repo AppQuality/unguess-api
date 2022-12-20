@@ -138,7 +138,8 @@ export const getWidgetBugsByDuplicates = async (
     LEFT JOIN wp_crowd_appq_device device ON (child.dev_id = device.id)
     LEFT JOIN wp_appq_campaign_task uc ON (uc.id = b.application_section_id)
     WHERE child.campaign_id = ? 
-    and child.is_duplicated = 1
+    AND child.publish = 1
+    AND child.is_duplicated = 1
     AND ${
       campaign.showNeedReview
         ? `(status.name = 'Approved' OR status.name = 'Need Review')`

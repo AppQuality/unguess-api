@@ -20,7 +20,6 @@ export const checkPlatforms = async (
     let platformResult = await db.query(platformSql);
 
     if (!platformResult.length) {
-      console.debug("Platform not found");
       platformExists = false;
       break;
     }

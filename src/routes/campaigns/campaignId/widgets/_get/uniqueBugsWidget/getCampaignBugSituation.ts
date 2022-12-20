@@ -7,7 +7,9 @@ async function getCampaignBugSituation(campaign: {
   const bugs = await db.query(
     db.format(
       `SELECT is_duplicated FROM wp_appq_evd_bug 
-            WHERE campaign_id = ? AND ${
+            WHERE campaign_id = ?  
+            AND publish = 1
+            AND ${
               campaign.showNeedReview
                 ? "(status_id = 2 OR status_id = 4)"
                 : "status_id = 2"
