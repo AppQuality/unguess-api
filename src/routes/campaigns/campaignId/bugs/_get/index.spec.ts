@@ -292,6 +292,31 @@ const bug_7: BugsParams = {
   severity_id: 2,
 };
 
+const bug_8_unpublished: BugsParams = {
+  id: 8,
+  internal_id: "BUG8",
+  message: "Bug 8 message",
+  description: "Bug 8 description",
+  expected_result: "Bug 8 expected result",
+  current_result: "Bug 8 current result",
+  campaign_id: campaign_1.id,
+  bug_type_id: 1,
+  bug_replicability_id: 1,
+  status_id: 2,
+  status_reason: "Bug 8 status reason",
+  application_section: "Bug 8 application section",
+  note: "Bug 8 note - this is a bug with no context",
+  wp_user_id: 1,
+  is_favorite: 1,
+  dev_id: device_1.id,
+  manufacturer: device_1.manufacturer,
+  model: device_1.model,
+  os: device_1.operating_system,
+  os_version: device_1.os_version,
+  severity_id: 2,
+  publish: 0,
+};
+
 const bug_media_1 = {
   id: 123,
   bug_id: bug_1.id,
@@ -332,6 +357,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
         await bugs.insert(bug_5);
         await bugs.insert(bug_6_pending);
         await bugs.insert(bug_7);
+        await bugs.insert(bug_8_unpublished);
         await bugMedia.insert(bug_media_1);
         await bugSeverity.addDefaultItems();
         await bugReplicability.addDefaultItems();

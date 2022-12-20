@@ -285,7 +285,7 @@ export default class Route extends UserRoute<{
     c.cust_bug_vis                                   as showNeedReview
 FROM wp_appq_evd_bug b
       JOIN wp_appq_evd_campaign c ON (c.id = b.campaign_id)
-WHERE campaign_id IN (${campaignIds})
+WHERE campaign_id IN (${campaignIds}) AND b.publish = 1
 GROUP BY campaign_id;
     `);
     const results: { [key: number]: number } = {};

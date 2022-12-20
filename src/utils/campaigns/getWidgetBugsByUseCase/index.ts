@@ -86,6 +86,7 @@ export const getWidgetBugsByUseCase = async (
       LEFT JOIN wp_appq_campaign_task t ON (t.id = b.application_section_id)
     where
       b.campaign_id = ?
+      AND b.publish = 1
       AND b.is_duplicated = 0
       AND ${
         campaign.showNeedReview
