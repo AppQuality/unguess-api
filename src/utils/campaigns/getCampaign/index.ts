@@ -116,6 +116,7 @@ async function getCampaignOutputs(campaign: {
         `SELECT COUNT(id) as total 
         FROM wp_appq_evd_bug 
         WHERE campaign_id = ?
+        AND publish = 1
         AND ${
           campaign.showNeedReview
             ? "(status_id = 2 OR status_id = 4)"

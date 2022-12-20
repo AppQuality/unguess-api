@@ -125,7 +125,8 @@ export const getCampaignBugs = async (
       ? `LEFT JOIN wp_appq_bug_read_status rs ON (rs.bug_id = b.id AND rs.is_read = 1 AND rs.wp_id = ${user.tryber_wp_user_id})`
       : ""
   }
-  WHERE b.campaign_id = ? 
+  WHERE b.campaign_id = ?
+  AND b.publish = 1
   ${onlyUnread ? "AND rs.id IS NULL" : ""}
   AND ${
     showNeedReview

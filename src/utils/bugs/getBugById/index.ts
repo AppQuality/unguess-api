@@ -63,7 +63,9 @@ export const getBugById = async ({
         JOIN wp_appq_evd_bug_status status ON (b.status_id = status.id)
         LEFT JOIN wp_crowd_appq_device device ON (b.dev_id = device.id)
         LEFT JOIN wp_appq_campaign_task uc ON (uc.id = b.application_section_id)
-        WHERE b.id = ? AND ${
+        WHERE b.id = ? 
+        AND b.publish = 1
+        AND ${
           showNeedReview
             ? `(status.name = 'Approved' OR status.name = 'Need Review')`
             : `status.name = 'Approved'`
