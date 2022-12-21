@@ -500,6 +500,83 @@ paths:
       security:
         - JWT: []
       parameters: []
+
+  '/campaigns/{cid}/severities':
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Campaign id
+    get:
+      summary: Get Campaigns Severities
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BugSeverity'
+              examples:
+                example-1:
+                  value:
+                    items:
+                      - id: 0
+                        internal_id: string
+                        campaign_id: 0
+                        title:
+                          full: string
+                          compact: string
+                          context:
+                            - string
+                        step_by_step: string
+                        expected_result: string
+                        current_result: string
+                        status:
+                          id: 0
+                          name: string
+                        severity:
+                          id: 0
+                          name: string
+                        type:
+                          id: 0
+                          name: string
+                        replicability:
+                          id: 0
+                          name: string
+                        created: string
+                        updated: string
+                        note: string
+                        device:
+                          manufacturer: string
+                          model: string
+                          os: string
+                          os_version: string
+                          type: smartphone
+                        application_section:
+                          id: 0
+                          title: string
+                        duplicated_of_id: 0
+                        is_favorite: 0
+                    start: 0
+                    limit: 0
+                    size: 0
+                    total: 0
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-severities
+      description: ''
+      security:
+        - JWT: []
+      parameters: []
   '/campaigns/{cid}/widgets':
     parameters:
       - name: cid
