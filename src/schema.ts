@@ -56,6 +56,16 @@ export interface paths {
       };
     };
   };
+  "/campaigns/{cid}/meta": {
+    /** Used to extra info about a selected campaign */
+    get: operations["get-campaigns-cid-meta"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: number;
+      };
+    };
+  };
   "/campaigns/{cid}/reports": {
     /** Return all available report of a specific campaign */
     get: operations["get-campaigns-reports"];
@@ -66,18 +76,17 @@ export interface paths {
       };
     };
   };
-  "/campaigns/{cid}/widgets": {
-    get: operations["get-campaigns-cid-widgets-wslug"];
+  "/campaigns/{cid}/tags": {
+    get: operations["get-campaigns-cid-tags"];
     parameters: {
       path: {
         /** Campaign id */
-        cid: number;
+        cid: string;
       };
     };
   };
-  "/campaigns/{cid}/meta": {
-    /** Used to extra info about a selected campaign */
-    get: operations["get-campaigns-cid-meta"];
+  "/campaigns/{cid}/widgets": {
+    get: operations["get-campaigns-cid-widgets-wslug"];
     parameters: {
       path: {
         /** Campaign id */
@@ -902,6 +911,31 @@ export interface operations {
       500: components["responses"]["Error"];
     };
   };
+  /** Used to extra info about a selected campaign */
+  "get-campaigns-cid-meta": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Campaign"] & {
+            selected_testers: number;
+            /** @description Array of form factors */
+            allowed_devices: string[];
+          };
+        };
+      };
+      400: components["responses"]["Error"];
+      401: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
   /** Return all available report of a specific campaign */
   "get-campaigns-reports": {
     parameters: {
@@ -917,6 +951,30 @@ export interface operations {
           "application/json": components["schemas"]["Report"][];
         };
       };
+    };
+  };
+  "get-campaigns-cid-tags": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            tag_id: number;
+            display_name: string;
+            slug: string;
+            is_public: number;
+          }[];
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
     };
   };
   "get-campaigns-cid-widgets-wslug": {
@@ -942,31 +1000,6 @@ export interface operations {
             | components["schemas"]["WidgetCampaignProgress"]
             | components["schemas"]["WidgetCampaignUniqueBugs"]
             | components["schemas"]["WidgetBugsByDuplicates"];
-        };
-      };
-      400: components["responses"]["Error"];
-      401: components["responses"]["Error"];
-      403: components["responses"]["Error"];
-      500: components["responses"]["Error"];
-    };
-  };
-  /** Used to extra info about a selected campaign */
-  "get-campaigns-cid-meta": {
-    parameters: {
-      path: {
-        /** Campaign id */
-        cid: number;
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Campaign"] & {
-            selected_testers: number;
-            /** @description Array of form factors */
-            allowed_devices: string[];
-          };
         };
       };
       400: components["responses"]["Error"];
