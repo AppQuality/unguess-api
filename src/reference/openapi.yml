@@ -437,7 +437,6 @@ paths:
                     - tag_id
                     - display_name
                     - slug
-                    - is_public
               examples:
                 example-1:
                   value:
