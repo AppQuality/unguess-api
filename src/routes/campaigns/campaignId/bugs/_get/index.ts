@@ -6,7 +6,6 @@ import {
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
 } from "@src/utils/constants";
-import { getCampaign } from "@src/utils/campaigns";
 import { getProjectById } from "@src/utils/projects";
 import UserRoute from "@src/features/routes/UserRoute";
 import { getBugTitle, getTitleRule } from "@src/utils/campaigns/getTitleRule";
