@@ -65,7 +65,7 @@ export default class BugsRoute extends UserRoute<{
   }
 
   protected async init(): Promise<void> {
-    const campaign = await getCampaign({ campaignId: this.cp_id });
+    const campaign = await this.initCampaign();
 
     if (!campaign) {
       this.setError(400, {
@@ -77,21 +77,28 @@ export default class BugsRoute extends UserRoute<{
     }
 
     this.campaign = {
-      project: campaign.project.id,
+      project: campaign.project_id,
       showNeedReview: campaign.showNeedReview,
       titleRule: await getTitleRule(this.cp_id),
     };
   }
 
+  private async initCampaign() {
+    const campaigns: { showNeedReview: boolean; project_id: number }[] =
+      await db.query(`
+      SELECT 
+        cust_bug_vis as showNeedReview,
+        project_id
+      FROM wp_appq_evd_campaign 
+      WHERE id = ${this.cp_id}`);
+    if (!campaigns.length) return false;
+    return campaigns[0];
+  }
+
   protected async filter(): Promise<boolean> {
     if (!(await super.filter())) return false;
 
-    try {
-      await getProjectById({
-        projectId: this.getCampaign().project,
-        user: this.getUser(),
-      });
-    } catch (error) {
+    if (!(await this.hasAccessToProject())) {
       this.setError(403, {
         code: 400,
         message: "Project not found",
@@ -99,6 +106,18 @@ export default class BugsRoute extends UserRoute<{
       return false;
     }
 
+    return true;
+  }
+
+  private async hasAccessToProject() {
+    try {
+      await getProjectById({
+        projectId: this.getCampaign().project,
+        user: this.getUser(),
+      });
+    } catch (error) {
+      return false;
+    }
     return true;
   }
 
@@ -166,8 +185,7 @@ export default class BugsRoute extends UserRoute<{
       }[]
   > {
     const bugs = await db.query(
-      db.format(
-        `SELECT 
+      `SELECT 
     b.id,
     b.internal_id,
     b.campaign_id,
@@ -211,16 +229,14 @@ export default class BugsRoute extends UserRoute<{
   LEFT JOIN wp_appq_bug_read_status rs ON (rs.bug_id = b.id AND rs.is_read = 1 AND rs.wp_id = ${this.getWordpressId(
     "tryber"
   )})
-  WHERE b.campaign_id = ?
+  WHERE b.campaign_id = ${this.cp_id}
   AND b.publish = 1
   AND ${
     this.shouldShowNeedReview()
       ? `(status.name = 'Approved' OR status.name = 'Need Review')`
       : `status.name = 'Approved'`
   }
-  ORDER BY b.${this.orderBy} ${this.order}`,
-        [this.cp_id]
-      )
+  ORDER BY b.${this.orderBy} ${this.order}`
     );
 
     if (!bugs) return false;
