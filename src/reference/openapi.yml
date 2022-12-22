@@ -296,6 +296,66 @@ paths:
       operationId: get-campaigns-single-bug
       security:
         - JWT: []
+    patch:
+      summary: Patch Campaigns Single Bug
+      operationId: patch-campaigns-cid-bugs-bid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tags:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        tag_id:
+                          type: number
+                        tag_name:
+                          type: string
+                      required:
+                        - tag_id
+                        - tag_name
+              examples:
+                oneTagResponse:
+                  value:
+                    tags:
+                      - tag_id: 0
+                        tag_name: string
+                emptyTagsResponse:
+                  value:
+                    tags: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tags:
+                  type: array
+                  items:
+                    anyOf:
+                      - properties:
+                          tag_id:
+                            type: number
+                      - properties:
+                          tag_name:
+                            type: string
+                    type: object
+            examples:
+              possibleTagEntries:
+                value:
+                  tags:
+                    - tid: 1
+                    - tag_name: tag2
+                    - tid: 3
+                      tag_name: tag3
+              emptyTagsEntries:
+                value:
+                  tags: []
   '/campaigns/{cid}/meta':
     parameters:
       - name: cid
