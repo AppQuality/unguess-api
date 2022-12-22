@@ -2,7 +2,6 @@ import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
-import bugType from "@src/__mocks__/database/bug_type";
 import tags from "@src/__mocks__/database/bug_tags";
 
 const campaign_type_1 = {
@@ -136,15 +135,15 @@ describe("GET /campaigns/{cid}/tags", () => {
     expect(response.status).toBe(403);
   });
 
-  //should return campaign bugTypes
-  it("Should return campaign bugTypes", async () => {
+  //should return campaign tags
+  it("Should return public campaign tags", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/tags`)
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
     expect(response.body).toEqual([
-      { tag_id: 1, slug: "tag1", display_name: "tag1", is_public: 1 },
-      { tag_id: 3, slug: "tag3", display_name: "tag3", is_public: 1 },
+      { tag_id: 1, slug: "tag1", display_name: "tag1" },
+      { tag_id: 3, slug: "tag3", display_name: "tag3" },
     ]);
   });
 

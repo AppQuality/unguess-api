@@ -47,7 +47,7 @@ export default class Route extends UserRoute<{
   protected async prepare(): Promise<void> {
     const campaignTags = await db.query(
       db.format(
-        ` SELECT tag_id, display_name, slug, is_public 
+        ` SELECT tag_id, display_name, slug
           FROM wp_appq_bug_taxonomy 
           WHERE campaign_id = ? AND is_public = 1
           GROUP BY tag_id`,
