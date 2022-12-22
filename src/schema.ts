@@ -47,6 +47,7 @@ export interface paths {
   };
   "/campaigns/{cid}/bugs/{bid}": {
     get: operations["get-campaigns-single-bug"];
+    patch: operations["patch-campaigns-cid-bugs-bid"];
     parameters: {
       path: {
         /** Campaign id */
@@ -72,7 +73,7 @@ export interface paths {
     parameters: {
       path: {
         /** Campaign id */
-        cid: components["parameters"]["cid"];
+        cid: number;
       };
     };
   };
@@ -956,13 +957,32 @@ export interface operations {
       path: {
         /** Campaign id */
         cid: components["parameters"]["cid"];
+        /** Defines an identifier for the bug object (BUG ID) */
+        bid: components["parameters"]["bid"];
       };
     };
     responses: {
       /** OK */
       200: {
         content: {
-          "application/json": components["schemas"]["Report"][];
+          "application/json": {
+            tags?: {
+              tag_id: number;
+              tag_name: string;
+            }[];
+          };
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          tags?: (Partial<{
+            tag_id?: number;
+          }> &
+            Partial<{
+              tag_name?: string;
+            }>)[];
         };
       };
     };
