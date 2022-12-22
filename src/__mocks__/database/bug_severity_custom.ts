@@ -21,20 +21,6 @@ class CustomSeverities extends Table<CustomBugSeverityParams> {
   constructor() {
     super(defaultItem);
   }
-
-  async addDefaultItems() {
-    await this.insert({
-      id: 1,
-      campaign_id: 1,
-      bug_severity_id: 1,
-    });
-
-    await this.insert({
-      id: 2,
-      campaign_id: 1,
-      bug_severity_id: 4,
-    });
-  }
 }
 const customSeverities = new CustomSeverities();
 export default customSeverities;
