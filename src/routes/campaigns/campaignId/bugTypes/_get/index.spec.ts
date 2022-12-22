@@ -144,7 +144,7 @@ describe("GET /campaigns/{cid}/bugTypes", () => {
   });
 
   //should return campaign bugTypes
-  it("Should return all campaign bugTypes if campaign has not custom bugTypes", async () => {
+  it("Should return custom campaign bugTypes if campaign has custom bugTypes", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugTypes`)
       .set("Authorization", "Bearer user");
@@ -161,7 +161,7 @@ describe("GET /campaigns/{cid}/bugTypes", () => {
     ]);
   });
 
-  it("Should return custom campaign bugTypes if campaign has custom bugTypes", async () => {
+  it("Should return all campaign bugTypes if campaign has not custom bugTypes", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_3.id}/bugTypes`)
       .set("Authorization", "Bearer user");
