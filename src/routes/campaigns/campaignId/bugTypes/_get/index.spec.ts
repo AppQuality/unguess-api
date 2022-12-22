@@ -95,7 +95,18 @@ describe("GET /campaigns/{cid}/bugTypes", () => {
       userToCustomers: [user_to_customer_1, user_to_customer_2],
     });
     await bugType.addDefaultItems();
-    await customBugTypes.addDefaultItems();
+
+    await customBugTypes.insert({
+      id: 1,
+      campaign_id: 1,
+      bug_type_id: 1,
+    });
+
+    await customBugTypes.insert({
+      id: 2,
+      campaign_id: 1,
+      bug_type_id: 5,
+    });
   });
 
   // It should answer 403 if user is not logged in
