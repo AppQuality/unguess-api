@@ -45,9 +45,22 @@ export default class Route extends UserRoute<{
   }
 
   protected async prepare(): Promise<void> {
-    const bugTypes = await db.query(
-      "SELECT id, name FROM wp_appq_evd_severity"
+    const cpBugTypes = await db.query(
+      db.format(
+        `SELECT sev.id, sev.name
+      FROM wp_appq_evd_severity sev
+               JOIN wp_appq_additional_bug_severities add_sev 
+                   ON sev.id = add_sev.bug_severity_id
+      WHERE campaign_id = ?`,
+        [this.cid]
+      )
     );
-    return this.setSuccess(200, bugTypes);
+    if (cpBugTypes.length === 0) {
+      const allSeverities = await db.query(
+        "SELECT id, name FROM wp_appq_evd_severity"
+      );
+      return this.setSuccess(200, allSeverities);
+    }
+    return this.setSuccess(200, cpBugTypes);
   }
 }
