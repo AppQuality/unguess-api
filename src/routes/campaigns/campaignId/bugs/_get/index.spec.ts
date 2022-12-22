@@ -776,5 +776,14 @@ describe("GET /campaigns/{cid}/bugs", () => {
     expect(response.body.items.length).toBe(1);
   });
 
+  it("Should return total of bugs when paginating", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?limit=1&start=0`)
+      .set("Authorization", "Bearer user");
+
+    expect(response.body).toHaveProperty("size", 1);
+    expect(response.body).toHaveProperty("total", 2);
+  });
+
   // --- End of file
 });

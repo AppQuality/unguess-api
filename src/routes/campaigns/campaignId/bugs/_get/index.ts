@@ -116,8 +116,8 @@ export default class BugsRoute extends UserRoute<{
       items: paginated,
       start: this.start,
       limit: this.limit,
-      size: bugs.length,
-      total: bugs.length,
+      size: paginated.length,
+      total: filtered.length,
     });
   }
 
@@ -257,7 +257,12 @@ export default class BugsRoute extends UserRoute<{
           id: bug.bug_replicability_id,
           name: bug.replicability,
         },
-        application_section: this.getBugUseCase(bug),
+        application_section: {
+          id: bug.application_section_id,
+          title: bug.uc_title ?? bug.application_section,
+          ...(bug.uc_simple_title && { simple_title: bug.uc_simple_title }),
+          ...(bug.uc_prefix && { prefix: bug.uc_prefix }),
+        },
         created: bug.created.toString(),
         ...(bug.updated && { updated: bug.updated.toString() }),
         note: bug.note,
@@ -268,21 +273,6 @@ export default class BugsRoute extends UserRoute<{
         is_duplicated: bug.is_duplicated,
       };
     });
-  }
-
-  private getBugUseCase(bug: {
-    application_section: string;
-    application_section_id: number;
-    uc_title?: string;
-    uc_simple_title?: string;
-    uc_prefix?: string;
-  }) {
-    return {
-      id: bug.application_section_id,
-      title: bug.uc_title ?? bug.application_section,
-      ...(bug.uc_simple_title && { simple_title: bug.uc_simple_title }),
-      ...(bug.uc_prefix && { prefix: bug.uc_prefix }),
-    };
   }
 
   private filterBugs(bugs: ReturnType<typeof this.formatBugs>) {
