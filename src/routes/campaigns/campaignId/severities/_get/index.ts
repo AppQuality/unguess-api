@@ -45,7 +45,7 @@ export default class Route extends UserRoute<{
   }
 
   protected async prepare(): Promise<void> {
-    const cpBugTypes = await db.query(
+    const cpSeverities = await db.query(
       db.format(
         `SELECT sev.id, sev.name
       FROM wp_appq_evd_severity sev
@@ -55,12 +55,12 @@ export default class Route extends UserRoute<{
         [this.cid]
       )
     );
-    if (cpBugTypes.length === 0) {
+    if (cpSeverities.length === 0) {
       const allSeverities = await db.query(
         "SELECT id, name FROM wp_appq_evd_severity"
       );
       return this.setSuccess(200, allSeverities);
     }
-    return this.setSuccess(200, cpBugTypes);
+    return this.setSuccess(200, cpSeverities);
   }
 }
