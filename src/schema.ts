@@ -968,7 +968,7 @@ export interface operations {
             tag_id: number;
             display_name: string;
             slug: string;
-            is_public: number;
+            is_public?: number;
           }[];
         };
       };
