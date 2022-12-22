@@ -570,11 +570,10 @@ describe("GET /campaigns/{cid}/bugs", () => {
     );
   });
 
-  // Should return the results ordered by the orderBy parameter
-  it("Should return the results ordered by the orderBy parameter", async () => {
+  it("Should allow ordering by severity", async () => {
     const response = await request(app)
       .get(
-        `/campaigns/${campaign_1.id}/bugs?limit=10&start=0&order=DESC&orderBy=is_favorite`
+        `/campaigns/${campaign_1.id}/bugs?limit=10&start=0&order=DESC&orderBy=severity_id`
       )
       .set("Authorization", "Bearer user");
 

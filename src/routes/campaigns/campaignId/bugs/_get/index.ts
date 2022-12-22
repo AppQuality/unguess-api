@@ -8,10 +8,6 @@ import {
 } from "@src/utils/constants";
 import { getCampaign } from "@src/utils/campaigns";
 import { getProjectById } from "@src/utils/projects";
-import {
-  BugsOrderByValues,
-  BugsOrderValues,
-} from "@src/utils/campaigns/getCampaignBugs";
 import UserRoute from "@src/features/routes/UserRoute";
 import { getBugTitle, getTitleRule } from "@src/utils/campaigns/getTitleRule";
 import { getBugDevice } from "@src/utils/bugs/getBugDevice";
@@ -44,13 +40,23 @@ export default class BugsRoute extends UserRoute<{
     if (query.limit) this.limit = parseInt(query.limit as unknown as string);
     if (query.start) this.start = parseInt(query.start as unknown as string);
 
-    if (query.order && BugsOrderValues.includes(query.order))
-      this.order = query.order;
-    if (query.orderBy && BugsOrderByValues.includes(query.orderBy))
-      this.orderBy = query.orderBy;
+    this.setOrder();
+    this.setOrderBy();
 
     if (query.filterBy)
       this.filterBy = query.filterBy as { [key: string]: string | string[] };
+  }
+
+  private setOrderBy() {
+    const query = this.getQuery();
+    if (query.orderBy && ["severity_id"].includes(query.orderBy))
+      this.orderBy = query.orderBy;
+  }
+
+  private setOrder() {
+    const query = this.getQuery();
+    if (query.order && ["ASC", "DESC"].includes(query.order))
+      this.order = query.order;
   }
 
   private getCampaign() {
