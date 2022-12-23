@@ -11,7 +11,7 @@ export default (dbname: "unguess" | "tryber") => {
     args.join("")
   );
   db.function("COALESCE", { varargs: true }, (...args: string[]) =>
-    (args.find((a: any) => a) || null)?.toString()
+    args.find((a: any) => a !== null)
   );
   const mockDb: any = {};
   mockDb.createTable = (table: string, columns: string[]) => {

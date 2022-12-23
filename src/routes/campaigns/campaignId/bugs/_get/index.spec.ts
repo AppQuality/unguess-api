@@ -145,6 +145,7 @@ const bug_1: BugsParams = {
   note: "Bug 1 note",
   wp_user_id: 1,
   dev_id: device_1.id,
+  is_duplicated: 1,
   manufacturer: device_1.manufacturer,
   model: device_1.model,
   os: device_1.operating_system,
@@ -168,6 +169,7 @@ const bug_2: BugsParams = {
   note: "Bug 2 note",
   wp_user_id: 1,
   is_favorite: 1,
+  is_duplicated: 0,
   dev_id: device_1.id,
   manufacturer: device_1.manufacturer,
   model: device_1.model,
@@ -205,6 +207,7 @@ const bug_3: BugsParams = {
   note: "Bug 3 note",
   wp_user_id: 1,
   is_favorite: 1,
+  is_duplicated: 1,
   dev_id: device_1.id,
   manufacturer: device_1.manufacturer,
   model: device_1.model,
@@ -230,6 +233,7 @@ const bug_4: BugsParams = {
   note: "Bug 4 note",
   wp_user_id: 1,
   is_favorite: 1,
+  is_duplicated: 1,
   dev_id: device_1.id,
   manufacturer: device_1.manufacturer,
   model: device_1.model,
@@ -254,6 +258,7 @@ const bug_5: BugsParams = {
   note: "Bug 5 note",
   wp_user_id: 1,
   is_favorite: 1,
+  is_duplicated: 1,
   dev_id: device_1.id,
   manufacturer: device_1.manufacturer,
   model: device_1.model,
@@ -284,6 +289,7 @@ const bug_7: BugsParams = {
   note: "Bug 7 note - this is a bug with no context",
   wp_user_id: 1,
   is_favorite: 1,
+  is_duplicated: 1,
   dev_id: device_1.id,
   manufacturer: device_1.manufacturer,
   model: device_1.model,
@@ -308,6 +314,7 @@ const bug_8_unpublished: BugsParams = {
   note: "Bug 8 note - this is a bug with no context",
   wp_user_id: 1,
   is_favorite: 1,
+  is_duplicated: 1,
   dev_id: device_1.id,
   manufacturer: device_1.manufacturer,
   model: device_1.model,
@@ -563,11 +570,10 @@ describe("GET /campaigns/{cid}/bugs", () => {
     );
   });
 
-  // Should return the results ordered by the orderBy parameter
-  it("Should return the results ordered by the orderBy parameter", async () => {
+  it("Should allow ordering by severity", async () => {
     const response = await request(app)
       .get(
-        `/campaigns/${campaign_1.id}/bugs?limit=10&start=0&order=DESC&orderBy=is_favorite`
+        `/campaigns/${campaign_1.id}/bugs?limit=10&start=0&order=DESC&orderBy=severity_id`
       )
       .set("Authorization", "Bearer user");
 
@@ -611,11 +617,10 @@ describe("GET /campaigns/{cid}/bugs", () => {
     );
   });
 
-  // Should return the results filtered by the filterBy parameter
-  it("Should return the results filtered by the filterBy parameter", async () => {
+  it("Should allow filtering by not duplicates", async () => {
     const response = await request(app)
       .get(
-        `/campaigns/${campaign_1.id}/bugs?limit=10&start=0&filterBy[is_favorite]=1`
+        `/campaigns/${campaign_1.id}/bugs?limit=10&start=0&filterBy[is_duplicated]=0`
       )
       .set("Authorization", "Bearer user");
 
@@ -636,7 +641,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
   it("Should return the correct items in the correct order if all parameters are specified", async () => {
     const response = await request(app)
       .get(
-        `/campaigns/${campaign_1.id}/bugs?limit=10&start=0&orderBy=severity_id&order=ASC&filterBy[is_favorite]=1`
+        `/campaigns/${campaign_1.id}/bugs?limit=10&start=0&orderBy=severity_id&order=ASC&filterBy[is_duplicated]=0`
       )
       .set("Authorization", "Bearer user");
 
@@ -768,6 +773,15 @@ describe("GET /campaigns/{cid}/bugs", () => {
       .set("Authorization", "Bearer user");
 
     expect(response.body.items.length).toBe(1);
+  });
+
+  it("Should return total of bugs when paginating", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?limit=1&start=0`)
+      .set("Authorization", "Bearer user");
+
+    expect(response.body).toHaveProperty("size", 1);
+    expect(response.body).toHaveProperty("total", 2);
   });
 
   // --- End of file
