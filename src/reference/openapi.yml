@@ -358,6 +358,8 @@ paths:
               emptyTagsEntries:
                 value:
                   tags: []
+      security:
+        - JWT: []
   '/campaigns/{cid}/meta':
     parameters:
       - name: cid
