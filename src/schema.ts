@@ -977,12 +977,14 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": {
-          tags?: (Partial<{
-            tag_id?: number;
-          }> &
-            Partial<{
-              tag_name?: string;
-            }>)[];
+          tags?: (
+            | {
+                tag_id: number;
+              }
+            | {
+                tag_name: string;
+              }
+          )[];
         };
       };
     };
