@@ -337,22 +337,24 @@ paths:
                 tags:
                   type: array
                   items:
-                    anyOf:
+                    oneOf:
                       - properties:
                           tag_id:
                             type: number
+                        required:
+                          - tag_id
                       - properties:
                           tag_name:
                             type: string
+                        required:
+                          - tag_name
                     type: object
             examples:
               possibleTagEntries:
                 value:
                   tags:
-                    - tid: 1
+                    - tag_id: 1
                     - tag_name: tag2
-                    - tid: 3
-                      tag_name: tag3
               emptyTagsEntries:
                 value:
                   tags: []
