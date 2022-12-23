@@ -73,7 +73,7 @@ export interface paths {
     parameters: {
       path: {
         /** Campaign id */
-        cid: number;
+        cid: components["parameters"]["cid"];
       };
     };
   };
@@ -926,33 +926,7 @@ export interface operations {
       500: components["responses"]["Error"];
     };
   };
-  /** Used to extra info about a selected campaign */
-  "get-campaigns-cid-meta": {
-    parameters: {
-      path: {
-        /** Campaign id */
-        cid: number;
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Campaign"] & {
-            selected_testers: number;
-            /** @description Array of form factors */
-            allowed_devices: string[];
-          };
-        };
-      };
-      400: components["responses"]["Error"];
-      401: components["responses"]["Error"];
-      403: components["responses"]["Error"];
-      500: components["responses"]["Error"];
-    };
-  };
-  /** Return all available report of a specific campaign */
-  "get-campaigns-reports": {
+  "patch-campaigns-cid-bugs-bid": {
     parameters: {
       path: {
         /** Campaign id */
@@ -985,6 +959,48 @@ export interface operations {
                 tag_name: string;
               }
           )[];
+        };
+      };
+    };
+  };
+  /** Used to extra info about a selected campaign */
+  "get-campaigns-cid-meta": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Campaign"] & {
+            selected_testers: number;
+            /** @description Array of form factors */
+            allowed_devices: string[];
+          };
+        };
+      };
+      400: components["responses"]["Error"];
+      401: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  /** Return all available report of a specific campaign */
+  "get-campaigns-reports": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Report"][];
         };
       };
     };
