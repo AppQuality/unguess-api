@@ -215,51 +215,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BugType'
-              examples:
-                example-1:
-                  value:
-                    items:
-                      - id: 0
-                        internal_id: string
-                        campaign_id: 0
-                        title:
-                          full: string
-                          compact: string
-                          context:
-                            - string
-                        step_by_step: string
-                        expected_result: string
-                        current_result: string
-                        status:
-                          id: 0
-                          name: string
-                        severity:
-                          id: 0
-                          name: string
-                        type:
-                          id: 0
-                          name: string
-                        replicability:
-                          id: 0
-                          name: string
-                        created: string
-                        updated: string
-                        note: string
-                        device:
-                          manufacturer: string
-                          model: string
-                          os: string
-                          os_version: string
-                          type: smartphone
-                        application_section:
-                          id: 0
-                          title: string
-                        duplicated_of_id: 0
-                        is_favorite: 0
-                    start: 0
-                    limit: 0
-                    size: 0
-                    total: 0
+              examples: {}
         '400':
           $ref: '#/components/responses/Error'
         '403':
@@ -312,77 +268,6 @@ paths:
       operationId: get-campaigns-single-bug
       security:
         - JWT: []
-  '/campaigns/{cid}/reports':
-    parameters:
-      - $ref: '#/components/parameters/cid'
-    get:
-      summary: GET Reports by Campaign
-      tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Report'
-      operationId: get-campaigns-reports
-      description: Return all available report of a specific campaign
-      security:
-        - JWT: []
-  '/campaigns/{cid}/widgets':
-    parameters:
-      - name: cid
-        in: path
-        required: true
-        schema:
-          type: number
-        description: Campaign id
-    get:
-      summary: Get Campaign widget data
-      tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/WidgetBugsByUseCase'
-                  - $ref: '#/components/schemas/WidgetBugsByDevice'
-                  - $ref: '#/components/schemas/WidgetCampaignProgress'
-                  - $ref: '#/components/schemas/WidgetCampaignUniqueBugs'
-                  - $ref: '#/components/schemas/WidgetBugsByDuplicates'
-              examples:
-                Bugs by UseCase:
-                  value:
-                    data:
-                      - title:
-                          full: UC1 asd
-                        description: string
-                        bugs: 10
-                        uniqueBugs: 8
-                        usecase_id: 1220
-                    kind: bugsByUseCase
-        '400':
-          $ref: '#/components/responses/Error'
-        '401':
-          $ref: '#/components/responses/Error'
-        '403':
-          $ref: '#/components/responses/Error'
-        '500':
-          $ref: '#/components/responses/Error'
-      operationId: get-campaigns-cid-widgets-wslug
-      security:
-        - JWT: []
-      parameters:
-        - $ref: '#/components/parameters/wslug'
-        - schema:
-            type: boolean
-          in: query
-          name: updateTrend
-          description: should update bug trend after request resolves?
   '/campaigns/{cid}/meta':
     parameters:
       - name: cid
@@ -456,6 +341,125 @@ paths:
         - JWT: []
       parameters: []
       description: Used to extra info about a selected campaign
+  '/campaigns/{cid}/reports':
+    parameters:
+      - $ref: '#/components/parameters/cid'
+    get:
+      summary: GET Reports by Campaign
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Report'
+      operationId: get-campaigns-reports
+      description: Return all available report of a specific campaign
+      security:
+        - JWT: []
+  '/campaigns/{cid}/tags':
+    parameters:
+      - $ref: '#/components/parameters/cid'
+    get:
+      summary: Get Campaigns Tags
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    tag_id:
+                      type: number
+                    display_name:
+                      type: string
+                    slug:
+                      type: string
+                    is_public:
+                      type: number
+                  required:
+                    - tag_id
+                    - display_name
+                    - slug
+              examples:
+                Example 1:
+                  value:
+                    - tag_id: 1
+                      display_name: tag1
+                      slug: string
+                    - tag_id: 2
+                      display_name: tag2
+                      slug: tag2
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-tags
+      description: ''
+      security:
+        - JWT: []
+      parameters: []
+  '/campaigns/{cid}/widgets':
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: number
+        description: Campaign id
+    get:
+      summary: Get Campaign widget data
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/WidgetBugsByUseCase'
+                  - $ref: '#/components/schemas/WidgetBugsByDevice'
+                  - $ref: '#/components/schemas/WidgetCampaignProgress'
+                  - $ref: '#/components/schemas/WidgetCampaignUniqueBugs'
+                  - $ref: '#/components/schemas/WidgetBugsByDuplicates'
+              examples:
+                Bugs by UseCase:
+                  value:
+                    data:
+                      - title:
+                          full: UC1 asd
+                        description: string
+                        bugs: 10
+                        uniqueBugs: 8
+                        usecase_id: 1220
+                    kind: bugsByUseCase
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-widgets-wslug
+      security:
+        - JWT: []
+      parameters:
+        - $ref: '#/components/parameters/wslug'
+        - schema:
+            type: boolean
+          in: query
+          name: updateTrend
+          description: should update bug trend after request resolves?
   /projects:
     post:
       summary: Create a new project
