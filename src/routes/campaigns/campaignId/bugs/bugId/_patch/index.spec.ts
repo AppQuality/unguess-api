@@ -124,10 +124,10 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
   beforeAll(async () => {
     await dbAdapter.add({
       campaignTypes: [campaign_type_1],
-      campaigns: [campaign_1],
-      companies: [customer_1],
-      projects: [project_1],
-      userToCustomers: [user_to_customer_1],
+      campaigns: [campaign_1, campaign_2],
+      companies: [customer_1, customer_2],
+      projects: [project_1, project_2],
+      userToCustomers: [user_to_customer_1, user_to_customer_2],
     });
     await bugType.addDefaultItems();
     await bugs.insert(bug_1);
@@ -163,6 +163,13 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
       .set("Authorization", "Bearer user");
 
     expect(response.status).toBe(400);
+  });
+  // it Should fail if the user is not the owner
+  it("Should fail if the user is not the owner", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_2.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(403);
   });
 
   // --- End of file

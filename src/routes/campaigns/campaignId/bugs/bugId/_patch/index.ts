@@ -42,18 +42,18 @@ export default class Route extends UserRoute<{
       return false;
     }
 
-    // try {
-    //   // Check if user has permission to edit the campaign
-    //   await getProjectById({
-    //     projectId: campaign.project.id,
-    //     user: this.getUser(),
-    //   });
-    // } catch (e) {
-    //   this.setError(403, {
-    //     message: ERROR_MESSAGE,
-    //   } as OpenapiError);
-    //   return false;
-    // }
+    try {
+      // Check if user has permission to edit the campaign
+      await getProjectById({
+        projectId: campaign.project.id,
+        user: this.getUser(),
+      });
+    } catch (e) {
+      this.setError(403, {
+        message: ERROR_MESSAGE,
+      } as OpenapiError);
+      return false;
+    }
     return true;
   }
 }
