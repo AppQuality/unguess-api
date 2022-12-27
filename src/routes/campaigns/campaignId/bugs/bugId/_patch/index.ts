@@ -102,7 +102,7 @@ export default class Route extends UserRoute<{
       VALUES
     `;
     const values = await Promise.all(
-      tags.map(async (tag) => {
+      tags.map(async (tag, i) => {
         const exitingTag = await db.query(
           `SELECT tag_id, display_name as tag_name 
           FROM wp_appq_bug_taxonomy 
@@ -112,6 +112,7 @@ export default class Route extends UserRoute<{
               : `display_name = '${tag.tag_name}'`
           } `
         );
+
         if (exitingTag.length > 0) {
           return `
           (${exitingTag[0].tag_id}, '${exitingTag[0].tag_name}', '${
@@ -120,9 +121,18 @@ export default class Route extends UserRoute<{
             this.getUser().tryber_wp_user_id
           }, 1)`;
         }
+
+        const maxTagId = await db.query(
+          "SELECT MAX(tag_id) AS id FROM wp_appq_bug_taxonomy"
+        );
+        return `
+            (${maxTagId[0].id + i}, '${tag.tag_name}', '${tag.tag_name}', ${
+          this.bid
+        }, ${this.cid}, ${this.getUser().unguess_wp_user_id}, ${
+          this.getUser().tryber_wp_user_id
+        }, 1)`;
       })
     );
-
     return query + values.join(",");
   }
 }

@@ -129,7 +129,7 @@ const tag_1 = {
 };
 const tag_2_other_cp = {
   id: 1,
-  tag_id: 2,
+  tag_id: 45,
   display_name: "Tag 2",
   campaign_id: campaign_2.id,
   bug_id: 1000,
@@ -205,15 +205,17 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
       .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer user")
       .send({
-        tags: [{ tag_id: 2 }],
+        tags: [{ tag_id: tag_2_other_cp.tag_id }],
       });
     expect(response.status).toBe(200);
-    expect(response.body.tags).toEqual([
-      {
-        tag_id: tag_2_other_cp.tag_id,
-        tag_name: tag_2_other_cp.display_name,
-      },
-    ]);
+    expect(response.body.tags).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          tag_id: tag_2_other_cp.tag_id,
+          tag_name: tag_2_other_cp.display_name,
+        }),
+      ])
+    );
   });
   it("Should add existing tag by tag_name", async () => {
     const response = await request(app)
@@ -223,12 +225,44 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
         tags: [{ tag_name: tag_2_other_cp.display_name }],
       });
     expect(response.status).toBe(200);
-    expect(response.body.tags).toEqual([
-      {
-        tag_id: tag_2_other_cp.tag_id,
-        tag_name: tag_2_other_cp.display_name,
-      },
-    ]);
+    expect(response.body.tags).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          tag_id: tag_2_other_cp.tag_id,
+          tag_name: tag_2_other_cp.display_name,
+        }),
+      ])
+    );
+  });
+  it("Should add tag by tag_name if tag does not exists", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user")
+      .send({
+        tags: [
+          { tag_id: tag_2_other_cp.tag_id },
+          { tag_name: "Tag to be add" },
+          { tag_name: "Tag to be add 2" },
+        ],
+      });
+    expect(response.status).toBe(200);
+    expect(response.body.tags).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          tag_id: 47,
+          tag_name: "Tag to be add 2",
+        }),
+        expect.objectContaining({
+          //existing tag
+          tag_id: tag_2_other_cp.tag_id,
+          tag_name: tag_2_other_cp.display_name,
+        }),
+        expect.objectContaining({
+          tag_id: 46,
+          tag_name: "Tag to be add",
+        }),
+      ])
+    );
   });
 
   // --- End of file
