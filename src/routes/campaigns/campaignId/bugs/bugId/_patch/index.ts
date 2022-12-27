@@ -13,7 +13,7 @@ export default class Route extends UserRoute<{
 }> {
   private cid: number;
   private bid: number;
-  private tags: ({ tag_id?: number } | { tag_name?: string })[] | undefined;
+  private tags: ({ tag_id: number } | { tag_name: string })[] | undefined;
 
   constructor(configuration: RouteClassConfiguration) {
     super(configuration);
@@ -69,6 +69,15 @@ export default class Route extends UserRoute<{
         [this.cid, this.bid]
       )
     );
+
+    //insert incoming tags
+    if (this.tags?.length) {
+      const insertIncomingTags = await this.getQueryInsertIncomingTags(
+        this.tags
+      );
+      await db.query(insertIncomingTags);
+    }
+
     const bugTags = await db.query(
       db.format(
         `
@@ -82,5 +91,38 @@ export default class Route extends UserRoute<{
       )
     );
     return this.setSuccess(200, { tags: bugTags });
+  }
+
+  protected async getQueryInsertIncomingTags(
+    tags: { tag_id?: number; tag_name?: string }[]
+  ): Promise<string> {
+    let query = `
+      INSERT INTO wp_appq_bug_taxonomy 
+        (tag_id, display_name, slug, bug_id, campaign_id, author_wp_id, author_tid, is_public) 
+      VALUES
+    `;
+    const values = await Promise.all(
+      tags.map(async (tag) => {
+        const exitingTag = await db.query(
+          `SELECT tag_id, display_name as tag_name 
+          FROM wp_appq_bug_taxonomy 
+          WHERE ${
+            tag.tag_id
+              ? `tag_id = ${tag.tag_id}`
+              : `display_name = '${tag.tag_name}'`
+          } `
+        );
+        if (exitingTag.length > 0) {
+          return `
+          (${exitingTag[0].tag_id}, '${exitingTag[0].tag_name}', '${
+            exitingTag[0].tag_name
+          }', ${this.bid}, ${this.cid}, ${this.getUser().unguess_wp_user_id}, ${
+            this.getUser().tryber_wp_user_id
+          }, 1)`;
+        }
+      })
+    );
+
+    return query + values.join(",");
   }
 }

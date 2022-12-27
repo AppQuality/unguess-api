@@ -127,6 +127,13 @@ const tag_1 = {
   campaign_id: campaign_1.id,
   bug_id: bug_1.id,
 };
+const tag_2_other_cp = {
+  id: 1,
+  tag_id: 2,
+  display_name: "Tag 2",
+  campaign_id: campaign_2.id,
+  bug_id: 1000,
+};
 
 describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
   beforeAll(async () => {
@@ -145,6 +152,7 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     await devices.insert(device_1);
     await usecases.insert(usecase_1);
     await tags.insert(tag_1);
+    await tags.insert(tag_2_other_cp);
   });
 
   // It should answer 403 if user is not logged in
@@ -190,6 +198,37 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
       });
     expect(response.status).toBe(200);
     expect(response.body.tags).toEqual([]);
+  });
+
+  it("Should add existing tag by tag_id", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user")
+      .send({
+        tags: [{ tag_id: 2 }],
+      });
+    expect(response.status).toBe(200);
+    expect(response.body.tags).toEqual([
+      {
+        tag_id: tag_2_other_cp.tag_id,
+        tag_name: tag_2_other_cp.display_name,
+      },
+    ]);
+  });
+  it("Should add existing tag by tag_name", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user")
+      .send({
+        tags: [{ tag_name: tag_2_other_cp.display_name }],
+      });
+    expect(response.status).toBe(200);
+    expect(response.body.tags).toEqual([
+      {
+        tag_id: tag_2_other_cp.tag_id,
+        tag_name: tag_2_other_cp.display_name,
+      },
+    ]);
   });
 
   // --- End of file
