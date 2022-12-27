@@ -4,22 +4,23 @@ import { getCampaign } from "@src/utils/campaigns";
 import UserRoute from "@src/features/routes/UserRoute";
 import { getProjectById } from "@src/utils/projects";
 import { getBugById } from "@src/utils/bugs";
+import * as db from "@src/features/db";
 
 export default class Route extends UserRoute<{
   parameters: StoplightOperations["patch-campaigns-cid-bugs-bid"]["parameters"]["path"];
-  // body: StoplightOperations["patch-campaigns-cid-bugs-bid"]["requestBody"]["content"]["application/json"];
-  // response: StoplightOperations["patch-campaigns-cid-bugs-bid"]["responses"]["200"]["content"]["application/json"];
+  body: StoplightOperations["patch-campaigns-cid-bugs-bid"]["requestBody"]["content"]["application/json"];
+  response: StoplightOperations["patch-campaigns-cid-bugs-bid"]["responses"]["200"]["content"]["application/json"];
 }> {
   private cid: number;
   private bid: number;
-  // public tags: ({ tag_id?: number } | { tag_name?: string })[] | undefined;
+  private tags: ({ tag_id?: number } | { tag_name?: string })[] | undefined;
 
   constructor(configuration: RouteClassConfiguration) {
     super(configuration);
     const params = this.getParameters();
     this.cid = parseInt(params.cid);
     this.bid = parseInt(params.bid);
-    // this.tags = this.getBody().tags;
+    this.tags = this.getBody().tags;
   }
 
   protected async filter(): Promise<boolean> {
@@ -55,5 +56,31 @@ export default class Route extends UserRoute<{
       return false;
     }
     return true;
+  }
+
+  protected async prepare(): Promise<void> {
+    await db.query(
+      db.format(
+        `
+        DELETE FROM wp_appq_bug_taxonomy 
+        WHERE campaign_id = ?
+            AND bug_id = ?
+        `,
+        [this.cid, this.bid]
+      )
+    );
+    const bugTags = await db.query(
+      db.format(
+        `
+        SELECT tag_id, display_name AS tag_name
+        FROM wp_appq_bug_taxonomy
+                WHERE is_public = 1
+            AND campaign_id = ?
+            AND bug_id = ?
+        `,
+        [this.cid, this.bid]
+      )
+    );
+    return this.setSuccess(200, { tags: bugTags });
   }
 }

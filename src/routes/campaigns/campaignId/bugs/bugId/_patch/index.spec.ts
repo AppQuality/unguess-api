@@ -10,6 +10,7 @@ import replicabilities from "@src/__mocks__/database/bug_replicability";
 import statuses from "@src/__mocks__/database/bug_status";
 import devices, { DeviceParams } from "@src/__mocks__/database/device";
 import usecases, { UseCaseParams } from "@src/__mocks__/database/use_cases";
+import tags from "@src/__mocks__/database/bug_tags";
 
 const campaign_type_1 = {
   id: 1,
@@ -119,6 +120,13 @@ const bug_1: BugsParams = {
   os: device_1.operating_system,
   os_version: device_1.os_version,
 };
+const tag_1 = {
+  id: 69,
+  tag_id: 1,
+  display_name: "Tag 1",
+  campaign_id: campaign_1.id,
+  bug_id: bug_1.id,
+};
 
 describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
   beforeAll(async () => {
@@ -136,6 +144,7 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     await statuses.addDefaultItems();
     await devices.insert(device_1);
     await usecases.insert(usecase_1);
+    await tags.insert(tag_1);
   });
 
   // It should answer 403 if user is not logged in
@@ -170,6 +179,17 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
       .patch(`/campaigns/${campaign_2.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(403);
+  });
+
+  it("Should remove all tags if send empty tags", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user")
+      .send({
+        tags: [],
+      });
+    expect(response.status).toBe(200);
+    expect(response.body.tags).toEqual([]);
   });
 
   // --- End of file
