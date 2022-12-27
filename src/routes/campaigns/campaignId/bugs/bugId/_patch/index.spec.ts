@@ -163,7 +163,6 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
 
     expect(response.status).toBe(403);
   });
-
   // It should fail if the campaign does not exist
   it("Should fail if the campaign does not exist", async () => {
     const response = await request(app)
@@ -172,7 +171,6 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
 
     expect(response.status).toBe(400);
   });
-
   // It should fail if the bug does not exist
   it("Should fail if the bug does not exist", async () => {
     const response = await request(app)
@@ -188,7 +186,6 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(403);
   });
-
   it("Should remove all tags if send empty tags", async () => {
     const response = await request(app)
       .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
@@ -199,7 +196,6 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     expect(response.status).toBe(200);
     expect(response.body.tags).toEqual([]);
   });
-
   it("Should add existing tag by tag_id", async () => {
     const response = await request(app)
       .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
@@ -264,7 +260,6 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
       ])
     );
   });
-
   it("Should ignore duplicated tag_id", async () => {
     const response = await request(app)
       .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
