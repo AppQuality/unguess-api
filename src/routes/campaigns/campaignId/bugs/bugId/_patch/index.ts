@@ -20,7 +20,7 @@ export default class Route extends UserRoute<{
     const params = this.getParameters();
     this.cid = parseInt(params.cid);
     this.bid = parseInt(params.bid);
-    this.tags = this.getBody().tags;
+    this.tags = this.removeDuplicatedId(this.getBody().tags);
   }
 
   protected async filter(): Promise<boolean> {
@@ -134,5 +134,19 @@ export default class Route extends UserRoute<{
       })
     );
     return query + values.join(",");
+  }
+  removeDuplicatedId(
+    tags: ({ tag_id: number } | { tag_name: string })[] | undefined
+  ): ({ tag_id: number } | { tag_name: string })[] | undefined {
+    if (!tags || tags?.length === 0) return undefined;
+    const tagsId = tags.map((tag) => {
+      if ("tag_id" in tag) return tag.tag_id;
+      return tag.tag_name;
+    });
+    const uniqueTagsId = [...new Set(tagsId)];
+    return uniqueTagsId.map((tagIdOrName) => {
+      if (typeof tagIdOrName === "number") return { tag_id: tagIdOrName };
+      return { tag_name: tagIdOrName };
+    });
   }
 }

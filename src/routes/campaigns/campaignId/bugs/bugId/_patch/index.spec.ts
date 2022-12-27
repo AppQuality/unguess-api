@@ -265,5 +265,32 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     );
   });
 
+  it("Should ignore duplicated tag_id", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user")
+      .send({
+        tags: [
+          { tag_id: tag_2_other_cp.tag_id },
+          { tag_name: "Tag to be add" },
+          { tag_id: tag_2_other_cp.tag_id },
+        ],
+      });
+    expect(response.status).toBe(200);
+    expect(response.body.tags.length).toEqual(2);
+    expect(response.body.tags).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          //existing tag
+          tag_id: tag_2_other_cp.tag_id,
+          tag_name: tag_2_other_cp.display_name,
+        }),
+      ])
+    );
+    expect(
+      response.body.tags[0].tag_id !== response.body.tags[1].tag_id
+    ).toEqual(true);
+  });
+
   // --- End of file
 });
