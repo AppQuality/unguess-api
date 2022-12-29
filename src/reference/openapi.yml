@@ -1096,6 +1096,18 @@ components:
           type: integer
         is_favorite:
           type: integer
+        tags:
+          type: array
+          items:
+            type: object
+            properties:
+              tag_id:
+                type: number
+              tag_name:
+                type: string
+            required:
+              - tag_id
+              - tag_name
       required:
         - id
         - internal_id
