@@ -230,6 +230,10 @@ export interface components {
       };
       duplicated_of_id?: number;
       is_favorite?: number;
+      tags?: {
+        tag_id: number;
+        tag_name: string;
+      }[];
     };
     /**
      * BugAdditionalField
