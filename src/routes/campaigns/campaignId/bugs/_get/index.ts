@@ -334,7 +334,8 @@ export default class BugsRoute extends UserRoute<{
         if (bug.tags?.length) {
           const tagsToFilter = this.filterBy["tags"]
             .split(",")
-            .map((tagId) => parseInt(tagId));
+            .map((tagId) => (parseInt(tagId) > 0 ? parseInt(tagId) : 0))
+            .filter((tagId) => tagId > 0);
           const bugTagsIds = bug.tags.map((tag) => tag.tag_id);
           return tagsToFilter.every((tagsToFilter) => {
             return bugTagsIds.includes(tagsToFilter);

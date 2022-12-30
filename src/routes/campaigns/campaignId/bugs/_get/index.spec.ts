@@ -825,6 +825,22 @@ describe("GET /campaigns/{cid}/bugs", () => {
       ])
     );
   });
+  it("Should return bugs filtered by tags ignoring invalid tags)", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[tags]=1,2,none`)
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          tags: [
+            { tag_id: 1, tag_name: "Tag 1" },
+            { tag_id: 2, tag_name: "Tag 2" },
+          ],
+        }),
+      ])
+    );
+  });
 
   // --- End of file
 });
