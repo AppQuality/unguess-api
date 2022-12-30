@@ -200,7 +200,7 @@ export default class BugsRoute extends UserRoute<{
         bug_type_id: number;
         severity_id: number;
         read_status: 0 | 1;
-        tags?: Tag[];
+        tags?: Tag[] | undefined;
       }[]
   > {
     const bugs = await db.query(
@@ -331,6 +331,9 @@ export default class BugsRoute extends UserRoute<{
         this.filterBy["tags"] &&
         typeof this.filterBy["tags"] === "string"
       ) {
+        if (this.filterBy["tags"] === "none") {
+          return !bug.tags?.length;
+        }
         if (bug.tags?.length) {
           const tagsToFilter = this.filterBy["tags"]
             .split(",")
@@ -341,6 +344,8 @@ export default class BugsRoute extends UserRoute<{
             return bugTagsIds.includes(tagsToFilter);
           });
         }
+
+        return false;
       }
       return true;
     });
