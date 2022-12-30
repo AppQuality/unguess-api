@@ -163,7 +163,7 @@ const bug_2: BugsParams = {
   current_result: "Bug 2 current result",
   campaign_id: campaign_1.id,
   bug_type_id: 1,
-  bug_replicability_id: 1,
+  bug_replicability_id: 3,
   status_id: 2,
   status_reason: "Bug 2 status reason",
   application_section: "Bug 2 application section",
@@ -334,7 +334,7 @@ const bug_9_no_tags: BugsParams = {
   current_result: "Bug 9 current result",
   campaign_id: campaign_1.id,
   bug_type_id: 1,
-  bug_replicability_id: 1,
+  bug_replicability_id: 2,
   status_id: 2,
   status_reason: "Bug 9 status reason",
   application_section: usecase_with_meta.title,
@@ -920,6 +920,19 @@ describe("GET /campaigns/{cid}/bugs", () => {
       expect.arrayContaining([
         expect.objectContaining({ id: bug_9_no_tags.id }),
         expect.objectContaining({ id: bug_1.id }),
+      ])
+    );
+  });
+
+  it("Should return bugs filtered by replicabilities ids", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[replicabilities]=2,3`)
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(2);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: bug_2.id }),
+        expect.objectContaining({ id: bug_9_no_tags.id }),
       ])
     );
   });

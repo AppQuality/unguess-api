@@ -358,6 +358,17 @@ export default class BugsRoute extends UserRoute<{
           .filter((sevId) => sevId > 0);
         return severitiesToFilter.includes(bug.severity.id);
       }
+      if (
+        this.filterBy &&
+        this.filterBy["replicabilities"] &&
+        typeof this.filterBy["replicabilities"] === "string"
+      ) {
+        const replicabilitiesToFilter = this.filterBy["replicabilities"]
+          .split(",")
+          .map((repId) => (parseInt(repId) > 0 ? parseInt(repId) : 0))
+          .filter((repId) => repId > 0);
+        return replicabilitiesToFilter.includes(bug.replicability.id);
+      }
       return true;
     });
   }
