@@ -347,7 +347,7 @@ const bug_9_no_tags: BugsParams = {
   model: device_1.model,
   os: device_1.operating_system,
   os_version: device_1.os_version,
-  severity_id: 1,
+  severity_id: 4,
 };
 
 const bug_media_1 = {
@@ -645,13 +645,13 @@ describe("GET /campaigns/{cid}/bugs", () => {
       expect.objectContaining({
         items: [
           expect.objectContaining({
+            id: bug_9_no_tags.id,
+          }),
+          expect.objectContaining({
             id: bug_2.id,
           }),
           expect.objectContaining({
             id: bug_1.id,
-          }),
-          expect.objectContaining({
-            id: bug_9_no_tags.id,
           }),
         ],
       })
@@ -722,10 +722,10 @@ describe("GET /campaigns/{cid}/bugs", () => {
       expect.objectContaining({
         items: [
           expect.objectContaining({
-            id: bug_9_no_tags.id,
+            id: bug_2.id,
           }),
           expect.objectContaining({
-            id: bug_2.id,
+            id: bug_9_no_tags.id,
           }),
         ],
       })
@@ -909,6 +909,19 @@ describe("GET /campaigns/{cid}/bugs", () => {
       ])
     );
     expect(response.body.items[0].tags).toEqual([]);
+  });
+
+  it("Should return bugs filtered by severities ids", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[severities]=1,4`)
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(2);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: bug_9_no_tags.id }),
+        expect.objectContaining({ id: bug_1.id }),
+      ])
+    );
   });
 
   // --- End of file

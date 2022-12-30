@@ -347,6 +347,17 @@ export default class BugsRoute extends UserRoute<{
 
         return false;
       }
+      if (
+        this.filterBy &&
+        this.filterBy["severities"] &&
+        typeof this.filterBy["severities"] === "string"
+      ) {
+        const severitiesToFilter = this.filterBy["severities"]
+          .split(",")
+          .map((sevId) => (parseInt(sevId) > 0 ? parseInt(sevId) : 0))
+          .filter((sevId) => sevId > 0);
+        return severitiesToFilter.includes(bug.severity.id);
+      }
       return true;
     });
   }
