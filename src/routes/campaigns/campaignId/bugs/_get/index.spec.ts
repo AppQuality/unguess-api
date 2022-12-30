@@ -12,6 +12,7 @@ import CampaignMeta from "@src/__mocks__/database/campaign_meta";
 import devices, { DeviceParams } from "@src/__mocks__/database/device";
 import bugsReadStatus from "@src/__mocks__/database/bug_read_status";
 import usecases, { UseCaseParams } from "@src/__mocks__/database/use_cases";
+import tags from "@src/__mocks__/database/bug_tags";
 
 const customer_1 = {
   id: 999,
@@ -332,6 +333,28 @@ const bug_media_1 = {
   uploaded: "2021-10-19 12:57:57.0",
 };
 
+const tag_1 = {
+  id: 1,
+  tag_id: 1,
+  display_name: "Tag 1",
+  campaign_id: campaign_1.id,
+  bug_id: bug_1.id,
+};
+const tag_2 = {
+  id: 2,
+  tag_id: 1,
+  display_name: "Tag 1",
+  campaign_id: campaign_1.id,
+  bug_id: bug_2.id,
+};
+const tag_3 = {
+  id: 3,
+  tag_id: 2,
+  display_name: "Tag 2",
+  campaign_id: campaign_2.id,
+  bug_id: bug_2.id,
+};
+
 describe("GET /campaigns/{cid}/bugs", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
@@ -375,8 +398,11 @@ describe("GET /campaigns/{cid}/bugs", () => {
         await usecases.insert(usecase_without_meta);
 
         await bugsReadStatus.insert({ wp_id: 1, bug_id: bug_2.id });
+        await tags.insert(tag_1);
+        await tags.insert(tag_2);
+        await tags.insert(tag_3);
       } catch (error) {
-        console.error(error);
+        //console.error(error);
         reject(error);
       }
 
@@ -487,7 +513,11 @@ describe("GET /campaigns/{cid}/bugs", () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs?limit=1&start=0`)
       .set("Authorization", "Bearer user");
-
+    // response.body.items.map((bug: any) =>{
+    //   console.log(`bugid:${bug.id} - tags:` + bug.tags)
+    //   console.log(bug.tags)
+    // }
+    // );
     expect(response.status).toBe(200);
 
     expect(response.body).toMatchObject(
@@ -771,7 +801,6 @@ describe("GET /campaigns/{cid}/bugs", () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs?filterBy[unread]=true`)
       .set("Authorization", "Bearer user");
-
     expect(response.body.items.length).toBe(1);
   });
 
@@ -783,6 +812,15 @@ describe("GET /campaigns/{cid}/bugs", () => {
     expect(response.body).toHaveProperty("size", 1);
     expect(response.body).toHaveProperty("total", 2);
   });
+
+  // Should return bugs with specific tags
+  // it("Should return bugs filtered by tags", async () => {
+  //   const response = await request(app)
+  //     .get(`/campaigns/${campaign_1.id}/bugs?filterBy[tags]=1,2`)
+  //     .set("Authorization", "Bearer user");
+  //   console.log(response.body);
+  //   expect(response.body.items.length).toBe(1);
+  // });
 
   // --- End of file
 });

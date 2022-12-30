@@ -10,8 +10,14 @@ import { getProjectById } from "@src/utils/projects";
 import UserRoute from "@src/features/routes/UserRoute";
 import { getBugTitle, getTitleRule } from "@src/utils/campaigns/getTitleRule";
 import { getBugDevice } from "@src/utils/bugs/getBugDevice";
+import { getBugTags } from "@src/utils/bugs/getBugTags";
 
 import * as db from "@src/features/db";
+
+interface Tag {
+  tag_id: number;
+  tag_name: string;
+}
 
 export default class BugsRoute extends UserRoute<{
   response: StoplightOperations["get-campaigns-cid-bugs"]["responses"]["200"]["content"]["application/json"];
@@ -133,8 +139,25 @@ export default class BugsRoute extends UserRoute<{
 
     if (!bugs || !bugs.length) return this.emptyResponse();
 
-    const formatted = this.formatBugs(bugs);
-    const filtered = this.filterBugs(formatted);
+    const bugsWithTags = await Promise.all(
+      bugs.map(async (bug) => {
+        const tags = await getBugTags(bug.id);
+        if (!tags) return bug;
+        return {
+          ...bug,
+          tags: tags.map((tag) => {
+            return { tag_id: tag.tag_id, tag_name: tag.name };
+          }) as Tag[],
+        };
+      })
+    );
+    const formatted = this.formatBugs(bugsWithTags);
+    // formatted.map((bug: any) =>{
+    //   console.log(`bugid:${bug.id} - tags:`)
+    //   console.log(bug.tags)
+    // }
+    // );
+    const filtered = this.filterBugs(bugsWithTags);
     const paginated = this.paginateBugs(filtered);
     return this.setSuccess(200, {
       items: paginated,
@@ -181,6 +204,7 @@ export default class BugsRoute extends UserRoute<{
         bug_type_id: number;
         severity_id: number;
         read_status: 0 | 1;
+        tags?: { tag_id: number; tag_name: string }[];
       }[]
   > {
     const bugs = await db.query(
@@ -292,6 +316,7 @@ export default class BugsRoute extends UserRoute<{
         is_favorite: bug.is_favorite,
         read_status: bug.read_status,
         is_duplicated: bug.is_duplicated,
+        tags: bug.tags,
       };
     });
   }
@@ -305,6 +330,10 @@ export default class BugsRoute extends UserRoute<{
       if (this.filterBy && this.filterBy["is_duplicated"]) {
         return bug.is_duplicated.toString() === this.filterBy["is_duplicated"];
       }
+      // if (this.filterBy && this.filterBy["tags"] && typeof this.filterBy["tags"] === "string") {
+      //   //console.log(this.filterBy["tags"].split(","));
+      //   //return bug.is_duplicated.toString() === this.filterBy["is_duplicated"];
+      // }
       return true;
     });
   }
