@@ -151,13 +151,9 @@ export default class BugsRoute extends UserRoute<{
         };
       })
     );
+
     const formatted = this.formatBugs(bugsWithTags);
-    // formatted.map((bug: any) =>{
-    //   console.log(`bugid:${bug.id} - tags:`)
-    //   console.log(bug.tags)
-    // }
-    // );
-    const filtered = this.filterBugs(bugsWithTags);
+    const filtered = this.filterBugs(formatted);
     const paginated = this.paginateBugs(filtered);
     return this.setSuccess(200, {
       items: paginated,
@@ -204,7 +200,7 @@ export default class BugsRoute extends UserRoute<{
         bug_type_id: number;
         severity_id: number;
         read_status: 0 | 1;
-        tags?: { tag_id: number; tag_name: string }[];
+        tags?: Tag[];
       }[]
   > {
     const bugs = await db.query(
