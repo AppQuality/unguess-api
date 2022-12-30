@@ -326,10 +326,21 @@ export default class BugsRoute extends UserRoute<{
       if (this.filterBy && this.filterBy["is_duplicated"]) {
         return bug.is_duplicated.toString() === this.filterBy["is_duplicated"];
       }
-      // if (this.filterBy && this.filterBy["tags"] && typeof this.filterBy["tags"] === "string") {
-      //   //console.log(this.filterBy["tags"].split(","));
-      //   //return bug.is_duplicated.toString() === this.filterBy["is_duplicated"];
-      // }
+      if (
+        this.filterBy &&
+        this.filterBy["tags"] &&
+        typeof this.filterBy["tags"] === "string"
+      ) {
+        if (bug.tags?.length) {
+          const tagsToFilter = this.filterBy["tags"]
+            .split(",")
+            .map((tagId) => parseInt(tagId));
+          const bugTagsIds = bug.tags.map((tag) => tag.tag_id);
+          return tagsToFilter.every((tagsToFilter) => {
+            return bugTagsIds.includes(tagsToFilter);
+          });
+        }
+      }
       return true;
     });
   }

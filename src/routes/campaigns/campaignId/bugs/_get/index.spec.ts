@@ -402,7 +402,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
         await tags.insert(tag_2);
         await tags.insert(tag_3);
       } catch (error) {
-        //console.error(error);
+        console.error(error);
         reject(error);
       }
 
@@ -513,11 +513,6 @@ describe("GET /campaigns/{cid}/bugs", () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs?limit=1&start=0`)
       .set("Authorization", "Bearer user");
-    // response.body.items.map((bug: any) =>{
-    //   console.log(`bugid:${bug.id} - tags:` + bug.tags)
-    //   console.log(bug.tags)
-    // }
-    // );
     expect(response.status).toBe(200);
 
     expect(response.body).toMatchObject(
@@ -813,14 +808,23 @@ describe("GET /campaigns/{cid}/bugs", () => {
     expect(response.body).toHaveProperty("total", 2);
   });
 
-  // Should return bugs with specific tags
-  // it("Should return bugs filtered by tags", async () => {
-  //   const response = await request(app)
-  //     .get(`/campaigns/${campaign_1.id}/bugs?filterBy[tags]=1,2`)
-  //     .set("Authorization", "Bearer user");
-  //   console.log(response.body);
-  //   expect(response.body.items.length).toBe(1);
-  // });
+  //Should return bugs with specific tags
+  it("Should return bugs filtered by tags (bugs containing all tags in filter)", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[tags]=1,2`)
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          tags: [
+            { tag_id: 1, tag_name: "Tag 1" },
+            { tag_id: 2, tag_name: "Tag 2" },
+          ],
+        }),
+      ])
+    );
+  });
 
   // --- End of file
 });
