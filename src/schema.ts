@@ -230,6 +230,7 @@ export interface components {
       };
       duplicated_of_id?: number;
       is_favorite?: number;
+      read?: boolean;
     };
     /**
      * BugAdditionalField
