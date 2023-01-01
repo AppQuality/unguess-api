@@ -1113,7 +1113,6 @@ components:
         - created
         - device
         - application_section
-        - read
     BugAdditionalField:
       title: BugAdditionalField
       allOf:
