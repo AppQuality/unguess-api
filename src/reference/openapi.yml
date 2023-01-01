@@ -1096,6 +1096,8 @@ components:
           type: integer
         is_favorite:
           type: integer
+        read:
+          type: boolean
       required:
         - id
         - internal_id
