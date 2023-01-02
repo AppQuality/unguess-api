@@ -848,10 +848,9 @@ describe("GET /campaigns/{cid}/bugs", () => {
     });
   });
 
-  // Should return only unread bugs
-  it("Should return only unread bugs if filterBy has unread filter", async () => {
+  it("Should return only unread bugs if filterBy has read filter as false", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[unread]=true`)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[read]=false`)
       .set("Authorization", "Bearer user");
     expect(response.body.items.length).toBe(2);
   });
