@@ -848,10 +848,29 @@ describe("GET /campaigns/{cid}/bugs", () => {
     });
   });
 
-  // Should return only unread bugs
-  it("Should return only unread bugs if filterBy has unread filter", async () => {
+  it("Should return bugs with read/unread", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[unread]=true`)
+      .get(`/campaigns/${campaign_1.id}/bugs`)
+      .set("Authorization", "Bearer user");
+    for (let i = 0; i < response.body.items.length; i++) {
+      expect(response.body.items[i]).toHaveProperty("read");
+    }
+    expect(response.body.items[0]).toHaveProperty("read", false);
+    expect(response.body.items[1]).toHaveProperty("read", true);
+    expect(response.body.items[2]).toHaveProperty("read", false);
+  });
+
+  // Should return only read bugs
+  it("Should return only read bugs if filterBy has read filter as true", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[read]=true`)
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(1);
+  });
+
+  it("Should return only unread bugs if filterBy has read filter as false", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[read]=false`)
       .set("Authorization", "Bearer user");
     expect(response.body.items.length).toBe(2);
   });

@@ -201,6 +201,7 @@ export default class BugsRoute extends UserRoute<{
         severity_id: number;
         read_status: 0 | 1;
         tags?: Tag[] | undefined;
+        read: true | false;
       }[]
   > {
     const bugs = await db.query(
@@ -313,6 +314,7 @@ export default class BugsRoute extends UserRoute<{
         read_status: bug.read_status,
         is_duplicated: bug.is_duplicated,
         tags: bug.tags,
+        read: bug.read_status ? true : false,
       };
     });
   }
@@ -320,8 +322,11 @@ export default class BugsRoute extends UserRoute<{
   private filterBugs(bugs: ReturnType<typeof this.formatBugs>) {
     if (!this.filterBy) return bugs;
     return bugs.filter((bug) => {
-      if (this.filterBy && this.filterBy["unread"]) {
+      if (this.filterBy && this.filterBy["read"] === "false") {
         return bug.read_status === 0;
+      }
+      if (this.filterBy && this.filterBy["read"] === "true") {
+        return bug.read_status === 1;
       }
       if (this.filterBy && this.filterBy["is_duplicated"]) {
         return bug.is_duplicated.toString() === this.filterBy["is_duplicated"];
