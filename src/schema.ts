@@ -694,6 +694,8 @@ export interface components {
       | "cp-progress"
       | "unique-bugs"
       | "bugs-by-duplicates";
+    /** @description keywords to search */
+    search: string;
   };
   requestBodies: {
     Credentials: {
@@ -846,6 +848,8 @@ export interface operations {
         orderBy?: components["parameters"]["orderBy"];
         /** filterBy[<fieldName>]=<fieldValue> */
         filterBy?: components["parameters"]["filterBy"];
+        /** keywords to search */
+        search?: components["parameters"]["search"];
       };
     };
     responses: {
