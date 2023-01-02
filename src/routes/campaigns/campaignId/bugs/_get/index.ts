@@ -325,6 +325,9 @@ export default class BugsRoute extends UserRoute<{
       if (this.filterBy && this.filterBy["read"] === "false") {
         return bug.read_status === 0;
       }
+      if (this.filterBy && this.filterBy["read"] === "true") {
+        return bug.read_status === 1;
+      }
       if (this.filterBy && this.filterBy["is_duplicated"]) {
         return bug.is_duplicated.toString() === this.filterBy["is_duplicated"];
       }

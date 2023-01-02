@@ -848,6 +848,14 @@ describe("GET /campaigns/{cid}/bugs", () => {
     });
   });
 
+  // Should return only read bugs
+  it("Should return only read bugs if filterBy has read filter as true", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[read]=true`)
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(1);
+  });
+
   it("Should return only unread bugs if filterBy has read filter as false", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs?filterBy[read]=false`)
