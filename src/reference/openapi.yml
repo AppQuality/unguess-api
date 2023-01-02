@@ -200,6 +200,7 @@ paths:
         - $ref: '#/components/parameters/order'
         - $ref: '#/components/parameters/orderBy'
         - $ref: '#/components/parameters/filterBy'
+        - $ref: '#/components/parameters/search'
   '/campaigns/{cid}/bugTypes':
     parameters:
       - $ref: '#/components/parameters/cid'
@@ -2200,6 +2201,13 @@ components:
           - unique-bugs
           - bugs-by-duplicates
       description: Campaign widget slug
+    search:
+      name: search
+      in: query
+      required: false
+      schema:
+        type: string
+      description: keywords to search
   requestBodies:
     Credentials:
       content:
