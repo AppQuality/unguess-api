@@ -384,6 +384,11 @@ export default class BugsRoute extends UserRoute<{
       ) {
         return bug.id === parseInt(this.search.replace(/\D/g, ""));
       }
+      if (this.search && this.search.length > 0) {
+        return bug.title.full
+          .toLocaleLowerCase()
+          .includes(this.search.toLocaleLowerCase());
+      }
       return true;
     });
   }

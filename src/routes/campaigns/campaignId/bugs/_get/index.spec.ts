@@ -133,7 +133,7 @@ const device_1: DeviceParams = {
 const bug_1: BugsParams = {
   id: 1,
   internal_id: "BUG1",
-  message: "[CON-TEXT] - Bug 1 super-message",
+  message: "[CON-TEXT-bike] - Bug 1 super-message",
   description: "Bug 1 description",
   expected_result: "Bug 1 expected result",
   current_result: "Bug 1 current result",
@@ -157,7 +157,7 @@ const bug_1: BugsParams = {
 const bug_2: BugsParams = {
   id: 2,
   internal_id: "BUG2",
-  message: "Bug 2 message",
+  message: "Bug 2 message orange",
   description: "Bug 2 description",
   expected_result: "Bug 2 expected result",
   current_result: "Bug 2 current result",
@@ -750,7 +750,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
     expect(response.body.items[2].title).toEqual({
       full: bug_1.message,
       compact: "Bug 1 super-message",
-      context: ["CON-TEXT"],
+      context: ["CON-TEXT-bike"],
     });
   });
 
@@ -964,6 +964,26 @@ describe("GET /campaigns/{cid}/bugs", () => {
       expect.arrayContaining([
         expect.objectContaining({ id: bug_9_no_tags.id }),
       ])
+    );
+  });
+
+  it("Should return bugs filtered by search (search by title)", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?search=orange`)
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: bug_2.id })])
+    );
+  });
+
+  it("Should return bugs filtered by search (search by context)", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?search=CON-TEXT-bike`)
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: bug_1.id })])
     );
   });
 
