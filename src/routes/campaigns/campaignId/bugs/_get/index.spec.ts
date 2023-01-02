@@ -955,6 +955,17 @@ describe("GET /campaigns/{cid}/bugs", () => {
       ])
     );
   });
+  it("Should return bugs filtered by search (search by bugID)", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?search=ccccc9cccccc`)
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: bug_9_no_tags.id }),
+      ])
+    );
+  });
 
   // --- End of file
 });

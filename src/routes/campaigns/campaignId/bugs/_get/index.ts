@@ -34,6 +34,7 @@ export default class BugsRoute extends UserRoute<{
     | { project: number; showNeedReview: boolean; titleRule: boolean }
     | undefined;
   private filterBy: { [key: string]: string | string[] } | undefined;
+  private search: string | undefined;
 
   constructor(configuration: RouteClassConfiguration) {
     super(configuration);
@@ -50,6 +51,8 @@ export default class BugsRoute extends UserRoute<{
 
     if (query.filterBy)
       this.filterBy = query.filterBy as { [key: string]: string | string[] };
+
+    if (query.search) this.search = query.search as string;
   }
 
   private setOrderBy() {
@@ -320,7 +323,7 @@ export default class BugsRoute extends UserRoute<{
   }
 
   private filterBugs(bugs: ReturnType<typeof this.formatBugs>) {
-    if (!this.filterBy) return bugs;
+    if (!this.filterBy && !this.search) return bugs;
     return bugs.filter((bug) => {
       if (this.filterBy && this.filterBy["read"] === "false") {
         return bug.read_status === 0;
@@ -373,6 +376,13 @@ export default class BugsRoute extends UserRoute<{
           .map((repId) => (parseInt(repId) > 0 ? parseInt(repId) : 0))
           .filter((repId) => repId > 0);
         return replicabilitiesToFilter.includes(bug.replicability.id);
+      }
+      if (
+        this.search &&
+        this.search.replace(/\D/g, "").length > 0 &&
+        !isNaN(parseInt(this.search.replace(/\D/g, "")))
+      ) {
+        return bug.id === parseInt(this.search.replace(/\D/g, ""));
       }
       return true;
     });
