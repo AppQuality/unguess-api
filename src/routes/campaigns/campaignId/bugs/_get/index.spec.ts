@@ -424,6 +424,8 @@ describe("GET /campaigns/{cid}/bugs", () => {
         await usecases.insert(usecase_without_meta);
 
         await bugsReadStatus.insert({ wp_id: 1, bug_id: bug_2.id });
+        await bugsReadStatus.insert({ wp_id: 2, bug_id: bug_2.id });
+
         await tags.insert(tag_1);
         await tags.insert(tag_2);
         await tags.insert(tag_3);
@@ -860,7 +862,6 @@ describe("GET /campaigns/{cid}/bugs", () => {
     expect(response.body.items[2]).toHaveProperty("read", false);
   });
 
-  // Should return only read bugs
   it("Should return only read bugs if filterBy has read filter as true", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs?filterBy[read]=true`)
@@ -873,6 +874,14 @@ describe("GET /campaigns/{cid}/bugs", () => {
       .get(`/campaigns/${campaign_1.id}/bugs?filterBy[read]=false`)
       .set("Authorization", "Bearer user");
     expect(response.body.items.length).toBe(2);
+  });
+
+  it("It should only return bugs read by the user if filterBy read the filter as true", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[read]=true`)
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(1);
+    expect(response.body.items[0]).toHaveProperty("id", 2);
   });
 
   it("Should return total of bugs when paginating", async () => {
