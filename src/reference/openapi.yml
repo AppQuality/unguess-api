@@ -128,7 +128,17 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Bug'
+                      allOf:
+                        - $ref: '#/components/schemas/Bug'
+                        - type: object
+                          properties:
+                            tags:
+                              type: object
+                              properties:
+                                tag_id:
+                                  type: number
+                                tag_name:
+                                  type: string
                   start:
                     type: integer
                   limit:
