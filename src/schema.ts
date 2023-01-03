@@ -861,7 +861,7 @@ export interface operations {
               tags?: {
                 tag_id?: number;
                 tag_name?: string;
-              };
+              }[];
             })[];
             start?: number;
             limit?: number;
