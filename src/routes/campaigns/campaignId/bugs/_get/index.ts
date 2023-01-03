@@ -15,8 +15,8 @@ import { getBugTags } from "@src/utils/bugs/getBugTags";
 import * as db from "@src/features/db";
 
 interface Tag {
-  tag_id: number;
-  tag_name: string;
+  tag_id?: number;
+  tag_name?: string;
 }
 
 export default class BugsRoute extends UserRoute<{
@@ -150,7 +150,7 @@ export default class BugsRoute extends UserRoute<{
           ...bug,
           tags: tags.map((tag) => {
             return { tag_id: tag.tag_id, tag_name: tag.name };
-          }) as Tag[],
+          }),
         };
       })
     );
@@ -316,7 +316,7 @@ export default class BugsRoute extends UserRoute<{
         is_favorite: bug.is_favorite,
         read_status: bug.read_status,
         is_duplicated: bug.is_duplicated,
-        tags: bug.tags,
+        tags: bug.tags ? bug.tags : undefined,
         read: bug.read_status ? true : false,
       };
     });
@@ -384,11 +384,11 @@ export default class BugsRoute extends UserRoute<{
       ) {
         return bug.id === parseInt(this.search.replace(/\D/g, ""));
       }
-      // if (this.search && this.search.length > 0) {
-      //   return bug.title.full
-      //     .toLocaleLowerCase()
-      //     .includes(this.search.toLocaleLowerCase());
-      // }
+      if (this.search && this.search.length > 0) {
+        return bug.title.full
+          .toLocaleLowerCase()
+          .includes(this.search.toLocaleLowerCase());
+      }
       return true;
     });
   }
