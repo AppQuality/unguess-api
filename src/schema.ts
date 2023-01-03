@@ -857,7 +857,12 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            items?: components["schemas"]["Bug"][];
+            items?: (components["schemas"]["Bug"] & {
+              tags?: {
+                tag_id?: number;
+                tag_name?: string;
+              };
+            })[];
             start?: number;
             limit?: number;
             size?: number;
