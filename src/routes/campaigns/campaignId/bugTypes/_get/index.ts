@@ -37,6 +37,7 @@ export default class Route extends UserRoute<{
       });
     } catch (e) {
       this.setError(403, {
+        code: 403,
         message: ERROR_MESSAGE,
       } as OpenapiError);
       return false;
