@@ -136,7 +136,7 @@ export default class BugsRoute extends UserRoute<{
     } catch (e: any) {
       return this.setError(500, {
         message: e.message || ERROR_MESSAGE,
-        status_code: e.code || 500,
+        status_code: 500,
       } as OpenapiError);
     }
 
