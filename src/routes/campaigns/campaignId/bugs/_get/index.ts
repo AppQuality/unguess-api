@@ -10,7 +10,6 @@ import { getProjectById } from "@src/utils/projects";
 import UserRoute from "@src/features/routes/UserRoute";
 import { getBugTitle, getTitleRule } from "@src/utils/campaigns/getTitleRule";
 import { getBugDevice } from "@src/utils/bugs/getBugDevice";
-import { getBugTags } from "@src/utils/bugs/getBugTags";
 
 import * as db from "@src/features/db";
 
@@ -148,12 +147,13 @@ export default class BugsRoute extends UserRoute<{
       bugs.map((bug) => {
         const tags = campaignTags.filter((tag) => tag.bug_id === bug.id);
         if (!tags.length) return bug;
-        return {
+        const ciolla = {
           ...bug,
           tags: tags.map((tag) => {
             return { tag_id: tag.tag_id, tag_name: tag.tag_name };
           }),
         };
+        return ciolla;
       });
     }
 
@@ -177,11 +177,10 @@ export default class BugsRoute extends UserRoute<{
         display_name as tag_name,
         bug_id
       FROM wp_appq_bug_taxonomy
-      WHERE campaign_id = ${this.cp_id}
+      WHERE campaign_id = ${this.cp_id} and is_public=1
     `);
 
     return tags;
-    return [];
   }
 
   private async getBugs(): Promise<

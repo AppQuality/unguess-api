@@ -368,14 +368,14 @@ const tag_1 = {
 const tag_2 = {
   id: 2,
   tag_id: 1,
-  display_name: "Tag 1",
+  display_name: "Tag 2",
   campaign_id: campaign_1.id,
   bug_id: bug_2.id,
 };
 const tag_3 = {
   id: 3,
   tag_id: 2,
-  display_name: "Tag 2",
+  display_name: "Tag 3",
   campaign_id: campaign_2.id,
   bug_id: bug_2.id,
 };
