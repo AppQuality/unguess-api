@@ -368,15 +368,22 @@ const tag_1 = {
 const tag_2 = {
   id: 2,
   tag_id: 1,
-  display_name: "Tag 2",
+  display_name: "Tag 1",
   campaign_id: campaign_1.id,
   bug_id: bug_2.id,
 };
 const tag_3 = {
   id: 3,
   tag_id: 2,
-  display_name: "Tag 3",
+  display_name: "Tag 2",
   campaign_id: campaign_2.id,
+  bug_id: bug_2.id,
+};
+const tag_4 = {
+  id: 4,
+  tag_id: 3,
+  display_name: "Tag 4",
+  campaign_id: campaign_1.id,
   bug_id: bug_2.id,
 };
 
@@ -429,6 +436,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
         await tags.insert(tag_1);
         await tags.insert(tag_2);
         await tags.insert(tag_3);
+        await tags.insert(tag_4);
       } catch (error) {
         console.error(error);
         reject(error);
@@ -896,7 +904,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
   //Should return bugs with specific tags
   it("Should return bugs filtered by tags (bugs containing all tags in filter)", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[tags]=1,2`)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[tags]=1,3`)
       .set("Authorization", "Bearer user");
     expect(response.body.items.length).toBe(1);
     expect(response.body.items).toEqual(
@@ -904,7 +912,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
         expect.objectContaining({
           tags: [
             { tag_id: 1, tag_name: "Tag 1" },
-            { tag_id: 2, tag_name: "Tag 2" },
+            { tag_id: 3, tag_name: "Tag 4" },
           ],
         }),
       ])
@@ -912,7 +920,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
   });
   it("Should return bugs filtered by tags ignoring invalid tags", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[tags]=1,2,none`)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[tags]=1,3,none`)
       .set("Authorization", "Bearer user");
     expect(response.body.items.length).toBe(1);
     expect(response.body.items).toEqual(
@@ -920,7 +928,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
         expect.objectContaining({
           tags: [
             { tag_id: 1, tag_name: "Tag 1" },
-            { tag_id: 2, tag_name: "Tag 2" },
+            { tag_id: 3, tag_name: "Tag 4" },
           ],
         }),
       ])
@@ -936,7 +944,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
         expect.objectContaining({ id: bug_9_no_tags.id }),
       ])
     );
-    expect(response.body.items[0].tags).toEqual([]);
+    expect(response.body.items[0].tags).toBeUndefined();
   });
 
   it("Should return bugs filtered by severities ids", async () => {

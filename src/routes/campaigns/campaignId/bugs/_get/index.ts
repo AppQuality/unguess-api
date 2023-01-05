@@ -144,16 +144,16 @@ export default class BugsRoute extends UserRoute<{
     const campaignTags = await this.getTags();
 
     if (campaignTags.length) {
-      bugs.map((bug) => {
+      bugs = bugs.map((bug) => {
         const tags = campaignTags.filter((tag) => tag.bug_id === bug.id);
         if (!tags.length) return bug;
-        const ciolla = {
+        const bugWithTags = {
           ...bug,
           tags: tags.map((tag) => {
             return { tag_id: tag.tag_id, tag_name: tag.tag_name };
           }),
         };
-        return ciolla;
+        return bugWithTags;
       });
     }
 
