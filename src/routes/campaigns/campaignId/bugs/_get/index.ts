@@ -142,20 +142,22 @@ export default class BugsRoute extends UserRoute<{
 
     if (!bugs || !bugs.length) return this.emptyResponse();
 
-    const bugsWithTags = await Promise.all(
-      bugs.map(async (bug) => {
-        const tags = await getBugTags(bug.id);
-        if (!tags) return bug;
+    const campaignTags = await this.getTags();
+
+    if (campaignTags.length) {
+      bugs.map((bug) => {
+        const tags = campaignTags.filter((tag) => tag.bug_id === bug.id);
+        if (!tags.length) return bug;
         return {
           ...bug,
           tags: tags.map((tag) => {
-            return { tag_id: tag.tag_id, tag_name: tag.name };
+            return { tag_id: tag.tag_id, tag_name: tag.tag_name };
           }),
         };
-      })
-    );
+      });
+    }
 
-    const formatted = this.formatBugs(bugsWithTags);
+    const formatted = this.formatBugs(bugs);
     const filtered = this.filterBugs(formatted);
     const paginated = this.paginateBugs(filtered);
 
@@ -166,6 +168,20 @@ export default class BugsRoute extends UserRoute<{
       size: paginated.length,
       total: filtered.length,
     });
+  }
+
+  private async getTags(): Promise<Array<Tag & { bug_id: number }>> {
+    const tags = await db.query(`
+      SELECT
+        tag_id,
+        display_name as tag_name,
+        bug_id
+      FROM wp_appq_bug_taxonomy
+      WHERE campaign_id = ${this.cp_id}
+    `);
+
+    return tags;
+    return [];
   }
 
   private async getBugs(): Promise<
@@ -265,22 +281,7 @@ export default class BugsRoute extends UserRoute<{
 
     if (!bugs) return false;
 
-    const bugsWithTags = await Promise.all(
-      bugs.map(async (bug: any) => {
-        const tags = await getBugTags(bug.id);
-
-        if (!tags) return bug;
-
-        return {
-          ...bug,
-          tags: tags.map((tag) => {
-            return { tag_id: tag.tag_id, tag_name: tag.name };
-          }),
-        };
-      })
-    );
-
-    return bugsWithTags;
+    return bugs;
   }
 
   private shouldShowNeedReview(): boolean {
