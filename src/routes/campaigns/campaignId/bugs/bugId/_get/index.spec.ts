@@ -114,6 +114,11 @@ const profile_1 = {
   name: "Tester 1",
 };
 
+const profile_2 = {
+  id: 2,
+  name: "Deleted User",
+};
+
 const bug_1: BugsParams = {
   id: 12999,
   internal_id: "UG12999",
@@ -155,6 +160,12 @@ const bug_3_pending = {
   ...bug_1,
   id: 13001,
   status_id: 1, // pending
+};
+
+const bug_4 = {
+  ...bug_1,
+  id: 13002,
+  wp_user_id: profile_2.id,
 };
 
 const bug_media_1 = {
@@ -212,7 +223,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
       try {
         await dbAdapter.add({
           companies: [customer_1],
-          profiles: [profile_1],
+          profiles: [profile_1, profile_2],
           userToCustomers: [user_to_customer_1],
           projects: [project_1, project_2],
           userToProjects: [user_to_project_1],
@@ -223,6 +234,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
         await bugs.insert(bug_1);
         await bugs.insert(bug_2);
         await bugs.insert(bug_3_pending);
+        await bugs.insert(bug_4);
         await devices.insert(device_1);
         await devices.insert(device_2);
         await bugMedia.insert(bug_media_1);
@@ -479,7 +491,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
     expect(usecase.prefix).toBeUndefined();
   });
 
-  it("Should answer 200 and tester details as tester id and name", async () => {
+  it("Should return tester details as tester id and name", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer user");
@@ -487,6 +499,17 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
     expect(response.body.posted_by).toEqual({
       tester_id: profile_1.id,
       name: profile_1.name,
+    });
+  });
+
+  it("Should return tester details if user is deleted user", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_4.id}`)
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(200);
+    expect(response.body.posted_by).toEqual({
+      tester_id: profile_2.id,
+      name: "Deleted user",
     });
   });
 
