@@ -109,6 +109,10 @@ const usecase_1: UseCaseParams = {
   simple_title: "something to do here",
   prefix: "Use Case 1:",
 };
+const profile_1 = {
+  id: 1,
+  name: "Tester 1",
+};
 
 const bug_1: BugsParams = {
   id: 12999,
@@ -208,6 +212,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
       try {
         await dbAdapter.add({
           companies: [customer_1],
+          profiles: [profile_1],
           userToCustomers: [user_to_customer_1],
           projects: [project_1, project_2],
           userToProjects: [user_to_project_1],
@@ -472,6 +477,17 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
     expect(usecase.title).toEqual(bug_2.application_section);
     expect(usecase.simple_title).toBeUndefined();
     expect(usecase.prefix).toBeUndefined();
+  });
+
+  it("Should answer 200 and tester details as tester id and name", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(200);
+    expect(response.body.posted_by).toEqual({
+      tester_id: profile_1.id,
+      name: profile_1.name,
+    });
   });
 
   /** --- end of file */
