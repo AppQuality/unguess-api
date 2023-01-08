@@ -272,6 +272,13 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/BugAdditionalField'
+                      posted_by:
+                        type: object
+                        properties:
+                          tester_id:
+                            type: number
+                          name:
+                            type: string
               examples: {}
         '400':
           $ref: '#/components/responses/Error'
