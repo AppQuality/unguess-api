@@ -1,0 +1,2 @@
+import ruleset from "https://stoplight.io/api/v1/projects/cHJqOjExNzc2Nw/spectral.js?branch_slug=UN-290-filter-by-tags-no-tags&token=b039927d-5dc7-4354-ac5c-afcaa8070e76";
+export default { extends: ruleset };

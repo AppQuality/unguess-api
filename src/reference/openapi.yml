@@ -141,6 +141,9 @@ paths:
                                     type: number
                                   tag_name:
                                     type: string
+                                required:
+                                  - tag_id
+                                  - tag_name
                   start:
                     type: integer
                   limit:
