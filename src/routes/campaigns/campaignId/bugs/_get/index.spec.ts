@@ -461,6 +461,15 @@ describe("GET /campaigns/{cid}/bugs", () => {
     );
   });
 
+  it("Should return total of bugs when paginating", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?limit=1&start=0`)
+      .set("Authorization", "Bearer user");
+
+    expect(response.body).toHaveProperty("size", 1);
+    expect(response.body).toHaveProperty("total", 3);
+  });
+
   // It should answer 403 if user is not logged in
 
   // Should return the items paginated by limit and start parameters

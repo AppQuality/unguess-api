@@ -30,7 +30,12 @@ export default class BugsRoute extends UserRoute<{
   private orderBy: string = DEFAULT_ORDER_BY_PARAMETER;
 
   private campaign:
-    | { project: number; showNeedReview: boolean; titleRule: boolean }
+    | {
+        project: number;
+        showNeedReview: boolean;
+        titleRule: boolean;
+        baseInternalId: string;
+      }
     | undefined;
   private filterBy: { [key: string]: string | string[] } | undefined;
   private search: string | undefined;
@@ -87,15 +92,20 @@ export default class BugsRoute extends UserRoute<{
       project: campaign.project_id,
       showNeedReview: campaign.showNeedReview,
       titleRule: await getTitleRule(this.cp_id),
+      baseInternalId: campaign.base_bug_internal_id,
     };
   }
 
   private async initCampaign() {
-    const campaigns: { showNeedReview: boolean; project_id: number }[] =
-      await db.query(`
+    const campaigns: {
+      showNeedReview: boolean;
+      project_id: number;
+      base_bug_internal_id: string;
+    }[] = await db.query(`
       SELECT 
         cust_bug_vis as showNeedReview,
-        project_id
+        project_id,
+        base_bug_internal_id
       FROM wp_appq_evd_campaign 
       WHERE id = ${this.cp_id}`);
     if (!campaigns.length) return false;
@@ -432,18 +442,27 @@ export default class BugsRoute extends UserRoute<{
     bug: Parameters<typeof this.filterBugs>[0][number]
   ) {
     if (!this.search) return true;
+    if (this.search.length <= 0) return true;
 
-    if (
-      this.search.replace(/\D/g, "").length > 0 &&
-      !isNaN(parseInt(this.search.replace(/\D/g, "")))
-    ) {
-      return bug.id === parseInt(this.search.replace(/\D/g, ""));
-    }
-    if (this.search.length > 0) {
-      return bug.title.full
-        .toLocaleLowerCase()
-        .includes(this.search.toLocaleLowerCase());
-    }
+    if (this.filterBugsBySearchById(bug) === true) return true;
+
+    return bug.title.full
+      .toLocaleLowerCase()
+      .includes(this.search.toLocaleLowerCase());
+  }
+
+  private filterBugsBySearchById(
+    bug: Parameters<typeof this.filterBugs>[0][number]
+  ) {
+    if (!this.search) return true;
+
+    const textToSearch = this.search.replace(
+      this.getCampaign().baseInternalId,
+      ""
+    );
+    if (bug.id.toString().includes(textToSearch)) return true;
+
+    return false;
   }
 
   private paginateBugs(bugs: ReturnType<typeof this.filterBugs>) {
