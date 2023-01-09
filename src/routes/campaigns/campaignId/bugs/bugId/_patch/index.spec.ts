@@ -4,7 +4,6 @@ import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 import bugType from "@src/__mocks__/database/bug_type";
 import bugs, { BugsParams } from "@src/__mocks__/database/bugs";
-import * as db from "@src/features/db";
 import severities from "@src/__mocks__/database/bug_severity";
 import replicabilities from "@src/__mocks__/database/bug_replicability";
 import statuses from "@src/__mocks__/database/bug_status";
@@ -120,6 +119,31 @@ const bug_1: BugsParams = {
   os: device_1.operating_system,
   os_version: device_1.os_version,
 };
+
+const bug_2: BugsParams = {
+  id: 2,
+  internal_id: "UG2",
+  wp_user_id: 1,
+  message: "[CON-TEXT][2ndContext] - Bug 12-999 message",
+  description: "Bug 12999 description",
+  expected_result: "Bug 12999 expected result",
+  current_result: "Bug 12999 actual result",
+  campaign_id: campaign_2.id,
+  status_id: 2,
+  created: "2021-10-19 12:57:57.0",
+  updated: "2021-10-19 12:57:57.0",
+  dev_id: device_1.id,
+  severity_id: 1,
+  bug_replicability_id: 1,
+  bug_type_id: 1,
+  application_section_id: usecase_1.id,
+  application_section: usecase_1.title,
+  note: "Bug 12999 notes",
+  manufacturer: device_1.manufacturer,
+  model: device_1.model,
+  os: device_1.operating_system,
+  os_version: device_1.os_version,
+};
 const tag_1 = {
   id: 69,
   tag_id: 1,
@@ -146,6 +170,7 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     });
     await bugType.addDefaultItems();
     await bugs.insert(bug_1);
+    await bugs.insert(bug_2);
     await severities.addDefaultItems();
     await replicabilities.addDefaultItems();
     await statuses.addDefaultItems();
@@ -182,7 +207,7 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
   // it Should fail if the user is not the owner
   it("Should fail if the user is not the owner", async () => {
     const response = await request(app)
-      .patch(`/campaigns/${campaign_2.id}/bugs/${bug_1.id}`)
+      .patch(`/campaigns/${campaign_2.id}/bugs/${bug_2.id}`)
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(403);
   });

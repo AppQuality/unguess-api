@@ -13,7 +13,7 @@ export default class Route extends UserRoute<{
 }> {
   private cid: number;
   private bid: number;
-  private tags: ({ tag_id: number } | { tag_name: string })[] | undefined;
+  private tags: ({ tag_id: number } | { tag_name: string })[];
 
   constructor(configuration: RouteClassConfiguration) {
     super(configuration);
@@ -34,7 +34,7 @@ export default class Route extends UserRoute<{
       return false;
     }
     try {
-      await getBugById({ bugId: this.bid });
+      await getBugById({ bugId: this.bid, campaignId: this.cid });
     } catch (e) {
       this.setError(400, {
         status_code: 400,
@@ -59,24 +59,8 @@ export default class Route extends UserRoute<{
   }
 
   protected async prepare(): Promise<void> {
-    await db.query(
-      db.format(
-        `
-        DELETE FROM wp_appq_bug_taxonomy 
-        WHERE campaign_id = ?
-            AND bug_id = ?
-        `,
-        [this.cid, this.bid]
-      )
-    );
-
-    //insert incoming tags
-    if (this.tags?.length) {
-      const insertIncomingTags = await this.getQueryInsertIncomingTags(
-        this.tags
-      );
-      await db.query(insertIncomingTags);
-    }
+    await this.clearTags();
+    await this.insertTags();
 
     const bugTags = await db.query(
       db.format(
@@ -93,52 +77,83 @@ export default class Route extends UserRoute<{
     return this.setSuccess(200, { tags: bugTags });
   }
 
+  private async clearTags() {
+    await db.query(
+      db.format(
+        `
+        DELETE FROM wp_appq_bug_taxonomy 
+        WHERE campaign_id = ?
+            AND bug_id = ?
+        `,
+        [this.cid, this.bid]
+      )
+    );
+  }
+
+  private async insertTags() {
+    if (this.tags?.length) {
+      const insertIncomingTags = await this.getQueryInsertIncomingTags(
+        this.tags
+      );
+      await db.query(insertIncomingTags);
+    }
+  }
+
   protected async getQueryInsertIncomingTags(
     tags: { tag_id?: number; tag_name?: string }[]
   ): Promise<string> {
-    let query = `
-      INSERT INTO wp_appq_bug_taxonomy 
-        (tag_id, display_name, slug, bug_id, campaign_id, author_wp_id, author_tid, is_public) 
-      VALUES
-    `;
+    const maxTagId = await this.getMaxTagId();
     const values = await Promise.all(
       tags.map(async (tag, i) => {
-        const exitingTag = await db.query(
-          `SELECT tag_id, display_name as tag_name 
-          FROM wp_appq_bug_taxonomy 
-          WHERE ${
-            tag.tag_id
-              ? `tag_id = ${tag.tag_id}`
-              : `display_name = '${tag.tag_name}'`
-          } `
-        );
+        let tagName = tag.tag_name;
+        let tagId = maxTagId + i;
 
-        if (exitingTag.length > 0) {
-          return `
-          (${exitingTag[0].tag_id}, '${exitingTag[0].tag_name}', '${
-            exitingTag[0].tag_name
-          }', ${this.bid}, ${this.cid}, ${this.getUser().unguess_wp_user_id}, ${
-            this.getUser().tryber_wp_user_id
-          }, 1)`;
+        const existingTag = await this.getTagByNameOrId(tag);
+        if (existingTag) {
+          tagName = existingTag.tag_name;
+          tagId = existingTag.tag_id;
         }
 
-        const maxTagId = await db.query(
-          "SELECT MAX(tag_id) AS id FROM wp_appq_bug_taxonomy"
-        );
         return `
-            (${maxTagId[0].id + i}, '${tag.tag_name}', '${tag.tag_name}', ${
-          this.bid
-        }, ${this.cid}, ${this.getUser().unguess_wp_user_id}, ${
-          this.getUser().tryber_wp_user_id
-        }, 1)`;
+            (${tagId}, '${tagName}', '${tagName}', ${this.bid}, ${
+          this.cid
+        }, ${this.getWordpressId("unguess")}, ${this.getUserId()}, 1)`;
       })
     );
-    return query + values.join(",");
+    return `
+    INSERT INTO wp_appq_bug_taxonomy 
+      (tag_id, display_name, slug, bug_id, campaign_id, author_wp_id, author_tid, is_public) 
+    VALUES ${values.join(",")}
+  `;
   }
-  removeDuplicatedId(
+
+  private async getTagByNameOrId(tag: { tag_id?: number; tag_name?: string }) {
+    const result = await db.query(
+      `SELECT tag_id, display_name as tag_name 
+      FROM wp_appq_bug_taxonomy 
+      WHERE ${
+        tag.tag_id
+          ? `tag_id = ${tag.tag_id}`
+          : `display_name = '${tag.tag_name}' AND campaign_id = ${this.cid}`
+      } `
+    );
+    if (!result.length) return false;
+    return result[0];
+  }
+
+  private async getMaxTagId() {
+    const result: { id: number }[] = await db.query(
+      "SELECT MAX(tag_id) AS id FROM wp_appq_bug_taxonomy"
+    );
+
+    if (!result.length) return 0;
+    return result[0].id;
+  }
+
+  private removeDuplicatedId(
     tags: ({ tag_id: number } | { tag_name: string })[] | undefined
-  ): ({ tag_id: number } | { tag_name: string })[] | undefined {
-    if (!tags || tags?.length === 0) return undefined;
+  ) {
+    if (!tags || tags?.length === 0) return [];
     const tagsId = tags.map((tag) => {
       if ("tag_id" in tag) return tag.tag_id;
       return tag.tag_name;
