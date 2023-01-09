@@ -64,6 +64,34 @@ const campaign_1 = {
   base_bug_internal_id: "BUG01",
 };
 
+const campaign_2 = {
+  id: 2,
+  start_date: "2017-07-20 10:00:00",
+  end_date: "2017-07-20 10:00:00",
+  close_date: "2017-07-20 10:00:00",
+  title: "Campaign 2 title",
+  customer_title: "Campaign 2 customer title",
+  status_id: 1,
+  is_public: 1,
+  campaign_type_id: campaign_type_1.id,
+  campaign_type: -1,
+  project_id: project_2.id,
+};
+
+const campaign_3 = {
+  id: 3,
+  start_date: "2017-07-20 10:00:00",
+  end_date: "2017-07-20 10:00:00",
+  close_date: "2017-07-20 10:00:00",
+  title: "Campaign 3 title",
+  customer_title: "Campaign 3 customer title",
+  status_id: 1,
+  is_public: 1,
+  campaign_type_id: campaign_type_1.id,
+  campaign_type: -1,
+  project_id: project_1.id,
+};
+
 const campaign_4 = {
   id: 4,
   start_date: "2017-07-20 10:00:00",
@@ -323,6 +351,31 @@ const bug_9_no_tags: BugsParams = {
   severity_id: 4,
 };
 
+const bug_55: BugsParams = {
+  id: 55,
+  internal_id: "BUG055",
+  message: "[Example] - Bug 5",
+  description: "Bug 5 description",
+  expected_result: "Bug 5 expected result",
+  current_result: "Bug 5 current result",
+  campaign_id: campaign_1.id,
+  bug_type_id: 1,
+  bug_replicability_id: 2,
+  status_id: 2,
+  status_reason: "Bug 5 status reason",
+  application_section: usecase_with_meta.title,
+  application_section_id: usecase_with_meta.id,
+  note: "Bug 5 note",
+  wp_user_id: 1,
+  dev_id: device_1.id,
+  is_duplicated: 0,
+  manufacturer: device_1.manufacturer,
+  model: device_1.model,
+  os: device_1.operating_system,
+  os_version: device_1.os_version,
+  severity_id: 4,
+};
+
 const bug_media_1 = {
   id: 123,
   bug_id: bug_1.id,
@@ -349,7 +402,7 @@ const tag_3 = {
   id: 3,
   tag_id: 2,
   display_name: "Tag 2",
-  campaign_id: 2,
+  campaign_id: campaign_2.id,
   bug_id: bug_2.id,
 };
 const tag_4 = {
@@ -370,7 +423,13 @@ describe("GET /campaigns/{cid}/bugs", () => {
           projects: [project_1, project_2],
           userToProjects: [user_to_project_1],
           campaignTypes: [campaign_type_1],
-          campaigns: [campaign_1, campaign_4, campaign_5],
+          campaigns: [
+            campaign_1,
+            campaign_2,
+            campaign_3,
+            campaign_4,
+            campaign_5,
+          ],
         });
         await CampaignMeta.insert({
           meta_id: 1,
@@ -412,20 +471,15 @@ describe("GET /campaigns/{cid}/bugs", () => {
       resolve(true);
     });
   });
-
-  // It should answer 200 with paginated bugs
-  it("Should answer 200 with paginated bugs", async () => {
+  // Should return the normal results if the filterBy is not accepted
+  it("Should ignore filterBy if is not valid", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs`)
+      .get(
+        `/campaigns/${campaign_1.id}/bugs?limit=10&start=0&filterBy[abc]=abc`
+      )
       .set("Authorization", "Bearer user");
-    expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty("items");
-    expect(response.body).toHaveProperty("start");
-    expect(response.body).toHaveProperty("limit");
-    expect(response.body).toHaveProperty("size");
-    expect(response.body).toHaveProperty("total");
 
-    expect(response.body.items).toHaveLength(3);
+    expect(response.status).toBe(200);
 
     expect(response.body).toMatchObject(
       expect.objectContaining({
@@ -442,322 +496,197 @@ describe("GET /campaigns/{cid}/bugs", () => {
         ],
       })
     );
-
-    // If smartphone, the bug should have manufacturer and model
-    response.body.items.forEach(
-      (
-        bug: StoplightOperations["get-campaigns-single-bug"]["responses"]["200"]["content"]["application/json"]
-      ) => {
-        expect(bug).toMatchObject(
-          expect.objectContaining({
-            device: expect.objectContaining({
-              manufacturer: device_1.manufacturer,
-              model: device_1.model,
-              type: "smartphone",
-            }),
-          })
-        );
-      }
-    );
+  });
+  it("Should return only read bugs if filterBy has read filter as true", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[read]=true`)
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(1);
   });
 
-  // It should answer 403 if user is not logged in
+  it("Should return only unread bugs if filterBy has read filter as false", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[read]=false`)
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(2);
+  });
 
-  // Should return the items paginated by limit and start parameters
-  it("Should return the items paginated by limit and start parameters", async () => {
+  it("It should only return bugs read by the user if filterBy read the filter as true", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[read]=true`)
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(1);
+    expect(response.body.items[0]).toHaveProperty("id", 2);
+  });
+
+  it("Should return total of bugs when paginating", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs?limit=1&start=0`)
       .set("Authorization", "Bearer user");
-    expect(response.status).toBe(200);
 
-    expect(response.body).toMatchObject(
-      expect.objectContaining({
-        items: [
-          expect.objectContaining({
-            id: bug_9_no_tags.id,
-          }),
-        ],
-      })
-    );
+    expect(response.body).toHaveProperty("size", 1);
+    expect(response.body).toHaveProperty("total", 3);
   });
 
-  // Should order by the default order if the order is not valid or not provided
-  it("Should order by the default order if the order is not valid or not provided", async () => {
+  //Should return bugs with specific tags
+  it("Should return bugs filtered by tags (bugs containing all tags in filter)", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs?limit=10&start=0&order=abc`)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[tags]=1,3`)
       .set("Authorization", "Bearer user");
-
-    expect(response.status).toBe(200);
-
-    expect(response.body).toMatchObject(
-      expect.objectContaining({
-        items: [
-          expect.objectContaining({
-            id: bug_9_no_tags.id,
-          }),
-          expect.objectContaining({
-            id: bug_2.id,
-          }),
-          expect.objectContaining({
-            id: bug_1.id,
-          }),
-        ],
-      })
-    );
-  });
-
-  // Should return the results ordered by the order parameter
-  it("Should return the results ordered by the order parameter", async () => {
-    // If orderBy is not specified, the default order is by id
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs?limit=10&start=0&order=ASC`)
-      .set("Authorization", "Bearer user");
-
-    expect(response.status).toBe(200);
-
-    expect(response.body).toMatchObject(
-      expect.objectContaining({
-        items: [
-          expect.objectContaining({
-            id: bug_1.id,
-          }),
-          expect.objectContaining({
-            id: bug_2.id,
-          }),
-          expect.objectContaining({
-            id: bug_9_no_tags.id,
-          }),
-        ],
-      })
-    );
-  });
-
-  // Should order by the default orderBy if the orderBy is not valid or not provided
-  it("Should order by the default orderBy if the orderBy is not valid or not provided", async () => {
-    const response = await request(app)
-      .get(
-        `/campaigns/${campaign_1.id}/bugs?limit=10&start=0&order=ASC&orderBy=abc`
-      )
-      .set("Authorization", "Bearer user");
-
-    expect(response.status).toBe(200);
-
-    expect(response.body).toMatchObject(
-      expect.objectContaining({
-        items: [
-          expect.objectContaining({
-            id: bug_1.id,
-          }),
-          expect.objectContaining({
-            id: bug_2.id,
-          }),
-          expect.objectContaining({
-            id: bug_9_no_tags.id,
-          }),
-        ],
-      })
-    );
-  });
-
-  it("Should allow ordering by severity", async () => {
-    const response = await request(app)
-      .get(
-        `/campaigns/${campaign_1.id}/bugs?limit=10&start=0&order=DESC&orderBy=severity_id`
-      )
-      .set("Authorization", "Bearer user");
-
-    expect(response.status).toBe(200);
-
-    expect(response.body).toMatchObject(
-      expect.objectContaining({
-        items: [
-          expect.objectContaining({
-            id: bug_9_no_tags.id,
-          }),
-          expect.objectContaining({
-            id: bug_2.id,
-          }),
-          expect.objectContaining({
-            id: bug_1.id,
-          }),
-        ],
-      })
-    );
-  });
-
-  it("Should allow filtering by not duplicates", async () => {
-    const response = await request(app)
-      .get(
-        `/campaigns/${campaign_1.id}/bugs?limit=10&start=0&filterBy[is_duplicated]=0`
-      )
-      .set("Authorization", "Bearer user");
-
-    expect(response.status).toBe(200);
-
-    expect(response.body).toMatchObject(
-      expect.objectContaining({
-        items: [
-          expect.objectContaining({
-            id: bug_9_no_tags.id,
-          }),
-          expect.objectContaining({
-            id: bug_2.id,
-          }),
-        ],
-      })
-    );
-  });
-
-  // Should return the correct items in the correct order if all parameters are specified
-  it("Should return the correct items in the correct order if all parameters are specified", async () => {
-    const response = await request(app)
-      .get(
-        `/campaigns/${campaign_1.id}/bugs?limit=10&start=0&orderBy=severity_id&order=ASC&filterBy[is_duplicated]=0`
-      )
-      .set("Authorization", "Bearer user");
-
-    expect(response.status).toBe(200);
-
-    expect(response.body).toMatchObject(
-      expect.objectContaining({
-        items: [
-          expect.objectContaining({
-            id: bug_2.id,
-          }),
-          expect.objectContaining({
-            id: bug_9_no_tags.id,
-          }),
-        ],
-      })
-    );
-  });
-
-  it("Should return the context parameters for each bugs if title_rule is active and the bug has context", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs`)
-      .set("Authorization", "Bearer user");
-    expect(response.body.items[0].title).toEqual({
-      full: bug_9_no_tags.message,
-      compact: "Bug 9 super-message",
-      context: ["CON-TEXT"],
-    });
-
-    expect(response.body.items[1].title).toEqual({
-      full: bug_2.message,
-      compact: bug_2.message,
-    });
-
-    expect(response.body.items[2].title).toEqual({
-      full: bug_1.message,
-      compact: "Bug 1 super-message",
-      context: ["CON-TEXT-bike"],
-    });
-  });
-
-  it("Should not return refused bugs", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs`)
-      .set("Authorization", "Bearer user");
-
-    expect(response.body.items.length).toBe(3);
-    expect(response.body.items).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ id: bug_1.id }),
-        expect.objectContaining({ id: bug_2.id }),
-        expect.objectContaining({ id: bug_9_no_tags.id }),
-      ])
-    );
-  });
-
-  it("Should not return need review bugs if option is not enabled", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs`)
-      .set("Authorization", "Bearer user");
-
-    expect(response.body.items.length).toBe(3);
-    expect(response.body.items).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ id: bug_1.id }),
-        expect.objectContaining({ id: bug_2.id }),
-        expect.objectContaining({ id: bug_9_no_tags.id }),
-      ])
-    );
-  });
-
-  it("Should return need review bugs if option is not enabled but user is admin", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs`)
-      .set("Authorization", "Bearer admin");
-
-    expect(response.body.items.length).toBe(4);
-    expect(response.body.items).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ id: bug_1.id }),
-        expect.objectContaining({ id: bug_2.id }),
-        expect.objectContaining({ id: bug_4.id }),
-        expect.objectContaining({ id: bug_9_no_tags.id }),
-      ])
-    );
-  });
-
-  it("Should return the usecase simple title if available", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs`)
-      .set("Authorization", "Bearer admin");
-    expect(response.body.items[0].application_section).toEqual(
-      expect.objectContaining({
-        id: usecase_with_meta.id,
-        title: usecase_with_meta.title,
-        simple_title: usecase_with_meta.simple_title,
-        prefix: usecase_with_meta.prefix,
-      })
-    );
-  });
-
-  it("Should return need review bugs if option is enabled", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_4.id}/bugs`)
-      .set("Authorization", "Bearer user");
-
     expect(response.body.items.length).toBe(1);
     expect(response.body.items).toEqual(
-      expect.arrayContaining([expect.objectContaining({ id: bug_5.id })])
+      expect.arrayContaining([
+        expect.objectContaining({
+          tags: [
+            { tag_id: 1, tag_name: "Tag 1" },
+            { tag_id: 3, tag_name: "Tag 4" },
+          ],
+        }),
+      ])
     );
   });
-
-  it("Should NOT return pending bugs", async () => {
+  it("Should return bugs filtered by tags ignoring invalid tags", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_5.id}/bugs`)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[tags]=1,3,none`)
       .set("Authorization", "Bearer user");
-
     expect(response.body.items.length).toBe(1);
-    expect(response.body.items).not.toEqual(
+    expect(response.body.items).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ id: bug_6_pending.id }),
+        expect.objectContaining({
+          tags: [
+            { tag_id: 1, tag_name: "Tag 1" },
+            { tag_id: 3, tag_name: "Tag 4" },
+          ],
+        }),
+      ])
+    );
+  });
+  it("Should return bugs filtered by notags", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[tags]=none`)
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: bug_9_no_tags.id }),
+      ])
+    );
+    expect(response.body.items[0].tags).toBeUndefined();
+  });
+
+  it("Should return bugs filtered by severities ids", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[severities]=1,4`)
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(2);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: bug_9_no_tags.id }),
+        expect.objectContaining({ id: bug_1.id }),
       ])
     );
   });
 
-  it("Should bugs without context if title_rule is not active", async () => {
+  it("Should return bugs filtered by replicabilities ids", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_5.id}/bugs`)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[replicabilities]=2,3`)
       .set("Authorization", "Bearer user");
-    expect(response.body.items[0].title).toEqual({
-      full: bug_7.message,
-      compact: bug_7.message,
-    });
+    expect(response.body.items.length).toBe(2);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: bug_2.id }),
+        expect.objectContaining({ id: bug_9_no_tags.id }),
+      ])
+    );
+  });
+  it("Should return bugs filtered by search (search by bugID)", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?search=9`)
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: bug_9_no_tags.id }),
+      ])
+    );
   });
 
-  it("Should return bugs with read/unread", async () => {
+  it("Should return bugs filtered by search (search by title)", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs`)
+      .get(`/campaigns/${campaign_1.id}/bugs?search=orange`)
       .set("Authorization", "Bearer user");
-    for (let i = 0; i < response.body.items.length; i++) {
-      expect(response.body.items[i]).toHaveProperty("read");
-    }
-    expect(response.body.items[0]).toHaveProperty("read", false);
-    expect(response.body.items[1]).toHaveProperty("read", true);
-    expect(response.body.items[2]).toHaveProperty("read", false);
+    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: bug_2.id })])
+    );
+  });
+
+  it("Should return bugs filtered by search (search by context)", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?search=CON-TEXT-bike`)
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: bug_1.id })])
+    );
+  });
+
+  it("Should allow filtering multiple filterby, combining them in AND", async () => {
+    const response = await request(app)
+      .get(
+        `/campaigns/${campaign_1.id}/bugs?filterBy[replicabilities]=2,3&filterBy[severities]=4`
+      )
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: bug_9_no_tags.id }),
+      ])
+    );
+  });
+
+  it("Should allow mixing filterby and search, combining them in AND", async () => {
+    const response = await request(app)
+      .get(
+        `/campaigns/${campaign_1.id}/bugs?filterBy[replicabilities]=2,3&search=CON-TEXT`
+      )
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: bug_9_no_tags.id }),
+      ])
+    );
+  });
+
+  it("Should allow searching by internal id", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?search=BUG011`)
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: bug_1.id })])
+    );
+  });
+
+  it("Should allow searching by id", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?search=1`)
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: bug_1.id })])
+    );
+  });
+
+  it("Search by id should match partials", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?search=1`)
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: bug_1.id })])
+    );
   });
 
   // --- End of file
