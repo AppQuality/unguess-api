@@ -35,6 +35,7 @@ export default class BugsRoute extends UserRoute<{
         showNeedReview: boolean;
         titleRule: boolean;
         baseInternalId: string;
+        tags: (Tag & { bug_id: number })[];
       }
     | undefined;
   private filterBy: { [key: string]: string | string[] } | undefined;
@@ -93,6 +94,7 @@ export default class BugsRoute extends UserRoute<{
       showNeedReview: campaign.showNeedReview,
       titleRule: await getTitleRule(this.cp_id),
       baseInternalId: campaign.base_bug_internal_id,
+      tags: await this.getTags(),
     };
   }
 
@@ -151,42 +153,22 @@ export default class BugsRoute extends UserRoute<{
 
     if (!bugs || !bugs.length) return this.emptyResponse();
 
-    bugs = await this.enhanceBugsWithTags(bugs);
-
-    const formatted = this.formatBugs(bugs);
-    const filtered = this.filterBugs(formatted);
+    const enhancedBugs = this.enhanceBugs(bugs);
+    const filtered = this.filterBugs(enhancedBugs);
     const paginated = this.paginateBugs(filtered);
+    const formatted = this.formatBugs(paginated);
 
     return this.setSuccess(200, {
-      items: paginated,
+      items: formatted,
       start: this.start,
       limit: this.limit,
-      size: paginated.length,
+      size: formatted.length,
       total: filtered.length,
     });
   }
 
-  private async enhanceBugsWithTags(
-    bugs: Awaited<ReturnType<typeof this.getBugs>>
-  ) {
-    if (!bugs) return bugs;
-    const campaignTags = await this.getTags();
-    if (!campaignTags.length) return bugs;
-
-    return bugs.map((bug) => {
-      const tags = campaignTags
-        .filter((tag) => tag.bug_id === bug.id)
-        .map((tag) => ({
-          tag_id: tag.tag_id,
-          tag_name: tag.tag_name,
-        }));
-      if (!tags.length) return bug;
-      return { ...bug, tags };
-    });
-  }
-
   private async getTags(): Promise<Array<Tag & { bug_id: number }>> {
-    const tags = await db.query(`
+    return await db.query(`
       SELECT
         tag_id,
         display_name as tag_name,
@@ -194,8 +176,6 @@ export default class BugsRoute extends UserRoute<{
       FROM wp_appq_bug_taxonomy
       WHERE campaign_id = ${this.cp_id} and is_public=1
     `);
-
-    return tags;
   }
 
   private async getBugs(): Promise<
@@ -303,21 +283,26 @@ export default class BugsRoute extends UserRoute<{
     return this.getCampaign().showNeedReview;
   }
 
-  private formatBugs(bugs: Awaited<ReturnType<typeof this.getBugs>>) {
+  private enhanceBugs(bugs: Awaited<ReturnType<typeof this.getBugs>>) {
     if (!bugs || !bugs.length) return [];
 
     return bugs.map((bug) => {
+      let tags;
+      if (this.getCampaign().tags.length) {
+        tags = this.getCampaign()
+          .tags.filter((tag) => tag.bug_id === bug.id)
+          .map((tag) => ({
+            tag_id: tag.tag_id,
+            tag_name: tag.tag_name,
+          }));
+        if (!tags.length) tags = undefined;
+      }
       return {
-        id: bug.id,
-        internal_id: bug.internal_id,
-        campaign_id: bug.campaign_id,
+        ...bug,
         title: getBugTitle({
           bugTitle: bug.title,
           hasTitleRule: this.getCampaign().titleRule,
         }),
-        step_by_step: bug.description,
-        expected_result: bug.expected_result,
-        current_result: bug.current_result,
         status: {
           id: bug.status_id,
           name: bug.status_name,
@@ -340,21 +325,41 @@ export default class BugsRoute extends UserRoute<{
           ...(bug.uc_simple_title && { simple_title: bug.uc_simple_title }),
           ...(bug.uc_prefix && { prefix: bug.uc_prefix }),
         },
-        created: bug.created.toString(),
-        ...(bug.updated && { updated: bug.updated.toString() }),
-        note: bug.note,
         device: getBugDevice(bug),
-        ...(bug.duplicated_of_id && { duplicated_of_id: bug.duplicated_of_id }),
-        is_favorite: bug.is_favorite,
-        read_status: bug.read_status,
-        is_duplicated: bug.is_duplicated,
-        read: bug.read_status ? true : false,
-        ...(bug.tags && { tags: bug.tags }),
+        ...(tags && { tags }),
       };
     });
   }
 
-  private filterBugs(bugs: ReturnType<typeof this.formatBugs>) {
+  private formatBugs(bugs: ReturnType<typeof this.paginateBugs>) {
+    return bugs.map((bug) => {
+      return {
+        id: bug.id,
+        internal_id: bug.internal_id,
+        campaign_id: bug.campaign_id,
+        title: bug.title,
+        step_by_step: bug.description,
+        expected_result: bug.expected_result,
+        current_result: bug.current_result,
+        status: bug.status,
+        severity: bug.severity,
+        type: bug.type,
+        replicability: bug.replicability,
+        application_section: bug.application_section,
+        created: bug.created,
+        ...(bug.updated && { updated: bug.updated }),
+        ...(bug.duplicated_of_id && { duplicated_of_id: bug.duplicated_of_id }),
+        note: bug.note,
+        device: bug.device,
+        is_favorite: bug.is_favorite,
+        is_duplicated: bug.is_duplicated,
+        read: bug.read_status ? true : false,
+        tags: bug.tags,
+      };
+    });
+  }
+
+  private filterBugs(bugs: ReturnType<typeof this.enhanceBugs>) {
     if (!this.filterBy && !this.search) return bugs;
 
     return bugs.filter((bug) => {

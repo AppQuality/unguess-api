@@ -751,6 +751,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_5.id}/bugs`)
       .set("Authorization", "Bearer user");
+    expect(response.body).toHaveProperty("items");
     expect(response.body.items[0].title).toEqual({
       full: bug_7.message,
       compact: bug_7.message,
@@ -767,6 +768,15 @@ describe("GET /campaigns/{cid}/bugs", () => {
     expect(response.body.items[0]).toHaveProperty("read", false);
     expect(response.body.items[1]).toHaveProperty("read", true);
     expect(response.body.items[2]).toHaveProperty("read", false);
+  });
+
+  it("Should not return read_status prop", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs`)
+      .set("Authorization", "Bearer user");
+    for (let i = 0; i < response.body.items.length; i++) {
+      expect(response.body.items[i]).not.toHaveProperty("read_status");
+    }
   });
 
   // --- End of file
