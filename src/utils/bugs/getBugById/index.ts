@@ -11,9 +11,11 @@ type BugWithMedia =
 
 export const getBugById = async ({
   bugId,
+  campaignId,
   showNeedReview,
 }: {
   bugId: number;
+  campaignId: number;
   showNeedReview?: boolean;
 }): Promise<BugWithMedia> => {
   const error = {
@@ -55,22 +57,26 @@ export const getBugById = async ({
       b.is_favorite,
       b.bug_replicability_id,
       b.bug_type_id,
-      b.severity_id
+      b.severity_id,
+      p.id as tester_id,
+      p.name as tester_name
       from wp_appq_evd_bug b
         JOIN wp_appq_evd_severity s ON (b.severity_id = s.id)
         JOIN wp_appq_evd_bug_type t ON (b.bug_type_id = t.id)
         JOIN wp_appq_evd_bug_replicability r ON (b.bug_replicability_id = r.id)
         JOIN wp_appq_evd_bug_status status ON (b.status_id = status.id)
+        LEFT JOIN wp_appq_evd_profile p ON (b.wp_user_id = p.wp_user_id)
         LEFT JOIN wp_crowd_appq_device device ON (b.dev_id = device.id)
         LEFT JOIN wp_appq_campaign_task uc ON (uc.id = b.application_section_id)
         WHERE b.id = ? 
+        and b.campaign_id = ?
         AND b.publish = 1
         AND ${
           showNeedReview
             ? `(status.name = 'Approved' OR status.name = 'Need Review')`
             : `status.name = 'Approved'`
         };`,
-      [bugId]
+      [bugId, campaignId]
     )
   );
 
@@ -140,5 +146,9 @@ export const getBugById = async ({
     media: media || [],
     tags: tags || [],
     additional_fields: additional || [],
+    reporter: {
+      tester_id: bug.tester_id || 0,
+      name: bug.tester_name || "Unknown",
+    },
   };
 };

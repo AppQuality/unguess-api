@@ -128,7 +128,22 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Bug'
+                      allOf:
+                        - $ref: '#/components/schemas/Bug'
+                        - type: object
+                          properties:
+                            tags:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  tag_id:
+                                    type: number
+                                  tag_name:
+                                    type: string
+                                required:
+                                  - tag_id
+                                  - tag_name
                   start:
                     type: integer
                   limit:
@@ -200,6 +215,7 @@ paths:
         - $ref: '#/components/parameters/order'
         - $ref: '#/components/parameters/orderBy'
         - $ref: '#/components/parameters/filterBy'
+        - $ref: '#/components/parameters/search'
   '/campaigns/{cid}/bugTypes':
     parameters:
       - $ref: '#/components/parameters/cid'
@@ -256,6 +272,18 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/BugAdditionalField'
+                      reporter:
+                        type: object
+                        required:
+                          - tester_id
+                          - name
+                        properties:
+                          tester_id:
+                            type: number
+                          name:
+                            type: string
+                    required:
+                      - reporter
               examples: {}
         '400':
           $ref: '#/components/responses/Error'
@@ -1096,6 +1124,8 @@ components:
           type: integer
         is_favorite:
           type: integer
+        read:
+          type: boolean
       required:
         - id
         - internal_id
@@ -2198,6 +2228,13 @@ components:
           - unique-bugs
           - bugs-by-duplicates
       description: Campaign widget slug
+    search:
+      name: search
+      in: query
+      required: false
+      schema:
+        type: string
+      description: keywords to search
   requestBodies:
     Credentials:
       content:

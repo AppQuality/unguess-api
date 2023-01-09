@@ -46,14 +46,15 @@ export default async (
 
     const bug = await getBugById({
       bugId: bug_id,
+      campaignId: campaign.id,
       showNeedReview: campaign.showNeedReview,
     });
 
     return bug as StoplightOperations["get-campaigns-single-bug"]["responses"]["200"]["content"]["application/json"];
   } catch (e: any) {
     if (e.code) {
-      error.code = e.code;
-      res.status_code = e.code;
+      error.code = typeof e.code === "number" ? e.code : 500;
+      res.status_code = typeof e.code === "number" ? e.code : 500;
     } else {
       error.code = 500;
       res.status_code = 500;

@@ -230,6 +230,7 @@ export interface components {
       };
       duplicated_of_id?: number;
       is_favorite?: number;
+      read?: boolean;
     };
     /**
      * BugAdditionalField
@@ -693,6 +694,8 @@ export interface components {
       | "cp-progress"
       | "unique-bugs"
       | "bugs-by-duplicates";
+    /** @description keywords to search */
+    search: string;
   };
   requestBodies: {
     Credentials: {
@@ -845,6 +848,8 @@ export interface operations {
         orderBy?: components["parameters"]["orderBy"];
         /** filterBy[<fieldName>]=<fieldValue> */
         filterBy?: components["parameters"]["filterBy"];
+        /** keywords to search */
+        search?: components["parameters"]["search"];
       };
     };
     responses: {
@@ -852,7 +857,12 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            items?: components["schemas"]["Bug"][];
+            items?: (components["schemas"]["Bug"] & {
+              tags?: {
+                tag_id: number;
+                tag_name: string;
+              }[];
+            })[];
             start?: number;
             limit?: number;
             size?: number;
@@ -902,6 +912,10 @@ export interface operations {
             media?: components["schemas"]["BugMedia"][];
             tags?: components["schemas"]["BugTag"][];
             additional_fields?: components["schemas"]["BugAdditionalField"][];
+            reporter: {
+              tester_id: number;
+              name: string;
+            };
           };
         };
       };

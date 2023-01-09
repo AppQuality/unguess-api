@@ -13,6 +13,11 @@ import { getBugDevice } from "@src/utils/bugs/getBugDevice";
 
 import * as db from "@src/features/db";
 
+interface Tag {
+  tag_id: number;
+  tag_name: string;
+}
+
 export default class BugsRoute extends UserRoute<{
   response: StoplightOperations["get-campaigns-cid-bugs"]["responses"]["200"]["content"]["application/json"];
   parameters: StoplightOperations["get-campaigns-cid-bugs"]["parameters"]["path"];
@@ -28,6 +33,7 @@ export default class BugsRoute extends UserRoute<{
     | { project: number; showNeedReview: boolean; titleRule: boolean }
     | undefined;
   private filterBy: { [key: string]: string | string[] } | undefined;
+  private search: string | undefined;
 
   constructor(configuration: RouteClassConfiguration) {
     super(configuration);
@@ -44,6 +50,8 @@ export default class BugsRoute extends UserRoute<{
 
     if (query.filterBy)
       this.filterBy = query.filterBy as { [key: string]: string | string[] };
+
+    if (query.search) this.search = query.search as string;
   }
 
   private setOrderBy() {
@@ -125,17 +133,34 @@ export default class BugsRoute extends UserRoute<{
     try {
       bugs = await this.getBugs();
     } catch (e: any) {
-      return this.setError(e.code || 500, {
+      return this.setError(500, {
         message: e.message || ERROR_MESSAGE,
-        status_code: e.code || 500,
+        status_code: 500,
       } as OpenapiError);
     }
 
     if (!bugs || !bugs.length) return this.emptyResponse();
 
+    const campaignTags = await this.getTags();
+
+    if (campaignTags.length) {
+      bugs = bugs.map((bug) => {
+        const tags = campaignTags.filter((tag) => tag.bug_id === bug.id);
+        if (!tags.length) return bug;
+        const bugWithTags = {
+          ...bug,
+          tags: tags.map((tag) => {
+            return { tag_id: tag.tag_id, tag_name: tag.tag_name };
+          }),
+        };
+        return bugWithTags;
+      });
+    }
+
     const formatted = this.formatBugs(bugs);
     const filtered = this.filterBugs(formatted);
     const paginated = this.paginateBugs(filtered);
+
     return this.setSuccess(200, {
       items: paginated,
       start: this.start,
@@ -143,6 +168,19 @@ export default class BugsRoute extends UserRoute<{
       size: paginated.length,
       total: filtered.length,
     });
+  }
+
+  private async getTags(): Promise<Array<Tag & { bug_id: number }>> {
+    const tags = await db.query(`
+      SELECT
+        tag_id,
+        display_name as tag_name,
+        bug_id
+      FROM wp_appq_bug_taxonomy
+      WHERE campaign_id = ${this.cp_id} and is_public=1
+    `);
+
+    return tags;
   }
 
   private async getBugs(): Promise<
@@ -181,61 +219,63 @@ export default class BugsRoute extends UserRoute<{
         bug_type_id: number;
         severity_id: number;
         read_status: 0 | 1;
+        read: true | false;
+        tags?: Tag[];
       }[]
   > {
     const bugs = await db.query(
       `SELECT 
-    b.id,
-    b.internal_id,
-    b.campaign_id,
-    b.message     AS title,
-    b.description,
-    b.expected_result,
-    b.current_result,
-    b.status_id,
-    status.name   AS status_name,
-    s.name        AS severity,
-    t.name        AS type,
-    r.name        AS replicability,
-    b.created,
-    b.updated,
-    b.note,
-    device.form_factor,
-    device.pc_type,
-    b.manufacturer,
-    b.model,
-    b.os,
-    b.os_version,
-    b.application_section,
-    b.application_section_id,
-    uc.title as uc_title,
-    uc.simple_title as uc_simple_title,
-    uc.prefix as uc_prefix,
-    b.is_duplicated,
-    b.duplicated_of_id,
-    b.is_favorite,
-    b.bug_replicability_id,
-    b.bug_type_id,
-    b.severity_id,
-    COALESCE(rs.is_read, 0) as read_status
-  FROM wp_appq_evd_bug b
-  JOIN wp_appq_evd_severity s ON (b.severity_id = s.id)
-  JOIN wp_appq_evd_bug_type t ON (b.bug_type_id = t.id)
-  JOIN wp_appq_evd_bug_replicability r ON (b.bug_replicability_id = r.id)
-  JOIN wp_appq_evd_bug_status status ON (b.status_id = status.id)
-  LEFT JOIN wp_crowd_appq_device device ON (b.dev_id = device.id)
-  LEFT JOIN wp_appq_campaign_task uc ON (uc.id = b.application_section_id)
-  LEFT JOIN wp_appq_bug_read_status rs ON (rs.bug_id = b.id AND rs.is_read = 1 AND rs.wp_id = ${this.getWordpressId(
-    "tryber"
-  )})
-  WHERE b.campaign_id = ${this.cp_id}
-  AND b.publish = 1
-  AND ${
-    this.shouldShowNeedReview()
-      ? `(status.name = 'Approved' OR status.name = 'Need Review')`
-      : `status.name = 'Approved'`
-  }
-  ORDER BY b.${this.orderBy} ${this.order}`
+        b.id,
+        b.internal_id,
+        b.campaign_id,
+        b.message     AS title,
+        b.description,
+        b.expected_result,
+        b.current_result,
+        b.status_id,
+        status.name   AS status_name,
+        s.name        AS severity,
+        t.name        AS type,
+        r.name        AS replicability,
+        b.created,
+        b.updated,
+        b.note,
+        device.form_factor,
+        device.pc_type,
+        b.manufacturer,
+        b.model,
+        b.os,
+        b.os_version,
+        b.application_section,
+        b.application_section_id,
+        uc.title as uc_title,
+        uc.simple_title as uc_simple_title,
+        uc.prefix as uc_prefix,
+        b.is_duplicated,
+        b.duplicated_of_id,
+        b.is_favorite,
+        b.bug_replicability_id,
+        b.bug_type_id,
+        b.severity_id,
+        COALESCE(rs.is_read, 0) as read_status
+      FROM wp_appq_evd_bug b
+      JOIN wp_appq_evd_severity s ON (b.severity_id = s.id)
+      JOIN wp_appq_evd_bug_type t ON (b.bug_type_id = t.id)
+      JOIN wp_appq_evd_bug_replicability r ON (b.bug_replicability_id = r.id)
+      JOIN wp_appq_evd_bug_status status ON (b.status_id = status.id)
+      LEFT JOIN wp_crowd_appq_device device ON (b.dev_id = device.id)
+      LEFT JOIN wp_appq_campaign_task uc ON (uc.id = b.application_section_id)
+      LEFT JOIN wp_appq_bug_read_status rs ON (rs.bug_id = b.id AND rs.is_read = 1 AND rs.wp_id = ${this.getWordpressId(
+        "tryber"
+      )})
+      WHERE b.campaign_id = ${this.cp_id}
+      AND b.publish = 1
+      AND ${
+        this.shouldShowNeedReview()
+          ? `(status.name = 'Approved' OR status.name = 'Need Review')`
+          : `status.name = 'Approved'`
+      }
+      ORDER BY b.${this.orderBy} ${this.order}`
     );
 
     if (!bugs) return false;
@@ -250,7 +290,8 @@ export default class BugsRoute extends UserRoute<{
 
   private formatBugs(bugs: Awaited<ReturnType<typeof this.getBugs>>) {
     if (!bugs || !bugs.length) return [];
-    return bugs.map((bug) => {
+
+    const formattedBugs = bugs.map((bug) => {
       return {
         id: bug.id,
         internal_id: bug.internal_id,
@@ -292,21 +333,86 @@ export default class BugsRoute extends UserRoute<{
         is_favorite: bug.is_favorite,
         read_status: bug.read_status,
         is_duplicated: bug.is_duplicated,
+        read: bug.read_status ? true : false,
+        ...(bug.tags && { tags: bug.tags }),
       };
     });
+
+    return formattedBugs;
   }
 
   private filterBugs(bugs: ReturnType<typeof this.formatBugs>) {
-    if (!this.filterBy) return bugs;
-    return bugs.filter((bug) => {
-      if (this.filterBy && this.filterBy["unread"]) {
+    if (!this.filterBy && !this.search) return bugs;
+
+    const filteredBugs = bugs.filter((bug) => {
+      if (this.filterBy && this.filterBy["read"] === "false") {
         return bug.read_status === 0;
+      }
+      if (this.filterBy && this.filterBy["read"] === "true") {
+        return bug.read_status === 1;
       }
       if (this.filterBy && this.filterBy["is_duplicated"]) {
         return bug.is_duplicated.toString() === this.filterBy["is_duplicated"];
       }
+      if (
+        this.filterBy &&
+        this.filterBy["tags"] &&
+        typeof this.filterBy["tags"] === "string"
+      ) {
+        if (this.filterBy["tags"] === "none") {
+          return !bug.tags?.length;
+        }
+        if (bug.tags?.length) {
+          const tagsToFilter = this.filterBy["tags"]
+            .split(",")
+            .map((tagId) => (parseInt(tagId) > 0 ? parseInt(tagId) : 0))
+            .filter((tagId) => tagId > 0);
+          const bugTagsIds = bug.tags.map((tag) => tag.tag_id);
+          return tagsToFilter.every((tagsToFilter) => {
+            return bugTagsIds.includes(tagsToFilter);
+          });
+        }
+
+        return false;
+      }
+      if (
+        this.filterBy &&
+        this.filterBy["severities"] &&
+        typeof this.filterBy["severities"] === "string"
+      ) {
+        const severitiesToFilter = this.filterBy["severities"]
+          .split(",")
+          .map((sevId) => (parseInt(sevId) > 0 ? parseInt(sevId) : 0))
+          .filter((sevId) => sevId > 0);
+        return severitiesToFilter.includes(bug.severity.id);
+      }
+      if (
+        this.filterBy &&
+        this.filterBy["replicabilities"] &&
+        typeof this.filterBy["replicabilities"] === "string"
+      ) {
+        const replicabilitiesToFilter = this.filterBy["replicabilities"]
+          .split(",")
+          .map((repId) => (parseInt(repId) > 0 ? parseInt(repId) : 0))
+          .filter((repId) => repId > 0);
+        return replicabilitiesToFilter.includes(bug.replicability.id);
+      }
+      if (
+        this.search &&
+        this.search.replace(/\D/g, "").length > 0 &&
+        !isNaN(parseInt(this.search.replace(/\D/g, "")))
+      ) {
+        return bug.id === parseInt(this.search.replace(/\D/g, ""));
+      }
+      if (this.search && this.search.length > 0) {
+        return bug.title.full
+          .toLocaleLowerCase()
+          .includes(this.search.toLocaleLowerCase());
+      }
       return true;
     });
+
+    return filteredBugs;
   }
 
   private paginateBugs(bugs: ReturnType<typeof this.filterBugs>) {

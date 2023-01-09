@@ -110,6 +110,18 @@ const usecase_1: UseCaseParams = {
   prefix: "Use Case 1:",
 };
 
+const profile_1 = {
+  id: 32,
+  name: "Tester 1",
+  wp_user_id: 1,
+};
+
+const profile_2 = {
+  id: 34,
+  name: "Deleted User",
+  wp_user_id: 13,
+};
+
 const bug_1: BugsParams = {
   id: 12999,
   internal_id: "UG12999",
@@ -151,6 +163,19 @@ const bug_3_pending = {
   ...bug_1,
   id: 13001,
   status_id: 1, // pending
+};
+
+const bug_4 = {
+  ...bug_1,
+  id: 13002,
+  wp_user_id: profile_2.wp_user_id,
+};
+
+const bug_5_from_unknown = {
+  ...bug_1,
+  id: 13003,
+  campaign_id: campaign_2.id,
+  wp_user_id: 999,
 };
 
 const bug_media_1 = {
@@ -208,6 +233,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
       try {
         await dbAdapter.add({
           companies: [customer_1],
+          profiles: [profile_1, profile_2],
           userToCustomers: [user_to_customer_1],
           projects: [project_1, project_2],
           userToProjects: [user_to_project_1],
@@ -218,6 +244,8 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
         await bugs.insert(bug_1);
         await bugs.insert(bug_2);
         await bugs.insert(bug_3_pending);
+        await bugs.insert(bug_4);
+        await bugs.insert(bug_5_from_unknown);
         await devices.insert(device_1);
         await devices.insert(device_2);
         await bugMedia.insert(bug_media_1);
@@ -472,6 +500,46 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
     expect(usecase.title).toEqual(bug_2.application_section);
     expect(usecase.simple_title).toBeUndefined();
     expect(usecase.prefix).toBeUndefined();
+  });
+
+  it("Should return tester details as tester id and name", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(200);
+    expect(response.body.reporter).toEqual({
+      tester_id: profile_1.id,
+      name: profile_1.name,
+    });
+  });
+
+  it("Should return tester details if user is deleted user", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_4.id}`)
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(200);
+    expect(response.body.reporter).toEqual({
+      tester_id: profile_2.id,
+      name: "Deleted User",
+    });
+  });
+
+  it("Should return unknown if the tester doesn't exists", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_2.id}/bugs/${bug_5_from_unknown.id}`)
+      .set("Authorization", "Bearer admin");
+    expect(response.status).toBe(200);
+    expect(response.body.reporter).toEqual({
+      tester_id: 0,
+      name: "Unknown",
+    });
+  });
+
+  it("Should raise an error if the bug_id required is from another cp", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_5_from_unknown.id}`)
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(400);
   });
 
   /** --- end of file */
