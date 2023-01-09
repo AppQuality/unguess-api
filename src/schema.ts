@@ -912,7 +912,7 @@ export interface operations {
             media?: components["schemas"]["BugMedia"][];
             tags?: components["schemas"]["BugTag"][];
             additional_fields?: components["schemas"]["BugAdditionalField"][];
-            posted_by: {
+            reporter: {
               tester_id: number;
               name: string;
             };

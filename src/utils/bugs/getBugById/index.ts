@@ -143,7 +143,7 @@ export const getBugById = async ({
     media: media || [],
     tags: tags || [],
     additional_fields: additional || [],
-    posted_by: {
+    reporter: {
       tester_id: bug.tester_id,
       name: bug.tester_name,
     },

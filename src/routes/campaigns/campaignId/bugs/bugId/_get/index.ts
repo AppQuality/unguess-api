@@ -52,8 +52,8 @@ export default async (
     return bug as StoplightOperations["get-campaigns-single-bug"]["responses"]["200"]["content"]["application/json"];
   } catch (e: any) {
     if (e.code) {
-      error.code = e.code;
-      res.status_code = e.code;
+      error.code = typeof e.code === "number" ? e.code : 500;
+      res.status_code = typeof e.code === "number" ? e.code : 500;
     } else {
       error.code = 500;
       res.status_code = 500;

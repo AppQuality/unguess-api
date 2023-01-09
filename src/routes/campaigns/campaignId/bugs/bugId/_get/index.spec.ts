@@ -109,14 +109,17 @@ const usecase_1: UseCaseParams = {
   simple_title: "something to do here",
   prefix: "Use Case 1:",
 };
+
 const profile_1 = {
-  id: 1,
+  id: 32,
   name: "Tester 1",
+  wp_user_id: 1,
 };
 
 const profile_2 = {
-  id: 2,
+  id: 34,
   name: "Deleted User",
+  wp_user_id: 13,
 };
 
 const bug_1: BugsParams = {
@@ -165,7 +168,7 @@ const bug_3_pending = {
 const bug_4 = {
   ...bug_1,
   id: 13002,
-  wp_user_id: profile_2.id,
+  wp_user_id: profile_2.wp_user_id,
 };
 
 const bug_media_1 = {
@@ -496,7 +499,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
       .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
-    expect(response.body.posted_by).toEqual({
+    expect(response.body.reporter).toEqual({
       tester_id: profile_1.id,
       name: profile_1.name,
     });
@@ -507,9 +510,9 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
       .get(`/campaigns/${campaign_1.id}/bugs/${bug_4.id}`)
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
-    expect(response.body.posted_by).toEqual({
+    expect(response.body.reporter).toEqual({
       tester_id: profile_2.id,
-      name: "Deleted user",
+      name: "Deleted User",
     });
   });
 
