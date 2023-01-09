@@ -1004,5 +1004,33 @@ describe("GET /campaigns/{cid}/bugs", () => {
     );
   });
 
+  it("Should allow filtering multiple filterby, combining them in AND", async () => {
+    const response = await request(app)
+      .get(
+        `/campaigns/${campaign_1.id}/bugs?filterBy[replicabilities]=2,3&filterBy[severities]=4`
+      )
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: bug_9_no_tags.id }),
+      ])
+    );
+  });
+
+  it("Should allow mixing filterby and search, combining them in AND", async () => {
+    const response = await request(app)
+      .get(
+        `/campaigns/${campaign_1.id}/bugs?filterBy[replicabilities]=2,3&search=CON-TEXT`
+      )
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: bug_9_no_tags.id }),
+      ])
+    );
+  });
+
   // --- End of file
 });
