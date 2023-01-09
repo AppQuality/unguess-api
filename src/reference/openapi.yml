@@ -272,7 +272,7 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/BugAdditionalField'
-                      posted_by:
+                      reporter:
                         type: object
                         required:
                           - tester_id
@@ -283,7 +283,7 @@ paths:
                           name:
                             type: string
                     required:
-                      - posted_by
+                      - reporter
               examples: {}
         '400':
           $ref: '#/components/responses/Error'
