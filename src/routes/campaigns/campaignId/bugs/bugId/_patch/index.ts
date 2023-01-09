@@ -80,11 +80,8 @@ export default class Route extends UserRoute<{
   private async clearTags() {
     await db.query(
       db.format(
-        `
-        DELETE FROM wp_appq_bug_taxonomy 
-        WHERE campaign_id = ?
-            AND bug_id = ?
-        `,
+        `DELETE FROM wp_appq_bug_taxonomy 
+        WHERE campaign_id = ? AND bug_id = ?`,
         [this.cid, this.bid]
       )
     );
@@ -92,34 +89,36 @@ export default class Route extends UserRoute<{
 
   private async insertTags() {
     if (this.tags?.length) {
-      const insertIncomingTags = await this.getQueryInsertIncomingTags(
-        this.tags
-      );
+      const insertIncomingTags = await this.getQueryInsertIncomingTags();
       await db.query(insertIncomingTags);
     }
   }
 
-  protected async getQueryInsertIncomingTags(
-    tags: { tag_id?: number; tag_name?: string }[]
-  ): Promise<string> {
+  protected async getQueryInsertIncomingTags(): Promise<string> {
     const maxTagId = await this.getMaxTagId();
-    const values = await Promise.all(
-      tags.map(async (tag, i) => {
-        let tagName = tag.tag_name;
-        let tagId = maxTagId + i;
-
-        const existingTag = await this.getTagByNameOrId(tag);
+    const values: string[] = [];
+    let i = 1;
+    for (const tag of this.tags) {
+      let tagId = 0;
+      let tagName = "";
+      const existingTag = await this.getTagByNameOrId(tag);
+      if ("tag_name" in tag && !existingTag) {
+        tagId = maxTagId + i++;
+        tagName = tag.tag_name;
+      } else {
         if (existingTag) {
-          tagName = existingTag.tag_name;
           tagId = existingTag.tag_id;
+          tagName = existingTag.tag_name;
         }
-
-        return `
+      }
+      if (tagId > 0) {
+        values.push(`
             (${tagId}, '${tagName}', '${tagName}', ${this.bid}, ${
           this.cid
-        }, ${this.getWordpressId("unguess")}, ${this.getUserId()}, 1)`;
-      })
-    );
+        }, ${this.getWordpressId("unguess")}, ${this.getUserId()}, 1)`);
+      }
+    }
+
     return `
     INSERT INTO wp_appq_bug_taxonomy 
       (tag_id, display_name, slug, bug_id, campaign_id, author_wp_id, author_tid, is_public) 
@@ -128,12 +127,12 @@ export default class Route extends UserRoute<{
   }
 
   private async getTagByNameOrId(tag: { tag_id?: number; tag_name?: string }) {
-    const result = await db.query(
+    const result: { tag_id: number; tag_name: string }[] = await db.query(
       `SELECT tag_id, display_name as tag_name 
       FROM wp_appq_bug_taxonomy 
       WHERE ${
         tag.tag_id
-          ? `tag_id = ${tag.tag_id}`
+          ? `tag_id = ${tag.tag_id} AND campaign_id = ${this.cid}`
           : `display_name = '${tag.tag_name}' AND campaign_id = ${this.cid}`
       } `
     );
