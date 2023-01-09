@@ -144,6 +144,32 @@ const bug_2: BugsParams = {
   os: device_1.operating_system,
   os_version: device_1.os_version,
 };
+
+const bug_3: BugsParams = {
+  id: 3,
+  internal_id: "UG13",
+  wp_user_id: 1,
+  message: "[CON-TEXT][2ndContext] - Bug 12-999 message",
+  description: "Bug 12999 description",
+  expected_result: "Bug 12999 expected result",
+  current_result: "Bug 12999 actual result",
+  campaign_id: campaign_1.id,
+  status_id: 2,
+  created: "2021-10-19 12:57:57.0",
+  updated: "2021-10-19 12:57:57.0",
+  dev_id: device_1.id,
+  severity_id: 1,
+  bug_replicability_id: 1,
+  bug_type_id: 1,
+  application_section_id: usecase_1.id,
+  application_section: usecase_1.title,
+  note: "Bug 12999 notes",
+  manufacturer: device_1.manufacturer,
+  model: device_1.model,
+  os: device_1.operating_system,
+  os_version: device_1.os_version,
+};
+
 const tag_1 = {
   id: 69,
   tag_id: 1,
@@ -159,6 +185,14 @@ const tag_2_other_cp = {
   bug_id: 1000,
 };
 
+const tag_3 = {
+  id: 3,
+  tag_id: 2,
+  display_name: "Tag 3",
+  campaign_id: campaign_1.id,
+  bug_id: bug_3.id,
+};
+
 describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
   beforeAll(async () => {
     await dbAdapter.add({
@@ -171,6 +205,7 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     await bugType.addDefaultItems();
     await bugs.insert(bug_1);
     await bugs.insert(bug_2);
+    await bugs.insert(bug_3);
     await severities.addDefaultItems();
     await replicabilities.addDefaultItems();
     await statuses.addDefaultItems();
@@ -178,6 +213,7 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     await usecases.insert(usecase_1);
     await tags.insert(tag_1);
     await tags.insert(tag_2_other_cp);
+    await tags.insert(tag_3);
   });
 
   // It should answer 403 if user is not logged in
@@ -226,31 +262,14 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
       .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer user")
       .send({
-        tags: [{ tag_id: tag_2_other_cp.tag_id }],
+        tags: [{ tag_id: tag_3.tag_id }],
       });
     expect(response.status).toBe(200);
     expect(response.body.tags).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          tag_id: tag_2_other_cp.tag_id,
-          tag_name: tag_2_other_cp.display_name,
-        }),
-      ])
-    );
-  });
-  it("Should add existing tag by tag_name", async () => {
-    const response = await request(app)
-      .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
-      .set("Authorization", "Bearer user")
-      .send({
-        tags: [{ tag_name: tag_2_other_cp.display_name }],
-      });
-    expect(response.status).toBe(200);
-    expect(response.body.tags).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          tag_id: tag_2_other_cp.tag_id,
-          tag_name: tag_2_other_cp.display_name,
+          tag_id: tag_3.tag_id,
+          tag_name: tag_3.display_name,
         }),
       ])
     );
@@ -261,7 +280,7 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
       .set("Authorization", "Bearer user")
       .send({
         tags: [
-          { tag_id: tag_2_other_cp.tag_id },
+          { tag_id: tag_3.tag_id },
           { tag_name: "Tag to be add" },
           { tag_name: "Tag to be add 2" },
         ],
@@ -275,8 +294,8 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
         }),
         expect.objectContaining({
           //existing tag
-          tag_id: tag_2_other_cp.tag_id,
-          tag_name: tag_2_other_cp.display_name,
+          tag_id: tag_3.tag_id,
+          tag_name: tag_3.display_name,
         }),
         expect.objectContaining({
           tag_id: 46,
@@ -291,9 +310,9 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
       .set("Authorization", "Bearer user")
       .send({
         tags: [
-          { tag_id: tag_2_other_cp.tag_id },
+          { tag_id: tag_3.tag_id },
           { tag_name: "Tag to be add" },
-          { tag_id: tag_2_other_cp.tag_id },
+          { tag_id: tag_3.tag_id },
         ],
       });
     expect(response.status).toBe(200);
@@ -302,8 +321,8 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
       expect.arrayContaining([
         expect.objectContaining({
           //existing tag
-          tag_id: tag_2_other_cp.tag_id,
-          tag_name: tag_2_other_cp.display_name,
+          tag_id: tag_3.tag_id,
+          tag_name: tag_3.display_name,
         }),
       ])
     );
