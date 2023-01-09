@@ -859,8 +859,8 @@ export interface operations {
           "application/json": {
             items?: (components["schemas"]["Bug"] & {
               tags?: {
-                tag_id?: number;
-                tag_name?: string;
+                tag_id: number;
+                tag_name: string;
               }[];
             })[];
             start?: number;

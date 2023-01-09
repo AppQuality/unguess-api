@@ -14,8 +14,8 @@ import { getBugDevice } from "@src/utils/bugs/getBugDevice";
 import * as db from "@src/features/db";
 
 interface Tag {
-  tag_id?: number;
-  tag_name?: string;
+  tag_id: number;
+  tag_name: string;
 }
 
 export default class BugsRoute extends UserRoute<{
