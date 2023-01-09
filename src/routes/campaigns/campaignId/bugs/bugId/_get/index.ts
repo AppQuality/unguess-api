@@ -46,6 +46,7 @@ export default async (
 
     const bug = await getBugById({
       bugId: bug_id,
+      campaignId: campaign.id,
       showNeedReview: campaign.showNeedReview,
     });
 

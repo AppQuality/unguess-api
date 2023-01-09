@@ -171,6 +171,13 @@ const bug_4 = {
   wp_user_id: profile_2.wp_user_id,
 };
 
+const bug_5_from_unknown = {
+  ...bug_1,
+  id: 13003,
+  campaign_id: campaign_2.id,
+  wp_user_id: 999,
+};
+
 const bug_media_1 = {
   id: 123,
   bug_id: bug_1.id,
@@ -238,6 +245,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
         await bugs.insert(bug_2);
         await bugs.insert(bug_3_pending);
         await bugs.insert(bug_4);
+        await bugs.insert(bug_5_from_unknown);
         await devices.insert(device_1);
         await devices.insert(device_2);
         await bugMedia.insert(bug_media_1);
@@ -514,6 +522,24 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
       tester_id: profile_2.id,
       name: "Deleted User",
     });
+  });
+
+  it("Should return unknown if the tester doesn't exists", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_2.id}/bugs/${bug_5_from_unknown.id}`)
+      .set("Authorization", "Bearer admin");
+    expect(response.status).toBe(200);
+    expect(response.body.reporter).toEqual({
+      tester_id: 0,
+      name: "Unknown",
+    });
+  });
+
+  it("Should raise an error if the bug_id required is from another cp", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_5_from_unknown.id}`)
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(400);
   });
 
   /** --- end of file */
