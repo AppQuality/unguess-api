@@ -14,7 +14,9 @@
     "build": "npm-run-all clean transpile copy-reference",
     "start": "tsnd --respawn -r tsconfig-paths/register  --transpile-only  ./src/index.ts",
     "prepare": "npx husky install",
-    "types": "npx openapi-typescript src/reference/openapi.yml --output src/schema.ts"
+    "rename-schema": "node -e \"require('fs').rename('postman/schemas/openapi.yml','postman/schemas/schema.yaml', (err) => { (err ? console.log(err) : console.log('Rename complete!')); } ) \"",
+    "update-postman": "copyfiles -f src/reference/openapi.yml postman/schemas && npm run rename-schema",
+    "types": "npx openapi-typescript src/reference/openapi.yml --output src/schema.ts && npm run update-postman"
   },
   "author": "",
   "license": "ISC",
