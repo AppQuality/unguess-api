@@ -6057,31 +6057,7 @@
 					"script": {
 						"id": "139f1804-5e12-4183-83d7-86b089bd99c8",
 						"exec": [
-							"const echoPostRequest = {\r",
-							"  url: pm.environment.get('baseUrl') +'/authenticate',\r",
-							"  method: 'POST',\r",
-							"  header: 'Content-Type:application/json',\r",
-							"  body: {\r",
-							"    mode: 'application/json',\r",
-							"    raw: JSON.stringify(\r",
-							"        {\r",
-							"            username: pm.environment.get('username'),\r",
-							"            password: pm.environment.get('password')\r",
-							"        })\r",
-							"  }\r",
-							"};\r",
 							"\r",
-							"pm.sendRequest(echoPostRequest, function (err, res) {\r",
-							"    console.log(err ? err : res.json());\r",
-							"    if (err === null) {\r",
-							"        var responseJson = res.json();\r",
-							"        pm.environment.set('bearerToken', responseJson.token)\r",
-							"\r",
-							"        var expiryDate = new Date(0);\r",
-							"        expiryDate.setUTCSeconds(responseJson.exp);\r",
-							"        pm.environment.set('bearerTokenExpiry', expiryDate.getTime());\r",
-							"    }\r",
-							"});\r",
 							""
 						],
 						"type": "text/javascript"
@@ -6562,9 +6538,55 @@
 			]
 		}
 	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "864aa051-cd66-41d8-b618-0aff391add1a",
+				"type": "text/javascript",
+				"exec": [
+					"const echoPostRequest = {",
+					"  url: pm.environment.get('baseUrl') +'/authenticate',",
+					"  method: 'POST',",
+					"  header: 'Content-Type:application/json',",
+					"  body: {",
+					"    mode: 'application/json',",
+					"    raw: JSON.stringify(",
+					"        {",
+					"            username: pm.environment.get('username'),",
+					"            password: pm.environment.get('password')",
+					"        })",
+					"  }",
+					"};",
+					"",
+					"pm.sendRequest(echoPostRequest, function (err, res) {",
+					"    console.log(err ? err : res.json());",
+					"    if (err === null) {",
+					"        var responseJson = res.json();",
+					"        pm.environment.set('bearerToken', responseJson.token)",
+					"",
+					"        var expiryDate = new Date(0);",
+					"        expiryDate.setUTCSeconds(responseJson.exp);",
+					"        pm.environment.set('bearerTokenExpiry', expiryDate.getTime());",
+					"    }",
+					"});"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "91b042ac-cfa8-47e8-8320-4e4aced5eb26",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
 	"variable": [
 		{
-			"id": "b9a6f534-8544-41ca-990c-9a4595965c14",
+			"id": "73879b0a-e18c-470e-98b3-2140790397bf",
 			"key": "baseUrl",
 			"value": "https://api.unguess.io",
 			"type": "string"
