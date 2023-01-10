@@ -39,6 +39,7 @@ export default class BugsRoute extends UserRoute<{
       }
     | undefined;
   private filterBy: { [key: string]: string | string[] } | undefined;
+  private filterByTags: number[] | "none" | undefined;
   private search: string | undefined;
 
   constructor(configuration: RouteClassConfiguration) {
@@ -96,6 +97,8 @@ export default class BugsRoute extends UserRoute<{
       baseInternalId: campaign.base_bug_internal_id,
       tags: await this.getTags(),
     };
+
+    this.initFilterByTags();
   }
 
   private async initCampaign() {
@@ -112,6 +115,24 @@ export default class BugsRoute extends UserRoute<{
       WHERE id = ${this.cp_id}`);
     if (!campaigns.length) return false;
     return campaigns[0];
+  }
+
+  private initFilterByTags() {
+    const tags = this.getCampaign().tags;
+    if (
+      this.filterBy &&
+      this.filterBy["tags"] &&
+      typeof this.filterBy["tags"] === "string"
+    ) {
+      if (this.filterBy["tags"] === "none") {
+        this.filterByTags = "none";
+      } else {
+        this.filterByTags = this.filterBy["tags"]
+          .split(",")
+          .map((tagId) => (parseInt(tagId) > 0 ? parseInt(tagId) : 0))
+          .filter((tagId) => tags.map((t) => t.tag_id).includes(tagId));
+      }
+    }
   }
 
   protected async filter(): Promise<boolean> {
@@ -394,23 +415,15 @@ export default class BugsRoute extends UserRoute<{
   }
 
   private filterBugsByTags(bug: Parameters<typeof this.filterBugs>[0][number]) {
-    if (!this.filterBy) return true;
-    if (!this.filterBy["tags"]) return true;
-    if (typeof this.filterBy["tags"] !== "string") return true;
+    if (!this.filterByTags) return true;
+    if (!this.filterByTags.length) return true;
 
-    if (this.filterBy["tags"] === "none") return !bug.tags?.length;
+    if (this.filterByTags === "none") return !bug.tags?.length;
 
     if (!bug.tags?.length) return false;
 
-    const tagsToFilter = this.filterBy["tags"]
-      .split(",")
-      .map((tagId) => (parseInt(tagId) > 0 ? parseInt(tagId) : 0))
-      .filter((tagId) => tagId > 0);
-
     const bugTagsIds = bug.tags.map((tag) => tag.tag_id);
-    return tagsToFilter.every((tagsToFilter) =>
-      bugTagsIds.includes(tagsToFilter)
-    );
+    return this.filterByTags.every((tag) => bugTagsIds.includes(tag));
   }
 
   private filterBugsBySeverity(

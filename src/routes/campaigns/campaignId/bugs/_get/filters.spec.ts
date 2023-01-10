@@ -527,5 +527,12 @@ describe("GET /campaigns/{cid}/bugs", () => {
     );
   });
 
+  it("Should return all bugs if filter by invalid tag", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[tags]=invalid`)
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(4);
+  });
+
   // --- End of file
 });
