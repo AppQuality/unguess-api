@@ -20,7 +20,21 @@ export default class Route extends UserRoute<{
     const params = this.getParameters();
     this.cid = parseInt(params.cid);
     this.bid = parseInt(params.bid);
-    this.tags = this.removeDuplicatedId(this.getBody().tags);
+    this.tags = this.getTags();
+  }
+
+  private getTags() {
+    const tags = this.getBody().tags;
+    if (!tags || tags?.length === 0) return [];
+    const tagsId = tags.map((tag) => {
+      if ("tag_id" in tag) return tag.tag_id;
+      return tag.tag_name;
+    });
+    const uniqueTagsId = [...new Set(tagsId)];
+    return uniqueTagsId.map((tagIdOrName) => {
+      if (typeof tagIdOrName === "number") return { tag_id: tagIdOrName };
+      return { tag_name: tagIdOrName };
+    });
   }
 
   protected async filter(): Promise<boolean> {
@@ -87,43 +101,46 @@ export default class Route extends UserRoute<{
     );
   }
 
-  private async insertTags() {
-    if (this.tags?.length) {
-      const insertIncomingTags = await this.getQueryInsertIncomingTags();
-      await db.query(insertIncomingTags);
-    }
-  }
+  protected async insertTags() {
+    if (!this.tags.length) return;
 
-  protected async getQueryInsertIncomingTags(): Promise<string> {
     const maxTagId = await this.getMaxTagId();
     const values: string[] = [];
     let i = 1;
     for (const tag of this.tags) {
-      let tagId = 0;
-      let tagName = "";
+      let tagToAdd;
       const existingTag = await this.getTagByNameOrId(tag);
       if ("tag_name" in tag && !existingTag) {
-        tagId = maxTagId + i++;
-        tagName = tag.tag_name;
-      } else {
-        if (existingTag) {
-          tagId = existingTag.tag_id;
-          tagName = existingTag.tag_name;
-        }
+        tagToAdd = {
+          id: maxTagId + i++,
+          name: tag.tag_name,
+        };
+      } else if (existingTag) {
+        tagToAdd = {
+          id: existingTag.tag_id,
+          name: existingTag.tag_name,
+        };
       }
-      if (tagId > 0) {
+      if (tagToAdd) {
         values.push(`
-            (${tagId}, '${tagName}', '${tagName}', ${this.bid}, ${
-          this.cid
-        }, ${this.getWordpressId("unguess")}, ${this.getUserId()}, 1)`);
+        (
+          ${tagToAdd.id}, 
+          '${tagToAdd.name}', 
+          '${tagToAdd.name}', 
+          ${this.bid}, 
+          ${this.cid}, 
+          ${this.getWordpressId("unguess")}, 
+          ${this.getUserId()}, 
+          1
+        )`);
       }
     }
 
-    return `
+    await db.query(`
     INSERT INTO wp_appq_bug_taxonomy 
       (tag_id, display_name, slug, bug_id, campaign_id, author_wp_id, author_tid, is_public) 
     VALUES ${values.join(",")}
-  `;
+  `);
   }
 
   private async getTagByNameOrId(tag: { tag_id?: number; tag_name?: string }) {
@@ -147,20 +164,5 @@ export default class Route extends UserRoute<{
 
     if (!result.length) return 0;
     return result[0].id;
-  }
-
-  private removeDuplicatedId(
-    tags: ({ tag_id: number } | { tag_name: string })[] | undefined
-  ) {
-    if (!tags || tags?.length === 0) return [];
-    const tagsId = tags.map((tag) => {
-      if ("tag_id" in tag) return tag.tag_id;
-      return tag.tag_name;
-    });
-    const uniqueTagsId = [...new Set(tagsId)];
-    return uniqueTagsId.map((tagIdOrName) => {
-      if (typeof tagIdOrName === "number") return { tag_id: tagIdOrName };
-      return { tag_name: tagIdOrName };
-    });
   }
 }
