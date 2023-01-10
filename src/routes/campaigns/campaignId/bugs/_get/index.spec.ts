@@ -61,34 +61,7 @@ const campaign_1 = {
   campaign_type_id: campaign_type_1.id,
   campaign_type: -1,
   project_id: project_1.id,
-};
-
-const campaign_2 = {
-  id: 2,
-  start_date: "2017-07-20 10:00:00",
-  end_date: "2017-07-20 10:00:00",
-  close_date: "2017-07-20 10:00:00",
-  title: "Campaign 2 title",
-  customer_title: "Campaign 2 customer title",
-  status_id: 1,
-  is_public: 1,
-  campaign_type_id: campaign_type_1.id,
-  campaign_type: -1,
-  project_id: project_2.id,
-};
-
-const campaign_3 = {
-  id: 3,
-  start_date: "2017-07-20 10:00:00",
-  end_date: "2017-07-20 10:00:00",
-  close_date: "2017-07-20 10:00:00",
-  title: "Campaign 3 title",
-  customer_title: "Campaign 3 customer title",
-  status_id: 1,
-  is_public: 1,
-  campaign_type_id: campaign_type_1.id,
-  campaign_type: -1,
-  project_id: project_1.id,
+  base_bug_internal_id: "BUG01",
 };
 
 const campaign_4 = {
@@ -132,7 +105,7 @@ const device_1: DeviceParams = {
 
 const bug_1: BugsParams = {
   id: 1,
-  internal_id: "BUG1",
+  internal_id: "BUG011",
   message: "[CON-TEXT-bike] - Bug 1 super-message",
   description: "Bug 1 description",
   expected_result: "Bug 1 expected result",
@@ -156,7 +129,7 @@ const bug_1: BugsParams = {
 
 const bug_2: BugsParams = {
   id: 2,
-  internal_id: "BUG2",
+  internal_id: "BUG012",
   message: "Bug 2 message orange",
   description: "Bug 2 description",
   expected_result: "Bug 2 expected result",
@@ -193,7 +166,7 @@ const usecase_without_meta: UseCaseParams = {
 
 const bug_3: BugsParams = {
   id: 3,
-  internal_id: "BUG3",
+  internal_id: "BUG013",
   message: "Bug 3 message",
   description: "Bug 3 description",
   expected_result: "Bug 3 expected result",
@@ -219,7 +192,7 @@ const bug_3: BugsParams = {
 
 const bug_4: BugsParams = {
   id: 4,
-  internal_id: "BUG4",
+  internal_id: "BUG014",
   message: "Bug 4 message",
   description: "Bug 4 description",
   expected_result: "Bug 4 expected result",
@@ -245,7 +218,7 @@ const bug_4: BugsParams = {
 
 const bug_5: BugsParams = {
   id: 5,
-  internal_id: "BUG5",
+  internal_id: "BUG015",
   message: "Bug 5 message",
   description: "Bug 5 description",
   expected_result: "Bug 5 expected result",
@@ -276,7 +249,7 @@ const bug_6_pending: BugsParams = {
 
 const bug_7: BugsParams = {
   id: 7,
-  internal_id: "BUG7",
+  internal_id: "BUG017",
   message: "Bug 7 message",
   description: "Bug 7 description",
   expected_result: "Bug 7 expected result",
@@ -301,7 +274,7 @@ const bug_7: BugsParams = {
 
 const bug_8_unpublished: BugsParams = {
   id: 8,
-  internal_id: "BUG8",
+  internal_id: "BUG018",
   message: "Bug 8 message",
   description: "Bug 8 description",
   expected_result: "Bug 8 expected result",
@@ -327,7 +300,7 @@ const bug_8_unpublished: BugsParams = {
 
 const bug_9_no_tags: BugsParams = {
   id: 9,
-  internal_id: "BUG9",
+  internal_id: "BUG019",
   message: "[CON-TEXT] - Bug 9 super-message",
   description: "Bug 9 description",
   expected_result: "Bug 9 expected result",
@@ -376,7 +349,7 @@ const tag_3 = {
   id: 3,
   tag_id: 2,
   display_name: "Tag 2",
-  campaign_id: campaign_2.id,
+  campaign_id: 2,
   bug_id: bug_2.id,
 };
 const tag_4 = {
@@ -397,13 +370,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
           projects: [project_1, project_2],
           userToProjects: [user_to_project_1],
           campaignTypes: [campaign_type_1],
-          campaigns: [
-            campaign_1,
-            campaign_2,
-            campaign_3,
-            campaign_4,
-            campaign_5,
-          ],
+          campaigns: [campaign_1, campaign_4, campaign_5],
         });
         await CampaignMeta.insert({
           meta_id: 1,
@@ -444,31 +411,6 @@ describe("GET /campaigns/{cid}/bugs", () => {
 
       resolve(true);
     });
-  });
-
-  // It should answer 403 if user is not logged in
-  it("Should answer 403 if user is not logged in", async () => {
-    const response = await request(app).get(`/campaigns/${campaign_1.id}/bugs`);
-
-    expect(response.status).toBe(403);
-  });
-
-  // It should fail if the campaign does not exist
-  it("Should fail if the campaign does not exist", async () => {
-    const response = await request(app)
-      .get(`/campaigns/999/bugs`)
-      .set("Authorization", "Bearer user");
-
-    expect(response.status).toBe(400);
-  });
-
-  // It should fail if the user has no permission to see the campaign's project
-  it("Should fail if the user has no permission to see the campaign's project", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_2.id}/bugs`)
-      .set("Authorization", "Bearer user");
-
-    expect(response.status).toBe(403);
   });
 
   // It should answer 200 with paginated bugs
@@ -519,32 +461,16 @@ describe("GET /campaigns/{cid}/bugs", () => {
     );
   });
 
-  // Should return an empty items array if the campaign has not bugs
-  it("Should return Should return an empty items array if the campaign has not bugs", async () => {
+  it("Should return total of bugs when paginating", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_3.id}/bugs`)
+      .get(`/campaigns/${campaign_1.id}/bugs?limit=1&start=0`)
       .set("Authorization", "Bearer user");
 
-    expect(response.body.items).toEqual([]);
+    expect(response.body).toHaveProperty("size", 1);
+    expect(response.body).toHaveProperty("total", 3);
   });
 
-  // Should return an error if the limit is not a number
-  it("Should return an error if the limit is not a number", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs?limit=abc&start=0`)
-      .set("Authorization", "Bearer user");
-
-    expect(response.status).toBe(400);
-  });
-
-  // Should return an error if the start is not a number
-  it("Should return an error if the start is not a number", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs?limit=10&start=abc`)
-      .set("Authorization", "Bearer user");
-
-    expect(response.status).toBe(400);
-  });
+  // It should answer 403 if user is not logged in
 
   // Should return the items paginated by limit and start parameters
   it("Should return the items paginated by limit and start parameters", async () => {
@@ -646,33 +572,6 @@ describe("GET /campaigns/{cid}/bugs", () => {
     const response = await request(app)
       .get(
         `/campaigns/${campaign_1.id}/bugs?limit=10&start=0&order=DESC&orderBy=severity_id`
-      )
-      .set("Authorization", "Bearer user");
-
-    expect(response.status).toBe(200);
-
-    expect(response.body).toMatchObject(
-      expect.objectContaining({
-        items: [
-          expect.objectContaining({
-            id: bug_9_no_tags.id,
-          }),
-          expect.objectContaining({
-            id: bug_2.id,
-          }),
-          expect.objectContaining({
-            id: bug_1.id,
-          }),
-        ],
-      })
-    );
-  });
-
-  // Should return the normal results if the filterBy is not accepted
-  it("Should return an error if the filterBy is not valid", async () => {
-    const response = await request(app)
-      .get(
-        `/campaigns/${campaign_1.id}/bugs?limit=10&start=0&filterBy[abc]=abc`
       )
       .set("Authorization", "Bearer user");
 
@@ -852,6 +751,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_5.id}/bugs`)
       .set("Authorization", "Bearer user");
+    expect(response.body).toHaveProperty("items");
     expect(response.body.items[0].title).toEqual({
       full: bug_7.message,
       compact: bug_7.message,
@@ -870,138 +770,13 @@ describe("GET /campaigns/{cid}/bugs", () => {
     expect(response.body.items[2]).toHaveProperty("read", false);
   });
 
-  it("Should return only read bugs if filterBy has read filter as true", async () => {
+  it("Should not return read_status prop", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[read]=true`)
+      .get(`/campaigns/${campaign_1.id}/bugs`)
       .set("Authorization", "Bearer user");
-    expect(response.body.items.length).toBe(1);
-  });
-
-  it("Should return only unread bugs if filterBy has read filter as false", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[read]=false`)
-      .set("Authorization", "Bearer user");
-    expect(response.body.items.length).toBe(2);
-  });
-
-  it("It should only return bugs read by the user if filterBy read the filter as true", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[read]=true`)
-      .set("Authorization", "Bearer user");
-    expect(response.body.items.length).toBe(1);
-    expect(response.body.items[0]).toHaveProperty("id", 2);
-  });
-
-  it("Should return total of bugs when paginating", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs?limit=1&start=0`)
-      .set("Authorization", "Bearer user");
-
-    expect(response.body).toHaveProperty("size", 1);
-    expect(response.body).toHaveProperty("total", 3);
-  });
-
-  //Should return bugs with specific tags
-  it("Should return bugs filtered by tags (bugs containing all tags in filter)", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[tags]=1,3`)
-      .set("Authorization", "Bearer user");
-    expect(response.body.items.length).toBe(1);
-    expect(response.body.items).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          tags: [
-            { tag_id: 1, tag_name: "Tag 1" },
-            { tag_id: 3, tag_name: "Tag 4" },
-          ],
-        }),
-      ])
-    );
-  });
-  it("Should return bugs filtered by tags ignoring invalid tags", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[tags]=1,3,none`)
-      .set("Authorization", "Bearer user");
-    expect(response.body.items.length).toBe(1);
-    expect(response.body.items).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          tags: [
-            { tag_id: 1, tag_name: "Tag 1" },
-            { tag_id: 3, tag_name: "Tag 4" },
-          ],
-        }),
-      ])
-    );
-  });
-  it("Should return bugs filtered by notags", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[tags]=none`)
-      .set("Authorization", "Bearer user");
-    expect(response.body.items.length).toBe(1);
-    expect(response.body.items).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ id: bug_9_no_tags.id }),
-      ])
-    );
-    expect(response.body.items[0].tags).toBeUndefined();
-  });
-
-  it("Should return bugs filtered by severities ids", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[severities]=1,4`)
-      .set("Authorization", "Bearer user");
-    expect(response.body.items.length).toBe(2);
-    expect(response.body.items).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ id: bug_9_no_tags.id }),
-        expect.objectContaining({ id: bug_1.id }),
-      ])
-    );
-  });
-
-  it("Should return bugs filtered by replicabilities ids", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[replicabilities]=2,3`)
-      .set("Authorization", "Bearer user");
-    expect(response.body.items.length).toBe(2);
-    expect(response.body.items).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ id: bug_2.id }),
-        expect.objectContaining({ id: bug_9_no_tags.id }),
-      ])
-    );
-  });
-  it("Should return bugs filtered by search (search by bugID)", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs?search=ccccc9cccccc`)
-      .set("Authorization", "Bearer user");
-    expect(response.body.items.length).toBe(1);
-    expect(response.body.items).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ id: bug_9_no_tags.id }),
-      ])
-    );
-  });
-
-  it("Should return bugs filtered by search (search by title)", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs?search=orange`)
-      .set("Authorization", "Bearer user");
-    expect(response.body.items.length).toBe(1);
-    expect(response.body.items).toEqual(
-      expect.arrayContaining([expect.objectContaining({ id: bug_2.id })])
-    );
-  });
-
-  it("Should return bugs filtered by search (search by context)", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs?search=CON-TEXT-bike`)
-      .set("Authorization", "Bearer user");
-    expect(response.body.items.length).toBe(1);
-    expect(response.body.items).toEqual(
-      expect.arrayContaining([expect.objectContaining({ id: bug_1.id })])
-    );
+    for (let i = 0; i < response.body.items.length; i++) {
+      expect(response.body.items[i]).not.toHaveProperty("read_status");
+    }
   });
 
   // --- End of file

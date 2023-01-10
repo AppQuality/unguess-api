@@ -30,9 +30,16 @@ export default class BugsRoute extends UserRoute<{
   private orderBy: string = DEFAULT_ORDER_BY_PARAMETER;
 
   private campaign:
-    | { project: number; showNeedReview: boolean; titleRule: boolean }
+    | {
+        project: number;
+        showNeedReview: boolean;
+        titleRule: boolean;
+        baseInternalId: string;
+        tags: (Tag & { bug_id: number })[];
+      }
     | undefined;
   private filterBy: { [key: string]: string | string[] } | undefined;
+  private filterByTags: number[] | "none" | undefined;
   private search: string | undefined;
 
   constructor(configuration: RouteClassConfiguration) {
@@ -87,19 +94,45 @@ export default class BugsRoute extends UserRoute<{
       project: campaign.project_id,
       showNeedReview: campaign.showNeedReview,
       titleRule: await getTitleRule(this.cp_id),
+      baseInternalId: campaign.base_bug_internal_id,
+      tags: await this.getTags(),
     };
+
+    this.initFilterByTags();
   }
 
   private async initCampaign() {
-    const campaigns: { showNeedReview: boolean; project_id: number }[] =
-      await db.query(`
+    const campaigns: {
+      showNeedReview: boolean;
+      project_id: number;
+      base_bug_internal_id: string;
+    }[] = await db.query(`
       SELECT 
         cust_bug_vis as showNeedReview,
-        project_id
+        project_id,
+        base_bug_internal_id
       FROM wp_appq_evd_campaign 
       WHERE id = ${this.cp_id}`);
     if (!campaigns.length) return false;
     return campaigns[0];
+  }
+
+  private initFilterByTags() {
+    const tags = this.getCampaign().tags;
+    if (
+      this.filterBy &&
+      this.filterBy["tags"] &&
+      typeof this.filterBy["tags"] === "string"
+    ) {
+      if (this.filterBy["tags"] === "none") {
+        this.filterByTags = "none";
+      } else {
+        this.filterByTags = this.filterBy["tags"]
+          .split(",")
+          .map((tagId) => (parseInt(tagId) > 0 ? parseInt(tagId) : 0))
+          .filter((tagId) => tags.map((t) => t.tag_id).includes(tagId));
+      }
+    }
   }
 
   protected async filter(): Promise<boolean> {
@@ -141,37 +174,22 @@ export default class BugsRoute extends UserRoute<{
 
     if (!bugs || !bugs.length) return this.emptyResponse();
 
-    const campaignTags = await this.getTags();
-
-    if (campaignTags.length) {
-      bugs = bugs.map((bug) => {
-        const tags = campaignTags.filter((tag) => tag.bug_id === bug.id);
-        if (!tags.length) return bug;
-        const bugWithTags = {
-          ...bug,
-          tags: tags.map((tag) => {
-            return { tag_id: tag.tag_id, tag_name: tag.tag_name };
-          }),
-        };
-        return bugWithTags;
-      });
-    }
-
-    const formatted = this.formatBugs(bugs);
-    const filtered = this.filterBugs(formatted);
+    const enhancedBugs = this.enhanceBugs(bugs);
+    const filtered = this.filterBugs(enhancedBugs);
     const paginated = this.paginateBugs(filtered);
+    const formatted = this.formatBugs(paginated);
 
     return this.setSuccess(200, {
-      items: paginated,
+      items: formatted,
       start: this.start,
       limit: this.limit,
-      size: paginated.length,
+      size: formatted.length,
       total: filtered.length,
     });
   }
 
   private async getTags(): Promise<Array<Tag & { bug_id: number }>> {
-    const tags = await db.query(`
+    return await db.query(`
       SELECT
         tag_id,
         display_name as tag_name,
@@ -179,8 +197,6 @@ export default class BugsRoute extends UserRoute<{
       FROM wp_appq_bug_taxonomy
       WHERE campaign_id = ${this.cp_id} and is_public=1
     `);
-
-    return tags;
   }
 
   private async getBugs(): Promise<
@@ -288,21 +304,26 @@ export default class BugsRoute extends UserRoute<{
     return this.getCampaign().showNeedReview;
   }
 
-  private formatBugs(bugs: Awaited<ReturnType<typeof this.getBugs>>) {
+  private enhanceBugs(bugs: Awaited<ReturnType<typeof this.getBugs>>) {
     if (!bugs || !bugs.length) return [];
 
-    const formattedBugs = bugs.map((bug) => {
+    return bugs.map((bug) => {
+      let tags;
+      if (this.getCampaign().tags.length) {
+        tags = this.getCampaign()
+          .tags.filter((tag) => tag.bug_id === bug.id)
+          .map((tag) => ({
+            tag_id: tag.tag_id,
+            tag_name: tag.tag_name,
+          }));
+        if (!tags.length) tags = undefined;
+      }
       return {
-        id: bug.id,
-        internal_id: bug.internal_id,
-        campaign_id: bug.campaign_id,
+        ...bug,
         title: getBugTitle({
           bugTitle: bug.title,
           hasTitleRule: this.getCampaign().titleRule,
         }),
-        step_by_step: bug.description,
-        expected_result: bug.expected_result,
-        current_result: bug.current_result,
         status: {
           id: bug.status_id,
           name: bug.status_name,
@@ -325,94 +346,141 @@ export default class BugsRoute extends UserRoute<{
           ...(bug.uc_simple_title && { simple_title: bug.uc_simple_title }),
           ...(bug.uc_prefix && { prefix: bug.uc_prefix }),
         },
-        created: bug.created.toString(),
-        ...(bug.updated && { updated: bug.updated.toString() }),
-        note: bug.note,
         device: getBugDevice(bug),
-        ...(bug.duplicated_of_id && { duplicated_of_id: bug.duplicated_of_id }),
-        is_favorite: bug.is_favorite,
-        read_status: bug.read_status,
-        is_duplicated: bug.is_duplicated,
-        read: bug.read_status ? true : false,
-        ...(bug.tags && { tags: bug.tags }),
+        ...(tags && { tags }),
       };
     });
-
-    return formattedBugs;
   }
 
-  private filterBugs(bugs: ReturnType<typeof this.formatBugs>) {
+  private formatBugs(bugs: ReturnType<typeof this.paginateBugs>) {
+    return bugs.map((bug) => {
+      return {
+        id: bug.id,
+        internal_id: bug.internal_id,
+        campaign_id: bug.campaign_id,
+        title: bug.title,
+        step_by_step: bug.description,
+        expected_result: bug.expected_result,
+        current_result: bug.current_result,
+        status: bug.status,
+        severity: bug.severity,
+        type: bug.type,
+        replicability: bug.replicability,
+        application_section: bug.application_section,
+        created: bug.created.toString(),
+        ...(bug.updated && { updated: bug.updated.toString() }),
+        ...(bug.duplicated_of_id && { duplicated_of_id: bug.duplicated_of_id }),
+        note: bug.note,
+        device: bug.device,
+        is_favorite: bug.is_favorite,
+        is_duplicated: bug.is_duplicated,
+        read: bug.read_status ? true : false,
+        tags: bug.tags,
+      };
+    });
+  }
+
+  private filterBugs(bugs: ReturnType<typeof this.enhanceBugs>) {
     if (!this.filterBy && !this.search) return bugs;
 
-    const filteredBugs = bugs.filter((bug) => {
-      if (this.filterBy && this.filterBy["read"] === "false") {
-        return bug.read_status === 0;
-      }
-      if (this.filterBy && this.filterBy["read"] === "true") {
-        return bug.read_status === 1;
-      }
-      if (this.filterBy && this.filterBy["is_duplicated"]) {
-        return bug.is_duplicated.toString() === this.filterBy["is_duplicated"];
-      }
-      if (
-        this.filterBy &&
-        this.filterBy["tags"] &&
-        typeof this.filterBy["tags"] === "string"
-      ) {
-        if (this.filterBy["tags"] === "none") {
-          return !bug.tags?.length;
-        }
-        if (bug.tags?.length) {
-          const tagsToFilter = this.filterBy["tags"]
-            .split(",")
-            .map((tagId) => (parseInt(tagId) > 0 ? parseInt(tagId) : 0))
-            .filter((tagId) => tagId > 0);
-          const bugTagsIds = bug.tags.map((tag) => tag.tag_id);
-          return tagsToFilter.every((tagsToFilter) => {
-            return bugTagsIds.includes(tagsToFilter);
-          });
-        }
+    return bugs.filter((bug) => {
+      if (this.filterBugsByReadStatus(bug) === false) return false;
+      if (this.filterBugsByDuplicateStatus(bug) === false) return false;
+      if (this.filterBugsByTags(bug) === false) return false;
+      if (this.filterBugsBySeverity(bug) === false) return false;
+      if (this.filterBugsByReplicability(bug) === false) return false;
+      if (this.filterBugsBySearch(bug) === false) return false;
 
-        return false;
-      }
-      if (
-        this.filterBy &&
-        this.filterBy["severities"] &&
-        typeof this.filterBy["severities"] === "string"
-      ) {
-        const severitiesToFilter = this.filterBy["severities"]
-          .split(",")
-          .map((sevId) => (parseInt(sevId) > 0 ? parseInt(sevId) : 0))
-          .filter((sevId) => sevId > 0);
-        return severitiesToFilter.includes(bug.severity.id);
-      }
-      if (
-        this.filterBy &&
-        this.filterBy["replicabilities"] &&
-        typeof this.filterBy["replicabilities"] === "string"
-      ) {
-        const replicabilitiesToFilter = this.filterBy["replicabilities"]
-          .split(",")
-          .map((repId) => (parseInt(repId) > 0 ? parseInt(repId) : 0))
-          .filter((repId) => repId > 0);
-        return replicabilitiesToFilter.includes(bug.replicability.id);
-      }
-      if (
-        this.search &&
-        this.search.replace(/\D/g, "").length > 0 &&
-        !isNaN(parseInt(this.search.replace(/\D/g, "")))
-      ) {
-        return bug.id === parseInt(this.search.replace(/\D/g, ""));
-      }
-      if (this.search && this.search.length > 0) {
-        return bug.title.full
-          .toLocaleLowerCase()
-          .includes(this.search.toLocaleLowerCase());
-      }
       return true;
     });
+  }
 
-    return filteredBugs;
+  private filterBugsByReadStatus(
+    bug: Parameters<typeof this.filterBugs>[0][number]
+  ) {
+    if (!this.filterBy) return true;
+    if (!this.filterBy["read"]) return true;
+
+    if (this.filterBy["read"] === "false") return bug.read_status === 0;
+    return bug.read_status === 1;
+  }
+
+  private filterBugsByDuplicateStatus(
+    bug: Parameters<typeof this.filterBugs>[0][number]
+  ) {
+    if (!this.filterBy) return true;
+    if (!this.filterBy["is_duplicated"]) return true;
+
+    return bug.is_duplicated.toString() === this.filterBy["is_duplicated"];
+  }
+
+  private filterBugsByTags(bug: Parameters<typeof this.filterBugs>[0][number]) {
+    if (!this.filterByTags) return true;
+    if (!this.filterByTags.length) return true;
+
+    if (this.filterByTags === "none") return !bug.tags?.length;
+
+    if (!bug.tags?.length) return false;
+
+    const bugTagsIds = bug.tags.map((tag) => tag.tag_id);
+    return this.filterByTags.every((tag) => bugTagsIds.includes(tag));
+  }
+
+  private filterBugsBySeverity(
+    bug: Parameters<typeof this.filterBugs>[0][number]
+  ) {
+    if (!this.filterBy) return true;
+    if (!this.filterBy["severities"]) return true;
+    if (typeof this.filterBy["severities"] !== "string") return true;
+
+    const severitiesToFilter = this.filterBy["severities"]
+      .split(",")
+      .map((sevId) => (parseInt(sevId) > 0 ? parseInt(sevId) : 0))
+      .filter((sevId) => sevId > 0);
+
+    return severitiesToFilter.includes(bug.severity.id);
+  }
+
+  private filterBugsByReplicability(
+    bug: Parameters<typeof this.filterBugs>[0][number]
+  ) {
+    if (!this.filterBy) return true;
+    if (!this.filterBy["replicabilities"]) return true;
+    if (typeof this.filterBy["replicabilities"] !== "string") return true;
+
+    const replicabilitiesToFilter = this.filterBy["replicabilities"]
+      .split(",")
+      .map((repId) => (parseInt(repId) > 0 ? parseInt(repId) : 0))
+      .filter((repId) => repId > 0);
+
+    return replicabilitiesToFilter.includes(bug.replicability.id);
+  }
+
+  private filterBugsBySearch(
+    bug: Parameters<typeof this.filterBugs>[0][number]
+  ) {
+    if (!this.search) return true;
+    if (this.search.length <= 0) return true;
+
+    if (this.filterBugsBySearchById(bug) === true) return true;
+
+    return bug.title.full
+      .toLocaleLowerCase()
+      .includes(this.search.toLocaleLowerCase());
+  }
+
+  private filterBugsBySearchById(
+    bug: Parameters<typeof this.filterBugs>[0][number]
+  ) {
+    if (!this.search) return true;
+
+    const textToSearch = this.search.replace(
+      this.getCampaign().baseInternalId,
+      ""
+    );
+    if (bug.id.toString().includes(textToSearch)) return true;
+
+    return false;
   }
 
   private paginateBugs(bugs: ReturnType<typeof this.filterBugs>) {
