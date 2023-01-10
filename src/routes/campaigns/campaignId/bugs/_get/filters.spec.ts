@@ -100,7 +100,7 @@ const bug_2: BugsParams = {
   expected_result: "Bug 2 expected result",
   current_result: "Bug 2 current result",
   campaign_id: campaign_1.id,
-  bug_type_id: 1,
+  bug_type_id: 2,
   bug_replicability_id: 3,
   status_id: 2,
   status_reason: "Bug 2 status reason",
@@ -125,7 +125,7 @@ const bug_3: BugsParams = {
   expected_result: "Bug 3 expected result",
   current_result: "Bug 3 current result",
   campaign_id: campaign_1.id,
-  bug_type_id: 1,
+  bug_type_id: 3,
   bug_replicability_id: 1,
   status_id: 1,
   status_reason: "Bug 3 status reason",
@@ -149,7 +149,7 @@ const bug_4: BugsParams = {
   expected_result: "Bug 4 expected result",
   current_result: "Bug 4 current result",
   campaign_id: campaign_1.id,
-  bug_type_id: 1,
+  bug_type_id: 3,
   bug_replicability_id: 1,
   status_id: 4,
   status_reason: "Bug 4 status reason",
@@ -173,7 +173,7 @@ const bug_8_unpublished: BugsParams = {
   expected_result: "Bug 8 expected result",
   current_result: "Bug 8 current result",
   campaign_id: campaign_1.id,
-  bug_type_id: 1,
+  bug_type_id: 3,
   bug_replicability_id: 1,
   status_id: 2,
   status_reason: "Bug 8 status reason",
@@ -199,7 +199,7 @@ const bug_9_no_tags: BugsParams = {
   expected_result: "Bug 9 expected result",
   current_result: "Bug 9 current result",
   campaign_id: campaign_1.id,
-  bug_type_id: 1,
+  bug_type_id: 3,
   bug_replicability_id: 2,
   status_id: 2,
   status_reason: "Bug 9 status reason",
@@ -222,7 +222,7 @@ const bug_55: BugsParams = {
   expected_result: "Bug expected result",
   current_result: "Bug current result",
   campaign_id: campaign_1.id,
-  bug_type_id: 1,
+  bug_type_id: 3,
   bug_replicability_id: 1,
   status_id: 2,
   status_reason: "Bug status reason",
@@ -437,6 +437,20 @@ describe("GET /campaigns/{cid}/bugs", () => {
       ])
     );
   });
+
+  it("Should return bugs filtered by type ids", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[types]=1,2`)
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(2);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: bug_1.id }),
+        expect.objectContaining({ id: bug_2.id }),
+      ])
+    );
+  });
+
   it("Should return bugs filtered by search (search by bugID)", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs?search=9`)

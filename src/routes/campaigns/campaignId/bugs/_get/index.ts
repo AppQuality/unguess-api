@@ -389,6 +389,7 @@ export default class BugsRoute extends UserRoute<{
       if (this.filterBugsByTags(bug) === false) return false;
       if (this.filterBugsBySeverity(bug) === false) return false;
       if (this.filterBugsByReplicability(bug) === false) return false;
+      if (this.filterBugsByType(bug) === false) return false;
       if (this.filterBugsBySearch(bug) === false) return false;
 
       return true;
@@ -439,6 +440,19 @@ export default class BugsRoute extends UserRoute<{
       .filter((sevId) => sevId > 0);
 
     return severitiesToFilter.includes(bug.severity.id);
+  }
+
+  private filterBugsByType(bug: Parameters<typeof this.filterBugs>[0][number]) {
+    if (!this.filterBy) return true;
+    if (!this.filterBy["types"]) return true;
+    if (typeof this.filterBy["types"] !== "string") return true;
+
+    const typesToFilter = this.filterBy["types"]
+      .split(",")
+      .map((id) => (parseInt(id) > 0 ? parseInt(id) : 0))
+      .filter((id) => id > 0);
+
+    return typesToFilter.includes(bug.type.id);
   }
 
   private filterBugsByReplicability(
