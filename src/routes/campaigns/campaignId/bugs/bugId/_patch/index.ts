@@ -144,15 +144,18 @@ export default class Route extends UserRoute<{
   `);
   }
 
-  private async getTagByNameOrId(tag: { tag_id?: number; tag_name?: string }) {
+  private async getTagByNameOrId(
+    tag: { tag_id: number } | { tag_name: string }
+  ) {
     const result: { tag_id: number; tag_name: string }[] = await db.query(
-      `SELECT tag_id, display_name as tag_name 
-      FROM wp_appq_bug_taxonomy 
-      WHERE ${
-        tag.tag_id
-          ? `tag_id = ${tag.tag_id} AND campaign_id = ${this.cid}`
-          : `display_name = '${tag.tag_name}' AND campaign_id = ${this.cid}`
-      } `
+      db.format(
+        `SELECT tag_id, display_name as tag_name 
+    FROM wp_appq_bug_taxonomy 
+    WHERE ${
+      "tag_id" in tag ? `tag_id = ?` : `display_name = ?`
+    }  AND campaign_id = ?`,
+        ["tag_id" in tag ? tag.tag_id : tag.tag_name, this.cid]
+      )
     );
     if (!result.length) return false;
     return result[0];
