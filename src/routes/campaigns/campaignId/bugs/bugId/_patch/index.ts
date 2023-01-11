@@ -122,19 +122,20 @@ export default class Route extends UserRoute<{
         };
       }
       if (tagToAdd) {
-        values.push(`
-        (
-          ${tagToAdd.id}, 
-          '${tagToAdd.name}', 
-          '${tagToAdd.name}', 
-          ${this.bid}, 
-          ${this.cid}, 
-          ${this.getWordpressId("unguess")}, 
-          ${this.getUserId()}, 
-          1
-        )`);
+        values.push(
+          db.format(`(?,?,?,?,?,?,?,1)`, [
+            tagToAdd.id,
+            tagToAdd.name,
+            tagToAdd.name,
+            this.bid,
+            this.cid,
+            this.getWordpressId("unguess"),
+            this.getUserId(),
+          ])
+        );
       }
     }
+    if (!values.length) return;
 
     await db.query(`
     INSERT INTO wp_appq_bug_taxonomy 
