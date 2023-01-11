@@ -3,6 +3,7 @@ import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 import bugType from "@src/__mocks__/database/bug_type";
+import bugs from "@src/__mocks__/database/bugs";
 import customBugTypes from "@src/__mocks__/database/bug_type_custom";
 
 const campaign_type_1 = {
@@ -85,11 +86,25 @@ const campaign_3 = {
   project_id: 1,
 };
 
+const campaign_4 = {
+  id: 4,
+  start_date: "2017-07-20 10:00:00",
+  end_date: "2017-07-20 10:00:00",
+  close_date: "2017-07-20 10:00:00",
+  title: "Campaign 1 title",
+  customer_title: "Campaign 1 customer title",
+  status_id: 1,
+  is_public: 1,
+  campaign_type_id: campaign_type_1.id,
+  campaign_type: -1,
+  project_id: 1,
+};
+
 describe("GET /campaigns/{cid}/bugTypes", () => {
   beforeAll(async () => {
     await dbAdapter.add({
       campaignTypes: [campaign_type_1],
-      campaigns: [campaign_1, campaign_2, campaign_3],
+      campaigns: [campaign_1, campaign_2, campaign_3, campaign_4],
       companies: [customer_1, customer_2],
       projects: [project_1, project_2],
       userToCustomers: [user_to_customer_1, user_to_customer_2],
@@ -106,6 +121,29 @@ describe("GET /campaigns/{cid}/bugTypes", () => {
       id: 2,
       campaign_id: 1,
       bug_type_id: 5,
+    });
+    await customBugTypes.insert({
+      id: 3,
+      campaign_id: 4,
+      bug_type_id: 1,
+    });
+
+    await bugs.insert({
+      id: 1,
+      campaign_id: 4,
+      bug_type_id: 5,
+    });
+    await bugs.insert({
+      id: 2,
+      campaign_id: 4,
+      bug_type_id: 3,
+      publish: 0,
+    });
+    await bugs.insert({
+      id: 3,
+      campaign_id: 4,
+      bug_type_id: 3,
+      status_id: 1,
     });
   });
 
@@ -198,6 +236,23 @@ describe("GET /campaigns/{cid}/bugTypes", () => {
       {
         id: 10,
         name: "Usability",
+      },
+    ]);
+  });
+
+  it("Should return bug bugTypes even if campaign does not accept them", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_4.id}/bugTypes`)
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual([
+      {
+        id: 1,
+        name: "Crash",
+      },
+      {
+        id: 5,
+        name: "Performance",
       },
     ]);
   });
