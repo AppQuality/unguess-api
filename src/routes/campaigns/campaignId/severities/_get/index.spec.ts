@@ -2,6 +2,7 @@ import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
+import bugs from "@src/__mocks__/database/bugs";
 import severities from "@src/__mocks__/database/bug_severity";
 import customSeverities from "@src/__mocks__/database/bug_severity_custom";
 
@@ -86,11 +87,25 @@ const campaign_3 = {
   project_id: 1,
 };
 
+const campaign_4 = {
+  id: 4,
+  start_date: "2017-07-20 10:00:00",
+  end_date: "2017-07-20 10:00:00",
+  close_date: "2017-07-20 10:00:00",
+  title: "Campaign 1 title",
+  customer_title: "Campaign 1 customer title",
+  status_id: 1,
+  is_public: 1,
+  campaign_type_id: campaign_type_1.id,
+  campaign_type: -1,
+  project_id: 1,
+};
+
 describe("GET /campaigns/{cid}/severities", () => {
   beforeAll(async () => {
     await dbAdapter.add({
       campaignTypes: [campaign_type_1],
-      campaigns: [campaign_1, campaign_2, campaign_3],
+      campaigns: [campaign_1, campaign_2, campaign_3, campaign_4],
       companies: [customer_1, customer_2],
       projects: [project_1, project_2],
       userToCustomers: [user_to_customer_1, user_to_customer_2],
@@ -105,6 +120,29 @@ describe("GET /campaigns/{cid}/severities", () => {
       id: 2,
       campaign_id: 1,
       bug_severity_id: 4,
+    });
+
+    await customSeverities.insert({
+      id: 3,
+      campaign_id: 4,
+      bug_severity_id: 1,
+    });
+    await bugs.insert({
+      id: 1,
+      severity_id: 4,
+      campaign_id: 4,
+    });
+    await bugs.insert({
+      id: 2,
+      severity_id: 2,
+      campaign_id: 4,
+      publish: 0,
+    });
+    await bugs.insert({
+      id: 3,
+      severity_id: 2,
+      campaign_id: 4,
+      status_id: 1,
     });
   });
 
@@ -185,5 +223,21 @@ describe("GET /campaigns/{cid}/severities", () => {
     ]);
   });
 
+  it("Should return bug severities even if not available in list", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_4.id}/severities`)
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual([
+      {
+        id: 1,
+        name: "LOW",
+      },
+      {
+        id: 4,
+        name: "CRITICAL",
+      },
+    ]);
+  });
   // --- End of file
 });
