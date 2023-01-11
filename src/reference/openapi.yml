@@ -500,6 +500,38 @@ paths:
       security:
         - JWT: []
       parameters: []
+
+  '/campaigns/{cid}/severities':
+    parameters:
+      - $ref: '#/components/parameters/cid'
+    get:
+      summary: Get Campaigns Severities
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BugSeverity'
+              examples:
+                Example 1:
+                  value:
+                    - id: 1
+                      name: string
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-severities
+      description: ''
+      security:
+        - JWT: []
+      parameters: []
   '/campaigns/{cid}/widgets':
     parameters:
       - name: cid

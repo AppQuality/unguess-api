@@ -86,6 +86,15 @@ export interface paths {
       };
     };
   };
+  "/campaigns/{cid}/severities": {
+    get: operations["get-campaigns-cid-severities"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+  };
   "/campaigns/{cid}/widgets": {
     get: operations["get-campaigns-cid-widgets-wslug"];
     parameters: {
@@ -1022,6 +1031,25 @@ export interface operations {
             slug: string;
             is_public?: number;
           }[];
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  "get-campaigns-cid-severities": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["BugSeverity"][];
         };
       };
       400: components["responses"]["Error"];
