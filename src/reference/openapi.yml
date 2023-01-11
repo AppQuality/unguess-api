@@ -296,6 +296,70 @@ paths:
       operationId: get-campaigns-single-bug
       security:
         - JWT: []
+    patch:
+      summary: Patch Campaigns Single Bug
+      operationId: patch-campaigns-cid-bugs-bid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tags:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        tag_id:
+                          type: number
+                        tag_name:
+                          type: string
+                      required:
+                        - tag_id
+                        - tag_name
+              examples:
+                oneTagResponse:
+                  value:
+                    tags:
+                      - tag_id: 0
+                        tag_name: string
+                emptyTagsResponse:
+                  value:
+                    tags: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tags:
+                  type: array
+                  items:
+                    oneOf:
+                      - properties:
+                          tag_id:
+                            type: number
+                        required:
+                          - tag_id
+                      - properties:
+                          tag_name:
+                            type: string
+                        required:
+                          - tag_name
+                    type: object
+            examples:
+              possibleTagEntries:
+                value:
+                  tags:
+                    - tag_id: 1
+                    - tag_name: tag2
+              emptyTagsEntries:
+                value:
+                  tags: []
+      security:
+        - JWT: []
   '/campaigns/{cid}/meta':
     parameters:
       - name: cid
