@@ -91,7 +91,7 @@ export interface paths {
     parameters: {
       path: {
         /** Campaign id */
-        cid: string;
+        cid: components["parameters"]["cid"];
       };
     };
   };
@@ -268,7 +268,7 @@ export interface components {
     };
     /** BugMedia */
     BugMedia: {
-      type: {
+      mime_type: {
         /** @enum {string} */
         type: "video" | "image" | "other";
         extension: string;
@@ -1042,7 +1042,7 @@ export interface operations {
     parameters: {
       path: {
         /** Campaign id */
-        cid: string;
+        cid: components["parameters"]["cid"];
       };
     };
     responses: {
