@@ -165,6 +165,11 @@ const bug_3_pending = {
   status_id: 1, // pending
 };
 
+const bug_34 = {
+  ...bug_1,
+  id: 13401,
+};
+
 const bug_4 = {
   ...bug_1,
   id: 13002,
@@ -183,6 +188,13 @@ const bug_media_1 = {
   bug_id: bug_1.id,
   location: "https://example.com/bug_media_1.png",
   type: "image",
+  uploaded: "2021-10-19 12:57:57.0",
+};
+const bug_media_other_type = {
+  id: 1234,
+  bug_id: bug_34.id,
+  location: "https://example.com/bug_media_other_type.png",
+  type: "application/vnd.ms-office",
   uploaded: "2021-10-19 12:57:57.0",
 };
 
@@ -244,11 +256,13 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
         await bugs.insert(bug_1);
         await bugs.insert(bug_2);
         await bugs.insert(bug_3_pending);
+        await bugs.insert(bug_34);
         await bugs.insert(bug_4);
         await bugs.insert(bug_5_from_unknown);
         await devices.insert(device_1);
         await devices.insert(device_2);
         await bugMedia.insert(bug_media_1);
+        await bugMedia.insert(bug_media_other_type);
         await tags.insert(tag_1);
         await tags.insert(tag_2);
         await additionalField.insert(field_1);
@@ -389,6 +403,17 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
     expect(response.status).toBe(200);
 
     expect(response.body.media).toEqual([]);
+  });
+  it("Should return accepted bug media type", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_34.id}`)
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(200);
+    expect(
+      ["image", "video", "other"].includes(
+        response.body.media[0].mime_type.type
+      )
+    ).toEqual(true);
   });
 
   //Should return a list of tags if available
