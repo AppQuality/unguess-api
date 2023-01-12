@@ -500,7 +500,6 @@ paths:
       security:
         - JWT: []
       parameters: []
-
   '/campaigns/{cid}/severities':
     parameters:
       - $ref: '#/components/parameters/cid'
@@ -1288,7 +1287,7 @@ components:
       title: BugMedia
       type: object
       properties:
-        type:
+        mime_type:
           type: object
           required:
             - type
@@ -1308,7 +1307,7 @@ components:
         creation_date:
           type: string
       required:
-        - type
+        - mime_type
         - url
         - creation_date
     BugReplicability:
