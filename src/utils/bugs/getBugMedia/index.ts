@@ -1,7 +1,7 @@
 import * as db from "@src/features/db";
 
 interface BugMedia {
-  type: string;
+  type: StoplightComponents["schemas"]["BugMedia"]["mime_type"]["type"];
   location: string;
   uploaded: string;
 }
@@ -29,8 +29,8 @@ export const getBugMedia = async (
   const media = [] as StoplightComponents["schemas"]["BugMedia"][];
   results.forEach((result: BugMedia) => {
     media.push({
-      type: {
-        type: result.type as StoplightComponents["schemas"]["BugMedia"]["type"]["type"],
+      mime_type: {
+        type: ["image", "video"].includes(result.type) ? result.type : "other",
         extension: result.location.split(".").pop()?.toLowerCase() || "-",
       },
       url: result.location,
