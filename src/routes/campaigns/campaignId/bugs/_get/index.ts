@@ -6,47 +6,35 @@ import {
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
 } from "@src/utils/constants";
-import { getProjectById } from "@src/utils/projects";
-import UserRoute from "@src/features/routes/UserRoute";
 import { getBugTitle, getTitleRule } from "@src/utils/campaigns/getTitleRule";
 import { getBugDevice } from "@src/utils/bugs/getBugDevice";
 
 import * as db from "@src/features/db";
+import CampaignRoute from "@src/features/routes/CampaignRoute";
 
 interface Tag {
   tag_id: number;
   tag_name: string;
 }
 
-export default class BugsRoute extends UserRoute<{
+export default class BugsRoute extends CampaignRoute<{
   response: StoplightOperations["get-campaigns-cid-bugs"]["responses"]["200"]["content"]["application/json"];
   parameters: StoplightOperations["get-campaigns-cid-bugs"]["parameters"]["path"];
   query: StoplightOperations["get-campaigns-cid-bugs"]["parameters"]["query"];
 }> {
-  private cp_id: number;
   private limit: number = LIMIT_QUERY_PARAM_DEFAULT;
   private start: number = START_QUERY_PARAM_DEFAULT;
   private order: string = DEFAULT_ORDER_PARAMETER;
   private orderBy: string = DEFAULT_ORDER_BY_PARAMETER;
 
-  private campaign:
-    | {
-        project: number;
-        showNeedReview: boolean;
-        titleRule: boolean;
-        baseInternalId: string;
-        tags: (Tag & { bug_id: number })[];
-      }
-    | undefined;
+  private isTitleRuleActive: boolean = false;
+  private tags: (Tag & { bug_id: number })[] = [];
   private filterBy: { [key: string]: string | string[] } | undefined;
   private filterByTags: number[] | "none" | undefined;
   private search: string | undefined;
 
   constructor(configuration: RouteClassConfiguration) {
     super(configuration);
-
-    const { cid } = this.getParameters();
-    this.cp_id = parseInt(cid);
 
     const query = this.getQuery();
     if (query.limit) this.limit = parseInt(query.limit as unknown as string);
@@ -73,52 +61,16 @@ export default class BugsRoute extends UserRoute<{
       this.order = query.order;
   }
 
-  private getCampaign() {
-    if (!this.campaign) throw new Error("Project not defined");
-    return this.campaign;
-  }
-
   protected async init(): Promise<void> {
-    const campaign = await this.initCampaign();
-
-    if (!campaign) {
-      this.setError(400, {
-        code: 400,
-        message: "Campaign not found",
-      } as OpenapiError);
-
-      throw new Error("Campaign not found");
-    }
-
-    this.campaign = {
-      project: campaign.project_id,
-      showNeedReview: campaign.showNeedReview,
-      titleRule: await getTitleRule(this.cp_id),
-      baseInternalId: campaign.base_bug_internal_id,
-      tags: await this.getTags(),
-    };
+    await super.init();
+    this.isTitleRuleActive = await this.getTitleRuleStatus();
+    this.tags = await this.getTags();
 
     this.initFilterByTags();
   }
 
-  private async initCampaign() {
-    const campaigns: {
-      showNeedReview: boolean;
-      project_id: number;
-      base_bug_internal_id: string;
-    }[] = await db.query(`
-      SELECT 
-        cust_bug_vis as showNeedReview,
-        project_id,
-        base_bug_internal_id
-      FROM wp_appq_evd_campaign 
-      WHERE id = ${this.cp_id}`);
-    if (!campaigns.length) return false;
-    return campaigns[0];
-  }
-
   private initFilterByTags() {
-    const tags = this.getCampaign().tags;
+    const tags = this.tags;
     if (
       this.filterBy &&
       this.filterBy["tags"] &&
@@ -133,32 +85,6 @@ export default class BugsRoute extends UserRoute<{
           .filter((tagId) => tags.map((t) => t.tag_id).includes(tagId));
       }
     }
-  }
-
-  protected async filter(): Promise<boolean> {
-    if (!(await super.filter())) return false;
-
-    if (!(await this.hasAccessToProject())) {
-      this.setError(403, {
-        code: 400,
-        message: "Project not found",
-      } as OpenapiError);
-      return false;
-    }
-
-    return true;
-  }
-
-  private async hasAccessToProject() {
-    try {
-      await getProjectById({
-        projectId: this.getCampaign().project,
-        user: this.getUser(),
-      });
-    } catch (error) {
-      return false;
-    }
-    return true;
   }
 
   protected async prepare(): Promise<void> {
@@ -186,17 +112,6 @@ export default class BugsRoute extends UserRoute<{
       size: formatted.length,
       total: filtered.length,
     });
-  }
-
-  private async getTags(): Promise<Array<Tag & { bug_id: number }>> {
-    return await db.query(`
-      SELECT
-        tag_id,
-        display_name as tag_name,
-        bug_id
-      FROM wp_appq_bug_taxonomy
-      WHERE campaign_id = ${this.cp_id} and is_public=1
-    `);
   }
 
   private async getBugs(): Promise<
@@ -299,18 +214,14 @@ export default class BugsRoute extends UserRoute<{
     return bugs;
   }
 
-  private shouldShowNeedReview(): boolean {
-    return this.getCampaign().showNeedReview;
-  }
-
   private enhanceBugs(bugs: Awaited<ReturnType<typeof this.getBugs>>) {
     if (!bugs || !bugs.length) return [];
 
     return bugs.map((bug) => {
       let tags;
-      if (this.getCampaign().tags.length) {
-        tags = this.getCampaign()
-          .tags.filter((tag) => tag.bug_id === bug.id)
+      if (this.tags.length) {
+        tags = this.tags
+          .filter((tag) => tag.bug_id === bug.id)
           .map((tag) => ({
             tag_id: tag.tag_id,
             tag_name: tag.tag_name,
@@ -321,7 +232,7 @@ export default class BugsRoute extends UserRoute<{
         ...bug,
         title: getBugTitle({
           bugTitle: bug.title,
-          hasTitleRule: this.getCampaign().titleRule,
+          hasTitleRule: this.isTitleRuleActive,
         }),
         status: {
           id: bug.status_id,
@@ -487,10 +398,7 @@ export default class BugsRoute extends UserRoute<{
   ) {
     if (!this.search) return true;
 
-    const textToSearch = this.search.replace(
-      this.getCampaign().baseInternalId,
-      ""
-    );
+    const textToSearch = this.search.replace(this.baseBugInternalId, "");
     if (bug.id.toString().includes(textToSearch)) return true;
 
     return false;
