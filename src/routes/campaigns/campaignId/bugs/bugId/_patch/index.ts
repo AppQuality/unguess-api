@@ -73,22 +73,27 @@ export default class Route extends UserRoute<{
   }
 
   protected async prepare(): Promise<void> {
-    await this.clearTags();
-    await this.insertTags();
+    await this.replaceTags();
 
-    const bugTags = await db.query(
+    const bugTags = await this.getCurrentTags();
+    return this.setSuccess(200, { tags: bugTags });
+  }
+
+  private async getCurrentTags(
+    { byBug }: { byBug: boolean } = { byBug: true }
+  ): Promise<{ tag_id: number; tag_name: string }[]> {
+    return await db.query(
       db.format(
         `
         SELECT tag_id, display_name AS tag_name
         FROM wp_appq_bug_taxonomy
                 WHERE is_public = 1
             AND campaign_id = ?
-            AND bug_id = ?
+            ${byBug ? "AND bug_id = ?" : ""}
         `,
-        [this.cid, this.bid]
+        [this.cid, ...(byBug ? [this.bid] : [])]
       )
     );
-    return this.setSuccess(200, { tags: bugTags });
   }
 
   private async clearTags() {
@@ -101,15 +106,19 @@ export default class Route extends UserRoute<{
     );
   }
 
-  protected async insertTags() {
+  protected async replaceTags() {
+    const tags = await this.getCurrentTags({ byBug: false });
+    const maxTagId = await this.getMaxTagId();
+    await this.clearTags();
     if (!this.tags.length) return;
 
-    const maxTagId = await this.getMaxTagId();
     const values: string[] = [];
     let i = 1;
     for (const tag of this.tags) {
       let tagToAdd;
-      const existingTag = await this.getTagByNameOrId(tag);
+      const existingTag = tags.find(
+        (t) => "tag_id" in tag && t.tag_id === tag.tag_id
+      );
       if ("tag_name" in tag && !existingTag) {
         tagToAdd = {
           id: maxTagId + i++,
@@ -142,23 +151,6 @@ export default class Route extends UserRoute<{
       (tag_id, display_name, slug, bug_id, campaign_id, author_wp_id, author_tid, is_public) 
     VALUES ${values.join(",")}
   `);
-  }
-
-  private async getTagByNameOrId(
-    tag: { tag_id: number } | { tag_name: string }
-  ) {
-    const result: { tag_id: number; tag_name: string }[] = await db.query(
-      db.format(
-        `SELECT tag_id, display_name as tag_name 
-    FROM wp_appq_bug_taxonomy 
-    WHERE ${
-      "tag_id" in tag ? `tag_id = ?` : `display_name = ?`
-    }  AND campaign_id = ?`,
-        ["tag_id" in tag ? tag.tag_id : tag.tag_name, this.cid]
-      )
-    );
-    if (!result.length) return false;
-    return result[0];
   }
 
   private async getMaxTagId() {
