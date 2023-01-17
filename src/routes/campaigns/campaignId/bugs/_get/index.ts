@@ -300,7 +300,6 @@ export default class BugsRoute extends UserRoute<{
   }
 
   private shouldShowNeedReview(): boolean {
-    if (this.getUser().role === "administrator") return true;
     return this.getCampaign().showNeedReview;
   }
 

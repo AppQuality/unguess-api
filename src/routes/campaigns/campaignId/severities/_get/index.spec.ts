@@ -5,6 +5,7 @@ import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 import bugs from "@src/__mocks__/database/bugs";
 import severities from "@src/__mocks__/database/bug_severity";
 import customSeverities from "@src/__mocks__/database/bug_severity_custom";
+import bugStatus from "@src/__mocks__/database/bug_status";
 
 const campaign_type_1 = {
   id: 1,
@@ -111,6 +112,8 @@ describe("GET /campaigns/{cid}/severities", () => {
       userToCustomers: [user_to_customer_1, user_to_customer_2],
     });
     await severities.addDefaultItems();
+    await bugStatus.addDefaultItems();
+
     await customSeverities.insert({
       id: 1,
       campaign_id: 1,

@@ -40,7 +40,6 @@ export default class Route extends UserRoute<{
   }
 
   private shouldShowNeedReview(): boolean {
-    if (this.getUser().role === "administrator") return true;
     return this.showNeedReview;
   }
 
@@ -109,8 +108,13 @@ export default class Route extends UserRoute<{
         `SELECT btype.id, btype.name
             FROM wp_appq_evd_bug_type btype
             JOIN wp_appq_evd_bug bug ON (btype.id = bug.bug_type_id)
+            JOIN wp_appq_evd_bug_status bstatus ON (bug.status_id = bstatus.id)
         WHERE campaign_id = ? AND  btype.is_enabled = 1 AND publish = 1
-        AND status_id IN (${this.shouldShowNeedReview() ? "2,4" : "2"})
+        AND ${
+          this.shouldShowNeedReview()
+            ? `(bstatus.name = 'Approved' OR bstatus.name = 'Need Review')`
+            : `bstatus.name = 'Approved'`
+        }
         GROUP BY btype.id`,
         [this.cid]
       )

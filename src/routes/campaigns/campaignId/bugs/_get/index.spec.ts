@@ -693,17 +693,16 @@ describe("GET /campaigns/{cid}/bugs", () => {
     );
   });
 
-  it("Should return need review bugs if option is not enabled but user is admin", async () => {
+  it("Should NOT return need review bugs if option is not enabled but user is admin", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs`)
       .set("Authorization", "Bearer admin");
 
-    expect(response.body.items.length).toBe(4);
+    expect(response.body.items.length).toBe(3);
     expect(response.body.items).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ id: bug_1.id }),
         expect.objectContaining({ id: bug_2.id }),
-        expect.objectContaining({ id: bug_4.id }),
         expect.objectContaining({ id: bug_9_no_tags.id }),
       ])
     );

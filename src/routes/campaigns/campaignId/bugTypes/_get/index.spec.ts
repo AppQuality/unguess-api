@@ -3,6 +3,7 @@ import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 import bugType from "@src/__mocks__/database/bug_type";
+import bugStatus from "@src/__mocks__/database/bug_status";
 import bugs from "@src/__mocks__/database/bugs";
 import customBugTypes from "@src/__mocks__/database/bug_type_custom";
 
@@ -110,6 +111,7 @@ describe("GET /campaigns/{cid}/bugTypes", () => {
       userToCustomers: [user_to_customer_1, user_to_customer_2],
     });
     await bugType.addDefaultItems();
+    await bugStatus.addDefaultItems();
 
     await customBugTypes.insert({
       id: 1,
