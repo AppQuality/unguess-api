@@ -339,13 +339,10 @@ export default class BugsRoute extends CampaignRoute<{
     if (!this.filterBy["os"]) return true;
     if (typeof this.filterBy["os"] !== "string") return true;
 
-    const operatingSystems = this.filterBy["os"]
-      .replace(/\s+/g, " ")
-      .trim()
-      .split(",");
+    const operatingSystems = this.filterBy["os"].split(",");
 
     return operatingSystems.some((os) => {
-      return os === `${bug.os} ${bug.os_version}`;
+      return os.trim().localeCompare(`${bug.os} ${bug.os_version}`) === 0;
     });
   }
 

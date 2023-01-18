@@ -593,7 +593,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
     );
   });
 
-  it("Should return allow filtering by multiple device", async () => {
+  it("Should return bugs filtered by multiple device", async () => {
     const response = await request(app)
       .get(
         `/campaigns/${campaign_1.id}/bugs?filterBy[devices]=Apple iPhone 11,Notebook`
@@ -609,7 +609,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
     );
   });
 
-  it("Should return allow filtering by os", async () => {
+  it("Should return bugs filtered by os", async () => {
     const response = await request(app)
       .get(
         `/campaigns/${campaign_1.id}/bugs?filterBy[os]=Windows Windows 10 April 2018 Update (17134.191)`
@@ -623,24 +623,10 @@ describe("GET /campaigns/{cid}/bugs", () => {
     );
   });
 
-  it("Should return allow filtering by os even with wrong spaces", async () => {
+  it("Should return bugs filtered by multiple os", async () => {
     const response = await request(app)
       .get(
-        `/campaigns/${campaign_1.id}/bugs?filterBy[os]=Windows         Windows 10   April 2018             Update (17134.191)`
-      )
-      .set("Authorization", "Bearer user");
-
-    expect(response.body).toHaveProperty("items");
-    expect(response.body.items.length).toBe(1);
-    expect(response.body.items).toEqual(
-      expect.arrayContaining([expect.objectContaining({ id: bug_2.id })])
-    );
-  });
-
-  it("Should return allow filtering by multiple os", async () => {
-    const response = await request(app)
-      .get(
-        `/campaigns/${campaign_1.id}/bugs?filterBy[os]=iOS iOS 16 (16),Windows         Windows 10   April 2018             Update (17134.191)`
+        `/campaigns/${campaign_1.id}/bugs?filterBy[os]=iOS iOS 16 (16),Windows Windows 10 April 2018 Update (17134.191)`
       )
       .set("Authorization", "Bearer user");
 
@@ -654,7 +640,25 @@ describe("GET /campaigns/{cid}/bugs", () => {
     );
   });
 
-  it("Should return allow filtering by multiple os ignoring non-existent os", async () => {
+  it("Should return bugs filtered by multiple os even with wrong spaces", async () => {
+    const response = await request(app)
+      .get(
+        `/campaigns/${campaign_1.id}/bugs?filterBy[os]=iOS iOS 16 (16),          Windows Windows 10 April 2018 Update (17134.191)`
+      )
+      .set("Authorization", "Bearer user");
+
+    expect(response.body).toHaveProperty("items");
+    expect(response.body.items.length).toBe(2);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: bug_1.id }),
+        
+        expect.objectContaining({ id: bug_2.id }),
+      ])
+    );
+  });
+
+  it("Should return bugs filtered by multiple os ignoring non-existent os", async () => {
     const response = await request(app)
       .get(
         `/campaigns/${campaign_1.id}/bugs?filterBy[os]=unguess os,iOS iOS 16 (16)`
