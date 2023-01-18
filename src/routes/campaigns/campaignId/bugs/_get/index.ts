@@ -300,10 +300,38 @@ export default class BugsRoute extends CampaignRoute<{
       if (this.filterBugsBySeverity(bug) === false) return false;
       if (this.filterBugsByReplicability(bug) === false) return false;
       if (this.filterBugsByType(bug) === false) return false;
+      if (this.filterBugsByUsecase(bug) === false) return false;
+      if (this.filterBugsByDevice(bug) === false) return false;
+      if (this.filterBugsByOs(bug) === false) return false;
       if (this.filterBugsBySearch(bug) === false) return false;
 
       return true;
     });
+  }
+
+  private filterBugsByUsecase(
+    bug: Parameters<typeof this.filterBugs>[0][number]
+  ) {
+    if (!this.filterBy) return true;
+    if (!this.filterBy["usecases"]) return true;
+
+    throw new Error("Not implemented");
+  }
+
+  private filterBugsByDevice(
+    bug: Parameters<typeof this.filterBugs>[0][number]
+  ) {
+    if (!this.filterBy) return true;
+    if (!this.filterBy["devices"]) return true;
+
+    throw new Error("Not implemented");
+  }
+
+  private filterBugsByOs(bug: Parameters<typeof this.filterBugs>[0][number]) {
+    if (!this.filterBy) return true;
+    if (!this.filterBy["os"]) return true;
+
+    throw new Error("Not implemented");
   }
 
   private filterBugsByReadStatus(
