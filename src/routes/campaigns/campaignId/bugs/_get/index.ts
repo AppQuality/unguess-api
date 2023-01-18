@@ -329,7 +329,8 @@ export default class BugsRoute extends CampaignRoute<{
 
     return devices.some((device) => {
       return (
-        device === `${bug.manufacturer} ${bug.model}` || device === bug.pc_type
+        device === `${bug.manufacturer} ${bug.model}` ||
+        ("desktop_type" in bug.device && device === bug.device.desktop_type)
       );
     });
   }
