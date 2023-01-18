@@ -68,6 +68,27 @@ const device_1: DeviceParams = {
   form_factor: "Smartphone",
 };
 
+const device_2: DeviceParams = {
+  id: 15,
+  manufacturer: "Apple",
+  model: "iPhone 11",
+  platform_id: 2,
+  id_profile: 61042,
+  os_version: "iOS 16 (16)",
+  operating_system: "iOS",
+  form_factor: "Smartphone",
+};
+
+const device_3: DeviceParams = {
+  id: 60,
+  platform_id: 8,
+  id_profile: 61042,
+  os_version: "Windows 10 April 2018 Update (17134.191)",
+  operating_system: "Windows",
+  form_factor: "PC",
+  pc_type: "Notebook",
+};
+
 const bug_1: BugsParams = {
   id: 1,
   internal_id: "BUG011",
@@ -83,12 +104,12 @@ const bug_1: BugsParams = {
   application_section: "Bug 1 application section",
   note: "Bug 1 note",
   wp_user_id: 1,
-  dev_id: device_1.id,
+  dev_id: device_2.id,
   is_duplicated: 1,
-  manufacturer: device_1.manufacturer,
-  model: device_1.model,
-  os: device_1.operating_system,
-  os_version: device_1.os_version,
+  manufacturer: device_2.manufacturer,
+  model: device_2.model,
+  os: device_2.operating_system,
+  os_version: device_2.os_version,
   severity_id: 1,
 };
 
@@ -109,11 +130,11 @@ const bug_2: BugsParams = {
   wp_user_id: 1,
   is_favorite: 1,
   is_duplicated: 0,
-  dev_id: device_1.id,
-  manufacturer: device_1.manufacturer,
-  model: device_1.model,
-  os: device_1.operating_system,
-  os_version: device_1.os_version,
+  dev_id: device_3.id,
+  manufacturer: device_3.manufacturer,
+  model: device_3.model,
+  os: device_3.operating_system,
+  os_version: device_3.os_version,
   severity_id: 2,
 };
 
@@ -299,6 +320,8 @@ describe("GET /campaigns/{cid}/bugs", () => {
         await bugType.addDefaultItems();
         await bugStatus.addDefaultItems();
         await devices.insert(device_1);
+        await devices.insert(device_2);
+        await devices.insert(device_3);
 
         await bugsReadStatus.insert({ wp_id: 1, bug_id: bug_2.id });
         await bugsReadStatus.insert({ wp_id: 2, bug_id: bug_2.id });
@@ -546,6 +569,44 @@ describe("GET /campaigns/{cid}/bugs", () => {
       .get(`/campaigns/${campaign_1.id}/bugs?filterBy[tags]=invalid`)
       .set("Authorization", "Bearer user");
     expect(response.body.items.length).toBe(4);
+  });
+
+  it("Should return allow filtering by smartphone device", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[devices]=Apple iPhone 11`)
+      .set("Authorization", "Bearer user");
+    expect(response.body).toHaveProperty("items");
+    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: bug_1.id })])
+    );
+  });
+
+  it("Should return allow filtering by pc device", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[devices]=Notebook`)
+      .set("Authorization", "Bearer user");
+    expect(response.body).toHaveProperty("items");
+    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: bug_2.id })])
+    );
+  });
+
+  it("Should return allow filtering by multiple device", async () => {
+    const response = await request(app)
+      .get(
+        `/campaigns/${campaign_1.id}/bugs?filterBy[devices]=Apple iPhone 11,Notebook`
+      )
+      .set("Authorization", "Bearer user");
+    expect(response.body).toHaveProperty("items");
+    expect(response.body.items.length).toBe(2);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: bug_1.id }),
+        expect.objectContaining({ id: bug_2.id }),
+      ])
+    );
   });
 
   // --- End of file

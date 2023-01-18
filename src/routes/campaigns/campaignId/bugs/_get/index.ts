@@ -323,8 +323,15 @@ export default class BugsRoute extends CampaignRoute<{
   ) {
     if (!this.filterBy) return true;
     if (!this.filterBy["devices"]) return true;
+    if (typeof this.filterBy["devices"] !== "string") return true;
 
-    throw new Error("Not implemented");
+    const devices = this.filterBy["devices"].split(",");
+
+    return devices.some((device) => {
+      return (
+        device === `${bug.manufacturer} ${bug.model}` || device === bug.pc_type
+      );
+    });
   }
 
   private filterBugsByOs(bug: Parameters<typeof this.filterBugs>[0][number]) {
