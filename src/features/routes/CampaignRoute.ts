@@ -102,7 +102,6 @@ export default class CampaignRoute<
   }
 
   protected shouldShowNeedReview(): boolean {
-    if (this.getUser().role === "administrator") return true;
     return this.showNeedReview;
   }
 
