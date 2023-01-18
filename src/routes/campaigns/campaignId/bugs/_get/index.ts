@@ -337,8 +337,16 @@ export default class BugsRoute extends CampaignRoute<{
   private filterBugsByOs(bug: Parameters<typeof this.filterBugs>[0][number]) {
     if (!this.filterBy) return true;
     if (!this.filterBy["os"]) return true;
+    if (typeof this.filterBy["os"] !== "string") return true;
 
-    throw new Error("Not implemented");
+    const operatingSystems = this.filterBy["os"]
+      .replace(/\s+/g, " ")
+      .trim()
+      .split(",");
+
+    return operatingSystems.some((os) => {
+      return os === `${bug.os} ${bug.os_version}`;
+    });
   }
 
   private filterBugsByReadStatus(
