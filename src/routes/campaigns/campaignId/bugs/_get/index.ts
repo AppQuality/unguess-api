@@ -318,12 +318,9 @@ export default class BugsRoute extends CampaignRoute<{
 
     const usecasesIds = this.filterBy["usecases"]
       .split(",")
-      .reduce(function (result: number[], id: string) {
-        if (!isNaN(parseInt(id)) && !isNaN(parseInt(id))) {
-          result.push(parseInt(id));
-        }
-        return result;
-      }, []);
+      .filter((id) => !Number.isNaN(Number(id)))
+      .map((id) => Number(id));
+    console.log(usecasesIds);
     return usecasesIds.includes(bug.application_section.id);
   }
 
