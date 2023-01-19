@@ -677,5 +677,17 @@ describe("GET /campaigns/{cid}/bugs", () => {
     );
   });
 
+  it("Should return bugs filtered by not a specific usecase", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[usecases]=-1`)
+      .set("Authorization", "Bearer user");
+
+    expect(response.body).toHaveProperty("items");
+    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: bug_1.id })])
+    );
+  });
+
   // --- End of file
 });
