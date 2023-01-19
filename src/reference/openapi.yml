@@ -615,12 +615,7 @@ paths:
       parameters: []
   '/campaigns/{cid}/usecases':
     parameters:
-      - name: cid
-        in: path
-        required: true
-        schema:
-          type: number
-        description: Campaign id
+      - $ref: ../../postman/schemas/schema.yaml#/components/parameters/cid
     get:
       summary: Get Campaign usecases data
       tags: []
