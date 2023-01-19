@@ -113,6 +113,15 @@ export interface paths {
       };
     };
   };
+  "/campaigns/{cid}/usecases": {
+    get: operations["get-campaigns-cid-usecases"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: number;
+      };
+    };
+  };
   "/campaigns/{cid}/widgets": {
     get: operations["get-campaigns-cid-widgets-wslug"];
     parameters: {
@@ -368,6 +377,20 @@ export interface components {
       };
       description?: string;
       base_bug_internal_id?: string;
+    };
+    /** CampaignTask */
+    CampaignTask: {
+      id: number;
+      title: {
+        full: string;
+        simple?: string;
+        prefix?: string;
+      };
+      description: string;
+      info?: string;
+      bugs: number;
+      uniqueBugs?: number;
+      completion?: number;
     };
     /** CampaignWithOutput */
     CampaignWithOutput: components["schemas"]["Campaign"] & {
@@ -1114,6 +1137,26 @@ export interface operations {
         };
       };
       400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  "get-campaigns-cid-usecases": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["CampaignTask"][];
+        };
+      };
+      400: components["responses"]["Error"];
+      401: components["responses"]["Error"];
       403: components["responses"]["Error"];
       500: components["responses"]["Error"];
     };
