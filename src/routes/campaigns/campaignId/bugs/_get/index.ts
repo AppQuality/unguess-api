@@ -342,7 +342,7 @@ export default class BugsRoute extends CampaignRoute<{
     const operatingSystems = this.filterBy["os"].split(",");
 
     return operatingSystems.some((os) => {
-      return os.trim().localeCompare(`${bug.os} ${bug.os_version}`) === 0;
+      return os.localeCompare(`${bug.os} ${bug.os_version}`) === 0;
     });
   }
 
