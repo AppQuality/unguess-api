@@ -77,16 +77,6 @@ interface dataObject {
   transactions?: Array<any>;
   express?: Array<any>;
   unguess_users?: Array<any>;
-  campaignWithProject?: Array<{
-    project_id: number;
-    campaign_id: number;
-    wp_user_id: number;
-    customer_id: number;
-
-    project?: ProjectParams;
-    campaign?: CampaignsParams;
-    customer?: CustomerParams;
-  }>;
 }
 
 export const adapter = {
@@ -213,6 +203,55 @@ export const adapter = {
     await useCaseGroup.clear();
     await bugs.clear();
   },
+  addCampaignWithProject: async ({
+    campaign_id,
+    project_id,
+    wp_user_id,
+    customer_id,
+    ...rest
+  }: {
+    campaign_id: number;
+    project_id?: number;
+    wp_user_id?: number;
+    customer_id?: number;
+
+    project?: ProjectParams;
+    campaign?: CampaignsParams;
+    customer?: CustomerParams;
+  }) => {
+    await Campaigns.insert({
+      ...rest.campaign,
+      id: campaign_id,
+      project_id,
+    });
+
+    const project = await Projects.all(undefined, [{ id: project_id }]);
+    if (project.length === 0) {
+      await Projects.insert({
+        ...rest.project,
+        id: project_id,
+        customer_id: customer_id,
+      });
+    }
+
+    const customer = await Customer.all(undefined, [{ id: customer_id }]);
+    if (customer.length === 0) {
+      await Customer.insert({
+        ...rest.customer,
+        id: customer_id,
+      });
+    }
+
+    await UserToCustomer.insert({
+      wp_user_id: wp_user_id,
+      customer_id: customer_id,
+    });
+    await UserToProjects.insert({
+      wp_user_id: wp_user_id,
+      project_id: project_id,
+    });
+  },
+
   add: async ({
     profiles = [],
     companies = [],
@@ -228,7 +267,6 @@ export const adapter = {
     transactions = [],
     express = [],
     unguess_users = [],
-    campaignWithProject = [],
   }: dataObject) => {
     profiles.length &&
       profiles.forEach(async (profile) => {
@@ -301,40 +339,5 @@ export const adapter = {
       features.forEach(async (feature) => {
         await featuresData.basicItem(feature);
       });
-
-    campaignWithProject.length &&
-      campaignWithProject.forEach(
-        async ({
-          campaign_id,
-          project_id,
-          wp_user_id,
-          customer_id,
-          ...rest
-        }) => {
-          await Campaigns.insert({
-            ...rest.campaign,
-            id: campaign_id,
-            project_id,
-          });
-
-          Projects.insert({
-            ...rest.project,
-            id: project_id,
-            customer_id: customer_id,
-          });
-          UserToCustomer.insert({
-            wp_user_id: wp_user_id,
-            customer_id: customer_id,
-          });
-          Customer.insert({
-            ...rest.customer,
-            id: customer_id,
-          });
-          UserToProjects.insert({
-            wp_user_id: wp_user_id,
-            project_id: project_id,
-          });
-        }
-      );
   },
 };
