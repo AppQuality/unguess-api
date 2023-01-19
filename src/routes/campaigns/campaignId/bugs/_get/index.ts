@@ -320,7 +320,6 @@ export default class BugsRoute extends CampaignRoute<{
       .split(",")
       .filter((id) => !Number.isNaN(Number(id)))
       .map((id) => Number(id));
-    console.log(usecasesIds);
     return usecasesIds.includes(bug.application_section.id);
   }
 
