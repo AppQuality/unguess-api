@@ -12,6 +12,7 @@ import CampaignMeta from "@src/__mocks__/database/campaign_meta";
 import devices, { DeviceParams } from "@src/__mocks__/database/device";
 import bugsReadStatus from "@src/__mocks__/database/bug_read_status";
 import tags from "@src/__mocks__/database/bug_tags";
+import useCases from "@src/__mocks__/database/use_cases";
 
 const customer_1 = {
   id: 999,
@@ -136,6 +137,7 @@ const bug_2: BugsParams = {
   os: device_3.operating_system,
   os_version: device_3.os_version,
   severity_id: 2,
+  application_section_id: 2,
 };
 
 const bug_3: BugsParams = {
@@ -233,6 +235,7 @@ const bug_9_no_tags: BugsParams = {
   os: device_1.operating_system,
   os_version: device_1.os_version,
   severity_id: 4,
+  application_section_id: 1,
 };
 
 const bug_55: BugsParams = {
@@ -256,6 +259,7 @@ const bug_55: BugsParams = {
   os: device_1.operating_system,
   os_version: device_1.os_version,
   severity_id: 2,
+  application_section_id: 1,
 };
 
 const bug_media_1 = {
@@ -329,6 +333,9 @@ describe("GET /campaigns/{cid}/bugs", () => {
         await tags.insert(tag_1);
         await tags.insert(tag_2);
         await tags.insert(tag_4);
+
+        await useCases.insert({ id: 1, campaign_id: campaign_1.id });
+        await useCases.insert({ id: 2, campaign_id: campaign_1.id });
       } catch (error) {
         console.error(error);
         reject(error);
@@ -654,5 +661,44 @@ describe("GET /campaigns/{cid}/bugs", () => {
     );
   });
 
+  it("Should return bugs filtered by multiple usecases", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[usecases]=1,2`)
+      .set("Authorization", "Bearer user");
+
+    expect(response.body).toHaveProperty("items");
+    expect(response.body.items.length).toBe(3);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: bug_9_no_tags.id }),
+        expect.objectContaining({ id: bug_55.id }),
+        expect.objectContaining({ id: bug_2.id }),
+      ])
+    );
+  });
+
+  it("Should return bugs filtered by not a specific usecase", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[usecases]=-1`)
+      .set("Authorization", "Bearer user");
+
+    expect(response.body).toHaveProperty("items");
+    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: bug_1.id })])
+    );
+  });
+
+  it("Should return bugs filtered by usecase ignoring invalid values", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[usecases]=-1,apple`)
+      .set("Authorization", "Bearer user");
+
+    expect(response.body).toHaveProperty("items");
+    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: bug_1.id })])
+    );
+  });
   // --- End of file
 });

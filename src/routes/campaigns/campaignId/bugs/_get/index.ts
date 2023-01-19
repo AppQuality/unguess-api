@@ -314,8 +314,13 @@ export default class BugsRoute extends CampaignRoute<{
   ) {
     if (!this.filterBy) return true;
     if (!this.filterBy["usecases"]) return true;
+    if (typeof this.filterBy["usecases"] !== "string") return true;
 
-    throw new Error("Not implemented");
+    const usecasesIds = this.filterBy["usecases"]
+      .split(",")
+      .filter((id) => !Number.isNaN(Number(id)))
+      .map((id) => Number(id));
+    return usecasesIds.includes(bug.application_section.id);
   }
 
   private filterBugsByDevice(
