@@ -1,7 +1,7 @@
 import { table as customerTable, data as customerData } from "./customer";
 import { table as profileTable, data as profileData } from "./profile";
-import { table as projectTable, data as projectData } from "./project";
-import { table as campaignTable, data as campaignData } from "./campaign";
+import Projects, { ProjectParams, data as projectData } from "./project";
+import Campaigns, { CampaignsParams, data as campaignData } from "./campaign";
 import {
   table as campaignTypeTable,
   data as campaignTypesData,
@@ -64,8 +64,8 @@ import bugsReadStatus from "@src/__mocks__/database/bug_read_status";
 interface dataObject {
   profiles?: Array<any>;
   companies?: Array<any>;
-  projects?: Array<any>;
-  campaigns?: Array<any>;
+  projects?: Array<ProjectParams>;
+  campaigns?: Array<CampaignsParams>;
   campaignTypes?: Array<any>;
   userToProjects?: Array<any>;
   userToCustomers?: Array<any>;
@@ -83,8 +83,8 @@ export const adapter = {
   create: async () => {
     await profileTable.create();
     await customerTable.create();
-    await projectTable.create();
-    await campaignTable.create();
+    await Projects.mock();
+    await Campaigns.mock();
     await campaignTypeTable.create();
     await userToCustomerTable.create();
     await userToProjectTable.create();
@@ -132,8 +132,8 @@ export const adapter = {
   drop: async () => {
     await profileTable.drop();
     await customerTable.drop();
-    await projectTable.drop();
-    await campaignTable.drop();
+    await Projects.dropMock();
+    await Campaigns.dropMock();
     await campaignTypeTable.drop();
     await userToCustomerTable.drop();
     await userToProjectTable.drop();
@@ -183,8 +183,8 @@ export const adapter = {
   clear: async () => {
     await profileTable.clear();
     await customerTable.clear();
-    await projectTable.clear();
-    await campaignTable.clear();
+    await Projects.clear();
+    await Campaigns.clear();
     await campaignTypeTable.clear();
     await userToCustomerTable.clear();
     await userToProjectTable.clear();
