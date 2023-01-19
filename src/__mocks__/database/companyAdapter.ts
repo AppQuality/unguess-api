@@ -1,4 +1,4 @@
-import { table as customerTable, data as customerData } from "./customer";
+import Customer, { CustomerParams, data as customerData } from "./customer";
 import { table as profileTable, data as profileData } from "./profile";
 import Projects, { ProjectParams, data as projectData } from "./project";
 import Campaigns, { CampaignsParams, data as campaignData } from "./campaign";
@@ -9,13 +9,13 @@ import {
 import { table as userTable, data as userData } from "./user";
 import { table as userTableUG, data as userDataUG } from "./user_unguess";
 
-import {
-  table as userToProjectTable,
+import UserToProjects, {
+  UserToProjectParams,
   data as userToProjectData,
 } from "./user_to_project";
 
-import {
-  table as userToCustomerTable,
+import UserToCustomer, {
+  UserToCustomerParams,
   data as userToCustomerData,
 } from "./user_to_customer";
 
@@ -67,29 +67,38 @@ interface dataObject {
   projects?: Array<ProjectParams>;
   campaigns?: Array<CampaignsParams>;
   campaignTypes?: Array<any>;
-  userToProjects?: Array<any>;
-  userToCustomers?: Array<any>;
+  userToProjects?: Array<UserToProjectParams>;
+  userToCustomers?: Array<UserToCustomerParams>;
   userToFeatures?: Array<any>;
   features?: Array<any>;
   users?: Array<any>;
-  customers?: Array<any>;
+  customers?: Array<CustomerParams>;
   coins?: Array<any>;
   transactions?: Array<any>;
   express?: Array<any>;
   unguess_users?: Array<any>;
+  campaignWithProject?: Array<{
+    project_id: number;
+    campaign_id: number;
+    wp_user_id: number;
+    customer_id: number;
+
+    project?: ProjectParams;
+    campaign?: CampaignsParams;
+    customer?: CustomerParams;
+  }>;
 }
 
 export const adapter = {
   create: async () => {
     await profileTable.create();
-    await customerTable.create();
+    await Customer.mock();
     await Projects.mock();
     await Campaigns.mock();
     await campaignTypeTable.create();
-    await userToCustomerTable.create();
-    await userToProjectTable.create();
+    await UserToCustomer.mock();
+    await UserToProjects.mock();
     await userTable.create();
-    await customerTable.create();
     await userTableUG.create();
 
     //Features Tables
@@ -131,14 +140,13 @@ export const adapter = {
   },
   drop: async () => {
     await profileTable.drop();
-    await customerTable.drop();
+    await Customer.dropMock();
     await Projects.dropMock();
     await Campaigns.dropMock();
     await campaignTypeTable.drop();
-    await userToCustomerTable.drop();
-    await userToProjectTable.drop();
+    await UserToCustomer.dropMock();
+    await UserToProjects.dropMock();
     await userTable.drop();
-    await customerTable.drop();
     await userTableUG.drop();
 
     //Features Tables
@@ -182,14 +190,13 @@ export const adapter = {
 
   clear: async () => {
     await profileTable.clear();
-    await customerTable.clear();
+    await Customer.clear();
     await Projects.clear();
     await Campaigns.clear();
     await campaignTypeTable.clear();
-    await userToCustomerTable.clear();
-    await userToProjectTable.clear();
+    await UserToCustomer.clear();
+    await UserToProjects.clear();
     await userTable.clear();
-    await customerTable.clear();
     await userTableUG.clear();
 
     //Features Tables
@@ -221,6 +228,7 @@ export const adapter = {
     transactions = [],
     express = [],
     unguess_users = [],
+    campaignWithProject = [],
   }: dataObject) => {
     profiles.length &&
       profiles.forEach(async (profile) => {
@@ -293,5 +301,40 @@ export const adapter = {
       features.forEach(async (feature) => {
         await featuresData.basicItem(feature);
       });
+
+    campaignWithProject.length &&
+      campaignWithProject.forEach(
+        async ({
+          campaign_id,
+          project_id,
+          wp_user_id,
+          customer_id,
+          ...rest
+        }) => {
+          await Campaigns.insert({
+            ...rest.campaign,
+            id: campaign_id,
+            project_id,
+          });
+
+          Projects.insert({
+            ...rest.project,
+            id: project_id,
+            customer_id: customer_id,
+          });
+          UserToCustomer.insert({
+            wp_user_id: wp_user_id,
+            customer_id: customer_id,
+          });
+          Customer.insert({
+            ...rest.customer,
+            id: customer_id,
+          });
+          UserToProjects.insert({
+            wp_user_id: wp_user_id,
+            project_id: project_id,
+          });
+        }
+      );
   },
 };
