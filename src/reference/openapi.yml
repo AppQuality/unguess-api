@@ -642,21 +642,13 @@ paths:
                           type: string
                         prefix:
                           type: string
-                    description:
-                      type: string
-                    info:
-                      type: string
-                    totalBugs:
-                      type: number
-                    uniqueBugs:
-                      type: number
+                        info:
+                          type: string
                     completion:
                       type: number
                   required:
                     - id
                     - title
-                    - description
-                    - totalBugs
               examples:
                 not-a-specific-usecase-only:
                   value:
