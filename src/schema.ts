@@ -118,7 +118,7 @@ export interface paths {
     parameters: {
       path: {
         /** Campaign id */
-        cid: number;
+        cid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["cid"];
       };
     };
   };
@@ -377,20 +377,6 @@ export interface components {
       };
       description?: string;
       base_bug_internal_id?: string;
-    };
-    /** CampaignTask */
-    CampaignTask: {
-      id: number;
-      title: {
-        full: string;
-        simple?: string;
-        prefix?: string;
-      };
-      description: string;
-      info?: string;
-      bugs: number;
-      uniqueBugs?: number;
-      completion?: number;
     };
     /** CampaignWithOutput */
     CampaignWithOutput: components["schemas"]["Campaign"] & {
@@ -1137,6 +1123,7 @@ export interface operations {
         };
       };
       400: components["responses"]["Error"];
+      401: components["responses"]["Error"];
       403: components["responses"]["Error"];
       500: components["responses"]["Error"];
     };
@@ -1145,14 +1132,26 @@ export interface operations {
     parameters: {
       path: {
         /** Campaign id */
-        cid: number;
+        cid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["cid"];
       };
     };
     responses: {
       /** OK */
       200: {
         content: {
-          "application/json": components["schemas"]["CampaignTask"][];
+          "application/json": {
+            id: number;
+            title: {
+              full: string;
+              simple?: string;
+              prefix?: string;
+            };
+            description: string;
+            info?: string;
+            totalBugs: number;
+            uniqueBugs?: number;
+            completion?: number;
+          }[];
         };
       };
       400: components["responses"]["Error"];
@@ -1551,4 +1550,1384 @@ export interface operations {
   };
 }
 
-export interface external {}
+export interface external {
+  "../../postman/schemas/schema.yaml": {
+    paths: {
+      "/": {
+        /** Get all routes available for this apis */
+        get: external["../../postman/schemas/schema.yaml"]["operations"]["get-root"];
+        parameters: {};
+      };
+      "/authenticate": {
+        /** A request to login with your username and password */
+        post: external["../../postman/schemas/schema.yaml"]["operations"]["post-authenticate"];
+      };
+      "/campaigns": {
+        post: external["../../postman/schemas/schema.yaml"]["operations"]["post-campaigns"];
+        parameters: {};
+      };
+      "/campaigns/{cid}": {
+        get: external["../../postman/schemas/schema.yaml"]["operations"]["get-campaign"];
+        patch: external["../../postman/schemas/schema.yaml"]["operations"]["patch-campaigns"];
+        parameters: {
+          path: {
+            /** Campaign id */
+            cid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["cid"];
+          };
+        };
+      };
+      "/campaigns/{cid}/bugs": {
+        get: external["../../postman/schemas/schema.yaml"]["operations"]["get-campaigns-cid-bugs"];
+        parameters: {
+          path: {
+            /** Campaign id */
+            cid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["cid"];
+          };
+        };
+      };
+      "/campaigns/{cid}/bugTypes": {
+        get: external["../../postman/schemas/schema.yaml"]["operations"]["get-campaigns-cid-bug-types"];
+        parameters: {
+          path: {
+            /** Campaign id */
+            cid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["cid"];
+          };
+        };
+      };
+      "/campaigns/{cid}/bugs/{bid}": {
+        get: external["../../postman/schemas/schema.yaml"]["operations"]["get-campaigns-single-bug"];
+        parameters: {
+          path: {
+            /** Campaign id */
+            cid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["cid"];
+            /** Defines an identifier for the bug object (BUG ID) */
+            bid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["bid"];
+          };
+        };
+      };
+      "/campaigns/{cid}/meta": {
+        /** Used to extra info about a selected campaign */
+        get: external["../../postman/schemas/schema.yaml"]["operations"]["get-campaigns-cid-meta"];
+        parameters: {
+          path: {
+            /** Campaign id */
+            cid: number;
+          };
+        };
+      };
+      "/campaigns/{cid}/reports": {
+        /** Return all available report of a specific campaign */
+        get: external["../../postman/schemas/schema.yaml"]["operations"]["get-campaigns-reports"];
+        parameters: {
+          path: {
+            /** Campaign id */
+            cid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["cid"];
+          };
+        };
+      };
+      "/campaigns/{cid}/tags": {
+        get: external["../../postman/schemas/schema.yaml"]["operations"]["get-campaigns-cid-tags"];
+        parameters: {
+          path: {
+            /** Campaign id */
+            cid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["cid"];
+          };
+        };
+      };
+      "/campaigns/{cid}/widgets": {
+        get: external["../../postman/schemas/schema.yaml"]["operations"]["get-campaigns-cid-widgets-wslug"];
+        parameters: {
+          path: {
+            /** Campaign id */
+            cid: number;
+          };
+        };
+      };
+      "/projects": {
+        post: external["../../postman/schemas/schema.yaml"]["operations"]["post-projects"];
+      };
+      "/projects/{pid}": {
+        /** Retrieve projects details from an ID. */
+        get: external["../../postman/schemas/schema.yaml"]["operations"]["get-projects-projectId"];
+        /** Update fields of a specific project. Currently only the project name is editable. */
+        patch: external["../../postman/schemas/schema.yaml"]["operations"]["patch-projects-pid"];
+        parameters: {
+          path: {
+            /** Project id */
+            pid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["pid"];
+          };
+        };
+      };
+      "/projects/{pid}/campaigns": {
+        get: external["../../postman/schemas/schema.yaml"]["operations"]["get-project-campaigns"];
+        parameters: {
+          path: {
+            /** Project id */
+            pid: number;
+          };
+        };
+      };
+      "/templates": {
+        /** Retrieve all available use case templates */
+        get: external["../../postman/schemas/schema.yaml"]["operations"]["get-templates"];
+      };
+      "/users/me": {
+        get: external["../../postman/schemas/schema.yaml"]["operations"]["get-users-me"];
+      };
+      "/workspaces": {
+        get: external["../../postman/schemas/schema.yaml"]["operations"]["get-workspaces"];
+      };
+      "/workspaces/{wid}": {
+        get: external["../../postman/schemas/schema.yaml"]["operations"]["get-workspace"];
+        parameters: {
+          path: {
+            /** Workspace (company, customer) id */
+            wid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["wid"];
+          };
+        };
+      };
+      "/workspaces/{wid}/campaigns": {
+        get: external["../../postman/schemas/schema.yaml"]["operations"]["get-workspace-campaigns"];
+        parameters: {
+          path: {
+            /** Workspace (company, customer) id */
+            wid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["wid"];
+          };
+        };
+      };
+      "/workspaces/{wid}/coins": {
+        get: external["../../postman/schemas/schema.yaml"]["operations"]["get-workspaces-coins"];
+        parameters: {
+          path: {
+            /** Workspace (company, customer) id */
+            wid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["wid"];
+          };
+        };
+      };
+      "/workspaces/{wid}/projects": {
+        get: external["../../postman/schemas/schema.yaml"]["operations"]["get-workspace-projects"];
+        parameters: {
+          path: {
+            /** Workspace (company, customer) id */
+            wid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["wid"];
+          };
+        };
+      };
+      "/workspaces/{wid}/projects/{pid}": {
+        get: external["../../postman/schemas/schema.yaml"]["operations"]["get-workspace-project"];
+        parameters: {
+          path: {
+            /** Workspace (company, customer) id */
+            wid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["wid"];
+            /** Project id */
+            pid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["pid"];
+          };
+        };
+      };
+      "/workspaces/{wid}/projects/{pid}/campaigns": {
+        get: external["../../postman/schemas/schema.yaml"]["operations"]["get-workspace-project-campaigns"];
+        parameters: {
+          path: {
+            /** Workspace (company, customer) id */
+            wid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["wid"];
+            /** Project id */
+            pid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["pid"];
+          };
+        };
+      };
+    };
+    components: {
+      schemas: {
+        /** Authentication */
+        Authentication: {
+          id: number;
+          /** Format: email */
+          email: string;
+          role: string;
+          name: string;
+          picture?: string;
+          token: string;
+          iat?: number;
+          exp?: number;
+        };
+        /** Bug */
+        Bug: {
+          id: number;
+          internal_id: string;
+          campaign_id: number;
+          title: external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["BugTitle"];
+          step_by_step: string;
+          expected_result: string;
+          current_result: string;
+          status: external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["BugStatus"];
+          severity: external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["BugSeverity"];
+          type: external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["BugType"];
+          replicability: external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["BugReplicability"];
+          created: string;
+          updated?: string;
+          note?: string;
+          device:
+            | external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Smartphone"]
+            | external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Tablet"]
+            | external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Desktop"];
+          application_section: {
+            id?: number;
+            title?: string;
+            simple_title?: string;
+            prefix_title?: string;
+          };
+          duplicated_of_id?: number;
+          is_favorite?: number;
+          read?: boolean;
+        };
+        /**
+         * BugAdditionalField
+         * @description Describe any additional info
+         */
+        BugAdditionalField: {
+          id: number;
+          name: string;
+          value: string;
+        } & (
+          | external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["BugAdditionalFieldRegex"]
+          | external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["BugAdditionalFieldSelect"]
+        );
+        /** BugAdditionalFieldRegex */
+        BugAdditionalFieldRegex: {
+          validation: string;
+          /** @enum {string} */
+          kind: "regex";
+        };
+        /** BugAdditionalFieldSelect */
+        BugAdditionalFieldSelect: {
+          options: string[];
+          /** @enum {string} */
+          kind: "select";
+        };
+        /** BugMedia */
+        BugMedia: {
+          type: {
+            /** @enum {string} */
+            type: "video" | "image" | "other";
+            extension: string;
+          };
+          /** Format: uri */
+          url: string;
+          creation_date: string;
+        };
+        /** BugReplicability */
+        BugReplicability: {
+          id: number;
+          name: string;
+        };
+        /** BugSeverity */
+        BugSeverity: {
+          id: number;
+          name: string;
+        };
+        /** BugStatus */
+        BugStatus: {
+          id: number;
+          name: string;
+        };
+        /** BugTag */
+        BugTag: {
+          id: number;
+          tag_id: number;
+          name: string;
+          slug: string;
+          bug_id: number;
+          campaign_id: number;
+          author_wp_id?: number;
+          author_tid?: number;
+          creation_date: string;
+          is_visible_to_customer?: number;
+        };
+        /** BugTitle */
+        BugTitle: {
+          full: string;
+          /** @description Bug title without context. */
+          compact: string;
+          context?: string[];
+        };
+        /** BugType */
+        BugType: {
+          id: number;
+          name: string;
+        };
+        /** Campaign */
+        Campaign: {
+          id: number;
+          start_date: string;
+          end_date: string;
+          close_date: string;
+          title: string;
+          customer_title: string;
+          is_public: number;
+          /**
+           * @description -1: no bug form;
+           * 0: only bug form;
+           * 1: bug form with bug parade';
+           */
+          bug_form?: number;
+          type: {
+            id: number;
+            name: string;
+          };
+          family: {
+            id: number;
+            name: string;
+          };
+          status: {
+            id: number;
+            name: string;
+          };
+          project: {
+            id: number;
+            name: string;
+          };
+          description?: string;
+          base_bug_internal_id?: string;
+        };
+        /** CampaignWithOutput */
+        CampaignWithOutput: external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Campaign"] & {
+          outputs?: external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Output"][];
+        };
+        /**
+         * Coin
+         * @description A coin package is a set of coins (free or paid).
+         * The coin only valid currency in order to run an express campaign (no matter what type of express)
+         */
+        Coin: {
+          id: number;
+          customer_id: number;
+          /** @description Number of available coin */
+          amount: number;
+          agreement_id?: number;
+          /**
+           * Format: float
+           * @description This is the single coin price
+           * @default 0
+           */
+          price?: number;
+          created_on?: string;
+          /** @description On each coin use, the related package will be updated */
+          updated_on?: string;
+        };
+        /** Desktop */
+        Desktop: {
+          /** @enum {string} */
+          desktop_type:
+            | "Desktop"
+            | "Gaming PC"
+            | "Notebook"
+            | "Tablet PC / Hybrid"
+            | "Ultrabook";
+          os: string;
+          os_version: string;
+          /** @enum {string} */
+          type: "desktop";
+        };
+        /** Error */
+        Error: {
+          message: string;
+          code: number;
+          error: boolean;
+        };
+        /**
+         * Feature
+         * @description Flags used to enable functionality to some users
+         */
+        Feature: {
+          slug?: string;
+          name?: string;
+        };
+        /** Generic Device */
+        GenericDevice: {
+          os?: string;
+          os_version?: string;
+          type?: string;
+        };
+        /**
+         * Output
+         * @description campaign output item
+         * @enum {string}
+         */
+        Output: "bugs" | "media";
+        /** Platform Object */
+        Platform: {
+          /** @description os */
+          id: number;
+          /**
+           * @description form_factor
+           *
+           * 0 => smartphone,
+           * 1 => tablet
+           * 2 => pc
+           * 3 => smartwatch
+           * 4 => console
+           * 5 => tv
+           */
+          deviceType: number;
+        };
+        /** Project */
+        Project: {
+          id: number;
+          name: string;
+          campaigns_count: number;
+          workspaceId: number;
+        };
+        /** Report */
+        Report: {
+          id?: number;
+          title?: string;
+          description?: string;
+          url: string;
+          file_type?: {
+            extension?: external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["ReportExtensions"];
+            type: string;
+            domain_name?: string;
+          };
+          creation_date?: string;
+          update_date?: string;
+        };
+        /**
+         * ReportExtensions
+         * @enum {string}
+         */
+        ReportExtensions:
+          | "pdf"
+          | "doc"
+          | "docx"
+          | "xls"
+          | "xlsx"
+          | "ppt"
+          | "pptx"
+          | "rar"
+          | "txt"
+          | "csv"
+          | "zip"
+          | "gzip"
+          | "gz"
+          | "7z";
+        /** Smartphone */
+        Smartphone: {
+          manufacturer: string;
+          model: string;
+          os: string;
+          os_version: string;
+          /** @enum {string} */
+          type: "smartphone";
+        };
+        /** Tablet */
+        Tablet: {
+          manufacturer: string;
+          model: string;
+          os: string;
+          os_version: string;
+          /** @enum {string} */
+          type: "tablet";
+        };
+        /**
+         * Template
+         * @description Template of a usecase object
+         */
+        Template: {
+          title: string;
+          /** @description Short description used as preview of template or in templates dropdown */
+          description?: string;
+          /** @description HTML content used to pre-fill the use case editor */
+          content?: string;
+          category?: external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["TemplateCategory"];
+          /** @enum {string} */
+          device_type?: "webapp" | "mobileapp";
+          /**
+           * @default en
+           * @enum {string}
+           */
+          locale?: "en" | "it";
+          /** Format: uri */
+          image?: string;
+          /**
+           * @description The use case created by this template needs a login or not?
+           * @default false
+           */
+          requiresLogin?: boolean;
+        };
+        /**
+         * TemplateCategory
+         * @description Group different templates
+         */
+        TemplateCategory: {
+          id?: number;
+          name: string;
+        };
+        /** UseCase */
+        UseCase: {
+          title: string;
+          description: string;
+          /** @description Optional in experiential campaigns */
+          functionality?: {
+            id?: number;
+          } & external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Template"];
+          logged?: boolean;
+          link?: string;
+        };
+        /** User */
+        User: {
+          id: number;
+          /** Format: email */
+          email: string;
+          role: string;
+          name: string;
+          profile_id: number;
+          tryber_wp_user_id: number;
+          unguess_wp_user_id: number;
+          picture?: string;
+          features?: external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Feature"][];
+        };
+        /**
+         * Workspace
+         * @description A workspace is the company area with projects and campaigns
+         */
+        Workspace: {
+          id: number;
+          company: string;
+          tokens: number;
+          logo?: string;
+          csm: {
+            id: number;
+            email: string;
+            name: string;
+            profile_id: number;
+            tryber_wp_user_id: number;
+            picture?: string;
+            url?: string;
+          };
+          /** @description express coins */
+          coins?: number;
+        };
+        /**
+         * WidgetBugsByUseCase
+         * @description Returns a list of use case with the number of bugs
+         */
+        WidgetBugsByUseCase: {
+          data: {
+            title: {
+              full: string;
+              simple?: string;
+              prefix?: string;
+              info?: string;
+            };
+            description: string;
+            uniqueBugs?: number;
+            bugs: number;
+            usecase_completion?: number;
+            usecase_id: number;
+          }[];
+          /**
+           * @default bugsByUseCase
+           * @example bugsByUseCase
+           * @enum {string}
+           */
+          kind: "bugsByUseCase";
+        };
+        /**
+         * WidgetBugsByDevice
+         * @description Returns a list of devices with the number of bugs
+         */
+        WidgetBugsByDevice: {
+          data: ((
+            | external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Smartphone"]
+            | external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Desktop"]
+            | external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Tablet"]
+          ) & {
+            unique_bugs: number;
+            /** @description Unique bugs */
+            bugs: number;
+          })[];
+          /**
+           * @default bugsByDevice
+           * @example bugsByDevice
+           * @enum {string}
+           */
+          kind: "bugsByDevice";
+        };
+        /**
+         * WidgetBugsByDuplicates
+         * @description Returns the most 10 reported bugs ordered by numberd of duplicates
+         */
+        WidgetBugsByDuplicates: {
+          data: (external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Bug"] & {
+            duplicates: number;
+          })[];
+          /** @enum {string} */
+          kind: "bugsByDuplicates";
+        };
+        /**
+         * WidgetCampaignProgress
+         * @description Used to show an overview about a specific campaign.
+         */
+        WidgetCampaignProgress: {
+          data: {
+            start_date: string;
+            end_date: string;
+            /**
+             * Format: float
+             * @description Percentage fixed rate of completion
+             * @enum {number}
+             */
+            usecase_completion: 12.5 | 37.5 | 62.5 | 87.5 | 100;
+            /** @description Number of hours from start_date */
+            time_elapsed: number;
+            /** @description Expected amount of hours required to complete the campaign */
+            expected_duration: number;
+          };
+          /**
+           * @default campaignProgress
+           * @example campaignProgress
+           * @enum {string}
+           */
+          kind: "campaignProgress";
+        };
+        /**
+         * WidgetCampaignUniqueBugs
+         * @description Used to show an overview of unique bugs and its trent
+         */
+        WidgetCampaignUniqueBugs: {
+          data: {
+            unique: number;
+            total: number;
+            trend: number;
+          };
+          /**
+           * @default campaignUniqueBugs
+           * @example campaignUniqueBugs
+           * @enum {string}
+           */
+          kind: "campaignUniqueBugs";
+        };
+      };
+      responses: {
+        /** Example response */
+        Error: {
+          content: {
+            "application/json": external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Error"];
+          };
+        };
+      };
+      parameters: {
+        /** @description Workspace (company, customer) id */
+        wid: number;
+        /** @description Project id */
+        pid: number;
+        /** @description Limit pagination parameter */
+        limit: number;
+        /** @description Start pagination parameter */
+        start: number;
+        /** @description Order value (ASC, DESC) */
+        order: string;
+        /** @description Order by accepted field */
+        orderBy: string;
+        /** @description filterBy[<fieldName>]=<fieldValue> */
+        filterBy: unknown;
+        /** @description Campaign id */
+        cid: string;
+        /** @description Defines an identifier for the bug object (BUG ID) */
+        bid: string;
+        /** @description Campaign widget slug */
+        wslug:
+          | "bugs-by-usecase"
+          | "bugs-by-device"
+          | "cp-progress"
+          | "unique-bugs"
+          | "bugs-by-duplicates";
+        /** @description keywords to search */
+        search: string;
+      };
+      requestBodies: {
+        Credentials: {
+          content: {
+            "application/json": {
+              username: string;
+              password: string;
+            };
+          };
+        };
+        Campaign: {
+          content: {
+            "application/json": {
+              title: string;
+              start_date: string;
+              end_date: string;
+              close_date: string;
+              customer_title?: string;
+              status_id?: number;
+              is_public?: number;
+              campaign_type_id: number;
+              project_id: number;
+              pm_id: number;
+              platforms: external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Platform"][];
+              /** @description Da togliere */
+              page_preview_id?: number;
+              /** @description Da togliere */
+              page_manual_id?: number;
+              /** @description Used to check available coins */
+              customer_id: number;
+              has_bug_form?: number;
+              /** @description if has_bug_form is 0 this has to be 0 */
+              has_bug_parade?: number;
+              /** @description Useless value required by Tryber BackOffice */
+              description?: string;
+              base_bug_internal_id?: string;
+              express_slug: string;
+              use_cases?: external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["UseCase"][];
+            };
+          };
+        };
+        Project: {
+          content: {
+            "application/json": {
+              name: string;
+              customer_id: number;
+            };
+          };
+        };
+      };
+    };
+    operations: {
+      /** Get all routes available for this apis */
+      "get-root": {
+        parameters: {};
+        responses: {
+          /** OK */
+          200: {
+            content: {
+              "application/json": { [key: string]: unknown };
+            };
+          };
+          500: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+        };
+      };
+      /** A request to login with your username and password */
+      "post-authenticate": {
+        parameters: {};
+        responses: {
+          /** OK */
+          200: {
+            content: {
+              "application/json": external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Authentication"];
+            };
+          };
+          500: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+        };
+        requestBody: external["../../postman/schemas/schema.yaml"]["components"]["requestBodies"]["Credentials"];
+      };
+      "post-campaigns": {
+        parameters: {};
+        responses: {
+          /** OK */
+          200: {
+            content: {
+              "application/json": external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Campaign"];
+            };
+          };
+          400: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          403: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          404: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          500: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+        };
+        requestBody: external["../../postman/schemas/schema.yaml"]["components"]["requestBodies"]["Campaign"];
+      };
+      "get-campaign": {
+        parameters: {
+          path: {
+            /** Campaign id */
+            cid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["cid"];
+          };
+        };
+        responses: {
+          /** OK */
+          200: {
+            content: {
+              "application/json": external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["CampaignWithOutput"];
+            };
+          };
+        };
+      };
+      "patch-campaigns": {
+        parameters: {
+          path: {
+            /** Campaign id */
+            cid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["cid"];
+          };
+        };
+        responses: {
+          /** OK */
+          200: {
+            content: {
+              "application/json": external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Campaign"];
+            };
+          };
+        };
+        requestBody: {
+          content: {
+            "application/json": {
+              customer_title?: string;
+            };
+          };
+        };
+      };
+      "get-campaigns-cid-bugs": {
+        parameters: {
+          path: {
+            /** Campaign id */
+            cid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["cid"];
+          };
+          query: {
+            /** Limit pagination parameter */
+            limit?: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["limit"];
+            /** Start pagination parameter */
+            start?: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["start"];
+            /** Order value (ASC, DESC) */
+            order?: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["order"];
+            /** Order by accepted field */
+            orderBy?: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["orderBy"];
+            /** filterBy[<fieldName>]=<fieldValue> */
+            filterBy?: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["filterBy"];
+            /** keywords to search */
+            search?: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["search"];
+          };
+        };
+        responses: {
+          /** OK */
+          200: {
+            content: {
+              "application/json": {
+                items?: (external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Bug"] & {
+                  tags?: {
+                    tag_id: number;
+                    tag_name: string;
+                  }[];
+                })[];
+                start?: number;
+                limit?: number;
+                size?: number;
+                total?: number;
+              };
+            };
+          };
+          400: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          401: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          403: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          500: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+        };
+      };
+      "get-campaigns-cid-bug-types": {
+        parameters: {
+          path: {
+            /** Campaign id */
+            cid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["cid"];
+          };
+        };
+        responses: {
+          /** OK */
+          200: {
+            content: {
+              "application/json": external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["BugType"][];
+            };
+          };
+          400: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          403: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          500: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+        };
+      };
+      "get-campaigns-single-bug": {
+        parameters: {
+          path: {
+            /** Campaign id */
+            cid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["cid"];
+            /** Defines an identifier for the bug object (BUG ID) */
+            bid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["bid"];
+          };
+        };
+        responses: {
+          /** OK */
+          200: {
+            content: {
+              "application/json": external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Bug"] & {
+                media?: external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["BugMedia"][];
+                tags?: external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["BugTag"][];
+                additional_fields?: external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["BugAdditionalField"][];
+                reporter: {
+                  tester_id: number;
+                  name: string;
+                };
+              };
+            };
+          };
+          400: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          401: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          403: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          500: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+        };
+      };
+      /** Used to extra info about a selected campaign */
+      "get-campaigns-cid-meta": {
+        parameters: {
+          path: {
+            /** Campaign id */
+            cid: number;
+          };
+        };
+        responses: {
+          /** OK */
+          200: {
+            content: {
+              "application/json": external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Campaign"] & {
+                selected_testers: number;
+                /** @description Array of form factors */
+                allowed_devices: string[];
+              };
+            };
+          };
+          400: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          401: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          403: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          500: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+        };
+      };
+      /** Return all available report of a specific campaign */
+      "get-campaigns-reports": {
+        parameters: {
+          path: {
+            /** Campaign id */
+            cid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["cid"];
+          };
+        };
+        responses: {
+          /** OK */
+          200: {
+            content: {
+              "application/json": external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Report"][];
+            };
+          };
+        };
+      };
+      "get-campaigns-cid-tags": {
+        parameters: {
+          path: {
+            /** Campaign id */
+            cid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["cid"];
+          };
+        };
+        responses: {
+          /** OK */
+          200: {
+            content: {
+              "application/json": {
+                tag_id: number;
+                display_name: string;
+                slug: string;
+                is_public?: number;
+              }[];
+            };
+          };
+          400: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          403: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          500: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+        };
+      };
+      "get-campaigns-cid-widgets-wslug": {
+        parameters: {
+          path: {
+            /** Campaign id */
+            cid: number;
+          };
+          query: {
+            /** Campaign widget slug */
+            s: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["wslug"];
+            /** should update bug trend after request resolves? */
+            updateTrend?: boolean;
+          };
+        };
+        responses: {
+          /** OK */
+          200: {
+            content: {
+              "application/json":
+                | external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["WidgetBugsByUseCase"]
+                | external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["WidgetBugsByDevice"]
+                | external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["WidgetCampaignProgress"]
+                | external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["WidgetCampaignUniqueBugs"]
+                | external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["WidgetBugsByDuplicates"];
+            };
+          };
+          400: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          401: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          403: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          500: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+        };
+      };
+      "post-projects": {
+        responses: {
+          /** OK */
+          200: {
+            content: {
+              "application/json": external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Project"];
+            };
+          };
+          400: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          403: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          404: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          500: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+        };
+        requestBody: external["../../postman/schemas/schema.yaml"]["components"]["requestBodies"]["Project"];
+      };
+      /** Retrieve projects details from an ID. */
+      "get-projects-projectId": {
+        parameters: {
+          path: {
+            /** Project id */
+            pid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["pid"];
+          };
+        };
+        responses: {
+          /** OK */
+          200: {
+            content: {
+              "application/json": external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Project"];
+            };
+          };
+          400: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          401: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          403: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          500: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+        };
+      };
+      /** Update fields of a specific project. Currently only the project name is editable. */
+      "patch-projects-pid": {
+        parameters: {
+          path: {
+            /** Project id */
+            pid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["pid"];
+          };
+        };
+        responses: {
+          /** OK */
+          200: {
+            content: {
+              "application/json": external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Project"];
+            };
+          };
+          400: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          401: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          403: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          405: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          500: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+        };
+        requestBody: {
+          content: {
+            "application/json": {
+              display_name: string;
+            };
+          };
+        };
+      };
+      "get-project-campaigns": {
+        parameters: {
+          path: {
+            /** Project id */
+            pid: number;
+          };
+          query: {
+            /** Limit pagination parameter */
+            limit?: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["limit"];
+            /** Start pagination parameter */
+            start?: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["start"];
+          };
+        };
+        responses: {
+          /** OK */
+          200: {
+            content: {
+              "application/json": {
+                items?: external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["CampaignWithOutput"][];
+                start?: number;
+                limit?: number;
+                size?: number;
+                total?: number;
+              };
+            };
+          };
+          400: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          /** Unauthorized */
+          401: {
+            content: {
+              "application/json": {
+                items?: external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Campaign"][];
+                start?: number;
+                limit?: number;
+                size?: number;
+                total?: number;
+              };
+            };
+          };
+          403: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          404: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          500: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+        };
+      };
+      /** Retrieve all available use case templates */
+      "get-templates": {
+        parameters: {
+          query: {
+            /** filterBy[<fieldName>]=<fieldValue> */
+            filterBy?: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["filterBy"];
+            /** Order value (ASC, DESC) */
+            order?: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["order"];
+            /** Order by accepted field */
+            orderBy?: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["orderBy"];
+          };
+        };
+        responses: {
+          /** OK */
+          200: {
+            content: {
+              "application/json": ({
+                id?: number;
+              } & external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Template"])[];
+            };
+          };
+          400: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          403: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          500: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+        };
+      };
+      "get-users-me": {
+        responses: {
+          200: {
+            content: {
+              "application/json": external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["User"];
+            };
+          };
+          403: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          500: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+        };
+      };
+      "get-workspaces": {
+        parameters: {
+          query: {
+            /** Limit pagination parameter */
+            limit?: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["limit"];
+            /** Start pagination parameter */
+            start?: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["start"];
+            /** Order value (ASC, DESC) */
+            order?: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["order"];
+            /** Order by accepted field */
+            orderBy?: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["orderBy"];
+          };
+        };
+        responses: {
+          /** OK */
+          200: {
+            content: {
+              "application/json": {
+                items?: external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Workspace"][];
+                start?: number;
+                limit?: number;
+                size?: number;
+                total?: number;
+              };
+            };
+          };
+          400: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          403: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          404: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          500: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+        };
+      };
+      "get-workspace": {
+        parameters: {
+          path: {
+            /** Workspace (company, customer) id */
+            wid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["wid"];
+          };
+        };
+        responses: {
+          /** OK */
+          200: {
+            content: {
+              "application/json": external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Workspace"];
+            };
+          };
+          400: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          403: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          404: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          500: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+        };
+      };
+      "get-workspace-campaigns": {
+        parameters: {
+          path: {
+            /** Workspace (company, customer) id */
+            wid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["wid"];
+          };
+          query: {
+            /** Limit pagination parameter */
+            limit?: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["limit"];
+            /** Start pagination parameter */
+            start?: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["start"];
+            /** Order value (ASC, DESC) */
+            order?: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["order"];
+            /** Order by accepted field */
+            orderBy?: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["orderBy"];
+            /** filterBy[<fieldName>]=<fieldValue> */
+            filterBy?: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["filterBy"];
+          };
+        };
+        responses: {
+          /** OK */
+          200: {
+            content: {
+              "application/json": {
+                items?: external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["CampaignWithOutput"][];
+                start?: number;
+                limit?: number;
+                size?: number;
+                total?: number;
+              };
+            };
+          };
+          400: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          403: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          404: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          500: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+        };
+      };
+      "get-workspaces-coins": {
+        parameters: {
+          path: {
+            /** Workspace (company, customer) id */
+            wid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["wid"];
+          };
+          query: {
+            /** Limit pagination parameter */
+            limit?: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["limit"];
+            /** Start pagination parameter */
+            start?: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["start"];
+            /** Order value (ASC, DESC) */
+            order?: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["order"];
+            /** Order by accepted field */
+            orderBy?: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["orderBy"];
+          };
+        };
+        responses: {
+          /** OK */
+          200: {
+            content: {
+              "application/json": {
+                items?: external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Coin"][];
+                start?: number;
+                limit?: number;
+                size?: number;
+                total?: number;
+              };
+            };
+          };
+          400: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          403: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          500: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+        };
+      };
+      "get-workspace-projects": {
+        parameters: {
+          path: {
+            /** Workspace (company, customer) id */
+            wid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["wid"];
+          };
+          query: {
+            /** Limit pagination parameter */
+            limit?: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["limit"];
+            /** Start pagination parameter */
+            start?: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["start"];
+          };
+        };
+        responses: {
+          /** OK */
+          200: {
+            content: {
+              "application/json": {
+                items?: external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Project"][];
+                start?: number;
+                limit?: number;
+                size?: number;
+                total?: number;
+              };
+            };
+          };
+          400: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          403: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          404: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          500: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+        };
+      };
+      "get-workspace-project": {
+        parameters: {
+          path: {
+            /** Workspace (company, customer) id */
+            wid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["wid"];
+            /** Project id */
+            pid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["pid"];
+          };
+        };
+        responses: {
+          /** OK */
+          200: {
+            content: {
+              "application/json": external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["Project"];
+            };
+          };
+          400: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          403: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          404: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          500: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+        };
+      };
+      "get-workspace-project-campaigns": {
+        parameters: {
+          path: {
+            /** Workspace (company, customer) id */
+            wid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["wid"];
+            /** Project id */
+            pid: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["pid"];
+          };
+          query: {
+            /** Limit pagination parameter */
+            limit?: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["limit"];
+            /** Start pagination parameter */
+            start?: external["../../postman/schemas/schema.yaml"]["components"]["parameters"]["start"];
+          };
+        };
+        responses: {
+          /** OK */
+          200: {
+            content: {
+              "application/json": {
+                items?: external["../../postman/schemas/schema.yaml"]["components"]["schemas"]["CampaignWithOutput"][];
+                start?: number;
+                limit?: number;
+                size?: number;
+                total?: number;
+              };
+            };
+          };
+          400: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          403: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          404: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+          500: external["../../postman/schemas/schema.yaml"]["components"]["responses"]["Error"];
+        };
+      };
+    };
+  };
+}
