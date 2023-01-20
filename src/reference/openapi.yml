@@ -627,7 +627,36 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CampaignTask'
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                    title:
+                      type: object
+                      required:
+                        - full
+                      properties:
+                        full:
+                          type: string
+                        simple:
+                          type: string
+                        prefix:
+                          type: string
+                    description:
+                      type: string
+                    info:
+                      type: string
+                    totalBugs:
+                      type: number
+                    uniqueBugs:
+                      type: number
+                    completion:
+                      type: number
+                  required:
+                    - id
+                    - title
+                    - description
+                    - totalBugs
               examples:
                 not-a-specific-usecase-only:
                   value:
@@ -1600,58 +1629,6 @@ components:
         - family
         - status
         - project
-    CampaignTask:
-      title: CampaignTask
-      x-stoplight:
-        id: e7l1enjx1z0or
-      type: object
-      x-examples:
-        NotASpecificUseCase:
-          id: -1
-          title:
-            full: '[PREFIX] - NotASpecificUseCase'
-            simple: NotASpecificUseCase
-            prefix: PREFIX
-          description: usecase description
-          info: usecase info
-          bugs: 6
-          uniqueBugs: 4
-          completion: 100
-        just-required-fields:
-          id: 2
-          title:
-            full: '[PREFIX] - Usecase'
-          description: usecase description
-          bugs: 6
-      properties:
-        id:
-          type: number
-        title:
-          type: object
-          required:
-            - full
-          properties:
-            full:
-              type: string
-            simple:
-              type: string
-            prefix:
-              type: string
-        description:
-          type: string
-        info:
-          type: string
-        bugs:
-          type: number
-        uniqueBugs:
-          type: number
-        completion:
-          type: number
-      required:
-        - id
-        - title
-        - description
-        - bugs
     CampaignWithOutput:
       title: CampaignWithOutput
       allOf:
