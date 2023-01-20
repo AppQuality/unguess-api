@@ -114,47 +114,44 @@ export default class BugsRoute extends CampaignRoute<{
     });
   }
 
-  private async getBugs(): Promise<
-    | false
-    | {
-        id: number;
-        internal_id: string;
-        campaign_id: number;
-        title: string;
-        description: string;
-        expected_result: string;
-        current_result: string;
-        status_id: number;
-        status_name: string;
-        severity: string;
-        type: string;
-        replicability: string;
-        created: string;
-        updated: string;
-        note: string;
-        form_factor: string;
-        pc_type: string;
-        manufacturer: string;
-        model: string;
-        os: string;
-        os_version: string;
-        application_section: string;
-        application_section_id: number;
-        uc_title: string;
-        uc_simple_title: string;
-        uc_prefix: string;
-        is_duplicated: 0 | 1;
-        duplicated_of_id: number;
-        is_favorite: 0 | 1;
-        bug_replicability_id: number;
-        bug_type_id: number;
-        severity_id: number;
-        read_status: 0 | 1;
-        read: true | false;
-        tags?: Tag[];
-      }[]
-  > {
-    const bugs = await db.query(
+  private async getBugs() {
+    const bugs: {
+      id: number;
+      internal_id: string;
+      campaign_id: number;
+      title: string;
+      description: string;
+      expected_result: string;
+      current_result: string;
+      status_id: number;
+      status_name: string;
+      severity: string;
+      type: string;
+      replicability: string;
+      created: string;
+      updated: string;
+      note: string;
+      form_factor: string;
+      pc_type: string;
+      manufacturer: string;
+      model: string;
+      os: string;
+      os_version: string;
+      application_section: string;
+      application_section_id: number;
+      uc_title: string;
+      uc_simple_title: string;
+      uc_prefix: string;
+      is_duplicated: 0 | 1;
+      duplicated_of_id: number;
+      is_favorite: 0 | 1;
+      bug_replicability_id: number;
+      bug_type_id: number;
+      severity_id: number;
+      read_status: 0 | 1;
+      read: true | false;
+      tags?: Tag[];
+    }[] = await db.query(
       `SELECT 
         b.id,
         b.internal_id,
@@ -209,7 +206,7 @@ export default class BugsRoute extends CampaignRoute<{
       ORDER BY b.${this.orderBy} ${this.order}`
     );
 
-    if (!bugs) return false;
+    if (!bugs) return false as const;
 
     return bugs;
   }
@@ -257,9 +254,34 @@ export default class BugsRoute extends CampaignRoute<{
           ...(bug.uc_prefix && { prefix: bug.uc_prefix }),
         },
         device: getBugDevice(bug),
+        siblings: this.getSiblingsOfBug(bug, bugs),
         ...(tags && { tags }),
       };
     });
+  }
+
+  private getSiblingsOfBug(
+    bug: { is_duplicated: 0 | 1; id: number; duplicated_of_id: number },
+    bugs: { is_duplicated: 0 | 1; id: number; duplicated_of_id: number }[]
+  ) {
+    if (!bugs || !bugs.length) return 0;
+
+    const otherBugs = bugs.filter((search) => search.id !== bug.id);
+
+    return bug.is_duplicated === 0 ? getChildren() : getSiblingsAndFather();
+
+    function getChildren() {
+      return otherBugs.filter((search) => search.duplicated_of_id === bug.id)
+        .length;
+    }
+
+    function getSiblingsAndFather() {
+      return otherBugs.filter((search) => {
+        if (search.duplicated_of_id === bug.duplicated_of_id) return true;
+        if (search.id === bug.duplicated_of_id) return true;
+        return false;
+      }).length;
+    }
   }
 
   private formatBugs(bugs: ReturnType<typeof this.paginateBugs>) {
@@ -286,6 +308,7 @@ export default class BugsRoute extends CampaignRoute<{
         is_duplicated: bug.is_duplicated,
         read: bug.read_status ? true : false,
         tags: bug.tags,
+        siblings: bug.siblings,
       };
     });
   }
