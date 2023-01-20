@@ -649,6 +649,7 @@ paths:
                   required:
                     - id
                     - title
+                    - completion
               examples:
                 not-a-specific-usecase-only:
                   value:
