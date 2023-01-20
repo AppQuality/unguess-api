@@ -13,10 +13,10 @@
     "copy-reference": "copyfiles -f src/reference/* dist/reference/",
     "build": "npm-run-all clean transpile copy-reference",
     "start": "tsnd --respawn -r tsconfig-paths/register  --transpile-only  ./src/index.ts",
-    "prepare": "npx husky install",
+    "postinstall": "husky install",
     "rename-schema": "node -e \"require('fs').rename('postman/schemas/openapi.yml','postman/schemas/schema.yaml', (err) => { (err ? console.log(err) : console.log('Rename complete!')); } ) \"",
     "update-postman": "copyfiles -f src/reference/openapi.yml postman/schemas && npm run rename-schema",
-    "types": "npx openapi-typescript src/reference/openapi.yml --output src/schema.ts"
+    "types": "openapi-typescript src/reference/openapi.yml --output src/schema.ts"
   },
   "author": "",
   "license": "ISC",
@@ -54,6 +54,7 @@
     "commitizen": "^4.2.5",
     "copyfiles": "^2.4.1",
     "cz-conventional-changelog": "^3.3.0",
+    "husky": "^8.0.3",
     "jest": "^28.1.0",
     "jest-cli": "^28.1.0",
     "jest-expect-message": "^1.1.3",
