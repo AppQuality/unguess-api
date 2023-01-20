@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "coverage": "npm run test -- --coverage",
+    "coverage": "yarn test -- --coverage",
     "test": "tsnd -T node_modules/jest/bin/jest.js ",
-    "test:ls": "npm run test -- --json",
+    "test:ls": "yarn test -- --json",
     "test:watch": "tsnd -T node_modules/jest/bin/jest.js --watch",
     "clean": "rimraf dist",
     "transpile": "tsc --noEmit false && tscpaths -p tsconfig.json -s ./src -o ./dist",
