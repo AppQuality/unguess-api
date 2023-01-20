@@ -95,6 +95,15 @@ export interface paths {
       };
     };
   };
+  "/campaigns/{cid}/os": {
+    get: operations["get-campaigns-cid-os"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+  };
   "/campaigns/{cid}/severities": {
     get: operations["get-campaigns-cid-severities"];
     parameters: {
@@ -1060,6 +1069,27 @@ export interface operations {
         content: {
           "application/json": {
             device?: string;
+          }[];
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  "get-campaigns-cid-os": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            os?: string;
           }[];
         };
       };
