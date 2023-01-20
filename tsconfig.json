@@ -2,7 +2,11 @@
   "ts-node": {
     "files": true
   },
-  "files": ["src/index.ts", "src/types.d.ts"],
+  "files": [
+    "src/index.ts",
+    "src/types.d.ts",
+    "node_modules/jest-expect-message/types/index.d.ts"
+  ],
   "compilerOptions": {
     "inlineSourceMap": true,
     "noImplicitAny": true,
