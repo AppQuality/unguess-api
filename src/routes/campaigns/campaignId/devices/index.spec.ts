@@ -3,9 +3,11 @@ import request from "supertest";
 import { adapter } from "@src/__mocks__/database/companyAdapter";
 import bugs from "@src/__mocks__/database/bugs";
 import devices from "@src/__mocks__/database/device";
+import bugStatus from "@src/__mocks__/database/bug_status";
 
 describe("GET /campaigns/{cid}/devices", () => {
   beforeAll(async () => {
+    await bugStatus.addDefaultItems();
     await adapter.addCampaignWithProject({
       campaign_id: 1,
       project_id: 1,
@@ -39,12 +41,33 @@ describe("GET /campaigns/{cid}/devices", () => {
       model: "Desktop",
       dev_id: 2,
     });
+    await bugs.insert({
+      id: 3,
+      campaign_id: 1,
+      manufacturer: "-",
+      model: "Desktop",
+      dev_id: 3,
+      status_id: 4,
+    });
+    await bugs.insert({
+      id: 4,
+      campaign_id: 1,
+      manufacturer: "-",
+      model: "Desktop",
+      dev_id: 3,
+      status_id: 1,
+    });
     await devices.insert({
       id: 1,
       form_factor: "Smartphone",
     });
     await devices.insert({
       id: 2,
+      form_factor: "PC",
+      pc_type: "Desktop",
+    });
+    await devices.insert({
+      id: 3,
       form_factor: "PC",
       pc_type: "Desktop",
     });

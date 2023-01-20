@@ -24,7 +24,13 @@ export default class Route extends CampaignRoute<{
           SELECT device.form_factor, bug.manufacturer, bug.model, device.pc_type
       FROM wp_appq_evd_bug bug
               JOIN wp_crowd_appq_device device ON (bug.dev_id = device.id)
+              JOIN wp_appq_evd_bug_status bstatus ON (bug.status_id = bstatus.id)
       WHERE campaign_id = ?
+      AND ${
+        this.shouldShowNeedReview()
+          ? `(bstatus.name = 'Approved' OR bstatus.name = 'Need Review')`
+          : `bstatus.name = 'Approved'`
+      }
       GROUP BY (bug.dev_id);
       `,
         [this.cp_id]
