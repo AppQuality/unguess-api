@@ -1,7 +1,6 @@
 /** OPENAPI-CLASS: get-campaigns-cid-os */
 import CampaignRoute from "@src/features/routes/CampaignRoute";
 import * as db from "@src/features/db";
-import { getBugDevice } from "@src/utils/bugs/getBugDevice";
 
 export default class Route extends CampaignRoute<{
   response: StoplightOperations["get-campaigns-cid-os"]["responses"]["200"]["content"]["application/json"];
