@@ -11,8 +11,8 @@ export default class Route extends CampaignRoute<{
 }> {
   protected async prepare(): Promise<void> {
     const usecases = await this.getUsecases();
-    const enhanchedUsecases = await this.enhanceUsecases(usecases);
-    const campaignUsecases = this.formatUsecases(enhanchedUsecases);
+    const enhancedUsecases = await this.enhancedUsecases(usecases);
+    const campaignUsecases = this.formatUsecases(enhancedUsecases);
     return this.setSuccess(200, campaignUsecases);
   }
 
@@ -60,7 +60,7 @@ export default class Route extends CampaignRoute<{
     return result.length > 0;
   }
 
-  private async enhanceUsecases(
+  private async enhancedUsecases(
     usecases: Awaited<ReturnType<typeof this.getUsecases>>
   ) {
     const progress = await getUseCaseProgress(this.cp_id);
@@ -76,7 +76,7 @@ export default class Route extends CampaignRoute<{
   }
 
   private formatUsecases(
-    usecases: Awaited<ReturnType<typeof this.enhanceUsecases>>
+    usecases: Awaited<ReturnType<typeof this.enhancedUsecases>>
   ) {
     return usecases.map((usecase) => {
       return {
