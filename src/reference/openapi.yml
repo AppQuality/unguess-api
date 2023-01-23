@@ -500,6 +500,84 @@ paths:
       security:
         - JWT: []
       parameters: []
+  '/campaigns/{cid}/devices':
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Campaign id
+    get:
+      summary: Get Campaigns Bugs Devices
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    device:
+                      type: string
+              examples:
+                Example 1:
+                  value:
+                    - device: Apple iPhone 11
+                    - device: Desktop
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-devices
+      description: ''
+      security:
+        - JWT: []
+      parameters: []
+  '/campaigns/{cid}/os':
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Campaign id
+    get:
+      summary: Get Campaigns Bugs Os
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    os:
+                      type: string
+              examples:
+                Example 1:
+                  value:
+                    - device: Apple iPhone 11
+                    - device: Desktop
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-os
+      description: ''
+      security:
+        - JWT: []
+      parameters: []
   '/campaigns/{cid}/severities':
     parameters:
       - $ref: '#/components/parameters/cid'

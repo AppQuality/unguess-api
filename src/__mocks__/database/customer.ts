@@ -1,38 +1,41 @@
-import sqlite3 from "@src/features/sqlite";
+import Table from "./tryber_table";
 
-const db = sqlite3("tryber");
-
-export const table = {
-  create: async () => {
-    await db.createTable("wp_appq_customer", [
-      "id int(11) PRIMARY KEY",
-      "company varchar(64)",
-      "company_logo varchar(300)",
-      "tokens int(11)",
-      "pm_id int(11) DEFAULT NULL",
-    ]);
-  },
-  drop: async () => {
-    await db.dropTable("wp_appq_customer");
-  },
-  clear: async () => {
-    await db.run("DELETE FROM wp_appq_customer");
-  },
+type CustomerParams = {
+  id?: number;
+  company?: string;
+  company_logo?: string;
+  tokens?: number;
+  pm_id?: number;
+};
+const defaultItem: CustomerParams = {
+  id: 1,
+  company: "Company",
+  company_logo: "logo.png",
+  tokens: 100,
 };
 
-const data: {
-  [key: string]: (params?: any) => Promise<{ [key: string]: any }>;
-} = {};
+class Customers extends Table<CustomerParams> {
+  protected name = "wp_appq_customer";
+  protected columns = [
+    "id int(11) PRIMARY KEY",
+    "company varchar(64)",
+    "company_logo varchar(300)",
+    "tokens int(11)",
+    "pm_id int(11) DEFAULT NULL",
+  ];
+  constructor() {
+    super(defaultItem);
+  }
+}
+const customers = new Customers();
+export default customers;
+export type { CustomerParams };
 
-data.basicItem = async (params) => {
-  const item = {
-    company: "Company",
-    company_logo: "logo.png",
-    tokens: 100,
-    ...params,
-  };
-  await db.insert("wp_appq_customer", item);
-  return item;
+// Backward compatibility
+const data = {
+  basicItem: async (params: CustomerParams) => {
+    return await customers.insert(params);
+  },
 };
 
 export { data };

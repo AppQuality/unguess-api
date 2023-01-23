@@ -86,6 +86,24 @@ export interface paths {
       };
     };
   };
+  "/campaigns/{cid}/devices": {
+    get: operations["get-campaigns-cid-devices"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+  };
+  "/campaigns/{cid}/os": {
+    get: operations["get-campaigns-cid-os"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+  };
   "/campaigns/{cid}/severities": {
     get: operations["get-campaigns-cid-severities"];
     parameters: {
@@ -1030,6 +1048,48 @@ export interface operations {
             display_name: string;
             slug: string;
             is_public?: number;
+          }[];
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  "get-campaigns-cid-devices": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            device?: string;
+          }[];
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  "get-campaigns-cid-os": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            os?: string;
           }[];
         };
       };

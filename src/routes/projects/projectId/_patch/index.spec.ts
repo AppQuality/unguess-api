@@ -1,10 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import {
-  table as projectTable,
-  data as projectData,
-} from "@src/__mocks__/database/project";
+import Projects, { data as projectData } from "@src/__mocks__/database/project";
 import { ERROR_MESSAGE } from "@src/utils/constants";
 
 const customer_1 = {
@@ -94,17 +91,7 @@ describe("PATCH /projects/{pid}", () => {
   });
 
   afterEach(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        // Restore initial data for projects
-        await projectTable.clear();
-
-        resolve(true);
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-    });
+    await Projects.clear();
   });
 
   it("Should answer 403 if not logged in", async () => {
