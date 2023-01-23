@@ -50,12 +50,17 @@ export default class Route extends CampaignRoute<{
 
   private async hasBugNotInUsecases() {
     const result = await db.query(`
-      SELECT id
-      FROM wp_appq_evd_bug
-      WHERE campaign_id = ${this.cp_id} 
-        AND publish = 1
-        AND status_id IN (${this.shouldShowNeedReview() ? "2,4" : "2"})
-        AND application_section_id = -1
+      SELECT bug.id
+      FROM wp_appq_evd_bug bug
+      JOIN wp_appq_evd_bug_status status ON bug.status_id = status.id
+      WHERE bug.campaign_id = ${this.cp_id} 
+      AND bug.publish = 1
+      AND ${
+        this.shouldShowNeedReview()
+          ? `(status.name = 'Approved' OR status.name = 'Need Review')`
+          : `status.name = 'Approved'`
+      }
+        AND bug.application_section_id = -1
     `);
     return result.length > 0;
   }
