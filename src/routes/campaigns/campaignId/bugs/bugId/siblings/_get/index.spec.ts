@@ -3,6 +3,7 @@ import request from "supertest";
 import { adapter } from "@src/__mocks__/database/companyAdapter";
 import bugStatus from "@src/__mocks__/database/bug_status";
 import bugs from "@src/__mocks__/database/bugs";
+import CampaignMeta from "@src/__mocks__/database/campaign_meta";
 
 describe("GET /campaigns/{cid}/bugs/{bid}/sibilings", () => {
   beforeAll(async () => {
@@ -13,6 +14,12 @@ describe("GET /campaigns/{cid}/bugs/{bid}/sibilings", () => {
       customer_id: 1,
       wp_user_id: 1,
     });
+    await CampaignMeta.insert({
+      meta_id: 1,
+      campaign_id: 1,
+      meta_key: "bug_title_rule",
+      meta_value: "1",
+    });
     await adapter.addCampaignWithProject({
       campaign_id: 2,
       project_id: 2,
@@ -22,6 +29,18 @@ describe("GET /campaigns/{cid}/bugs/{bid}/sibilings", () => {
     bugs.insert({
       id: 1,
       campaign_id: 1,
+    });
+    bugs.insert({
+      id: 2,
+      message: "[CONTEXT] - father",
+      campaign_id: 1,
+      is_duplicated: 0,
+    });
+    bugs.insert({
+      id: 3,
+      campaign_id: 1,
+      is_duplicated: 1,
+      duplicated_of_id: 2,
     });
   });
 
@@ -46,8 +65,32 @@ describe("GET /campaigns/{cid}/bugs/{bid}/sibilings", () => {
 
   it("Should answer 200 if campaign exists and user has access", async () => {
     const response = await request(app)
-      .get("/campaigns/1/bugs/1/siblings")
+      .get("/campaigns/1/bugs/2/siblings")
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
+  });
+
+  it("Should answer 404 if there are no siblings", async () => {
+    const response = await request(app)
+      .get("/campaigns/1/bugs/1/siblings")
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(404);
+  });
+
+  it("Should answer with the father id and name if is a child", async () => {
+    const response = await request(app)
+      .get("/campaigns/1/bugs/3/siblings")
+      .set("Authorization", "Bearer user");
+    expect(response.body).toHaveProperty("father");
+    expect(response.body.father).toEqual(
+      expect.objectContaining({
+        id: 2,
+        title: {
+          full: "[CONTEXT] - father",
+          compact: "father",
+          context: ["CONTEXT"],
+        },
+      })
+    );
   });
 });

@@ -417,26 +417,76 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: number
-                    title:
-                      type: string
-                    context:
-                      type: string
-                    device:
-                      type: string
-                    os:
-                      type: string
-                  required:
-                    - id
-                    - title
-                    - context
-                    - device
-                    - os
+                type: object
+                properties:
+                  father:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                      title:
+                        type: object
+                        required:
+                          - full
+                          - compact
+                        properties:
+                          full:
+                            type: string
+                          compact:
+                            type: string
+                          context:
+                            type: array
+                            items:
+                              type: string
+                      context:
+                        type: string
+                      device:
+                        type: string
+                      os:
+                        type: object
+                        required:
+                          - name
+                          - version
+                        properties:
+                          name:
+                            type: string
+                          version:
+                            type: string
+                    required:
+                      - id
+                      - title
+                      - device
+                      - os
+                  siblings:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                        title:
+                          type: string
+                        context:
+                          type: string
+                        device:
+                          type: string
+                        os:
+                          type: object
+                          required:
+                            - name
+                            - version
+                          properties:
+                            name:
+                              type: string
+                            version:
+                              type: string
+                      required:
+                        - id
+                        - title
+                        - device
+                        - os
+                required:
+                  - siblings
               examples: {}
         '400':
           $ref: '#/components/responses/Error'

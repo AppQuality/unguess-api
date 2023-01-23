@@ -1056,12 +1056,31 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            id: number;
-            title: string;
-            context: string;
-            device: string;
-            os: string;
-          }[];
+            father?: {
+              id: number;
+              title: {
+                full: string;
+                compact: string;
+                context?: string[];
+              };
+              context?: string;
+              device: string;
+              os: {
+                name: string;
+                version: string;
+              };
+            };
+            siblings: {
+              id: number;
+              title: string;
+              context?: string;
+              device: string;
+              os: {
+                name: string;
+                version: string;
+              };
+            }[];
+          };
         };
       };
       400: components["responses"]["Error"];
