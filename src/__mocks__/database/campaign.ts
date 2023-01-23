@@ -14,6 +14,14 @@ type CampaignsParams = {
   project_id?: number;
   customer_id?: number;
   cust_bug_vis?: number;
+  base_bug_internal?: string;
+  campaign_type?: 1 | 0;
+  pm_id?: number;
+  platform_id?: number;
+  os?: string;
+  form_factor?: string;
+  page_preview_id?: number;
+  page_manual_id?: number;
 };
 const defaultItem: CampaignsParams = {
   id: 1,

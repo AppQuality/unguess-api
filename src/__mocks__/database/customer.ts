@@ -5,6 +5,7 @@ type CustomerParams = {
   company?: string;
   company_logo?: string;
   tokens?: number;
+  pm_id?: number;
 };
 const defaultItem: CustomerParams = {
   id: 1,
