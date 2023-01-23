@@ -615,7 +615,7 @@ paths:
       parameters: []
   '/campaigns/{cid}/usecases':
     parameters:
-      - $ref: ../../postman/schemas/schema.yaml#/components/parameters/cid
+      - $ref: '#/components/parameters/cid'
     get:
       summary: Get Campaign usecases data
       tags: []
