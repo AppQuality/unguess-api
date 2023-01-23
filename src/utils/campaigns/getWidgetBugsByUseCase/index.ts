@@ -16,7 +16,7 @@ interface bugsByUseCaseQueryResults {
   prefix: string;
 }
 
-const getSingleUseCaseCompletion = ({
+export const getSingleUseCaseCompletion = ({
   progress,
   usecase_id,
 }: {

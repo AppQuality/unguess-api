@@ -4,6 +4,8 @@ import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 import useCases from "@src/__mocks__/database/use_cases";
 import bugs from "@src/__mocks__/database/bugs";
+import candidates from "@src/__mocks__/database/cp_has_candidate";
+import useCaseGroup from "@src/__mocks__/database/use_case_group";
 
 const campaign_type_1 = {
   id: 1,
@@ -73,6 +75,17 @@ const campaign_2 = {
   project_id: 2,
   cust_bug_vis: 1,
 };
+const candidates_1 = {
+  user_id: 1,
+  campaign_id: 1,
+  accepted: 1,
+  group_id: 1,
+};
+const usecase_group_1 = {
+  task_id: 1,
+  group_id: 1,
+};
+
 const usecase_1 = {
   id: 1,
   title: "Usecase 1",
@@ -146,6 +159,8 @@ describe("GET /campaigns/{cid}/usecases", () => {
       projects: [project_1, project_2],
       userToCustomers: [user_to_customer_1, user_to_customer_2],
     });
+    await candidates.insert(candidates_1);
+    await useCaseGroup.insert(usecase_group_1);
     await useCases.insert(usecase_1);
     await useCases.insert(usecase_2);
     await useCases.insert(usecase_3);
@@ -154,13 +169,15 @@ describe("GET /campaigns/{cid}/usecases", () => {
     await bugs.insert(bug_2);
     await bugs.insert(bug_3);
   });
+  afterAll(async () => {
+    await dbAdapter.clear();
+  });
 
   // It should answer 403 if user is not logged in
   it("Should answer 403 if user is not logged in", async () => {
     const response = await request(app).get(
       `/campaigns/${campaign_1.id}/usecases`
     );
-
     expect(response.status).toBe(403);
   });
 
@@ -203,12 +220,12 @@ describe("GET /campaigns/{cid}/usecases", () => {
           prefix: usecase_1.prefix,
           info: usecase_1.info,
         },
-        completion: 1,
+        completion: 12.5,
       },
       {
         id: -1,
         title: { full: "Not a specific Usecase" },
-        completion: 1,
+        completion: 12.5,
       },
     ]);
   });

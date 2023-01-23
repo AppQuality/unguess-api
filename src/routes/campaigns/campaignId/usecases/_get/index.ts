@@ -2,6 +2,8 @@
 
 import CampaignRoute from "@src/features/routes/CampaignRoute";
 import * as db from "@src/features/db";
+import { getUseCaseProgress } from "@src/utils/campaigns/getWidgetCampaignProgress/getUseCaseProgress";
+import { getSingleUseCaseCompletion } from "@src/utils/campaigns/getWidgetBugsByUseCase";
 
 export default class Route extends CampaignRoute<{
   response: StoplightOperations["get-campaigns-cid-usecases"]["responses"]["200"]["content"]["application/json"];
@@ -27,6 +29,7 @@ export default class Route extends CampaignRoute<{
         AND bug.publish = 1
         AND bug.status_id IN (${this.showNeedReview ? "2,4" : "2"})
   `);
+    const progress = await getUseCaseProgress(cpId);
     const campaignUsecases = usecases.map(
       (usecase: {
         id: number;
@@ -43,7 +46,10 @@ export default class Route extends CampaignRoute<{
             prefix: usecase.prefix ? usecase.prefix : undefined,
             info: usecase.info ? usecase.info : undefined,
           },
-          completion: 1,
+          completion: getSingleUseCaseCompletion({
+            progress,
+            usecase_id: usecase.id,
+          }),
         };
       }
     );
@@ -51,7 +57,10 @@ export default class Route extends CampaignRoute<{
       campaignUsecases.push({
         id: -1,
         title: { full: "Not a specific Usecase" },
-        completion: 1,
+        completion: getSingleUseCaseCompletion({
+          progress,
+          usecase_id: -1,
+        }),
       });
     return this.setSuccess(200, campaignUsecases);
   }
