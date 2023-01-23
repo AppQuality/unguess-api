@@ -232,3 +232,31 @@ describe("GET /campaigns/{cid}/usecases", () => {
 
   // --- End of file
 });
+
+describe("GET /campaigns/{cid}/usecases when campaign has not usecases", () => {
+  beforeAll(async () => {
+    await dbAdapter.add({
+      campaignTypes: [campaign_type_1],
+      campaigns: [campaign_1],
+      companies: [customer_1],
+      projects: [project_1],
+      userToCustomers: [user_to_customer_1],
+    });
+    await bugs.insert(bug_2);
+  });
+
+  //should return campaign usecases
+  it("Should return not a specific usecase if campaign has not bug in usecases", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/usecases`)
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual([
+      {
+        id: -1,
+        title: { full: "Not a specific Usecase" },
+        completion: 12.5,
+      },
+    ]);
+  });
+});
