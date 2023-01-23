@@ -3,6 +3,7 @@ import request from "supertest";
 import { adapter } from "@src/__mocks__/database/companyAdapter";
 import bugStatus from "@src/__mocks__/database/bug_status";
 import bugs from "@src/__mocks__/database/bugs";
+import devices from "@src/__mocks__/database/device";
 import CampaignMeta from "@src/__mocks__/database/campaign_meta";
 
 describe("GET /campaigns/{cid}/bugs/{bid}/sibilings", () => {
@@ -29,18 +30,66 @@ describe("GET /campaigns/{cid}/bugs/{bid}/sibilings", () => {
     bugs.insert({
       id: 1,
       campaign_id: 1,
+      dev_id: 2,
     });
     bugs.insert({
       id: 2,
       message: "[CONTEXT] - father",
       campaign_id: 1,
+      os: "Windows",
+      os_version: "Windows 10 May 2021 Update (19043)",
       is_duplicated: 0,
+      dev_id: 1,
+    });
+    devices.insert({
+      id: 1,
+      pc_type: "Desktop",
+      form_factor: "PC",
     });
     bugs.insert({
+      message: "[CONTEXT] - children 3",
       id: 3,
       campaign_id: 1,
       is_duplicated: 1,
       duplicated_of_id: 2,
+      os: "iOS",
+      os_version: "iOS 11 (11)",
+      dev_id: 2,
+    });
+    bugs.insert({
+      id: 4,
+      message: "[CONTEXT] - father",
+      campaign_id: 1,
+      os: "iOS",
+      os_version: "iOS 16 (16)",
+      is_duplicated: 0,
+      dev_id: 2,
+    });
+    devices.insert({
+      id: 2,
+      manufacturer: "Apple",
+      model: "iPhone X",
+      form_factor: "Smartphone",
+    });
+    bugs.insert({
+      id: 5,
+      message: "[CONTEXT] - children 5",
+      os: "iOS",
+      os_version: "iOS 11 (11)",
+      campaign_id: 1,
+      is_duplicated: 1,
+      duplicated_of_id: 4,
+      dev_id: 2,
+    });
+    bugs.insert({
+      id: 6,
+      campaign_id: 1,
+      is_duplicated: 1,
+      duplicated_of_id: 4,
+      message: "[CONTEXT] - children 6",
+      os: "iOS",
+      os_version: "iOS 11 (11)",
+      dev_id: 2,
     });
   });
 
@@ -91,6 +140,92 @@ describe("GET /campaigns/{cid}/bugs/{bid}/sibilings", () => {
           context: ["CONTEXT"],
         },
       })
+    );
+  });
+
+  it("Should answer with the father os if is a child", async () => {
+    const response = await request(app)
+      .get("/campaigns/1/bugs/3/siblings")
+      .set("Authorization", "Bearer user");
+    expect(response.body).toHaveProperty("father");
+    expect(response.body.father).toEqual(
+      expect.objectContaining({
+        id: 2,
+        os: {
+          name: "Windows",
+          version: "Windows 10 May 2021 Update (19043)",
+        },
+      })
+    );
+  });
+
+  it("Should answer with the father device name for desktop if is a child", async () => {
+    const response = await request(app)
+      .get("/campaigns/1/bugs/3/siblings")
+      .set("Authorization", "Bearer user");
+    expect(response.body).toHaveProperty("father");
+    expect(response.body.father).toEqual(
+      expect.objectContaining({
+        id: 2,
+        device: "Desktop",
+      })
+    );
+  });
+
+  it("Should answer with the father device name for mobile if is a child", async () => {
+    const response = await request(app)
+      .get("/campaigns/1/bugs/5/siblings")
+      .set("Authorization", "Bearer user");
+    expect(response.body).toHaveProperty("father");
+    expect(response.body.father).toEqual(
+      expect.objectContaining({
+        id: 4,
+        device: "Apple iPhone X",
+      })
+    );
+  });
+
+  it("Should answer with the childrens if is a father", async () => {
+    const response = await request(app)
+      .get("/campaigns/1/bugs/2/siblings")
+      .set("Authorization", "Bearer user");
+    expect(response.body).toHaveProperty("siblings");
+    expect(response.body.siblings.length).toBe(1);
+    expect(response.body.siblings).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 3,
+          title: {
+            full: "[CONTEXT] - children 3",
+            compact: "children 3",
+            context: ["CONTEXT"],
+          },
+          device: "Apple iPhone X",
+          os: { name: "iOS", version: "iOS 11 (11)" },
+        }),
+      ])
+    );
+  });
+
+  it("Should answer with the siblings if is a children", async () => {
+    const response = await request(app)
+      .get("/campaigns/1/bugs/6/siblings")
+      .set("Authorization", "Bearer user");
+    expect(response.body).toHaveProperty("siblings");
+    expect(response.body.siblings.length).toBe(1);
+    expect(response.body.siblings).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 5,
+          title: {
+            full: "[CONTEXT] - children 5",
+            compact: "children 5",
+            context: ["CONTEXT"],
+          },
+          device: "Apple iPhone X",
+          os: { name: "iOS", version: "iOS 11 (11)" },
+        }),
+      ])
     );
   });
 });

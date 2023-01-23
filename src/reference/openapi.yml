@@ -465,7 +465,19 @@ paths:
                         id:
                           type: number
                         title:
-                          type: string
+                          type: object
+                          required:
+                            - full
+                            - compact
+                          properties:
+                            full:
+                              type: string
+                            compact:
+                              type: string
+                            context:
+                              type: array
+                              items:
+                                type: string
                         context:
                           type: string
                         device:

@@ -1072,7 +1072,11 @@ export interface operations {
             };
             siblings: {
               id: number;
-              title: string;
+              title: {
+                full: string;
+                compact: string;
+                context?: string[];
+              };
               context?: string;
               device: string;
               os: {
