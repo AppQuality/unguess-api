@@ -15,7 +15,7 @@ type CampaignsParams = {
   customer_id?: number;
   cust_bug_vis?: number;
   base_bug_internal?: string;
-  campaign_type?: 1 | 0;
+  campaign_type?: number;
   pm_id?: number;
   platform_id?: number;
   os?: string;
