@@ -43,14 +43,15 @@ export default class Route extends CampaignRoute<{
   private formatBugDevices(
     devices: Awaited<ReturnType<typeof this.getBugDevices>>
   ) {
-    return devices.map((d) => {
+    const deviceList = devices.map((d) => {
       const device = getBugDevice(d);
-      return {
-        device:
-          device.type === "desktop"
-            ? device.desktop_type
-            : `${device.manufacturer} ${device.model}`,
-      };
+      return device.type === "desktop"
+        ? device.desktop_type
+        : `${device.manufacturer} ${device.model}`;
     });
+
+    return [...new Set(deviceList)].map((d) => ({
+      device: d,
+    }));
   }
 }

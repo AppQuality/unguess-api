@@ -57,6 +57,14 @@ describe("GET /campaigns/{cid}/devices", () => {
       dev_id: 3,
       status_id: 1,
     });
+
+    await bugs.insert({
+      id: 5,
+      campaign_id: 1,
+      manufacturer: "-",
+      model: "Desktop",
+      dev_id: 4,
+    });
     await devices.insert({
       id: 1,
       form_factor: "Smartphone",
@@ -68,6 +76,11 @@ describe("GET /campaigns/{cid}/devices", () => {
     });
     await devices.insert({
       id: 3,
+      form_factor: "PC",
+      pc_type: "Desktop",
+    });
+    await devices.insert({
+      id: 4,
       form_factor: "PC",
       pc_type: "Desktop",
     });
