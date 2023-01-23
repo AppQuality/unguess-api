@@ -613,6 +613,62 @@ paths:
       security:
         - JWT: []
       parameters: []
+  '/campaigns/{cid}/usecases':
+    parameters:
+      - $ref: ../../postman/schemas/schema.yaml#/components/parameters/cid
+    get:
+      summary: Get Campaign usecases data
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                    title:
+                      type: object
+                      required:
+                        - full
+                      properties:
+                        full:
+                          type: string
+                        simple:
+                          type: string
+                        prefix:
+                          type: string
+                        info:
+                          type: string
+                    completion:
+                      type: number
+                  required:
+                    - id
+                    - title
+                    - completion
+              examples:
+                not-a-specific-usecase-only:
+                  value:
+                    - title:
+                        full: UC1 asd
+                      description: string
+                      bugs: 10
+                      uniqueBugs: 8
+                      id: 1220
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-usecases
+      security:
+        - JWT: []
+      parameters: []
   '/campaigns/{cid}/widgets':
     parameters:
       - name: cid
