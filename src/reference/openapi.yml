@@ -161,6 +161,7 @@ paths:
                   value:
                     items:
                       - id: 0
+                        siblings: 5
                         internal_id: string
                         campaign_id: 0
                         title:
