@@ -194,7 +194,6 @@ describe("GET /campaigns/{cid}/usecases", () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/usecases`)
       .set("Authorization", "Bearer user");
-    console.log(response.body);
     expect(response.status).toBe(200);
     expect(response.body).toEqual([
       {
