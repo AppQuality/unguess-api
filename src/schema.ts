@@ -1145,12 +1145,9 @@ export interface operations {
               full: string;
               simple?: string;
               prefix?: string;
+              info?: string;
             };
-            description: string;
-            info?: string;
-            totalBugs: number;
-            uniqueBugs?: number;
-            completion?: number;
+            completion: number;
           }[];
         };
       };
