@@ -10,58 +10,85 @@ export default class Route extends CampaignRoute<{
   parameters: StoplightOperations["get-campaigns-cid-usecases"]["parameters"]["path"];
 }> {
   protected async prepare(): Promise<void> {
-    const cpId = this.cp_id;
-    const bugsNotInUsecase = await db.query(`
-      SELECT id
-      FROM wp_appq_evd_bug
-      WHERE campaign_id = ${cpId} 
-        AND publish = 1
-        AND status_id IN (${this.showNeedReview ? "2,4" : "2"})
-        AND application_section_id = -1
-    `);
+    const usecases = await this.getUsecases();
+    const enhanchedUsecases = await this.enhanceUsecases(usecases);
+    const campaignUsecases = this.formatUsecases(enhanchedUsecases);
+    return this.setSuccess(200, campaignUsecases);
+  }
 
-    const usecases = await db.query(`
+  private async getUsecases() {
+    const result: {
+      id: number;
+      title: string;
+      simple: string | null;
+      info: string | null;
+      prefix: string | null;
+    }[] = await db.query(`
     SELECT usecase.id, usecase.title, usecase.simple_title as simple, usecase.prefix, usecase.info
       FROM wp_appq_campaign_task usecase
         JOIN wp_appq_evd_bug bug ON usecase.id = bug.application_section_id
-      WHERE usecase.campaign_id = ${cpId} 
-        AND bug.campaign_id = ${cpId} 
+        JOIN wp_appq_evd_bug_status status ON bug.status_id = status.id
+      WHERE usecase.campaign_id = ${this.cp_id} 
+        AND bug.campaign_id = ${this.cp_id} 
         AND bug.publish = 1
-        AND bug.status_id IN (${this.showNeedReview ? "2,4" : "2"})
+        AND ${
+          this.shouldShowNeedReview()
+            ? `(status.name = 'Approved' OR status.name = 'Need Review')`
+            : `status.name = 'Approved'`
+        }
   `);
-    const progress = await getUseCaseProgress(cpId);
-    const campaignUsecases = usecases.map(
-      (usecase: {
-        id: number;
-        title: string;
-        simple: string;
-        prefix: string;
-        info: string;
-      }) => {
-        return {
-          id: usecase.id,
-          title: {
-            full: usecase.title,
-            simple: usecase.simple ? usecase.simple : undefined,
-            prefix: usecase.prefix ? usecase.prefix : undefined,
-            info: usecase.info ? usecase.info : undefined,
-          },
-          completion: getSingleUseCaseCompletion({
-            progress,
-            usecase_id: usecase.id,
-          }),
-        };
-      }
-    );
-    if (bugsNotInUsecase.length)
-      campaignUsecases.push({
+    if (await this.hasBugNotInUsecases())
+      result.push({
         id: -1,
-        title: { full: "Not a specific Usecase" },
+        title: "Not a specific Usecase",
+        simple: null,
+        info: null,
+        prefix: null,
+      });
+    return result;
+  }
+
+  private async hasBugNotInUsecases() {
+    const result = await db.query(`
+      SELECT id
+      FROM wp_appq_evd_bug
+      WHERE campaign_id = ${this.cp_id} 
+        AND publish = 1
+        AND status_id IN (${this.shouldShowNeedReview() ? "2,4" : "2"})
+        AND application_section_id = -1
+    `);
+    return result.length > 0;
+  }
+
+  private async enhanceUsecases(
+    usecases: Awaited<ReturnType<typeof this.getUsecases>>
+  ) {
+    const progress = await getUseCaseProgress(this.cp_id);
+    return usecases.map((usecase) => {
+      return {
+        ...usecase,
         completion: getSingleUseCaseCompletion({
           progress,
-          usecase_id: -1,
+          usecase_id: usecase.id,
         }),
-      });
-    return this.setSuccess(200, campaignUsecases);
+      };
+    });
+  }
+
+  private formatUsecases(
+    usecases: Awaited<ReturnType<typeof this.enhanceUsecases>>
+  ) {
+    return usecases.map((usecase) => {
+      return {
+        id: usecase.id,
+        title: {
+          full: usecase.title,
+          simple: usecase.simple ? usecase.simple : undefined,
+          prefix: usecase.prefix ? usecase.prefix : undefined,
+          info: usecase.info ? usecase.info : undefined,
+        },
+        completion: usecase.completion,
+      };
+    });
   }
 }
