@@ -64,6 +64,26 @@ describe("GET /campaigns/{cid}/os", () => {
       dev_id: 3,
       status_id: 1,
     });
+    await bugs.insert({
+      id: 5,
+      campaign_id: 1,
+      manufacturer: "-",
+      model: "Desktop",
+      os: "Windows",
+      os_version: "XP",
+      dev_id: 3,
+      status_id: 1,
+      publish: 0,
+    });
+    await bugs.insert({
+      id: 6,
+      campaign_id: 1,
+      manufacturer: "-",
+      model: "Desktop",
+      os: "Windows",
+      os_version: "11",
+      dev_id: 9,
+    });
   });
 
   it("Should answer 403 if user is not logged in", async () => {

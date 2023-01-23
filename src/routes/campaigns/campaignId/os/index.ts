@@ -22,6 +22,7 @@ export default class Route extends CampaignRoute<{
       FROM wp_appq_evd_bug bug
               JOIN wp_appq_evd_bug_status bstatus ON (bug.status_id = bstatus.id)
       WHERE campaign_id = ?
+      AND bug.publish = 1
       AND ${
         this.shouldShowNeedReview()
           ? `(bstatus.name = 'Approved' OR bstatus.name = 'Need Review')`
@@ -37,6 +38,8 @@ export default class Route extends CampaignRoute<{
   }
 
   private formatBugOs(os: Awaited<ReturnType<typeof this.getBugOs>>) {
-    return os.map((d) => ({ os: `${d.os} ${d.os_version}` }));
+    const osList = os.map((d) => `${d.os} ${d.os_version}`);
+
+    return [...new Set(osList)].map((os) => ({ os }));
   }
 }

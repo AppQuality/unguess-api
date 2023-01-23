@@ -26,6 +26,7 @@ export default class Route extends CampaignRoute<{
               JOIN wp_crowd_appq_device device ON (bug.dev_id = device.id)
               JOIN wp_appq_evd_bug_status bstatus ON (bug.status_id = bstatus.id)
       WHERE campaign_id = ?
+      AND bug.publish = 1
       AND ${
         this.shouldShowNeedReview()
           ? `(bstatus.name = 'Approved' OR bstatus.name = 'Need Review')`
