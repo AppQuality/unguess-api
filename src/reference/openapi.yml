@@ -393,6 +393,63 @@ paths:
       description: Return all accepted replicabilities of a specific campaign
       security:
         - JWT: []
+
+  '/campaigns/{cid}/bugs/{bid}/siblings':
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Campaign id
+      - name: bid
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Defines an identifier for the bug object (BUG ID)
+    get:
+      summary: Get Bug siblings
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                    title:
+                      type: string
+                    context:
+                      type: string
+                    device:
+                      type: string
+                    os:
+                      type: string
+                  required:
+                    - id
+                    - title
+                    - context
+                    - device
+                    - os
+              examples: {}
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-bug-siblings
+      security:
+        - JWT: []
+      description: ''
   '/campaigns/{cid}/meta':
     parameters:
       - name: cid
@@ -644,7 +701,7 @@ paths:
       parameters: []
   '/campaigns/{cid}/usecases':
     parameters:
-      - $ref: '#/components/parameters/cid'
+      - $ref: ../../postman/schemas/schema.yaml#/components/parameters/cid
     get:
       summary: Get Campaign usecases data
       tags: []

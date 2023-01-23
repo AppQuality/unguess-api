@@ -3,8 +3,14 @@ import * as db from "@src/features/db";
 import { getProjectById } from "@src/utils/projects/getProjectById";
 import { getTitleRule } from "@src/utils/campaigns/getTitleRule";
 
+type CampaignRouteParameters = { cid: string };
+
+export type { CampaignRouteParameters };
+
 export default class CampaignRoute<
-  T extends RouteClassTypes & { parameters: T["parameters"] & { cid: string } }
+  T extends RouteClassTypes & {
+    parameters: T["parameters"] & CampaignRouteParameters;
+  }
 > extends UserRoute<T> {
   protected cp_id: number;
   protected projectId: number | undefined;
