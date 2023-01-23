@@ -144,6 +144,10 @@ paths:
                                 required:
                                   - tag_id
                                   - tag_name
+                            siblings:
+                              type: number
+                          required:
+                            - siblings
                   start:
                     type: integer
                   limit:

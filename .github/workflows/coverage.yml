@@ -1,24 +1,24 @@
-name: "Generate test coverage"
+name: 'Generate test coverage'
 on:
   push:
     branches:
-      - "*"
+      - '*'
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: "Install Node"
+      - name: 'Install Node'
         uses: actions/setup-node@v3
         with:
           node-version: 16
       - name: Install dependencies
         run: |
-          npm ci
-      - name: "Generate Coverage"
+          yarn --frozen-lockfile
+      - name: 'Generate Coverage'
         run: |
-          npm run coverage
+          yarn coverage
       - name: Coveralls
         uses: coverallsapp/github-action@master
         with:

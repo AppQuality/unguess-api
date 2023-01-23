@@ -890,6 +890,7 @@ export interface operations {
                 tag_id: number;
                 tag_name: string;
               }[];
+              siblings: number;
             })[];
             start?: number;
             limit?: number;

@@ -120,6 +120,7 @@ const bug_1: BugsParams = {
   wp_user_id: 1,
   dev_id: device_1.id,
   is_duplicated: 1,
+  duplicated_of_id: 2,
   manufacturer: device_1.manufacturer,
   model: device_1.model,
   os: device_1.operating_system,
