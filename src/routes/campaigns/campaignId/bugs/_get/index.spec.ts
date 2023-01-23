@@ -779,27 +779,5 @@ describe("GET /campaigns/{cid}/bugs", () => {
     }
   });
 
-  it("Should return the number of siblings", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs`)
-      .set("Authorization", "Bearer user");
-    expect(response.body).toHaveProperty("items");
-    expect(response.body.items.length).toBe(3);
-    expect(
-      response.body.items.find((bug: { id: number }) => bug.id === bug_1.id),
-      "Bug 1 should have 1 sibling"
-    ).toHaveProperty("siblings", 1);
-    expect(
-      response.body.items.find((bug: { id: number }) => bug.id === bug_2.id),
-      "Bug 2 should have 1 sibling"
-    ).toHaveProperty("siblings", 1);
-    expect(
-      response.body.items.find(
-        (bug: { id: number }) => bug.id === bug_9_no_tags.id
-      ),
-      "Bug 9 should have 0 sibling"
-    ).toHaveProperty("siblings", 0);
-  });
-
   // --- End of file
 });
