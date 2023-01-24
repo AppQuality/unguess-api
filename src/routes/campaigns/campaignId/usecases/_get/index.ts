@@ -24,7 +24,7 @@ export default class Route extends CampaignRoute<{
       info: string | null;
       prefix: string | null;
     }[] = await db.query(`
-    SELECT usecase.id, usecase.title, usecase.simple_title as simple, usecase.prefix, usecase.info
+    SELECT DISTINCT usecase.id, usecase.title, usecase.simple_title as simple, usecase.prefix, usecase.info
       FROM wp_appq_campaign_task usecase
         JOIN wp_appq_evd_bug bug ON usecase.id = bug.application_section_id
         JOIN wp_appq_evd_bug_status status ON bug.status_id = status.id
