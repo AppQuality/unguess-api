@@ -385,6 +385,10 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BugReplicability'
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
       operationId: get-campaigns-replicabilities
       description: Return all accepted replicabilities of a specific campaign
       security:
