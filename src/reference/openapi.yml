@@ -365,6 +365,30 @@ paths:
                   tags: []
       security:
         - JWT: []
+  '/campaigns/{cid}/replicabilities':
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Campaign id
+    get:
+      summary: GET Replicabilities by Campaign
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BugReplicability'
+      operationId: get-campaigns-replicabilities
+      description: Return all accepted replicabilities of a specific campaign
+      security:
+        - JWT: []
   '/campaigns/{cid}/meta':
     parameters:
       - name: cid
