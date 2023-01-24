@@ -87,10 +87,10 @@ export default class Route extends CampaignRoute<{
       return {
         id: usecase.id,
         title: {
-          full: usecase.title,
-          simple: usecase.simple ? usecase.simple : undefined,
-          prefix: usecase.prefix ? usecase.prefix : undefined,
-          info: usecase.info ? usecase.info : undefined,
+          full: usecase.title.trim(),
+          simple: usecase.simple ? usecase.simple.trim() : undefined,
+          prefix: usecase.prefix ? usecase.prefix.trim() : undefined,
+          info: usecase.info ? usecase.info.trim() : undefined,
         },
         completion: usecase.completion,
       };
