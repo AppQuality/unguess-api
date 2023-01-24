@@ -7,6 +7,9 @@ export default class BugRoute<
   }
 > extends CampaignRoute<T> {
   protected bug_id: number;
+  protected bug:
+    | { id: number; is_duplicated: 0 | 1; duplicated_of_id: number }
+    | undefined;
 
   constructor(configuration: RouteClassConfiguration) {
     super(configuration);
@@ -30,14 +33,18 @@ export default class BugRoute<
   }
 
   private async initBug() {
-    const bugs: {
-      id: number;
-    }[] = await db.query(`
+    const bugs = await db.query(`
       SELECT 
-        id
+        id, is_duplicated, duplicated_of_id
       FROM wp_appq_evd_bug 
       WHERE id = ${this.bug_id} AND campaign_id = ${this.cp_id}`);
     if (!bugs.length) return false;
-    return bugs[0];
+    this.bug = bugs[0];
+    return this.bug;
+  }
+
+  protected getBug() {
+    if (!this.bug) throw new Error("Bug not found");
+    return this.bug;
   }
 }

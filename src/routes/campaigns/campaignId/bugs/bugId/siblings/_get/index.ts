@@ -25,12 +25,19 @@ export default class Route extends BugRoute<{
 }> {
   private replication: "unique" | "father" | "children" = "unique";
   private isTitleRuleActive: boolean = false;
+  private children: Bug[] | undefined;
 
   protected async init(): Promise<void> {
     await super.init();
 
     this.isTitleRuleActive = await this.getTitleRuleStatus();
-    this.replication = await this.getReplicationStatus();
+
+    if (await this.isChildren()) this.replication = "children";
+    else {
+      await this.initChildren();
+      if (this.children) this.replication = "father";
+      else this.replication = "unique";
+    }
 
     if (this.replication === "unique") {
       this.setError(404, {
@@ -42,24 +49,21 @@ export default class Route extends BugRoute<{
     }
   }
 
-  private async getReplicationStatus() {
-    if (await this.isChildren()) return "children";
-    if (await this.isFather()) return "father";
-    return "unique";
+  private async initChildren() {
+    const bugs: Bug[] = await db.query(
+      `
+      SELECT bug.id, bug.message, bug.os, bug.os_version, device.form_factor, device.pc_type, device.manufacturer, device.model
+      FROM wp_appq_evd_bug bug
+      JOIN wp_crowd_appq_device device ON (device.id = bug.dev_id) 
+      WHERE bug.duplicated_of_id = ${this.bug_id}`
+    );
+    if (bugs.length) {
+      this.children = bugs;
+    }
   }
 
   private async isChildren() {
-    const bugs = await db.query(
-      `SELECT is_duplicated FROM wp_appq_evd_bug WHERE id = ${this.bug_id}`
-    );
-    return bugs[0].is_duplicated === 1;
-  }
-
-  private async isFather() {
-    const bugs = await db.query(
-      `SELECT id FROM wp_appq_evd_bug WHERE duplicated_of_id = ${this.bug_id}`
-    );
-    return bugs.length > 0;
+    return this.getBug().is_duplicated === 1;
   }
 
   protected async prepare() {
@@ -79,23 +83,14 @@ export default class Route extends BugRoute<{
       SELECT bug.id, bug.message, bug.os, bug.os_version, device.form_factor, device.pc_type, device.manufacturer, device.model
         FROM wp_appq_evd_bug bug
         JOIN wp_crowd_appq_device device ON (device.id = bug.dev_id) 
-      WHERE bug.id = (
-        SELECT duplicated_of_id FROM wp_appq_evd_bug WHERE id = ${this.bug_id}
-      )`
+      WHERE bug.id = ${this.getBug().duplicated_of_id}`
     );
     if (!bugs.length) return undefined;
     return this.formatBug(bugs[0]);
   }
 
   private async getChildren() {
-    const bugs: Bug[] = await db.query(
-      `
-      SELECT bug.id, bug.message, bug.os, bug.os_version, device.form_factor, device.pc_type, device.manufacturer, device.model
-      FROM wp_appq_evd_bug bug
-      JOIN wp_crowd_appq_device device ON (device.id = bug.dev_id) 
-      WHERE bug.duplicated_of_id = ${this.bug_id}`
-    );
-    return bugs.map((bug) => this.formatBug(bug));
+    return (this.children || []).map((bug) => this.formatBug(bug));
   }
 
   private async getSiblings() {
@@ -105,9 +100,9 @@ export default class Route extends BugRoute<{
       SELECT bug.id, bug.message, bug.os, bug.os_version, device.form_factor, device.pc_type, device.manufacturer, device.model
       FROM wp_appq_evd_bug bug
       JOIN wp_crowd_appq_device device ON (device.id = bug.dev_id) 
-      WHERE bug.id != ${this.bug_id} AND bug.duplicated_of_id = (
-        SELECT duplicated_of_id FROM wp_appq_evd_bug WHERE id = ${this.bug_id}
-      )`
+      WHERE bug.id != ${this.bug_id} AND bug.duplicated_of_id = ${
+        this.getBug().duplicated_of_id
+      }`
     );
     return bugs.map((bug) => this.formatBug(bug));
   }
