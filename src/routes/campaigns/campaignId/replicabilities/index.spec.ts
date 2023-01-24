@@ -43,6 +43,13 @@ describe("GET /campaigns/{cid}/replicabilities", () => {
     expect(response.status).toBe(400);
   });
 
+  it("Should fail if the user is not the owner", async () => {
+    const response = await request(app)
+      .get(`/campaigns/2/replicabilities`)
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(403);
+  });
+
   it("Should answer 200 if campaign exists and user has access", async () => {
     const response = await request(app)
       .get("/campaigns/1/replicabilities")
