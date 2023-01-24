@@ -24,6 +24,11 @@ describe("GET /campaigns/{cid}/replicabilities", () => {
       campaign_id: 1,
       bug_replicability_id: 1,
     });
+    customReplicabilities.insert({
+      id: 2,
+      campaign_id: 2,
+      bug_replicability_id: 1,
+    });
   });
 
   it("Should answer 403 if user is not logged in", async () => {
@@ -43,5 +48,17 @@ describe("GET /campaigns/{cid}/replicabilities", () => {
       .get("/campaigns/1/replicabilities")
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
+  });
+
+  it("Should return custom replicabilities", async () => {
+    const response = await request(app)
+      .get("/campaigns/1/replicabilities")
+      .set("Authorization", "Bearer user");
+    expect(response.body).toEqual([
+      {
+        id: 1,
+        name: "Sometimes",
+      },
+    ]);
   });
 });
