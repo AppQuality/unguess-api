@@ -1016,6 +1016,10 @@ export interface operations {
           "application/json": components["schemas"]["BugReplicability"][];
         };
       };
+      /** Bad Request */
+      400: unknown;
+      /** Forbidden */
+      403: unknown;
     };
   };
   /** Used to extra info about a selected campaign */
