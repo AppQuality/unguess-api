@@ -67,6 +67,17 @@ export interface paths {
       };
     };
   };
+  "/campaigns/{cid}/bugs/{bid}/siblings": {
+    get: operations["get-campaigns-bug-siblings"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+        /** Defines an identifier for the bug object (BUG ID) */
+        bid: string;
+      };
+    };
+  };
   "/campaigns/{cid}/meta": {
     /** Used to extra info about a selected campaign */
     get: operations["get-campaigns-cid-meta"];
@@ -1029,6 +1040,57 @@ export interface operations {
       400: unknown;
       /** Forbidden */
       403: unknown;
+    };
+  };
+  "get-campaigns-bug-siblings": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+        /** Defines an identifier for the bug object (BUG ID) */
+        bid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            father?: {
+              id: number;
+              title: {
+                full: string;
+                compact: string;
+                context?: string[];
+              };
+              context?: string;
+              device: string;
+              os: {
+                name: string;
+                version: string;
+              };
+            };
+            siblings: {
+              id: number;
+              title: {
+                full: string;
+                compact: string;
+                context?: string[];
+              };
+              context?: string;
+              device: string;
+              os: {
+                name: string;
+                version: string;
+              };
+            }[];
+          };
+        };
+      };
+      400: components["responses"]["Error"];
+      401: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
     };
   };
   /** Used to extra info about a selected campaign */
