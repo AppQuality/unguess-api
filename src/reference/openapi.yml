@@ -161,6 +161,7 @@ paths:
                   value:
                     items:
                       - id: 0
+                        siblings: 5
                         internal_id: string
                         campaign_id: 0
                         title:
@@ -362,6 +363,34 @@ paths:
               emptyTagsEntries:
                 value:
                   tags: []
+      security:
+        - JWT: []
+  '/campaigns/{cid}/replicabilities':
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Campaign id
+    get:
+      summary: GET Replicabilities by Campaign
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BugReplicability'
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+      operationId: get-campaigns-replicabilities
+      description: Return all accepted replicabilities of a specific campaign
       security:
         - JWT: []
   '/campaigns/{cid}/meta':

@@ -44,6 +44,7 @@ import reports from "@src/__mocks__/database/report";
 import bugSeverity from "@src/__mocks__/database/bug_severity";
 import customSeverity from "@src/__mocks__/database/bug_severity_custom";
 import bugReplicability from "@src/__mocks__/database/bug_replicability";
+import customReplicabilities from "@src/__mocks__/database/bug_replicability_custom";
 import bugType from "@src/__mocks__/database/bug_type";
 import customBugType from "@src/__mocks__/database/bug_type_custom";
 import bugStatus from "@src/__mocks__/database/bug_status";
@@ -112,6 +113,7 @@ export const adapter = {
     await bugSeverity.mock();
     await customSeverity.mock();
     await bugReplicability.mock();
+    await customReplicabilities.mock();
     await bugType.mock();
     await customBugType.mock();
     await bugStatus.mock();
@@ -161,6 +163,7 @@ export const adapter = {
     await bugSeverity.dropMock();
     await customSeverity.dropMock();
     await bugReplicability.dropMock();
+    await customReplicabilities.dropMock();
     await bugType.dropMock();
     await customBugType.dropMock();
     await bugStatus.dropMock();
