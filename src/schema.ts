@@ -57,6 +57,16 @@ export interface paths {
       };
     };
   };
+  "/campaigns/{cid}/replicabilities": {
+    /** Return all accepted replicabilities of a specific campaign */
+    get: operations["get-campaigns-replicabilities"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+  };
   "/campaigns/{cid}/meta": {
     /** Used to extra info about a selected campaign */
     get: operations["get-campaigns-cid-meta"];
@@ -987,6 +997,23 @@ export interface operations {
                 tag_name: string;
               }
           )[];
+        };
+      };
+    };
+  };
+  /** Return all accepted replicabilities of a specific campaign */
+  "get-campaigns-replicabilities": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["BugReplicability"][];
         };
       };
     };
