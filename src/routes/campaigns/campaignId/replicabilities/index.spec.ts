@@ -3,6 +3,8 @@ import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import replicability from "@src/__mocks__/database/bug_replicability";
 import customReplicabilities from "@src/__mocks__/database/bug_replicability_custom";
+import bugs from "@src/__mocks__/database/bugs";
+import bugStatus from "@src/__mocks__/database/bug_status";
 
 describe("GET /campaigns/{cid}/replicabilities", () => {
   beforeAll(async () => {
@@ -24,6 +26,12 @@ describe("GET /campaigns/{cid}/replicabilities", () => {
       customer_id: 1,
       wp_user_id: 1,
     });
+    await dbAdapter.addCampaignWithProject({
+      campaign_id: 4,
+      project_id: 1,
+      customer_id: 1,
+      wp_user_id: 1,
+    });
     replicability.addDefaultItems();
     customReplicabilities.insert({
       id: 1,
@@ -34,6 +42,17 @@ describe("GET /campaigns/{cid}/replicabilities", () => {
       id: 2,
       campaign_id: 2,
       bug_replicability_id: 1,
+    });
+    customReplicabilities.insert({
+      id: 3,
+      campaign_id: 4,
+      bug_replicability_id: 3,
+    });
+    bugStatus.addDefaultItems();
+    await bugs.insert({
+      id: 1,
+      bug_replicability_id: 2,
+      campaign_id: 4,
     });
   });
 
@@ -92,6 +111,22 @@ describe("GET /campaigns/{cid}/replicabilities", () => {
       {
         id: 3,
         name: "Once",
+      },
+    ]);
+  });
+
+  it("Should return bug replicabilities even if not available in list", async () => {
+    const response = await request(app)
+      .get(`/campaigns/4/replicabilities`)
+      .set("Authorization", "Bearer user");
+    expect(response.body).toEqual([
+      {
+        id: 3,
+        name: "Once",
+      },
+      {
+        id: 2,
+        name: "Always",
       },
     ]);
   });
