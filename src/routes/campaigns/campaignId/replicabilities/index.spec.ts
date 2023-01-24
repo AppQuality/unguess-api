@@ -18,6 +18,12 @@ describe("GET /campaigns/{cid}/replicabilities", () => {
       customer_id: 2,
       wp_user_id: 2,
     });
+    await dbAdapter.addCampaignWithProject({
+      campaign_id: 3,
+      project_id: 1,
+      customer_id: 1,
+      wp_user_id: 1,
+    });
     replicability.addDefaultItems();
     customReplicabilities.insert({
       id: 1,
@@ -65,6 +71,27 @@ describe("GET /campaigns/{cid}/replicabilities", () => {
       {
         id: 1,
         name: "Sometimes",
+      },
+    ]);
+  });
+
+  it("Should return all campaign replicabilities if campaign has not custom replicability", async () => {
+    const response = await request(app)
+      .get(`/campaigns/3/replicabilities`)
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual([
+      {
+        id: 1,
+        name: "Sometimes",
+      },
+      {
+        id: 2,
+        name: "Always",
+      },
+      {
+        id: 3,
+        name: "Once",
       },
     ]);
   });

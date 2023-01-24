@@ -27,7 +27,22 @@ export default class Route extends CampaignRoute<{
         [this.cp_id]
       )
     );
+    if (result.length === 0) {
+      return await this.getAllReplicabilities();
+    }
 
     return result;
+  }
+
+  private async getAllReplicabilities() {
+    return await db.query(
+      db.format(
+        `
+          SELECT id, name
+          FROM wp_appq_evd_bug_replicability
+          `,
+        []
+      )
+    );
   }
 }
