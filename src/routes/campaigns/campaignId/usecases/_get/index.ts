@@ -36,6 +36,7 @@ export default class Route extends CampaignRoute<{
             ? `(status.name = 'Approved' OR status.name = 'Need Review')`
             : `status.name = 'Approved'`
         }
+        ORDER BY usecase.position ASC
   `);
     if (await this.hasBugNotInUsecases())
       result.push({
