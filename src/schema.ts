@@ -1171,7 +1171,7 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            device?: string;
+            device: string;
           }[];
         };
       };
@@ -1192,7 +1192,7 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            os?: string;
+            os: string;
           }[];
         };
       };
