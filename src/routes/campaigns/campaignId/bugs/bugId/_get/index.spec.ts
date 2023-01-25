@@ -296,6 +296,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
     await bugReplicability.clear();
     await bugType.clear();
     await bugStatus.clear();
+    await readStatus.clear();
   });
 
   // It should answer 403 if user is not logged in
@@ -582,6 +583,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
         is_read: 1,
       },
     ]);
+    console.log(statusBeforeGet);
     expect(statusBeforeGet.length).toBe(0);
     await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
