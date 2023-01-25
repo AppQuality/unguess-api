@@ -170,6 +170,15 @@ describe("GET /campaigns/{cid}/usecases", () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual([
       {
+        id: 5,
+        title: {
+          full: usecase_5.title,
+          prefix: usecase_5.prefix,
+          info: usecase_5.info,
+        },
+        completion: 12.5,
+      },
+      {
         id: 1,
         title: {
           full: usecase_1.title,
