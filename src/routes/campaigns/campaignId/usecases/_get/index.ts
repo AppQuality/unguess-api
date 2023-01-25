@@ -24,7 +24,7 @@ export default class Route extends CampaignRoute<{
       info: string | null;
       prefix: string | null;
     }[] = await db.query(`
-    SELECT usecase.id, usecase.title, usecase.simple_title as simple, usecase.prefix, usecase.info
+    SELECT DISTINCT usecase.id, usecase.title, usecase.simple_title as simple, usecase.prefix, usecase.info
       FROM wp_appq_campaign_task usecase
         JOIN wp_appq_evd_bug bug ON usecase.id = bug.application_section_id
         JOIN wp_appq_evd_bug_status status ON bug.status_id = status.id
@@ -36,6 +36,7 @@ export default class Route extends CampaignRoute<{
             ? `(status.name = 'Approved' OR status.name = 'Need Review')`
             : `status.name = 'Approved'`
         }
+        ORDER BY usecase.position ASC, usecase.id ASC
   `);
     if (await this.hasBugNotInUsecases())
       result.push({
@@ -87,10 +88,10 @@ export default class Route extends CampaignRoute<{
       return {
         id: usecase.id,
         title: {
-          full: usecase.title,
-          simple: usecase.simple ? usecase.simple : undefined,
-          prefix: usecase.prefix ? usecase.prefix : undefined,
-          info: usecase.info ? usecase.info : undefined,
+          full: usecase.title.trim(),
+          simple: usecase.simple ? usecase.simple.trim() : undefined,
+          prefix: usecase.prefix ? usecase.prefix.trim() : undefined,
+          info: usecase.info ? usecase.info.trim() : undefined,
         },
         completion: usecase.completion,
       };

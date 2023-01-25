@@ -21,15 +21,14 @@ const usecase_group_1 = {
 const usecase_1 = {
   id: 1,
   title: "Usecase 1",
-  content: "Use Case 1 description",
   campaign_id: 1,
   info: "usecase 1 info",
   prefix: "usecase 1 prefix",
+  position: 10,
 };
 const usecase_2 = {
   id: 2,
   title: "Usecase 2 no bugs",
-  content: "Use Case 2 description",
   campaign_id: 1,
   info: "usecase 2 info",
   prefix: "usecase 2 prefix",
@@ -37,7 +36,6 @@ const usecase_2 = {
 const usecase_3 = {
   id: 3,
   title: "Usecase 3 other cp",
-  content: "Use Case 2 description",
   campaign_id: 2,
   info: "usecase 3 info",
   prefix: "usecase 3 prefix",
@@ -45,12 +43,19 @@ const usecase_3 = {
 const usecase_4 = {
   id: 4,
   title: "Usecase 4 no acceptable bugs",
-  content: "Use Case 4 description",
   campaign_id: 1,
   info: "usecase 3 info",
   prefix: "usecase 3 prefix",
 };
 
+const usecase_5 = {
+  id: 5,
+  title: "Usecase 5 first position",
+  campaign_id: 1,
+  info: "usecase 5 info",
+  prefix: "usecase 5 prefix",
+  position: 1,
+};
 const bug_1 = {
   id: 1,
   wp_user_id: 1,
@@ -81,6 +86,16 @@ const bug_3 = {
   status_id: 1,
   campaign_id: 1,
 };
+const bug_4 = {
+  id: 4,
+  wp_user_id: 2,
+  message: "Bug 4 not approved",
+  description: "Bug 4 description",
+  application_section_id: usecase_5.id,
+  severity_id: 1,
+  status_id: 2,
+  campaign_id: 1,
+};
 
 describe("GET /campaigns/{cid}/usecases", () => {
   beforeAll(async () => {
@@ -104,10 +119,12 @@ describe("GET /campaigns/{cid}/usecases", () => {
     await useCases.insert(usecase_2);
     await useCases.insert(usecase_3);
     await useCases.insert(usecase_4);
+    await useCases.insert(usecase_5);
     await bugStatus.addDefaultItems();
     await bugs.insert(bug_1);
     await bugs.insert(bug_2);
     await bugs.insert(bug_3);
+    await bugs.insert(bug_4);
   });
   afterAll(async () => {
     await dbAdapter.clear();
@@ -152,6 +169,15 @@ describe("GET /campaigns/{cid}/usecases", () => {
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
     expect(response.body).toEqual([
+      {
+        id: 5,
+        title: {
+          full: usecase_5.title,
+          prefix: usecase_5.prefix,
+          info: usecase_5.info,
+        },
+        completion: 12.5,
+      },
       {
         id: 1,
         title: {
