@@ -1,4 +1,5 @@
 /** OPENAPI-CLASS: get-campaigns-single-bug */
+import * as db from "@src/features/db";
 import { getBugById } from "@src/utils/bugs";
 import BugsRoute from "@src/features/routes/BugRoute";
 
@@ -26,6 +27,41 @@ export default class Route extends BugsRoute<{
       campaignId: this.cp_id,
       showNeedReview: this.shouldShowNeedReview(),
     });
+    await this.setBugAsRead();
     this.setSuccess(200, bug);
+  }
+
+  private async setBugAsRead() {
+    const readStatus = await this.getReadStatus();
+
+    if (readStatus) return;
+
+    if (typeof readStatus === "undefined") {
+      await db.query(
+        db.format(
+          "INSERT INTO wp_appq_bug_read_status (wp_id,bug_id,is_read) VALUES (?,?,1) ",
+          [this.getWordpressId("tryber"), this.bug_id]
+        )
+      );
+      return;
+    }
+
+    await db.query(
+      db.format(
+        "UPDATE wp_appq_bug_read_status SET is_read = 1 WHERE wp_id=? AND bug_id=? ",
+        [this.getWordpressId("tryber"), this.bug_id]
+      )
+    );
+  }
+
+  private async getReadStatus() {
+    const result = await db.query(
+      db.format(
+        "SELECT is_read FROM wp_appq_bug_read_status WHERE wp_id=? AND bug_id=?",
+        [this.getWordpressId("tryber"), this.bug_id]
+      )
+    );
+    if (!result.length) return undefined;
+    return result[0].is_read === 1;
   }
 }
