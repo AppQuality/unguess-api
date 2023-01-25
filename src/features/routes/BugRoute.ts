@@ -63,9 +63,6 @@ export default class BugRoute<
   }
 
   protected shouldShowThisBug() {
-    if (this.shouldShowNeedReview()) {
-      return [2, 4].includes(this.getBug().status_id);
-    }
-    return this.getBug().status_id === 2;
+    return this.acceptedStatuses().includes(this.getBug().status_id);
   }
 }
