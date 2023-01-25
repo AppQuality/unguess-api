@@ -55,7 +55,9 @@ export default class Route extends BugRoute<{
       SELECT bug.id, bug.message, bug.os, bug.os_version, device.form_factor, device.pc_type, device.manufacturer, device.model
       FROM wp_appq_evd_bug bug
       JOIN wp_crowd_appq_device device ON (device.id = bug.dev_id) 
-      WHERE bug.duplicated_of_id = ${this.bug_id}`
+      WHERE 
+      bug.duplicated_of_id = ${this.bug_id} 
+      AND bug.status_id IN (${this.acceptedStatuses().join(",")})`
     );
     if (bugs.length) {
       this.children = bugs;
@@ -83,7 +85,9 @@ export default class Route extends BugRoute<{
       SELECT bug.id, bug.message, bug.os, bug.os_version, device.form_factor, device.pc_type, device.manufacturer, device.model
         FROM wp_appq_evd_bug bug
         JOIN wp_crowd_appq_device device ON (device.id = bug.dev_id) 
-      WHERE bug.id = ${this.getBug().duplicated_of_id}`
+      WHERE 
+      bug.id = ${this.getBug().duplicated_of_id}
+      AND bug.status_id IN (${this.acceptedStatuses().join(",")})`
     );
     if (!bugs.length) return undefined;
     return this.formatBug(bugs[0]);
@@ -100,9 +104,10 @@ export default class Route extends BugRoute<{
       SELECT bug.id, bug.message, bug.os, bug.os_version, device.form_factor, device.pc_type, device.manufacturer, device.model
       FROM wp_appq_evd_bug bug
       JOIN wp_crowd_appq_device device ON (device.id = bug.dev_id) 
-      WHERE bug.id != ${this.bug_id} AND bug.duplicated_of_id = ${
-        this.getBug().duplicated_of_id
-      }`
+      WHERE 
+      bug.id != ${this.bug_id} 
+      AND bug.duplicated_of_id = ${this.getBug().duplicated_of_id}
+      AND bug.status_id IN (${this.acceptedStatuses().join(",")})`
     );
     return bugs.map((bug) => this.formatBug(bug));
   }

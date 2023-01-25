@@ -393,7 +393,6 @@ paths:
       description: Return all accepted replicabilities of a specific campaign
       security:
         - JWT: []
-
   '/campaigns/{cid}/bugs/{bid}/siblings':
     parameters:
       - name: cid
@@ -675,6 +674,8 @@ paths:
                   properties:
                     device:
                       type: string
+                  required:
+                    - device
               examples:
                 Example 1:
                   value:
@@ -714,6 +715,8 @@ paths:
                   properties:
                     os:
                       type: string
+                  required:
+                    - os
               examples:
                 Example 1:
                   value:

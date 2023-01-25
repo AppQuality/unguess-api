@@ -16,6 +16,8 @@ export default class CampaignRoute<
   protected projectId: number | undefined;
   protected showNeedReview: boolean = false;
   protected baseBugInternalId: string = "";
+  private NEED_REVIEW_STATUS_ID = 4;
+  private APPROVED_STATUS_ID = 2;
 
   constructor(configuration: RouteClassConfiguration) {
     super(configuration);
@@ -113,5 +115,12 @@ export default class CampaignRoute<
 
   protected async getTitleRuleStatus() {
     return await getTitleRule(this.cp_id);
+  }
+
+  protected acceptedStatuses(): number[] {
+    if (this.shouldShowNeedReview()) {
+      return [this.NEED_REVIEW_STATUS_ID, this.APPROVED_STATUS_ID];
+    }
+    return [this.APPROVED_STATUS_ID];
   }
 }
