@@ -8,7 +8,12 @@ export default class BugRoute<
 > extends CampaignRoute<T> {
   protected bug_id: number;
   protected bug:
-    | { id: number; is_duplicated: 0 | 1; duplicated_of_id: number }
+    | {
+        id: number;
+        is_duplicated: 0 | 1;
+        duplicated_of_id: number;
+        status_id: 1 | 2 | 3 | 4;
+      }
     | undefined;
 
   constructor(configuration: RouteClassConfiguration) {
@@ -20,6 +25,15 @@ export default class BugRoute<
 
   protected async init(): Promise<void> {
     await super.init();
+
+    if (isNaN(this.bug_id)) {
+      this.setError(400, {
+        code: 400,
+        message: "Invalid bug id",
+      } as OpenapiError);
+
+      throw new Error("Invalid bug id");
+    }
     const bug = await this.initBug();
 
     if (!bug) {
@@ -35,7 +49,7 @@ export default class BugRoute<
   private async initBug() {
     const bugs = await db.query(`
       SELECT 
-        id, is_duplicated, duplicated_of_id
+        id, is_duplicated, duplicated_of_id, status_id
       FROM wp_appq_evd_bug 
       WHERE id = ${this.bug_id} AND campaign_id = ${this.cp_id}`);
     if (!bugs.length) return false;
@@ -46,5 +60,9 @@ export default class BugRoute<
   protected getBug() {
     if (!this.bug) throw new Error("Bug not found");
     return this.bug;
+  }
+
+  protected shouldShowThisBug() {
+    return this.acceptedStatuses().includes(this.getBug().status_id);
   }
 }
