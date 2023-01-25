@@ -583,7 +583,6 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
         is_read: 1,
       },
     ]);
-    console.log(statusBeforeGet);
     expect(statusBeforeGet.length).toBe(0);
     await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
