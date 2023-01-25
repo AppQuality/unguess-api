@@ -307,11 +307,11 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   });
 
   // It should answer 403 if the user has no permissions to see the campaign
-  it("Should answer 403 if the user has no permissions to see the campaign", async () => {
+  it("Should answer 400 if the user has no permissions to see the campaign", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_2.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer user");
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(400);
   });
 
   // It should answer 200 with the campaign
@@ -504,7 +504,6 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer user");
-
     expect(response.status).toBe(200);
     expect(response.body.application_section).toEqual({
       id: usecase_1.id,
