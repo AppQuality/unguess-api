@@ -102,6 +102,17 @@ describe("GET /campaigns/{cid}/bugs/{bid}/sibilings", () => {
       os_version: "iOS 11 (11)",
       dev_id: 2,
     });
+    bugs.insert({
+      message: "[CONTEXT] - refused bug",
+      id: 8,
+      campaign_id: 1,
+      is_duplicated: 1,
+      duplicated_of_id: 2,
+      os: "iOS",
+      os_version: "iOS 11 (11)",
+      dev_id: 2,
+      publish: 0,
+    });
   });
 
   it("Should answer 403 if user is not logged in", async () => {
