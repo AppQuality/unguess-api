@@ -16,6 +16,7 @@ import additionalField, {
 import additionalFieldData from "@src/__mocks__/database/campaign_additional_field_data";
 import CampaignMeta from "@src/__mocks__/database/campaign_meta";
 import useCases, { UseCaseParams } from "@src/__mocks__/database/use_cases";
+import readStatus from "@src/__mocks__/database/bug_read_status";
 
 const customer_1 = {
   id: 999,
@@ -240,54 +241,62 @@ const field_2_data = {
 };
 
 describe("GET /campaigns/{cid}/bugs/{bid}", () => {
-  beforeAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.add({
-          companies: [customer_1],
-          profiles: [profile_1, profile_2],
-          userToCustomers: [user_to_customer_1],
-          projects: [project_1, project_2],
-          userToProjects: [user_to_project_1],
-          campaignTypes: [campaign_type_1],
-          campaigns: [campaign_1, campaign_2],
-        });
-
-        await bugs.insert(bug_1);
-        await bugs.insert(bug_2);
-        await bugs.insert(bug_3_pending);
-        await bugs.insert(bug_34);
-        await bugs.insert(bug_4);
-        await bugs.insert(bug_5_from_unknown);
-        await devices.insert(device_1);
-        await devices.insert(device_2);
-        await bugMedia.insert(bug_media_1);
-        await bugMedia.insert(bug_media_other_type);
-        await tags.insert(tag_1);
-        await tags.insert(tag_2);
-        await additionalField.insert(field_1);
-        await additionalField.insert(field_2);
-        await additionalFieldData.insert(field_1_data);
-        await additionalFieldData.insert(field_2_data);
-        await useCases.insert(usecase_1);
-
-        await bugSeverity.addDefaultItems();
-        await bugReplicability.addDefaultItems();
-        await bugType.addDefaultItems();
-        await bugStatus.addDefaultItems();
-        await CampaignMeta.insert({
-          meta_id: 1,
-          campaign_id: campaign_1.id,
-          meta_key: "bug_title_rule",
-          meta_value: "1",
-        });
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
+  beforeEach(async () => {
+    await dbAdapter.add({
+      companies: [customer_1],
+      profiles: [profile_1, profile_2],
+      userToCustomers: [user_to_customer_1],
+      projects: [project_1, project_2],
+      userToProjects: [user_to_project_1],
+      campaignTypes: [campaign_type_1],
+      campaigns: [campaign_1, campaign_2],
     });
+
+    await bugs.insert(bug_1);
+    await bugs.insert(bug_2);
+    await bugs.insert(bug_3_pending);
+    await bugs.insert(bug_34);
+    await bugs.insert(bug_4);
+    await bugs.insert(bug_5_from_unknown);
+    await devices.insert(device_1);
+    await devices.insert(device_2);
+    await bugMedia.insert(bug_media_1);
+    await bugMedia.insert(bug_media_other_type);
+    await tags.insert(tag_1);
+    await tags.insert(tag_2);
+    await additionalField.insert(field_1);
+    await additionalField.insert(field_2);
+    await additionalFieldData.insert(field_1_data);
+    await additionalFieldData.insert(field_2_data);
+    await useCases.insert(usecase_1);
+
+    await bugSeverity.addDefaultItems();
+    await bugReplicability.addDefaultItems();
+    await bugType.addDefaultItems();
+    await bugStatus.addDefaultItems();
+    await CampaignMeta.insert({
+      meta_id: 1,
+      campaign_id: campaign_1.id,
+      meta_key: "bug_title_rule",
+      meta_value: "1",
+    });
+  });
+
+  afterEach(async () => {
+    await dbAdapter.clear();
+    await bugs.clear();
+    await devices.clear();
+    await bugMedia.clear();
+    await tags.clear();
+    await additionalField.clear();
+    await additionalFieldData.clear();
+    await useCases.clear();
+    await CampaignMeta.clear();
+    await bugSeverity.clear();
+    await bugReplicability.clear();
+    await bugType.clear();
+    await bugStatus.clear();
+    await readStatus.clear();
   });
 
   // It should answer 403 if user is not logged in
@@ -307,11 +316,11 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   });
 
   // It should answer 403 if the user has no permissions to see the campaign
-  it("Should answer 403 if the user has no permissions to see the campaign", async () => {
+  it("Should answer 400 if the user has no permissions to see the campaign", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_2.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer user");
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(400);
   });
 
   // It should answer 200 with the campaign
@@ -504,7 +513,6 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer user");
-
     expect(response.status).toBe(200);
     expect(response.body.application_section).toEqual({
       id: usecase_1.id,
@@ -567,5 +575,40 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
     expect(response.status).toBe(400);
   });
 
+  it("Should set the bug as read if the user when returning a bug", async () => {
+    const statusBeforeGet = await readStatus.all(undefined, [
+      {
+        wp_id: 1,
+        bug_id: 1,
+        is_read: 1,
+      },
+    ]);
+    expect(statusBeforeGet.length).toBe(0);
+    await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user");
+
+    const statusAfterGet = await readStatus.all(undefined, [
+      {
+        wp_id: 1,
+        bug_id: 1,
+        is_read: 1,
+      },
+    ]);
+    expect(statusAfterGet.length).toBe(1);
+
+    await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user");
+
+    const statusAfterSecondGet = await readStatus.all(undefined, [
+      {
+        wp_id: 1,
+        bug_id: 1,
+        is_read: 1,
+      },
+    ]);
+    expect(statusAfterSecondGet.length).toBe(1);
+  });
   /** --- end of file */
 });

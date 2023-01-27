@@ -1,69 +1,67 @@
-/** OPENAPI-ROUTE: get-campaigns-single-bug */
-import { Context } from "openapi-backend";
-import { ERROR_MESSAGE } from "@src/utils/constants";
-import { getCampaign } from "@src/utils/campaigns";
-import { getProjectById } from "@src/utils/projects";
+/** OPENAPI-CLASS: get-campaigns-single-bug */
+import * as db from "@src/features/db";
 import { getBugById } from "@src/utils/bugs";
+import BugsRoute from "@src/features/routes/BugRoute";
 
-export default async (
-  c: Context,
-  req: OpenapiRequest,
-  res: OpenapiResponse
-) => {
-  let user = req.user;
-  let error = {
-    code: 500,
-    message: ERROR_MESSAGE,
-    error: true,
-  } as StoplightComponents["schemas"]["Error"];
-  const campaign_id = parseInt(c.request.params.cid as string);
-  const bug_id = parseInt(c.request.params.bid as string);
+export default class Route extends BugsRoute<{
+  response: StoplightOperations["get-campaigns-single-bug"]["responses"]["200"]["content"]["application/json"];
+  parameters: StoplightOperations["get-campaigns-single-bug"]["parameters"]["path"];
+}> {
+  protected async filter(): Promise<boolean> {
+    if (!(await super.filter())) return false;
 
-  res.status_code = 200;
-
-  try {
-    if (!campaign_id || !bug_id) {
-      error.code = 400;
-      throw error;
+    if (!this.shouldShowThisBug()) {
+      this.setError(400, {
+        status_code: 400,
+        name: "bugs",
+        message: "You don't have access to this bug",
+      });
+      return false;
     }
-
-    // Check if the campaign exists
-    const campaign = await getCampaign({
-      campaignId: campaign_id,
-      withOutputs: false,
-    });
-
-    if (!campaign) {
-      error.code = 400;
-      throw error;
-    }
-
-    // Check if user has permission to edit the campaign
-    await getProjectById({
-      projectId: campaign.project.id,
-      user: user,
-    });
-
-    const bug = await getBugById({
-      bugId: bug_id,
-      campaignId: campaign.id,
-      showNeedReview: campaign.showNeedReview,
-    });
-
-    return bug as StoplightOperations["get-campaigns-single-bug"]["responses"]["200"]["content"]["application/json"];
-  } catch (e: any) {
-    if (e.code) {
-      error.code = typeof e.code === "number" ? e.code : 500;
-      res.status_code = typeof e.code === "number" ? e.code : 500;
-    } else {
-      error.code = 500;
-      res.status_code = 500;
-    }
-
-    if (e.message) {
-      error.message = e.message;
-    }
-
-    return error;
+    return true;
   }
-};
+
+  protected async prepare(): Promise<void> {
+    const bug = await getBugById({
+      bugId: this.bug_id,
+      campaignId: this.cp_id,
+      showNeedReview: this.shouldShowNeedReview(),
+    });
+    await this.setBugAsRead();
+    this.setSuccess(200, bug);
+  }
+
+  private async setBugAsRead() {
+    const readStatus = await this.getReadStatus();
+
+    if (readStatus) return;
+
+    if (typeof readStatus === "undefined") {
+      await db.query(
+        db.format(
+          "INSERT INTO wp_appq_bug_read_status (wp_id,bug_id,is_read) VALUES (?,?,1) ",
+          [this.getWordpressId("tryber"), this.bug_id]
+        )
+      );
+      return;
+    }
+
+    await db.query(
+      db.format(
+        "UPDATE wp_appq_bug_read_status SET is_read = 1 WHERE wp_id=? AND bug_id=? ",
+        [this.getWordpressId("tryber"), this.bug_id]
+      )
+    );
+  }
+
+  private async getReadStatus() {
+    const result = await db.query(
+      db.format(
+        "SELECT is_read FROM wp_appq_bug_read_status WHERE wp_id=? AND bug_id=?",
+        [this.getWordpressId("tryber"), this.bug_id]
+      )
+    );
+    if (!result.length) return undefined;
+    return result[0].is_read === 1;
+  }
+}

@@ -23,11 +23,22 @@ export default class CampaignRoute<
     super(configuration);
 
     const { cid } = this.getParameters();
+
     this.cp_id = parseInt(cid);
   }
 
   protected async init(): Promise<void> {
     await super.init();
+
+    if (isNaN(this.cp_id)) {
+      this.setError(400, {
+        code: 400,
+        message: "Invalid campaign id",
+      } as OpenapiError);
+
+      throw new Error("Invalid campaign id");
+    }
+
     const campaign = await this.initCampaign();
 
     if (!campaign) {
