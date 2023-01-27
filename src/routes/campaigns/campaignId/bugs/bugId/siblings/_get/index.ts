@@ -57,6 +57,7 @@ export default class Route extends BugRoute<{
       JOIN wp_crowd_appq_device device ON (device.id = bug.dev_id) 
       WHERE 
       bug.duplicated_of_id = ${this.bug_id} 
+      AND bug.publish = 1
       AND bug.status_id IN (${this.acceptedStatuses().join(",")})`
     );
     if (bugs.length) {
@@ -87,6 +88,7 @@ export default class Route extends BugRoute<{
         JOIN wp_crowd_appq_device device ON (device.id = bug.dev_id) 
       WHERE 
       bug.id = ${this.getBug().duplicated_of_id}
+      AND bug.publish = 1
       AND bug.status_id IN (${this.acceptedStatuses().join(",")})`
     );
     if (!bugs.length) return undefined;
@@ -106,6 +108,7 @@ export default class Route extends BugRoute<{
       JOIN wp_crowd_appq_device device ON (device.id = bug.dev_id) 
       WHERE 
       bug.id != ${this.bug_id} 
+      AND bug.publish = 1
       AND bug.duplicated_of_id = ${this.getBug().duplicated_of_id}
       AND bug.status_id IN (${this.acceptedStatuses().join(",")})`
     );
