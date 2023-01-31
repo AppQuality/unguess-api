@@ -100,7 +100,7 @@ export default class Route extends UserRoute<{
     await db.query(
       db.format(
         `DELETE FROM wp_appq_bug_taxonomy 
-        WHERE campaign_id = ? AND bug_id = ?`,
+        WHERE is_public = 1 AND campaign_id = ? AND bug_id = ?`,
         [this.cid, this.bid]
       )
     );
