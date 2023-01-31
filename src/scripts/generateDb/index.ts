@@ -36,7 +36,10 @@ const isSshDefined = Object.values(sshConfig).every(
     db: db as any,
   });
 
+  fs.mkdirSync("./src/types/tables", { recursive: true });
+
   const files = format({ tableData: tables });
+
   files.forEach((file) => {
     fs.writeFileSync(`./src/types/tables/${file.filename}.ts`, file.content);
   });
