@@ -396,35 +396,49 @@ describe("GET /campaigns/{cid}/bugs", () => {
   });
 
   //Should return bugs with specific tags
-  it("Should return bugs filtered by tags (bugs containing all tags in filter)", async () => {
+  it("Should return bugs filtered by tags (bugs containing one of the tags in filter)", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs?filterBy[tags]=1,3`)
       .set("Authorization", "Bearer user");
-    expect(response.body.items.length).toBe(1);
+    expect(response.body.items.length).toBe(2);
     expect(response.body.items).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          tags: [
-            { tag_id: 1, tag_name: "Tag 1" },
-            { tag_id: 3, tag_name: "Tag 4" },
-          ],
+          id: bug_1.id,
+        }),
+        expect.objectContaining({
+          id: bug_2.id,
         }),
       ])
     );
   });
   it("Should return bugs filtered by tags ignoring invalid tags", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[tags]=1,3,none`)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[tags]=1,3,pippo`)
       .set("Authorization", "Bearer user");
-    expect(response.body.items.length).toBe(1);
+    expect(response.body.items.length).toBe(2);
     expect(response.body.items).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          tags: [
-            { tag_id: 1, tag_name: "Tag 1" },
-            { tag_id: 3, tag_name: "Tag 4" },
-          ],
+          id: bug_1.id,
         }),
+        expect.objectContaining({
+          id: bug_2.id,
+        }),
+      ])
+    );
+  });
+
+  it("Should allow combining no tag with valid tags", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[tags]=3,none`)
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(3);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: bug_9_no_tags.id }),
+        expect.objectContaining({ id: bug_55.id }),
+        expect.objectContaining({ id: bug_2.id }),
       ])
     );
   });
