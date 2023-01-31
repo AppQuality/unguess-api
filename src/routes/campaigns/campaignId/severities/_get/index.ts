@@ -11,7 +11,7 @@ export default class Route extends CampaignRoute<{
   protected async init(): Promise<void> {
     await super.init();
     this.severities = await db.query(
-      "SELECT id, name FROM wp_appq_evd_severity"
+      "SELECT id, name FROM wp_appq_evd_severity ORDER BY id DESC"
     );
   }
 
@@ -30,7 +30,7 @@ export default class Route extends CampaignRoute<{
         result.push(bugSeverity);
       }
     }
-    return result;
+    return result.sort((sev) => sev.id).reverse();
   }
 
   private async getCustomSeverityList() {
@@ -48,7 +48,7 @@ export default class Route extends CampaignRoute<{
   }
 
   private async getBugSeverities() {
-    return await db.query(
+    const res = await db.query(
       db.format(
         `SELECT sev.id, sev.name
             FROM wp_appq_evd_severity sev
@@ -60,9 +60,10 @@ export default class Route extends CampaignRoute<{
             ? `(bstatus.name = 'Approved' OR bstatus.name = 'Need Review')`
             : `bstatus.name = 'Approved'`
         }
-        GROUP BY sev.id`,
+        GROUP BY sev.id ORDER BY sev.id DESC`,
         [this.cp_id]
       )
     );
+    return res;
   }
 }
