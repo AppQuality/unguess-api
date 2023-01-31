@@ -79,10 +79,14 @@ export const getTablesAndColumns = async ({
   });
 
   const [results] = await connection.execute(
-    `SELECT * FROM information_schema.columns WHERE table_schema = '${db.database}';`
+    `SELECT col.*
+    FROM information_schema.columns col
+    JOIN information_schema.tables tab ON (col.TABLE_NAME = tab.TABLE_NAME)
+    WHERE col.table_schema = '${db.database}' AND tab.table_type = 'BASE TABLE';`
   );
   connection.end();
 
+  // process.exit(0);
   if (!Array.isArray(results)) {
     console.log("No tables");
     return [];

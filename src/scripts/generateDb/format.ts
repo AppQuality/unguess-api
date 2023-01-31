@@ -1,5 +1,6 @@
 import { RowDataPacket } from "mysql2/promise";
 import { snakeToPascal } from "./snakeToPascal";
+import prettier from "prettier";
 
 const formatColumnTypes = (columnType: string) => {
   switch (columnType) {
@@ -43,6 +44,9 @@ export const format = ({ tableData }: { tableData: RowDataPacket[] }) => {
         return {
           name: item.COLUMN_NAME,
           type: item.DATA_TYPE,
+          isNotNull: item.IS_NULLABLE === "NO",
+          isPrimary: item.COLUMN_KEY === "PRI",
+          columnType: item.COLUMN_TYPE,
         };
       });
     return {
@@ -54,32 +58,34 @@ export const format = ({ tableData }: { tableData: RowDataPacket[] }) => {
   const result: { filename: string; content: string }[] = [];
 
   tableDefinitions.forEach((table) => {
-    let data = `import Table from "./tryber_table";
+    const types = table.columns.reduce((carry, column) => {
+      return `${carry}${column.name}?: ${formatColumnTypes(column.type)};`;
+    }, "");
 
-    type ${table.name}Params = {
-      ${table.columns.reduce((carry, column) => {
-        return `${carry}  ${column.name}?: ${formatColumnTypes(
-          column.type
-        )};\r`;
-      }, "")}
-    };
-    
-    const defaultItem: ${table.name}Params= {
-    };
-    class ${table.name} extends Table<${table.name}Params> {
-      protected name = "${table.table}";
-      protected columns = [
-        ${table.columns.reduce((carry, column) => {
-          return `${carry}        "${column.name} ${column.type}",\r`;
-        }, "")}
-      ];
-      constructor() {
-        super(defaultItem);
-      }
-    }
-    const ${table.name.toLowerCase()} = new ${table.name}();
-    export default ${table.name.toLowerCase()};
-    export type { ${table.name}Params };
+    const columns = `[${table.columns.reduce((carry, column) => {
+      return `${carry}"${column.name} ${column.columnType}${
+        column.isPrimary ? ` PRIMARY KEY` : ""
+      }${column.isNotNull ? ` NOT NULL` : ""}",`;
+    }, "")}]`;
+
+    const paramsName = `${table.name}Params`;
+    let data = `
+        
+import Table from "./tryber_table";
+
+type ${paramsName} = {${types}};
+
+const defaultItem: ${paramsName} = {};
+class ${table.name} extends Table<${paramsName}> {
+  protected name = "${table.table}";
+  protected columns = ${columns};
+  constructor() {
+    super(defaultItem);
+  }
+}
+const ${table.name.toLowerCase()} = new ${table.name}();
+export default ${table.name.toLowerCase()};
+export type { ${paramsName} };
     `;
 
     result.push({
@@ -87,5 +93,12 @@ export const format = ({ tableData }: { tableData: RowDataPacket[] }) => {
       content: data,
     });
   });
+
+  for (let i = 0; i < result.length; i++) {
+    result[i].content = prettier.format(result[i].content, {
+      parser: "typescript",
+    });
+  }
+
   return result;
 };

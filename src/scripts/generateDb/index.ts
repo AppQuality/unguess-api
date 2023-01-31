@@ -1,7 +1,7 @@
 import fs from "fs";
 import dotenv from "dotenv";
-import { snakeToPascal } from "./snakeToPascal";
 import { getTablesAndColumns } from "./createConnection";
+import { format } from "./format";
 
 dotenv.config();
 
@@ -36,71 +36,13 @@ const isSshDefined = Object.values(sshConfig).every(
     db: db as any,
   });
 
-  let tableNames: string[] = tables.map((table) => table.TABLE_NAME);
-  tableNames = [...new Set(tableNames)];
-
-  const tableDefinitions = tableNames.map((tableName) => {
-    const columns = tables
-      .filter((table) => table.TABLE_NAME === tableName)
-      .map((item) => {
-        return {
-          name: item.COLUMN_NAME,
-          type: item.DATA_TYPE,
-        };
-      });
-    return {
-      name: snakeToPascal(tableName),
-      columns: columns,
-    };
-  });
-
-  fs.mkdirSync(`./src/types/tables/`, { recursive: true });
-
-  tableDefinitions.forEach((table) => {
-    let data = `export type ${table.name} = {`;
-    table.columns.forEach((column) => {
-      switch (column.type) {
-        case "int":
-        case "decimal":
-        case "mediumint":
-        case "bigint":
-        case "smallint":
-        case "float":
-        case "double":
-        case "tinyint":
-          column.type = "number";
-          break;
-        case "longtext":
-        case "timestamp":
-        case "mediumtext":
-        case "text":
-        case "char":
-        case "varchar":
-        case "datetime":
-        case "date":
-        case "time":
-        case "enum":
-        case "longblob":
-          column.type = "string";
-          break;
-        case "binary":
-        case "varbinary":
-          column.type = "boolean";
-          break;
-        default:
-          throw new Error(`Unknown type ${column.type}`);
-      }
-      data += `  ${column.name}: ${column.type};\r`;
-    });
-    data += `}\r`;
-
-    fs.writeFileSync(`./src/types/tables/${table.name}.ts`, data);
+  const files = format({ tableData: tables });
+  files.forEach((file) => {
+    fs.writeFileSync(`./src/types/tables/${file.filename}.ts`, file.content);
   });
 
   fs.readdirSync(`./src/types/tables/`).forEach((file) => {
-    if (
-      !tableDefinitions.map((t) => t.name).includes(file.replace(".ts", ""))
-    ) {
+    if (!files.map((t) => t.filename).includes(file.replace(".ts", ""))) {
       fs.unlinkSync(`./src/types/tables/${file}`);
     }
   });
