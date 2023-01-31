@@ -30,7 +30,8 @@ export default class BugsRoute extends CampaignRoute<{
   private isTitleRuleActive: boolean = false;
   private tags: (Tag & { bug_id: number })[] = [];
   private filterBy: { [key: string]: string | string[] } | undefined;
-  private filterByTags: number[] | "none" | undefined;
+  private filterByTags: number[] | undefined;
+  private filterByNoTags: boolean = false;
   private search: string | undefined;
 
   constructor(configuration: RouteClassConfiguration) {
@@ -76,14 +77,13 @@ export default class BugsRoute extends CampaignRoute<{
       this.filterBy["tags"] &&
       typeof this.filterBy["tags"] === "string"
     ) {
-      if (this.filterBy["tags"] === "none") {
-        this.filterByTags = "none";
-      } else {
-        this.filterByTags = this.filterBy["tags"]
-          .split(",")
-          .map((tagId) => (parseInt(tagId) > 0 ? parseInt(tagId) : 0))
-          .filter((tagId) => tags.map((t) => t.tag_id).includes(tagId));
+      if (this.filterBy["tags"].split(",").includes("none")) {
+        this.filterByNoTags = true;
       }
+      this.filterByTags = this.filterBy["tags"]
+        .split(",")
+        .map((tagId) => (parseInt(tagId) > 0 ? parseInt(tagId) : 0))
+        .filter((tagId) => tags.map((t) => t.tag_id).includes(tagId));
     }
   }
 
@@ -395,15 +395,15 @@ export default class BugsRoute extends CampaignRoute<{
   }
 
   private filterBugsByTags(bug: Parameters<typeof this.filterBugs>[0][number]) {
-    if (!this.filterByTags) return true;
-    if (!this.filterByTags.length) return true;
+    if (this.filterByNoTags && !bug.tags?.length) return true;
 
-    if (this.filterByTags === "none") return !bug.tags?.length;
+    if (!this.filterByTags) return !this.filterByNoTags;
+    if (!this.filterByTags.length) return !this.filterByNoTags;
 
     if (!bug.tags?.length) return false;
 
     const bugTagsIds = bug.tags.map((tag) => tag.tag_id);
-    return this.filterByTags.every((tag) => bugTagsIds.includes(tag));
+    return this.filterByTags.some((tag) => bugTagsIds.includes(tag));
   }
 
   private filterBugsBySeverity(
