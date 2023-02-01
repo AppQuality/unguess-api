@@ -184,61 +184,61 @@ describe("GET /campaigns/{cid}/severities", () => {
   });
 
   //should return campaign bugTypes
-  it("Should return campaign custom severities", async () => {
+  it("Should return campaign custom severities ordered by id desc", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/severities`)
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
     expect(response.body).toEqual([
       {
-        id: 1,
-        name: "LOW",
-      },
-      {
         id: 4,
         name: "CRITICAL",
+      },
+      {
+        id: 1,
+        name: "LOW",
       },
     ]);
   });
 
-  it("Should return all campaign severities if campaign has not custom severity", async () => {
+  it("Should return all campaign severities if campaign has not custom severity ordered by id desc", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_3.id}/severities`)
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
     expect(response.body).toEqual([
       {
-        id: 1,
-        name: "LOW",
-      },
-      {
-        id: 2,
-        name: "MEDIUM",
+        id: 4,
+        name: "CRITICAL",
       },
       {
         id: 3,
         name: "HIGH",
       },
       {
-        id: 4,
-        name: "CRITICAL",
+        id: 2,
+        name: "MEDIUM",
+      },
+      {
+        id: 1,
+        name: "LOW",
       },
     ]);
   });
 
-  it("Should return bug severities even if not available in list", async () => {
+  it("Should return bug severities even if not available in list ordered by id desc", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_4.id}/severities`)
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
     expect(response.body).toEqual([
       {
-        id: 1,
-        name: "LOW",
-      },
-      {
         id: 4,
         name: "CRITICAL",
+      },
+      {
+        id: 1,
+        name: "LOW",
       },
     ]);
   });
