@@ -31,6 +31,7 @@ export default class Route extends CampaignRoute<{
       WHERE usecase.campaign_id = ${this.cp_id} 
         AND bug.campaign_id = ${this.cp_id} 
         AND bug.publish = 1
+        AND usecase.is_required = 1
         AND ${
           this.shouldShowNeedReview()
             ? `(status.name = 'Approved' OR status.name = 'Need Review')`
