@@ -47,6 +47,35 @@ paths:
           $ref: '#/components/responses/Error'
       requestBody:
         $ref: '#/components/requestBodies/Credentials'
+  '/analytics/views/campaigns/{cid}':
+    post:
+      description: ''
+      summary: View a campaign
+      operationId: post-analytics-views-campaigns-cid
+      tags:
+        - Authentication
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '500':
+          $ref: '#/components/responses/Error'
+      security:
+        - JWT: []
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Campaign id
   /campaigns:
     post:
       summary: Create campaign

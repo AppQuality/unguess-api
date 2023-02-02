@@ -13,6 +13,15 @@ export interface paths {
     /** A request to login with your username and password */
     post: operations["post-authenticate"];
   };
+  "/analytics/views/campaigns/{cid}": {
+    post: operations["post-analytics-views-campaigns-cid"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+  };
   "/campaigns": {
     post: operations["post-campaigns"];
     parameters: {};
@@ -833,6 +842,25 @@ export interface operations {
       500: components["responses"]["Error"];
     };
     requestBody: components["requestBodies"]["Credentials"];
+  };
+  "post-analytics-views-campaigns-cid": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            success?: boolean;
+          };
+        };
+      };
+      500: components["responses"]["Error"];
+    };
   };
   "post-campaigns": {
     parameters: {};
