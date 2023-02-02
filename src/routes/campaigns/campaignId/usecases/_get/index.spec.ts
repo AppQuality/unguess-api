@@ -25,7 +25,6 @@ const usecase_1 = {
   info: "usecase 1 info",
   prefix: "usecase 1 prefix",
   position: 10,
-  is_required: 1,
 };
 const usecase_2 = {
   id: 2,
@@ -33,7 +32,6 @@ const usecase_2 = {
   campaign_id: 1,
   info: "usecase 2 info",
   prefix: "usecase 2 prefix",
-  is_required: 1,
 };
 const usecase_3 = {
   id: 3,
@@ -41,7 +39,6 @@ const usecase_3 = {
   campaign_id: 2,
   info: "usecase 3 info",
   prefix: "usecase 3 prefix",
-  is_required: 1,
 };
 const usecase_4 = {
   id: 4,
@@ -49,7 +46,6 @@ const usecase_4 = {
   campaign_id: 1,
   info: "usecase 3 info",
   prefix: "usecase 3 prefix",
-  is_required: 1,
 };
 
 const usecase_5 = {
@@ -59,16 +55,6 @@ const usecase_5 = {
   info: "usecase 5 info",
   prefix: "usecase 5 prefix",
   position: 1,
-  is_required: 1,
-};
-const usecase_6 = {
-  id: 6,
-  title: "Usecase 6 not required",
-  campaign_id: 1,
-  info: "usecase 6 info",
-  prefix: "usecase 5 prefix",
-  position: 1,
-  is_required: 0,
 };
 const bug_1 = {
   id: 1,
@@ -110,16 +96,6 @@ const bug_4 = {
   status_id: 2,
   campaign_id: 1,
 };
-const bug_5 = {
-  id: 5,
-  wp_user_id: 1,
-  message: "Bug 5",
-  description: "Bug 5 description",
-  application_section_id: usecase_6.id,
-  severity_id: 1,
-  status_id: 2,
-  campaign_id: 1,
-};
 
 describe("GET /campaigns/{cid}/usecases", () => {
   beforeAll(async () => {
@@ -144,13 +120,11 @@ describe("GET /campaigns/{cid}/usecases", () => {
     await useCases.insert(usecase_3);
     await useCases.insert(usecase_4);
     await useCases.insert(usecase_5);
-    await useCases.insert(usecase_6);
     await bugStatus.addDefaultItems();
     await bugs.insert(bug_1);
     await bugs.insert(bug_2);
     await bugs.insert(bug_3);
     await bugs.insert(bug_4);
-    await bugs.insert(bug_5);
   });
   afterAll(async () => {
     await dbAdapter.clear();
