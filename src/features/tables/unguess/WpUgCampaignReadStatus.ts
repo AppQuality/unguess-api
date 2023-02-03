@@ -13,12 +13,12 @@ const table = () => unguess<iTable>("wp_ug_campaign_read_status");
 
 const create = () =>
   unguess.schema.createTable("wp_ug_campaign_read_status", function (table) {
-    table.integer("id");
-    table.integer("unguess_wp_user_id");
-    table.integer("campaign_id");
-    table.integer("is_read");
-    table.timestamp("read_on");
-    table.timestamp("last_read_on");
+    table.increments("id").notNullable();
+    table.integer("unguess_wp_user_id").notNullable();
+    table.integer("campaign_id").notNullable();
+    table.integer("is_read").notNullable();
+    table.timestamp("read_on").notNullable();
+    table.timestamp("last_read_on").notNullable();
     table.unique(["campaign_id", "unguess_wp_user_id"]);
   });
 

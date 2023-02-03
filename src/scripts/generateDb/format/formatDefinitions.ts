@@ -1,8 +1,14 @@
 import { RowDataPacket } from "mysql2";
 
 export const formatDefinitions = (column: RowDataPacket) => {
-  if (column.isPrimary) {
-    return `table.increments("${column.COLUMN_NAME}");`;
+  return `${getColumnCreationFunction(column)}${
+    column.IS_NULLABLE === "NO" ? ".notNullable()" : ""
+  };`;
+};
+
+const getColumnCreationFunction = (column: RowDataPacket) => {
+  if (column.COLUMN_KEY === "PRI") {
+    return `table.increments("${column.COLUMN_NAME}")`;
   }
   switch (column.DATA_TYPE) {
     case "int":
@@ -13,7 +19,7 @@ export const formatDefinitions = (column: RowDataPacket) => {
     case "float":
     case "double":
     case "tinyint":
-      return `table.integer("${column.COLUMN_NAME}");`;
+      return `table.integer("${column.COLUMN_NAME}")`;
     case "longtext":
     case "mediumtext":
     case "text":
@@ -25,16 +31,16 @@ export const formatDefinitions = (column: RowDataPacket) => {
     case "time":
     case "enum":
     case "longblob":
-      return `table.string("${column.COLUMN_NAME}");`;
+      return `table.string("${column.COLUMN_NAME}")`;
     case "timestamp":
-      return `table.timestamp("${column.COLUMN_NAME}");`;
+      return `table.timestamp("${column.COLUMN_NAME}")`;
     case "datetime":
     case "date":
     case "time":
-      return `table.datetime("${column.COLUMN_NAME}");`;
+      return `table.datetime("${column.COLUMN_NAME}")`;
     case "binary":
     case "varbinary":
-      return `table.boolean("${column.COLUMN_NAME}");`;
+      return `table.boolean("${column.COLUMN_NAME}")`;
     default:
       throw new Error(`Unknown type ${JSON.stringify(column)}`);
   }
