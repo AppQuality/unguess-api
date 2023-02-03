@@ -38,15 +38,15 @@ import { ${database} } from "@src/features/knex";
 
 interface iTable {${types}}
 
-const table = () => ${database}<iTable>("${table.TABLE_NAME}}");
+const table = () => ${database}<iTable>("${table.TABLE_NAME}");
 
 const create = () =>
-  ${database}.schema.createTable("${table.TABLE_NAME}}", function (table) {
+  ${database}.schema.createTable("${table.TABLE_NAME}", function (table) {
     ${definitions}
     ${keys}
   });
 
-const drop = () => ${database}.schema.dropTable("${table.TABLE_NAME}}");
+const drop = () => ${database}.schema.dropTable("${table.TABLE_NAME}");
 
 export default table;
 export { create, drop };

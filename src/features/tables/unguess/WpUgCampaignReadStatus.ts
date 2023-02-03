@@ -9,10 +9,10 @@ interface iTable {
   last_read_on: string;
 }
 
-const table = () => unguess<iTable>("wp_ug_campaign_read_status}");
+const table = () => unguess<iTable>("wp_ug_campaign_read_status");
 
 const create = () =>
-  unguess.schema.createTable("wp_ug_campaign_read_status}", function (table) {
+  unguess.schema.createTable("wp_ug_campaign_read_status", function (table) {
     table.integer("id");
     table.integer("unguess_wp_user_id");
     table.integer("campaign_id");
@@ -22,7 +22,7 @@ const create = () =>
     table.unique(["campaign_id", "unguess_wp_user_id"]);
   });
 
-const drop = () => unguess.schema.dropTable("wp_ug_campaign_read_status}");
+const drop = () => unguess.schema.dropTable("wp_ug_campaign_read_status");
 
 export default table;
 export { create, drop };
