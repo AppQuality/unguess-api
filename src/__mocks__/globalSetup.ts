@@ -2,7 +2,7 @@ import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import {
   create as campaignReadStatusesCreate,
   drop as campaignReadStatusesDrop,
-} from "@src/features/tables/campaignReadStatuses";
+} from "@src/features/tables/unguess/WpUgCampaignReadStatus";
 
 expect.extend({
   toBeNow(received: number, precision: number = 0) {

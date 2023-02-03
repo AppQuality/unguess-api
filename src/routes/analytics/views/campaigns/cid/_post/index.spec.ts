@@ -1,7 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import campaignReadStatuses from "@src/features/tables/campaignReadStatuses";
+import campaignReadStatuses from "@src/features/tables/unguess/WpUgCampaignReadStatus";
 
 describe("POST /analytics/views/campaigns/{cid}", () => {
   beforeAll(async () => {

@@ -1,7 +1,7 @@
 /** OPENAPI-CLASS: post-analytics-views-campaigns-cid */
 import CampaignRoute from "@src/features/routes/CampaignRoute";
 import { unguess } from "@src/features/knex";
-import campaignReadStatuses from "@src/features/tables/campaignReadStatuses";
+import campaignReadStatuses from "@src/features/tables/unguess/WpUgCampaignReadStatus";
 
 export default class Route extends CampaignRoute<{
   response: StoplightOperations["post-analytics-views-campaigns-cid"]["responses"]["200"]["content"]["application/json"];
