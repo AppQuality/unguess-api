@@ -70,12 +70,7 @@ paths:
       security:
         - JWT: []
     parameters:
-      - name: cid
-        in: path
-        required: true
-        schema:
-          type: string
-        description: Campaign id
+      - $ref: ../../postman/schemas/schema.yaml#/components/parameters/cid
   /campaigns:
     post:
       summary: Create campaign
