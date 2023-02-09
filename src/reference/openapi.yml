@@ -70,7 +70,7 @@ paths:
       security:
         - JWT: []
     parameters:
-      - $ref: ../../postman/schemas/schema.yaml#/components/parameters/cid
+      - $ref: '#/components/parameters/cid'
   /campaigns:
     post:
       summary: Create campaign
