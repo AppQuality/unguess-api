@@ -6,7 +6,7 @@ import {
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
 } from "@src/utils/constants";
-import { getBugTitle, getTitleRule } from "@src/utils/campaigns/getTitleRule";
+import { getBugTitle } from "@src/utils/campaigns/getTitleRule";
 import { getBugDevice } from "@src/utils/bugs/getBugDevice";
 
 import * as db from "@src/features/db";
