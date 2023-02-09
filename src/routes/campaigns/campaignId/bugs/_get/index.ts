@@ -6,7 +6,7 @@ import {
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
 } from "@src/utils/constants";
-import { getBugTitle, getTitleRule } from "@src/utils/campaigns/getTitleRule";
+import { getBugTitle } from "@src/utils/campaigns/getTitleRule";
 import { getBugDevice } from "@src/utils/bugs/getBugDevice";
 
 import * as db from "@src/features/db";
@@ -129,6 +129,7 @@ export default class BugsRoute extends CampaignRoute<{
       type: string;
       replicability: string;
       created: string;
+      occurred_date: string;
       updated: string;
       note: string;
       form_factor: string;
@@ -167,6 +168,7 @@ export default class BugsRoute extends CampaignRoute<{
         r.name        AS replicability,
         b.created,
         b.updated,
+        b.last_seen  AS occurred_date,
         b.note,
         device.form_factor,
         device.pc_type,
@@ -254,6 +256,7 @@ export default class BugsRoute extends CampaignRoute<{
           ...(bug.uc_prefix && { prefix: bug.uc_prefix }),
         },
         device: getBugDevice(bug),
+
         siblings: this.getSiblingsOfBug(bug, bugs),
         ...(tags && { tags }),
       };
@@ -300,6 +303,7 @@ export default class BugsRoute extends CampaignRoute<{
         replicability: bug.replicability,
         application_section: bug.application_section,
         created: bug.created.toString(),
+        occurred_date: bug.occurred_date.toString(),
         ...(bug.updated && { updated: bug.updated.toString() }),
         ...(bug.duplicated_of_id && { duplicated_of_id: bug.duplicated_of_id }),
         note: bug.note,
