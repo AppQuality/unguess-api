@@ -59,6 +59,7 @@ export const getUseCaseProgress = async (
         LEFT JOIN wp_appq_user_task t ON (t.task_id = uc.id AND t.is_completed = 1)
         JOIN wp_appq_campaign_task_group g ON (g.task_id = uc.id)
       WHERE uc.campaign_id = ?
+      AND uc.is_required = 1
       group by uc.id, g.group_id`;
 
   const uc = await db.query(db.format(ucQuery, [campaign_id]));

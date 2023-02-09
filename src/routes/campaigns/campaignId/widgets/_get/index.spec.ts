@@ -535,6 +535,11 @@ describe("GET /campaigns/{cid}/widgets", () => {
       prefix: "",
       info: "",
     };
+    const useCaseNotRequired: UseCaseParams = {
+      ...useCase2,
+      id: 69,
+      is_required: 0,
+    };
 
     const uT1: UserTaskParams = {
       id: 1,
@@ -562,6 +567,11 @@ describe("GET /campaigns/{cid}/widgets", () => {
 
     beforeAll(async () => {
       await useCases.insert(useCase2);
+      await useCases.insert(useCaseNotRequired);
+      await useCaseGroup.insert({
+        task_id: useCaseNotRequired.id || 69,
+        group_id: 0,
+      });
       await useCaseGroup.insert({
         task_id: useCase1.id || 123,
         group_id: 0,
