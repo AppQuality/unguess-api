@@ -23,10 +23,10 @@ export const format = ({
       ""
     );
 
-    const definitions = table.columns.reduce((carry, column) => {
-      console.log(column);
-      return `${carry}${formatDefinitions(column)}`;
-    }, "");
+    const definitions = table.columns.reduce(
+      (carry, column) => `${carry}${formatDefinitions(column)}`,
+      ""
+    );
 
     let keys = "";
     if (table.keys.length > 0) {
