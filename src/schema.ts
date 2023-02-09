@@ -283,6 +283,7 @@ export interface components {
       type: components["schemas"]["BugType"];
       replicability: components["schemas"]["BugReplicability"];
       created: string;
+      occurred_date: string;
       updated?: string;
       note?: string;
       device:
@@ -291,9 +292,9 @@ export interface components {
         | components["schemas"]["Desktop"];
       application_section: {
         id?: number;
-        title?: string;
         simple_title?: string;
         prefix_title?: string;
+        title?: string;
       };
       duplicated_of_id?: number;
       is_favorite?: number;
