@@ -24,7 +24,7 @@ export const format = ({
     );
 
     const definitions = table.columns.reduce(
-      (carry, column) => `${carry}${formatDefinitions(column)}`,
+      (carry, column) => `${carry}${formatDefinitions(database, column)}`,
       ""
     );
 

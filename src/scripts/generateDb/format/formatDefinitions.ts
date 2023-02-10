@@ -1,9 +1,31 @@
 import { RowDataPacket } from "mysql2";
 
-export const formatDefinitions = (column: RowDataPacket) => {
+export const formatDefinitions = (dbName: string, column: RowDataPacket) => {
   return `${getColumnCreationFunction(column)}${
     column.IS_NULLABLE === "NO" ? ".notNullable()" : ""
-  };`;
+  }${getDefault(dbName, column)};`;
+};
+
+const getDefault = (dbName: string, column: RowDataPacket) => {
+  if (column.COLUMN_DEFAULT === null) return "";
+
+  if (["CURRENT_TIMESTAMP"].includes(column.COLUMN_DEFAULT)) {
+    return `.defaultTo(${dbName}.fn.now())`;
+  }
+  if (!isNaN(column.COLUMN_DEFAULT)) {
+    return `.defaultTo(${column.COLUMN_DEFAULT})`;
+  }
+
+  if (
+    ["varchar", "enum", "timestamp", "datetime", "date", "binary"].includes(
+      column.DATA_TYPE
+    )
+  ) {
+    return `.defaultTo("${column.COLUMN_DEFAULT}")`;
+  }
+  console.log(column);
+
+  throw new Error(`Invalid column default ${column.COLUMN_DEFAULT}`);
 };
 
 const getColumnCreationFunction = (column: RowDataPacket) => {
