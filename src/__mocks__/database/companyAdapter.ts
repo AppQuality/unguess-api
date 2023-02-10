@@ -1,7 +1,7 @@
-import { table as customerTable, data as customerData } from "./customer";
+import Customer, { CustomerParams, data as customerData } from "./customer";
 import { table as profileTable, data as profileData } from "./profile";
-import { table as projectTable, data as projectData } from "./project";
-import { table as campaignTable, data as campaignData } from "./campaign";
+import Projects, { ProjectParams, data as projectData } from "./project";
+import Campaigns, { CampaignsParams, data as campaignData } from "./campaign";
 import {
   table as campaignTypeTable,
   data as campaignTypesData,
@@ -9,13 +9,13 @@ import {
 import { table as userTable, data as userData } from "./user";
 import { table as userTableUG, data as userDataUG } from "./user_unguess";
 
-import {
-  table as userToProjectTable,
+import UserToProjects, {
+  UserToProjectParams,
   data as userToProjectData,
 } from "./user_to_project";
 
-import {
-  table as userToCustomerTable,
+import UserToCustomer, {
+  UserToCustomerParams,
   data as userToCustomerData,
 } from "./user_to_customer";
 
@@ -42,8 +42,11 @@ import bugs from "@src/__mocks__/database/bugs";
 import userTaskMedia from "@src/__mocks__/database/user_task_media";
 import reports from "@src/__mocks__/database/report";
 import bugSeverity from "@src/__mocks__/database/bug_severity";
+import customSeverity from "@src/__mocks__/database/bug_severity_custom";
 import bugReplicability from "@src/__mocks__/database/bug_replicability";
+import customReplicabilities from "@src/__mocks__/database/bug_replicability_custom";
 import bugType from "@src/__mocks__/database/bug_type";
+import customBugType from "@src/__mocks__/database/bug_type_custom";
 import bugStatus from "@src/__mocks__/database/bug_status";
 import bugMedia from "@src/__mocks__/database/bug_media";
 import devices from "@src/__mocks__/database/device";
@@ -58,19 +61,20 @@ import Category from "@src/__mocks__/database/template_categories";
 import userTask from "@src/__mocks__/database/user_task";
 import customerUniqueBugsRead from "@src/__mocks__/database/customer_unique_bug_read";
 import bugsReadStatus from "@src/__mocks__/database/bug_read_status";
+import campaignReadStatuses from "@src/__mocks__/database/campaign_read_status";
 
 interface dataObject {
   profiles?: Array<any>;
   companies?: Array<any>;
-  projects?: Array<any>;
-  campaigns?: Array<any>;
+  projects?: Array<ProjectParams>;
+  campaigns?: Array<CampaignsParams>;
   campaignTypes?: Array<any>;
-  userToProjects?: Array<any>;
-  userToCustomers?: Array<any>;
+  userToProjects?: Array<UserToProjectParams>;
+  userToCustomers?: Array<UserToCustomerParams>;
   userToFeatures?: Array<any>;
   features?: Array<any>;
   users?: Array<any>;
-  customers?: Array<any>;
+  customers?: Array<CustomerParams>;
   coins?: Array<any>;
   transactions?: Array<any>;
   express?: Array<any>;
@@ -80,14 +84,13 @@ interface dataObject {
 export const adapter = {
   create: async () => {
     await profileTable.create();
-    await customerTable.create();
-    await projectTable.create();
-    await campaignTable.create();
+    await Customer.mock();
+    await Projects.mock();
+    await Campaigns.mock();
     await campaignTypeTable.create();
-    await userToCustomerTable.create();
-    await userToProjectTable.create();
+    await UserToCustomer.mock();
+    await UserToProjects.mock();
     await userTable.create();
-    await customerTable.create();
     await userTableUG.create();
 
     //Features Tables
@@ -109,8 +112,11 @@ export const adapter = {
     await userTaskMedia.mock();
     await reports.mock();
     await bugSeverity.mock();
+    await customSeverity.mock();
     await bugReplicability.mock();
+    await customReplicabilities.mock();
     await bugType.mock();
+    await customBugType.mock();
     await bugStatus.mock();
     await bugMedia.mock();
     await devices.mock();
@@ -124,17 +130,17 @@ export const adapter = {
     await userTask.mock();
     await customerUniqueBugsRead.mock();
     await bugsReadStatus.mock();
+    await campaignReadStatuses.mock();
   },
   drop: async () => {
     await profileTable.drop();
-    await customerTable.drop();
-    await projectTable.drop();
-    await campaignTable.drop();
+    await Customer.dropMock();
+    await Projects.dropMock();
+    await Campaigns.dropMock();
     await campaignTypeTable.drop();
-    await userToCustomerTable.drop();
-    await userToProjectTable.drop();
+    await UserToCustomer.dropMock();
+    await UserToProjects.dropMock();
     await userTable.drop();
-    await customerTable.drop();
     await userTableUG.drop();
 
     //Features Tables
@@ -157,8 +163,11 @@ export const adapter = {
     await userTaskMedia.dropMock();
     await reports.dropMock();
     await bugSeverity.dropMock();
+    await customSeverity.dropMock();
     await bugReplicability.dropMock();
+    await customReplicabilities.dropMock();
     await bugType.dropMock();
+    await customBugType.dropMock();
     await bugStatus.dropMock();
     await bugMedia.dropMock();
     await devices.dropMock();
@@ -172,18 +181,18 @@ export const adapter = {
     await Category.dropMock();
     await customerUniqueBugsRead.dropMock();
     await bugsReadStatus.dropMock();
+    await campaignReadStatuses.dropMock();
   },
 
   clear: async () => {
     await profileTable.clear();
-    await customerTable.clear();
-    await projectTable.clear();
-    await campaignTable.clear();
+    await Customer.clear();
+    await Projects.clear();
+    await Campaigns.clear();
     await campaignTypeTable.clear();
-    await userToCustomerTable.clear();
-    await userToProjectTable.clear();
+    await UserToCustomer.clear();
+    await UserToProjects.clear();
     await userTable.clear();
-    await customerTable.clear();
     await userTableUG.clear();
 
     //Features Tables
@@ -199,7 +208,57 @@ export const adapter = {
     await UseCase.clear();
     await useCaseGroup.clear();
     await bugs.clear();
+    await campaignReadStatuses.clear();
   },
+  addCampaignWithProject: async ({
+    campaign_id,
+    project_id,
+    wp_user_id,
+    customer_id,
+    ...rest
+  }: {
+    campaign_id: number;
+    project_id?: number;
+    wp_user_id?: number;
+    customer_id?: number;
+
+    project?: ProjectParams;
+    campaign?: CampaignsParams;
+    customer?: CustomerParams;
+  }) => {
+    await Campaigns.insert({
+      ...rest.campaign,
+      id: campaign_id,
+      project_id,
+    });
+
+    const project = await Projects.all(undefined, [{ id: project_id }]);
+    if (project.length === 0) {
+      await Projects.insert({
+        ...rest.project,
+        id: project_id,
+        customer_id: customer_id,
+      });
+    }
+
+    const customer = await Customer.all(undefined, [{ id: customer_id }]);
+    if (customer.length === 0) {
+      await Customer.insert({
+        ...rest.customer,
+        id: customer_id,
+      });
+    }
+
+    await UserToCustomer.insert({
+      wp_user_id: wp_user_id,
+      customer_id: customer_id,
+    });
+    await UserToProjects.insert({
+      wp_user_id: wp_user_id,
+      project_id: project_id,
+    });
+  },
+
   add: async ({
     profiles = [],
     companies = [],

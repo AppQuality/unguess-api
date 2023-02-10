@@ -47,6 +47,30 @@ paths:
           $ref: '#/components/responses/Error'
       requestBody:
         $ref: '#/components/requestBodies/Credentials'
+  '/analytics/views/campaigns/{cid}':
+    post:
+      description: ''
+      summary: View a campaign
+      operationId: post-analytics-views-campaigns-cid
+      tags:
+        - Authentication
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '500':
+          $ref: '#/components/responses/Error'
+      security:
+        - JWT: []
+    parameters:
+      - $ref: '#/components/parameters/cid'
   /campaigns:
     post:
       summary: Create campaign
@@ -128,7 +152,26 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Bug'
+                      allOf:
+                        - $ref: '#/components/schemas/Bug'
+                        - type: object
+                          properties:
+                            tags:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  tag_id:
+                                    type: number
+                                  tag_name:
+                                    type: string
+                                required:
+                                  - tag_id
+                                  - tag_name
+                            siblings:
+                              type: number
+                          required:
+                            - siblings
                   start:
                     type: integer
                   limit:
@@ -138,7 +181,7 @@ paths:
                   total:
                     type: integer
               examples:
-                example-1:
+                Example 1:
                   value:
                     items:
                       - id: 0
@@ -165,6 +208,7 @@ paths:
                           id: 0
                           name: string
                         created: string
+                        occurred_date: '2023-02-09T15:15:04+01:00'
                         updated: string
                         note: string
                         device:
@@ -175,9 +219,16 @@ paths:
                           type: smartphone
                         application_section:
                           id: 0
+                          simple_title: string
+                          prefix_title: string
                           title: string
                         duplicated_of_id: 0
                         is_favorite: 0
+                        read: true
+                        tags:
+                          - tag_id: 0
+                            tag_name: string
+                        siblings: 0
                     start: 0
                     limit: 0
                     size: 0
@@ -200,6 +251,7 @@ paths:
         - $ref: '#/components/parameters/order'
         - $ref: '#/components/parameters/orderBy'
         - $ref: '#/components/parameters/filterBy'
+        - $ref: '#/components/parameters/search'
   '/campaigns/{cid}/bugTypes':
     parameters:
       - $ref: '#/components/parameters/cid'
@@ -215,51 +267,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BugType'
-              examples:
-                example-1:
-                  value:
-                    items:
-                      - id: 0
-                        internal_id: string
-                        campaign_id: 0
-                        title:
-                          full: string
-                          compact: string
-                          context:
-                            - string
-                        step_by_step: string
-                        expected_result: string
-                        current_result: string
-                        status:
-                          id: 0
-                          name: string
-                        severity:
-                          id: 0
-                          name: string
-                        type:
-                          id: 0
-                          name: string
-                        replicability:
-                          id: 0
-                          name: string
-                        created: string
-                        updated: string
-                        note: string
-                        device:
-                          manufacturer: string
-                          model: string
-                          os: string
-                          os_version: string
-                          type: smartphone
-                        application_section:
-                          id: 0
-                          title: string
-                        duplicated_of_id: 0
-                        is_favorite: 0
-                    start: 0
-                    limit: 0
-                    size: 0
-                    total: 0
+              examples: {}
         '400':
           $ref: '#/components/responses/Error'
         '403':
@@ -300,6 +308,18 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/BugAdditionalField'
+                      reporter:
+                        type: object
+                        required:
+                          - tester_id
+                          - name
+                        properties:
+                          tester_id:
+                            type: number
+                          name:
+                            type: string
+                    required:
+                      - reporter
               examples: {}
         '400':
           $ref: '#/components/responses/Error'
@@ -312,11 +332,80 @@ paths:
       operationId: get-campaigns-single-bug
       security:
         - JWT: []
-  '/campaigns/{cid}/reports':
+    patch:
+      summary: Patch Campaigns Single Bug
+      operationId: patch-campaigns-cid-bugs-bid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tags:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        tag_id:
+                          type: number
+                        tag_name:
+                          type: string
+                      required:
+                        - tag_id
+                        - tag_name
+              examples:
+                oneTagResponse:
+                  value:
+                    tags:
+                      - tag_id: 0
+                        tag_name: string
+                emptyTagsResponse:
+                  value:
+                    tags: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tags:
+                  type: array
+                  items:
+                    oneOf:
+                      - properties:
+                          tag_id:
+                            type: number
+                        required:
+                          - tag_id
+                      - properties:
+                          tag_name:
+                            type: string
+                        required:
+                          - tag_name
+                    type: object
+            examples:
+              possibleTagEntries:
+                value:
+                  tags:
+                    - tag_id: 1
+                    - tag_name: tag2
+              emptyTagsEntries:
+                value:
+                  tags: []
+      security:
+        - JWT: []
+  '/campaigns/{cid}/replicabilities':
     parameters:
-      - $ref: '#/components/parameters/cid'
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Campaign id
     get:
-      summary: GET Reports by Campaign
+      summary: GET Replicabilities by Campaign
       tags: []
       responses:
         '200':
@@ -326,21 +415,31 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Report'
-      operationId: get-campaigns-reports
-      description: Return all available report of a specific campaign
+                  $ref: '#/components/schemas/BugReplicability'
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+      operationId: get-campaigns-replicabilities
+      description: Return all accepted replicabilities of a specific campaign
       security:
         - JWT: []
-  '/campaigns/{cid}/widgets':
+  '/campaigns/{cid}/bugs/{bid}/siblings':
     parameters:
       - name: cid
         in: path
         required: true
         schema:
-          type: number
+          type: string
         description: Campaign id
+      - name: bid
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Defines an identifier for the bug object (BUG ID)
     get:
-      summary: Get Campaign widget data
+      summary: Get Bug siblings
       tags: []
       responses:
         '200':
@@ -348,23 +447,89 @@ paths:
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: '#/components/schemas/WidgetBugsByUseCase'
-                  - $ref: '#/components/schemas/WidgetBugsByDevice'
-                  - $ref: '#/components/schemas/WidgetCampaignProgress'
-                  - $ref: '#/components/schemas/WidgetCampaignUniqueBugs'
-                  - $ref: '#/components/schemas/WidgetBugsByDuplicates'
-              examples:
-                Bugs by UseCase:
-                  value:
-                    data:
-                      - title:
-                          full: UC1 asd
-                        description: string
-                        bugs: 10
-                        uniqueBugs: 8
-                        usecase_id: 1220
-                    kind: bugsByUseCase
+                type: object
+                properties:
+                  father:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                      title:
+                        type: object
+                        required:
+                          - full
+                          - compact
+                        properties:
+                          full:
+                            type: string
+                          compact:
+                            type: string
+                          context:
+                            type: array
+                            items:
+                              type: string
+                      context:
+                        type: string
+                      device:
+                        type: string
+                      os:
+                        type: object
+                        required:
+                          - name
+                          - version
+                        properties:
+                          name:
+                            type: string
+                          version:
+                            type: string
+                    required:
+                      - id
+                      - title
+                      - device
+                      - os
+                  siblings:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                        title:
+                          type: object
+                          required:
+                            - full
+                            - compact
+                          properties:
+                            full:
+                              type: string
+                            compact:
+                              type: string
+                            context:
+                              type: array
+                              items:
+                                type: string
+                        context:
+                          type: string
+                        device:
+                          type: string
+                        os:
+                          type: object
+                          required:
+                            - name
+                            - version
+                          properties:
+                            name:
+                              type: string
+                            version:
+                              type: string
+                      required:
+                        - id
+                        - title
+                        - device
+                        - os
+                required:
+                  - siblings
+              examples: {}
         '400':
           $ref: '#/components/responses/Error'
         '401':
@@ -373,16 +538,10 @@ paths:
           $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
-      operationId: get-campaigns-cid-widgets-wslug
+      operationId: get-campaigns-bug-siblings
       security:
         - JWT: []
-      parameters:
-        - $ref: '#/components/parameters/wslug'
-        - schema:
-            type: boolean
-          in: query
-          name: updateTrend
-          description: should update bug trend after request resolves?
+      description: ''
   '/campaigns/{cid}/meta':
     parameters:
       - name: cid
@@ -456,6 +615,294 @@ paths:
         - JWT: []
       parameters: []
       description: Used to extra info about a selected campaign
+  '/campaigns/{cid}/reports':
+    parameters:
+      - $ref: '#/components/parameters/cid'
+    get:
+      summary: GET Reports by Campaign
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Report'
+      operationId: get-campaigns-reports
+      description: Return all available report of a specific campaign
+      security:
+        - JWT: []
+  '/campaigns/{cid}/tags':
+    parameters:
+      - $ref: '#/components/parameters/cid'
+    get:
+      summary: Get Campaigns Tags
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    tag_id:
+                      type: number
+                    display_name:
+                      type: string
+                    slug:
+                      type: string
+                    is_public:
+                      type: number
+                  required:
+                    - tag_id
+                    - display_name
+                    - slug
+              examples:
+                Example 1:
+                  value:
+                    - tag_id: 1
+                      display_name: tag1
+                      slug: string
+                    - tag_id: 2
+                      display_name: tag2
+                      slug: tag2
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-tags
+      description: ''
+      security:
+        - JWT: []
+      parameters: []
+  '/campaigns/{cid}/devices':
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Campaign id
+    get:
+      summary: Get Campaigns Bugs Devices
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    device:
+                      type: string
+                  required:
+                    - device
+              examples:
+                Example 1:
+                  value:
+                    - device: Apple iPhone 11
+                    - device: Desktop
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-devices
+      description: ''
+      security:
+        - JWT: []
+      parameters: []
+  '/campaigns/{cid}/os':
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Campaign id
+    get:
+      summary: Get Campaigns Bugs Os
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    os:
+                      type: string
+                  required:
+                    - os
+              examples:
+                Example 1:
+                  value:
+                    - os: iOS 16
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-os
+      description: ''
+      security:
+        - JWT: []
+      parameters: []
+  '/campaigns/{cid}/severities':
+    parameters:
+      - $ref: '#/components/parameters/cid'
+    get:
+      summary: Get Campaigns Severities
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BugSeverity'
+              examples:
+                Example 1:
+                  value:
+                    - id: 1
+                      name: string
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-severities
+      description: ''
+      security:
+        - JWT: []
+      parameters: []
+  '/campaigns/{cid}/usecases':
+    parameters:
+      - $ref: '#/components/parameters/cid'
+    get:
+      summary: Get Campaign usecases data
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                    title:
+                      type: object
+                      required:
+                        - full
+                      properties:
+                        full:
+                          type: string
+                        simple:
+                          type: string
+                        prefix:
+                          type: string
+                        info:
+                          type: string
+                    completion:
+                      type: number
+                  required:
+                    - id
+                    - title
+                    - completion
+              examples:
+                not-a-specific-usecase-only:
+                  value:
+                    - title:
+                        full: UC1 asd
+                      description: string
+                      bugs: 10
+                      uniqueBugs: 8
+                      id: 1220
+                      completion: 62.5
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-usecases
+      security:
+        - JWT: []
+      parameters: []
+  '/campaigns/{cid}/widgets':
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: number
+        description: Campaign id
+    get:
+      summary: Get Campaign widget data
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/WidgetBugsByUseCase'
+                  - $ref: '#/components/schemas/WidgetBugsByDevice'
+                  - $ref: '#/components/schemas/WidgetCampaignProgress'
+                  - $ref: '#/components/schemas/WidgetCampaignUniqueBugs'
+                  - $ref: '#/components/schemas/WidgetBugsByDuplicates'
+              examples:
+                Bugs by UseCase:
+                  value:
+                    data:
+                      - title:
+                          full: UC1 asd
+                        description: string
+                        bugs: 10
+                        uniqueBugs: 8
+                        usecase_id: 1220
+                    kind: bugsByUseCase
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-widgets-wslug
+      security:
+        - JWT: []
+      parameters:
+        - $ref: '#/components/parameters/wslug'
+        - schema:
+            type: boolean
+          in: query
+          name: updateTrend
+          description: should update bug trend after request resolves?
   /projects:
     post:
       summary: Create a new project
@@ -1068,6 +1515,8 @@ components:
           $ref: '#/components/schemas/BugReplicability'
         created:
           type: string
+        occurred_date:
+          type: string
         updated:
           type: string
         note:
@@ -1082,16 +1531,18 @@ components:
           properties:
             id:
               type: integer
-            title:
-              type: string
             simple_title:
               type: string
             prefix_title:
+              type: string
+            title:
               type: string
         duplicated_of_id:
           type: integer
         is_favorite:
           type: integer
+        read:
+          type: boolean
       required:
         - id
         - internal_id
@@ -1105,6 +1556,7 @@ components:
         - type
         - replicability
         - created
+        - occurred_date
         - device
         - application_section
     BugAdditionalField:
@@ -1158,7 +1610,7 @@ components:
       title: BugMedia
       type: object
       properties:
-        type:
+        mime_type:
           type: object
           required:
             - type
@@ -1178,7 +1630,7 @@ components:
         creation_date:
           type: string
       required:
-        - type
+        - mime_type
         - url
         - creation_date
     BugReplicability:
@@ -2194,6 +2646,13 @@ components:
           - unique-bugs
           - bugs-by-duplicates
       description: Campaign widget slug
+    search:
+      name: search
+      in: query
+      required: false
+      schema:
+        type: string
+      description: keywords to search
   requestBodies:
     Credentials:
       content:
