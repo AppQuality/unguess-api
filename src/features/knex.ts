@@ -11,3 +11,14 @@ export const unguess = knex({
   },
   pool: { min: 0, max: 7 },
 });
+
+export const tryber = knex({
+  client: "mysql",
+  connection: {
+    host: config.db.host,
+    user: config.db.user,
+    password: config.db.password,
+    database: config.db.database,
+  },
+  pool: { min: 0, max: 7 },
+});

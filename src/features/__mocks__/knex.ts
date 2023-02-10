@@ -7,3 +7,11 @@ export const unguess = knex({
   },
   useNullAsDefault: true,
 });
+
+export const tryber = knex({
+  client: "better-sqlite3",
+  connection: {
+    filename: ":memory:",
+  },
+  useNullAsDefault: true,
+});

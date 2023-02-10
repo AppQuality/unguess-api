@@ -10,10 +10,8 @@ import bugType from "@src/__mocks__/database/bug_type";
 import bugStatus from "@src/__mocks__/database/bug_status";
 import tags from "@src/__mocks__/database/bug_tags";
 import devices, { DeviceParams } from "@src/__mocks__/database/device";
-import additionalField, {
-  CampaingAdditionalFieldsParams,
-} from "@src/__mocks__/database/campaign_additional_field";
-import additionalFieldData from "@src/__mocks__/database/campaign_additional_field_data";
+import WpAppqCampaignAdditionalFields from "@src/features/tables/tryber/WpAppqCampaignAdditionalFields";
+import WpAppqCampaignAdditionalFieldsData from "@src/features/tables/tryber/WpAppqCampaignAdditionalFieldsData";
 import CampaignMeta from "@src/__mocks__/database/campaign_meta";
 import useCases, { UseCaseParams } from "@src/__mocks__/database/use_cases";
 import readStatus from "@src/__mocks__/database/bug_read_status";
@@ -225,7 +223,9 @@ const field_1 = {
   id: 123,
   cp_id: bug_1.campaign_id,
   title: "product_code",
+  slug: "product_code",
   validation: ".",
+  error_message: "",
 };
 
 const field_1_data = {
@@ -234,12 +234,14 @@ const field_1_data = {
   value: "ENELXXX",
 };
 
-const field_2: CampaingAdditionalFieldsParams = {
+const field_2 = {
   id: 124,
   cp_id: bug_1.campaign_id,
   title: "browser",
+  slug: "browser",
   validation: "Chrome;Firefox",
   type: "select",
+  error_message: "",
 };
 
 const field_2_data = {
@@ -282,10 +284,10 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
     await bugMedia.insert(bug_media_other_type);
     await tags.insert(tag_1);
     await tags.insert(tag_2);
-    await additionalField.insert(field_1);
-    await additionalField.insert(field_2);
-    await additionalFieldData.insert(field_1_data);
-    await additionalFieldData.insert(field_2_data);
+    await WpAppqCampaignAdditionalFields().insert(field_1);
+    await WpAppqCampaignAdditionalFields().insert(field_2);
+    await WpAppqCampaignAdditionalFieldsData().insert(field_1_data);
+    await WpAppqCampaignAdditionalFieldsData().insert(field_2_data);
     await useCases.insert(usecase_1);
 
     await priorities.addDefaultItems();
@@ -312,8 +314,8 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
     await devices.clear();
     await bugMedia.clear();
     await tags.clear();
-    await additionalField.clear();
-    await additionalFieldData.clear();
+    await WpAppqCampaignAdditionalFields().delete();
+    await WpAppqCampaignAdditionalFieldsData().delete();
     await useCases.clear();
     await CampaignMeta.clear();
     await bugSeverity.clear();

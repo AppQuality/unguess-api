@@ -3,6 +3,14 @@ import {
   create as campaignReadStatusesCreate,
   drop as campaignReadStatusesDrop,
 } from "@src/features/tables/unguess/WpUgCampaignReadStatus";
+import {
+  create as additionalFieldsCreate,
+  drop as additionalFieldsDrop,
+} from "@src/features/tables/tryber/WpAppqCampaignAdditionalFields";
+import {
+  create as additionalFieldsDataCreate,
+  drop as additionalFieldsDataDrop,
+} from "@src/features/tables/tryber/WpAppqCampaignAdditionalFieldsData";
 
 expect.extend({
   toBeNow(received: number, precision: number = 0) {
@@ -17,10 +25,14 @@ expect.extend({
 beforeAll(async () => {
   await dbAdapter.create();
   await campaignReadStatusesCreate();
+  await additionalFieldsCreate();
+  await additionalFieldsDataCreate();
 });
 afterAll(async () => {
   await dbAdapter.drop();
   await campaignReadStatusesDrop();
+  await additionalFieldsDrop();
+  await additionalFieldsDataDrop();
 });
 
 export {};
