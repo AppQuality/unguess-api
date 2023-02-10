@@ -11,8 +11,15 @@ const tryberDb = {
   database: process.env.SCHEMA_DB_NAME,
 };
 
+const unguessDb = {
+  host: process.env.SCHEMA_DB_HOST_UNGUESS,
+  user: process.env.SCHEMA_DB_USER_UNGUESS,
+  password: process.env.SCHEMA_DB_PASSWORD_UNGUESS,
+  database: process.env.SCHEMA_DB_NAME_UNGUESS,
+};
+
 const config: { [key: string]: Knex.Config } = {
-  tryberStaging: {
+  tryber: {
     client: "mysql",
     connection: {
       host: "localhost",
@@ -28,17 +35,18 @@ const config: { [key: string]: Knex.Config } = {
     },
   },
 
-  tryberProduction: {
+  unguess: {
     client: "mysql",
     connection: {
-      host: tryberDb.host,
-      user: tryberDb.user,
-      password: tryberDb.password,
-      database: tryberDb.database,
+      host: "localhost",
+      port: 5431,
+      user: unguessDb.user,
+      password: unguessDb.password,
+      database: unguessDb.database,
     },
     pool: { min: 0, max: 7 },
     migrations: {
-      directory: "./migrations/tryber",
+      directory: "./migrations/unguess",
       tableName: "knex_migrations",
     },
   },

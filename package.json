@@ -5,6 +5,10 @@
   "main": "index.js",
   "scripts": {
     "generate-db": "tsnd -r tsconfig-paths/register  --transpile-only ./src/scripts/generateDb/index.ts",
+    "migrate:tryber:up": "knex migrate:latest --env tryber & yarn generate-db tryber",
+    "migrate:tryber:down": "knex migrate:rollback --env tryber & yarn generate-db tryber",
+    "migrate:unguess:up": "knex migrate:latest --env unguess & yarn generate-db unguess",
+    "migrate:unguess:down": "knex migrate:rollback --env unguess & yarn generate-db unguess",
     "coverage": "yarn test -- --coverage",
     "test": "tsnd -T node_modules/jest/bin/jest.js ",
     "test:ls": "yarn test -- --json",
@@ -15,9 +19,7 @@
     "build": "npm-run-all clean transpile copy-reference",
     "start": "tsnd --respawn -r tsconfig-paths/register  --transpile-only  ./src/index.ts",
     "postinstall": "husky install",
-    "rename-schema": "node -e \"require('fs').rename('postman/schemas/openapi.yml','postman/schemas/schema.yaml', (err) => { (err ? console.log(err) : console.log('Rename complete!')); } ) \"",
-    "update-postman": "copyfiles -f src/reference/openapi.yml postman/schemas && npm run rename-schema",
-    "types": "openapi-typescript src/reference/openapi.yml --output src/schema.ts "
+    "types": "openapi-typescript src/reference/openapi.yml --output src/schema.ts"
   },
   "author": "",
   "license": "ISC",
