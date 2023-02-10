@@ -60,7 +60,7 @@ const path = `./src/features/tables/${database}`;
 
   fs.mkdirSync(path, { recursive: true });
 
-  const files = format({ tableData: tables, database: "unguess" });
+  const files = format({ tableData: tables, database });
 
   files.forEach((file) => {
     fs.writeFileSync(`${path}/${file.filename}.ts`, file.content);
