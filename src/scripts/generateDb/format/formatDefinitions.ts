@@ -29,7 +29,7 @@ const getDefault = (dbName: string, column: RowDataPacket) => {
 };
 
 const getColumnCreationFunction = (column: RowDataPacket) => {
-  if (column.COLUMN_KEY === "PRI") {
+  if (column.EXTRA.includes("auto_increment")) {
     return `table.increments("${column.COLUMN_NAME}")`;
   }
   switch (column.DATA_TYPE) {
