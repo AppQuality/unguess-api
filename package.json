@@ -9,6 +9,8 @@
     "migrate:tryber:down": "knex migrate:rollback --env tryber & yarn generate-db tryber",
     "migrate:unguess:up": "knex migrate:latest --env unguess & yarn generate-db unguess",
     "migrate:unguess:down": "knex migrate:rollback --env unguess & yarn generate-db unguess",
+    "migrate:unguess:make": "knex migrate:make --env unguess",
+    "migrate:tryber:make": "knex migrate:make --env tryber",
     "coverage": "yarn test -- --coverage",
     "test": "tsnd -T node_modules/jest/bin/jest.js ",
     "test:ls": "yarn test -- --json",
