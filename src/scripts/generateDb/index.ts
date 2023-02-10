@@ -2,6 +2,8 @@ import fs from "fs";
 import dotenv from "dotenv";
 import { getTablesAndColumns } from "./createConnection";
 import { format } from "./format";
+import { snakeToPascal } from "./snakeToPascal";
+import prettier from "prettier";
 
 dotenv.config();
 
@@ -62,9 +64,19 @@ const path = `./src/features/tables/${database}`;
 
   const files = format({ tableData: tables, database });
 
+  let types = `import { Knex } from "knex"; declare module "knex/types/tables" {`;
+  let typeLinks = ``;
   files.forEach((file) => {
     fs.writeFileSync(`${path}/${file.filename}.ts`, file.content);
+    types += `interface i${snakeToPascal(file.tableName)} ${file.types}`;
+    typeLinks += `${file.tableName}: i${snakeToPascal(file.tableName)};`;
   });
+  types += ` interface Tables {${typeLinks}} }`;
+
+  fs.writeFileSync(
+    `./src/${database}TableTypes.ts`,
+    prettier.format(types, { parser: "typescript" })
+  );
 
   fs.readdirSync(path).forEach((file) => {
     if (!files.map((t) => t.filename).includes(file.replace(".ts", ""))) {

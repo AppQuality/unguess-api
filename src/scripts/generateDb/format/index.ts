@@ -11,7 +11,12 @@ export const format = ({
   tableData: { TABLE_NAME: string; columns: RowDataPacket[]; keys: string[] }[];
   database: "unguess" | "tryber";
 }) => {
-  const result: { filename: string; content: string }[] = [];
+  const result: {
+    filename: string;
+    content: string;
+    types: string;
+    tableName: string;
+  }[] = [];
 
   tableData.forEach((table) => {
     const pascalCaseName = snakeToPascal(table.TABLE_NAME);
@@ -36,9 +41,7 @@ export const format = ({
     let data = `
 import { ${database} } from "@src/features/knex";
 
-interface iTable {${types}}
-
-const table = () => ${database}<iTable>("${table.TABLE_NAME}");
+const table = () => ${database}("${table.TABLE_NAME}");
 
 const create = () =>
   ${database}.schema.createTable("${table.TABLE_NAME}", function (table) {
@@ -55,6 +58,8 @@ export { create, drop };
     result.push({
       filename: pascalCaseName,
       content: data,
+      types: `{${types}}`,
+      tableName: table.TABLE_NAME,
     });
   });
 
