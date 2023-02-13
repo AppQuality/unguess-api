@@ -1,12 +1,12 @@
 import { Knex } from "knex";
 
 export async function up(knex: Knex): Promise<void> {
-  await knex.schema.dropTable("wp_aiowps_events");
-  await knex.schema.dropTable("wp_aiowps_failed_logins");
-  await knex.schema.dropTable("wp_aiowps_global_meta");
-  await knex.schema.dropTable("wp_aiowps_login_activity");
-  await knex.schema.dropTable("wp_aiowps_login_lockdown");
-  await knex.schema.dropTable("wp_aiowps_permanent_block");
+  await knex.schema.dropTableIfExists("wp_aiowps_events");
+  await knex.schema.dropTableIfExists("wp_aiowps_failed_logins");
+  await knex.schema.dropTableIfExists("wp_aiowps_global_meta");
+  await knex.schema.dropTableIfExists("wp_aiowps_login_activity");
+  await knex.schema.dropTableIfExists("wp_aiowps_login_lockdown");
+  await knex.schema.dropTableIfExists("wp_aiowps_permanent_block");
   return;
 }
 
