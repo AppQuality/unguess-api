@@ -28,10 +28,11 @@ export const getBugTitle = ({
 
   if (hasTitleRule) {
     if (!bugTitle.match(/\[(.*?)\]/)) return formattedBugTitle;
+
     return {
       ...formattedBugTitle,
       compact: bugTitle
-        .replace(bugTitle.match(/\[(.*?)\]/g)!?.join(""), "")
+        .replace(/\[(.*?)\]/g, "")
         .replace("-", "")
         .trim(),
       context: bugTitle
