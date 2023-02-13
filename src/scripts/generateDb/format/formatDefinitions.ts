@@ -12,7 +12,7 @@ const getDefault = (dbName: string, column: RowDataPacket) => {
   if (["CURRENT_TIMESTAMP"].includes(column.COLUMN_DEFAULT)) {
     return `.defaultTo(${dbName}.fn.now())`;
   }
-  if (!isNaN(column.COLUMN_DEFAULT)) {
+  if (!isNaN(column.COLUMN_DEFAULT) && column.COLUMN_DEFAULT !== "") {
     return `.defaultTo(${column.COLUMN_DEFAULT})`;
   }
 
