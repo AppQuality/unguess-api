@@ -30,7 +30,7 @@ export default class Route extends CampaignRoute<{
         result.push(bugSeverity);
       }
     }
-    return result.sort((sev) => sev.id).reverse();
+    return result.sort((s1, s2) => s2.id - s1.id);
   }
 
   private async getCustomSeverityList() {
