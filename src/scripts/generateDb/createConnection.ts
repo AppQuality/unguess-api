@@ -17,8 +17,8 @@ const createConnection = async ({
     return new Promise((resolve, reject) => {
       mysql
         .createConnection({
-          user: db.user || "root",
-          password: db.password || "root",
+          user: db.user || "test",
+          password: db.password || "test",
           multipleStatements: true,
           host: db.host || "localhost",
         })
