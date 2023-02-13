@@ -1,16 +1,7 @@
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import {
-  create as campaignReadStatusesCreate,
-  drop as campaignReadStatusesDrop,
-} from "@src/features/tables/unguess/WpUgCampaignReadStatus";
-import {
-  create as additionalFieldsCreate,
-  drop as additionalFieldsDrop,
-} from "@src/features/tables/tryber/WpAppqCampaignAdditionalFields";
-import {
-  create as additionalFieldsDataCreate,
-  drop as additionalFieldsDataDrop,
-} from "@src/features/tables/tryber/WpAppqCampaignAdditionalFieldsData";
+import WpUgCampaignReadStatus from "@src/features/tables/unguess/WpUgCampaignReadStatus";
+import WpAppqCampaignAdditionalFields from "@src/features/tables/tryber/WpAppqCampaignAdditionalFields";
+import WpAppqCampaignAdditionalFieldsData from "@src/features/tables/tryber/WpAppqCampaignAdditionalFieldsData";
 
 expect.extend({
   toBeNow(received: number, precision: number = 0) {
@@ -24,15 +15,15 @@ expect.extend({
 
 beforeAll(async () => {
   await dbAdapter.create();
-  await campaignReadStatusesCreate();
-  await additionalFieldsCreate();
-  await additionalFieldsDataCreate();
+  await WpUgCampaignReadStatus.create();
+  await WpAppqCampaignAdditionalFields.create();
+  await WpAppqCampaignAdditionalFieldsData.create();
 });
 afterAll(async () => {
   await dbAdapter.drop();
-  await campaignReadStatusesDrop();
-  await additionalFieldsDrop();
-  await additionalFieldsDataDrop();
+  await WpUgCampaignReadStatus.drop();
+  await WpAppqCampaignAdditionalFields.drop();
+  await WpAppqCampaignAdditionalFieldsData.drop();
 });
 
 export {};

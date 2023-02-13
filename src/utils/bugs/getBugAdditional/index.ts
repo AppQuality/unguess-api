@@ -4,7 +4,7 @@ import { tryber } from "@src/features/knex";
 export const getBugAdditional = async (
   bugId: number
 ): Promise<StoplightComponents["schemas"]["BugAdditionalField"][] | false> => {
-  const results = await WpAdditionalFields()
+  const results = await WpAdditionalFields.do()
     .select("id", tryber.ref("title").as("name"), "value", "validation", "type")
     .join(
       "wp_appq_campaign_additional_fields_data",

@@ -8,7 +8,8 @@ export default class Route extends CampaignRoute<{
   parameters: StoplightOperations["post-analytics-views-campaigns-cid"]["parameters"]["path"];
 }> {
   protected async prepare(): Promise<void> {
-    await campaignReadStatuses()
+    await campaignReadStatuses
+      .do()
       .insert({
         is_read: 1,
         last_read_on: unguess.fn.now(),

@@ -284,10 +284,10 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
     await bugMedia.insert(bug_media_other_type);
     await tags.insert(tag_1);
     await tags.insert(tag_2);
-    await WpAppqCampaignAdditionalFields().insert(field_1);
-    await WpAppqCampaignAdditionalFields().insert(field_2);
-    await WpAppqCampaignAdditionalFieldsData().insert(field_1_data);
-    await WpAppqCampaignAdditionalFieldsData().insert(field_2_data);
+    await WpAppqCampaignAdditionalFields.do().insert(field_1);
+    await WpAppqCampaignAdditionalFields.do().insert(field_2);
+    await WpAppqCampaignAdditionalFieldsData.do().insert(field_1_data);
+    await WpAppqCampaignAdditionalFieldsData.do().insert(field_2_data);
     await useCases.insert(usecase_1);
 
     await priorities.addDefaultItems();
@@ -314,8 +314,8 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
     await devices.clear();
     await bugMedia.clear();
     await tags.clear();
-    await WpAppqCampaignAdditionalFields().delete();
-    await WpAppqCampaignAdditionalFieldsData().delete();
+    await WpAppqCampaignAdditionalFields.do().delete();
+    await WpAppqCampaignAdditionalFieldsData.do().delete();
     await useCases.clear();
     await CampaignMeta.clear();
     await bugSeverity.clear();

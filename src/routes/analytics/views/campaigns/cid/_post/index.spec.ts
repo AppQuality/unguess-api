@@ -19,7 +19,7 @@ describe("POST /analytics/views/campaigns/{cid}", () => {
     });
   });
   afterEach(async () => {
-    await campaignReadStatuses().delete();
+    await campaignReadStatuses.do().delete();
   });
 
   it("Should return 403 if user is not authenticated", async () => {
@@ -49,7 +49,9 @@ describe("POST /analytics/views/campaigns/{cid}", () => {
   });
 
   it("Should create a read status on view", async () => {
-    const itemsBeforePost = await campaignReadStatuses().select("campaign_id");
+    const itemsBeforePost = await campaignReadStatuses
+      .do()
+      .select("campaign_id");
     console.log(itemsBeforePost);
     expect(itemsBeforePost.length, "There should be no views before post").toBe(
       0
@@ -59,7 +61,8 @@ describe("POST /analytics/views/campaigns/{cid}", () => {
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
 
-    const itemsAfterPost = await campaignReadStatuses()
+    const itemsAfterPost = await campaignReadStatuses
+      .do()
       .select("campaign_id")
       .select("unguess_wp_user_id");
     console.log(itemsAfterPost);
@@ -74,7 +77,7 @@ describe("POST /analytics/views/campaigns/{cid}", () => {
   });
 
   it("Should not insert a read status if already exists", async () => {
-    const itemsBeforePost = await campaignReadStatuses().select();
+    const itemsBeforePost = await campaignReadStatuses.do().select();
     expect(itemsBeforePost.length, "There should be no views before post").toBe(
       0
     );
@@ -82,7 +85,7 @@ describe("POST /analytics/views/campaigns/{cid}", () => {
       .post("/analytics/views/campaigns/1")
       .set("Authorization", "Bearer user");
 
-    const itemsAfterFirstPost = await campaignReadStatuses().select();
+    const itemsAfterFirstPost = await campaignReadStatuses.do().select();
     expect(
       itemsAfterFirstPost.length,
       "There should be a single view after first post"
@@ -93,7 +96,7 @@ describe("POST /analytics/views/campaigns/{cid}", () => {
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
 
-    const itemsAfterSecondPost = await campaignReadStatuses().select();
+    const itemsAfterSecondPost = await campaignReadStatuses.do().select();
     expect(
       itemsAfterSecondPost.length,
       "There should be a single view after second post"
@@ -106,7 +109,7 @@ describe("POST /analytics/views/campaigns/{cid}", () => {
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
 
-    const itemsAfterPost = await campaignReadStatuses().select();
+    const itemsAfterPost = await campaignReadStatuses.do().select();
     expect(
       itemsAfterPost.length,
       "There should be a single view after post"

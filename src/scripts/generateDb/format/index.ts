@@ -39,20 +39,31 @@ export const format = ({
     }
 
     let data = `
-import { ${database} } from "@src/features/knex";
+    import {  ${database} } from "@src/features/knex";
 
-const table = () => ${database}("${table.TABLE_NAME}");
-
-const create = () =>
-  ${database}.schema.createTable("${table.TABLE_NAME}", function (table) {
-    ${definitions}
-    ${keys}
-  });
-
-const drop = () => ${database}.schema.dropTable("${table.TABLE_NAME}");
-
-export default table;
-export { create, drop };
+    class Table {
+      public do() {
+        return  ${database}("${table.TABLE_NAME}");
+      }
+    
+      public create() {
+        return  ${database}.schema.createTable(
+          "${table.TABLE_NAME}",
+          function (table) {
+            ${definitions}
+            ${keys}
+          }
+        );
+      }
+      public drop() {
+        return  ${database}.schema.dropTable("${table.TABLE_NAME}");
+      }
+    }
+    
+    const item = new Table();
+    
+    export default item;
+    
 `;
 
     result.push({
