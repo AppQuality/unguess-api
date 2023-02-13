@@ -2,6 +2,7 @@ import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import WpUgCampaignReadStatus from "@src/features/tables/unguess/WpUgCampaignReadStatus";
 import WpAppqCampaignAdditionalFields from "@src/features/tables/tryber/WpAppqCampaignAdditionalFields";
 import WpAppqCampaignAdditionalFieldsData from "@src/features/tables/tryber/WpAppqCampaignAdditionalFieldsData";
+import { unguess, tryber } from "@src/features/knex";
 
 expect.extend({
   toBeNow(received: number, precision: number = 0) {
@@ -24,6 +25,8 @@ afterAll(async () => {
   await WpUgCampaignReadStatus.drop();
   await WpAppqCampaignAdditionalFields.drop();
   await WpAppqCampaignAdditionalFieldsData.drop();
+  await unguess.destroy();
+  await tryber.destroy();
 });
 
 export {};
