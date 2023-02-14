@@ -80,4 +80,35 @@ export async function down(knex: Knex): Promise<void> {
     table.string("additional_info");
     table.integer("is_website").notNullable().defaultTo(0);
   });
+
+  await knex.schema.table(
+    "wp_appq_additional_bug_replicabilities",
+    function (table) {
+      table.integer("version_id");
+    }
+  );
+  await knex.schema.table(
+    "wp_appq_additional_bug_severities",
+    function (table) {
+      table.integer("version_id");
+    }
+  );
+  await knex.schema.table("wp_appq_additional_bug_types", function (table) {
+    table.integer("version_id");
+  });
+  await knex.schema.table("wp_appq_contracts", function (table) {
+    table.integer("version_id");
+  });
+  await knex.schema.table("wp_appq_evd_bug", function (table) {
+    table.integer("version_id");
+  });
+  await knex.schema.table("wp_appq_evd_bug_rev", function (table) {
+    table.integer("version_id");
+  });
+  await knex.schema.table("wp_appq_exp_points", function (table) {
+    table.integer("version_id");
+  });
+  await knex.schema.table("wp_appq_payment", function (table) {
+    table.integer("version_id");
+  });
 }
