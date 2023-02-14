@@ -302,7 +302,7 @@ const bug_8_unpublished: BugsParams = {
 const bug_9_no_tags: BugsParams = {
   id: 9,
   internal_id: "BUG019",
-  message: "[CON-TEXT] - Bug 9 super-message",
+  message: "[CONTEXT] [additional - strange context] - Bug 9 super-message",
   description: "Bug 9 description",
   expected_result: "Bug 9 expected result",
   current_result: "Bug 9 current result",
@@ -646,10 +646,11 @@ describe("GET /campaigns/{cid}/bugs", () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs`)
       .set("Authorization", "Bearer user");
+
     expect(response.body.items[0].title).toEqual({
       full: bug_9_no_tags.message,
       compact: "Bug 9 super-message",
-      context: ["CON-TEXT"],
+      context: ["CONTEXT", "additional - strange context"],
     });
 
     expect(response.body.items[1].title).toEqual({
