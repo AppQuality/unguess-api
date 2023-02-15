@@ -16,6 +16,7 @@ export async function up(knex: Knex): Promise<void> {
   await knex.schema.dropTable("wp_appq_evd_oauth2_credentials");
   await knex.schema.dropTable("wp_appq_evd_redmine_settings");
   await knex.schema.dropTable("wp_appq_evd_redmine_sync");
+  await knex.schema.dropTable("wp_appq_evd_credentials");
 }
 
 export async function down(knex: Knex): Promise<void> {
@@ -137,5 +138,16 @@ export async function down(knex: Knex): Promise<void> {
   await knex.schema.createTable("wp_appq_evd_redmine_sync", function (table) {
     table.increments("id").notNullable();
     table.string("issue_key").notNullable();
+  });
+
+  await knex.schema.createTable("wp_appq_evd_credentials", function (table) {
+    table.increments("id").notNullable();
+    table.integer("campaign_id").notNullable();
+    table.string("auth_method").notNullable();
+    table.string("base_url");
+    table.string("project_key").notNullable();
+    table.string("bug_tracker").notNullable();
+    table.integer("credentials_id").notNullable();
+    table.integer("version_id").notNullable();
   });
 }
