@@ -33,6 +33,28 @@ export async function up(knex: Knex): Promise<void> {
   await knex.schema.table("wp_appq_payment", function (table) {
     table.dropColumn("version_id");
   });
+
+  await knex.raw("DROP TRIGGER IF EXISTS save_bug_history");
+  await knex.raw(`
+  CREATE TRIGGER save_bug_history
+  BEFORE UPDATE
+  ON wp_appq_evd_bug
+  FOR EACH ROW
+    if @disable_bug_trigger is null then
+        INSERT INTO wp_appq_evd_bug_rev(bug_id, internal_id, wp_user_id, message, description, expected_result,
+                                        current_result, campaign_id,  status_id, publish, status_reason,
+                                        bug_replicability_id, bug_type_id, severity_id, last_seen, last_seen_date,
+                                        last_seen_time, application_section, bug_creation_date, note, dev_id,
+                                        manufacturer, model, os, os_version, reviewer, is_perfect, last_editor_id,
+                                        last_editor_is_tester, is_duplicated, is_favorite, duplicated_of_id)
+        VALUES (old.id, old.internal_id, old.wp_user_id, old.message, old.description, old.expected_result,
+                old.current_result, old.campaign_id,  old.status_id, old.publish, old.status_reason,
+                old.bug_replicability_id, old.bug_type_id, old.severity_id, old.last_seen, old.last_seen_date,
+                old.last_seen_time, old.application_section, old.created, old.note, old.dev_id, old.manufacturer,
+                old.model, old.os, old.os_version, old.reviewer, old.is_perfect, old.last_editor_id,
+                old.last_editor_is_tester, old.is_duplicated, old.is_favorite, old.duplicated_of_id);
+    end if;
+  `);
 }
 
 export async function down(knex: Knex): Promise<void> {
@@ -111,4 +133,26 @@ export async function down(knex: Knex): Promise<void> {
   await knex.schema.table("wp_appq_payment", function (table) {
     table.integer("version_id");
   });
+
+  await knex.raw("DROP TRIGGER IF EXISTS save_bug_history");
+  await knex.raw(`
+  CREATE TRIGGER save_bug_history
+  BEFORE UPDATE
+  ON wp_appq_evd_bug
+  FOR EACH ROW
+    if @disable_bug_trigger is null then
+        INSERT INTO wp_appq_evd_bug_rev(bug_id, internal_id, wp_user_id, message, description, expected_result,
+                                        current_result, campaign_id, version_id, status_id, publish, status_reason,
+                                        bug_replicability_id, bug_type_id, severity_id, last_seen, last_seen_date,
+                                        last_seen_time, application_section, bug_creation_date, note, dev_id,
+                                        manufacturer, model, os, os_version, reviewer, is_perfect, last_editor_id,
+                                        last_editor_is_tester, is_duplicated, is_favorite, duplicated_of_id)
+        VALUES (old.id, old.internal_id, old.wp_user_id, old.message, old.description, old.expected_result,
+                old.current_result, old.campaign_id, old.version_id, old.status_id, old.publish, old.status_reason,
+                old.bug_replicability_id, old.bug_type_id, old.severity_id, old.last_seen, old.last_seen_date,
+                old.last_seen_time, old.application_section, old.created, old.note, old.dev_id, old.manufacturer,
+                old.model, old.os, old.os_version, old.reviewer, old.is_perfect, old.last_editor_id,
+                old.last_editor_is_tester, old.is_duplicated, old.is_favorite, old.duplicated_of_id);
+    end if;
+  `);
 }
