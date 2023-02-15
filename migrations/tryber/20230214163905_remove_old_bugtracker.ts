@@ -117,6 +117,15 @@ export async function down(knex: Knex): Promise<void> {
   );
 
   await knex.schema.createTable(
+    "wp_appq_evd_oauth2_credentials",
+    function (table) {
+      table.increments("id").notNullable();
+      table.string("client_id").notNullable();
+      table.string("consumer_key").notNullable();
+    }
+  );
+
+  await knex.schema.createTable(
     "wp_appq_evd_redmine_settings",
     function (table) {
       table.increments("id").notNullable();
