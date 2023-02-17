@@ -3,6 +3,14 @@ import { Context } from "openapi-backend";
 import { ERROR_MESSAGE } from "@src/utils/constants";
 import { editCampaign, getCampaign } from "@src/utils/campaigns";
 import { getProjectById } from "@src/utils/projects";
+/* import CampaignRoute from "@src/features/routes/CampaignRoute"; */
+
+/* export default class Route extends CampaignRoute<{
+  response: StoplightOperations["patch-campaigns"]["responses"]["200"]["content"]["application/json"];
+  parameters: StoplightOperations["patch-campaigns"]["parameters"]["path"];
+}>{
+  
+} */
 
 export default async (
   c: Context,

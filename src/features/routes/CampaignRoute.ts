@@ -134,4 +134,7 @@ export default class CampaignRoute<
     }
     return [this.APPROVED_STATUS_ID];
   }
+
+  /* Might need */
+  protected getCampaign() {}
 }
