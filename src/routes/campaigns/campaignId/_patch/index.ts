@@ -8,12 +8,8 @@ export default class Route extends CampaignRoute<{
   parameters: StoplightOperations["patch-campaigns"]["parameters"]["path"];
   body: StoplightComponents["requestBodies"]["Campaign"]["content"]["application/json"];
 }> {
-  protected async prepare() {
-    const campaign = await getCampaign({
-      campaignId: this.cp_id,
-      withOutputs: true,
-    });
-
+  protected async filter() {
+    if (!(await super.filter())) return false;
     const { customer_title } = this.getBody();
 
     if (
@@ -22,25 +18,25 @@ export default class Route extends CampaignRoute<{
       customer_title.length > this.CUSTOMER_TITLE_MAX_LENGTH ||
       this.bodyIsEmpty()
     ) {
-      return this.setError(400, {} as OpenapiError);
+      this.setError(400, {} as OpenapiError);
+      return false;
     }
+    return true;
+  }
 
-    const projectId = this.getProjectId();
-    if (!projectId) return this.setError(401, {} as OpenapiError);
-
-    if (!campaign) return this.setError(404, {} as OpenapiError);
-
-    this.setSuccess(200, await this.editCampaign(this.cp_id, this.getBody()));
+  protected async prepare() {
+    this.setSuccess(200, await this.editCampaign());
   }
 
   private bodyIsEmpty() {
     return Object.keys(this.getBody()).length === 0;
   }
 
-  private async editCampaign(
-    campaignId: number,
-    patchRequest: StoplightOperations["patch-campaigns"]["requestBody"]["content"]["application/json"]
-  ): Promise<StoplightComponents["schemas"]["Campaign"]> {
+  private async editCampaign(): Promise<
+    StoplightComponents["schemas"]["Campaign"]
+  > {
+    const patchRequest =
+      this.getBody() as StoplightOperations["patch-campaigns"]["requestBody"]["content"]["application/json"];
     // Get campaign fields and values to update
     const campaignFields = Object.keys(patchRequest);
     const campaignValues = Object.values(patchRequest);
@@ -55,10 +51,10 @@ export default class Route extends CampaignRoute<{
       ", "
     )} WHERE id = ?`;
 
-    await db.query(db.format(updateCampaignQuery, [campaignId]));
+    await db.query(db.format(updateCampaignQuery, [this.cp_id]));
 
     // Get the updated campaign
-    const campaign = await getCampaign({ campaignId });
+    const campaign = await getCampaign({ campaignId: this.cp_id });
 
     return campaign as StoplightComponents["schemas"]["Campaign"];
   }
