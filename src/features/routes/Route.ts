@@ -56,6 +56,12 @@ export default class Route<T extends RouteClassTypes> {
     return this.body;
   }
 
+  protected bodyIsEmpty() {
+    if (!this.body || this.body === undefined) {
+      return true;
+    }
+  }
+
   protected getParameters() {
     if (typeof this.parameters === "undefined")
       throw new Error("Invalid parameters");
