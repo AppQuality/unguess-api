@@ -971,85 +971,9 @@ declare module "knex/types/tables" {
     updated_date: string;
     note: string;
   }
-  interface iWpAppqPaymentTwQuote {
-    id: number;
-    transaction_id: number;
-    source_currency: string;
-    target_currency: string;
-    source_amount: number;
-    target_amount: number;
-    type: string;
-    created_time: string;
-    modification_time: string;
-    created_by_user_id: number;
-    operator_id: number;
-    rate: string;
-    delivery_estimate: string;
-    fee: number;
-  }
-  interface iWpAppqPaymentTwRecipient {
-    id: number;
-    tester_id: number;
-    currency: string;
-    country: string;
-    type: string;
-    legal_type: string;
-    tw_account_id: number;
-    created_time: string;
-    modification_time: string;
-  }
-  interface iWpAppqPaymentTwTransfer {
-    id: number;
-    tw_account: number;
-    quote_id: number;
-    customer_transaction_id: string;
-    status: string;
-    reference: string;
-    created: string;
-    has_active_issues: string;
-    source_currency: string;
-    source_amount: number;
-    target_currency: string;
-    target_amount: number;
-    type: string;
-    error_code: string;
-    created_time: string;
-    modification_time: string;
-  }
   interface iWpAppqPaymentWorkTypes {
     id: number;
     work_type: string;
-  }
-  interface iWpAppqPaypalBulkTransaction {
-    id: number;
-    payout_batch_id: string;
-    operator_id: number;
-    creation_time: string;
-    completed_time: string;
-    status: string;
-    amount_value: number;
-    amount_currency: string;
-    fee_value: number;
-    fee_currency: string;
-  }
-  interface iWpAppqPaypalTransaction {
-    id: number;
-    request_id: number;
-    payout_batch_id: string;
-    notes: string;
-    creation: string;
-    update: string;
-    transaction_id: string;
-    transaction_status: string;
-    payout_item_id: string;
-    time_processed: string;
-    receiver: string;
-    amount_value: number;
-    amount_currency: string;
-    fee_value: number;
-    fee_currency: string;
-    sender_item_id: string;
-    email_subject: string;
   }
   interface iWpAppqPlatform {
     id: number;
@@ -1715,12 +1639,7 @@ declare module "knex/types/tables" {
     wp_appq_payment: iWpAppqPayment;
     wp_appq_payment_request: iWpAppqPaymentRequest;
     wp_appq_payment_request_history: iWpAppqPaymentRequestHistory;
-    wp_appq_payment_tw_quote: iWpAppqPaymentTwQuote;
-    wp_appq_payment_tw_recipient: iWpAppqPaymentTwRecipient;
-    wp_appq_payment_tw_transfer: iWpAppqPaymentTwTransfer;
     wp_appq_payment_work_types: iWpAppqPaymentWorkTypes;
-    wp_appq_paypal_bulk_transaction: iWpAppqPaypalBulkTransaction;
-    wp_appq_paypal_transaction: iWpAppqPaypalTransaction;
     wp_appq_platform: iWpAppqPlatform;
     wp_appq_popups: iWpAppqPopups;
     wp_appq_popups_read_status: iWpAppqPopupsReadStatus;

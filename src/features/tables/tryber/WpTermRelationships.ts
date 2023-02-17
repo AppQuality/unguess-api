@@ -10,7 +10,7 @@ class Table {
       table.integer("object_id").notNullable().defaultTo(0);
       table.integer("term_taxonomy_id").notNullable().defaultTo(0);
       table.integer("term_order").notNullable().defaultTo(0);
-      table.unique(["term_taxonomy_id", "object_id"]);
+      table.unique(["object_id", "term_taxonomy_id"]);
     });
   }
   public drop() {
