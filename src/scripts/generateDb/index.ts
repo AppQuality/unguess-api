@@ -67,7 +67,8 @@ const path = `./src/features/tables/${database}`;
   let types = `import { Knex } from "knex"; declare module "knex/types/tables" {`;
   let typeLinks = ``;
   let tableImport = ``;
-  let tableInit = ``;
+  let tableInitCreate = ``;
+  let tableInitDrop = ``;
   files.forEach((file) => {
     fs.writeFileSync(`${path}/${file.filename}.ts`, file.content);
     types += `interface i${snakeToPascal(file.tableName)} ${file.types}`;
@@ -75,7 +76,8 @@ const path = `./src/features/tables/${database}`;
     tableImport += `import ${snakeToPascal(file.tableName)} from "${path}/${
       file.filename
     }";`;
-    tableInit += `${snakeToPascal(file.tableName)}.create();`;
+    tableInitCreate += `await ${snakeToPascal(file.tableName)}.create();`;
+    tableInitDrop += `await ${snakeToPascal(file.tableName)}.drop();`;
   });
   types += ` interface Tables {${typeLinks}} }`;
 
@@ -85,9 +87,17 @@ const path = `./src/features/tables/${database}`;
   );
   fs.writeFileSync(
     `${path}.ts`,
-    prettier.format(`${tableImport}; export default () => {${tableInit}}`, {
-      parser: "typescript",
-    })
+    prettier.format(
+      `
+    ${tableImport}; 
+    
+    export const create = async () => {${tableInitCreate}};
+    export const drop = async () => {${tableInitDrop}};
+    `,
+      {
+        parser: "typescript",
+      }
+    )
   );
 
   fs.readdirSync(path).forEach((file) => {
