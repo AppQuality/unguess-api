@@ -1,4 +1,5 @@
 import mysql, { RowDataPacket } from "mysql2/promise";
+import { getFirstAvailableIp } from "./getFirstAvailableIp";
 import { Client } from "ssh2";
 
 const createConnection = async ({
@@ -27,12 +28,13 @@ const createConnection = async ({
         });
     });
   }
+  const ip = await getFirstAvailableIp();
   return new Promise((resolve, reject) => {
     const ssh = new Client();
     ssh
       .on("ready", function () {
         ssh.forwardOut(
-          "192.168.100.102",
+          ip,
           3306,
           db.host || "localhost",
           3306,
