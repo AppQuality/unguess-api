@@ -18,6 +18,7 @@ export default class CampaignRoute<
   protected baseBugInternalId: string = "";
   private NEED_REVIEW_STATUS_ID = 4;
   private APPROVED_STATUS_ID = 2;
+  public CUSTOMER_TITLE_MAX_LENGTH = 256;
 
   constructor(configuration: RouteClassConfiguration) {
     super(configuration);

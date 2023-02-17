@@ -14,28 +14,30 @@ export default class Route extends CampaignRoute<{
       withOutputs: true,
     });
 
-    if (!campaign) return this.setError(404, {} as OpenapiError);
-
-    const projectId = this.getProjectId();
-    if (!projectId) return this.setError(401, {} as OpenapiError);
-
-    const rBody = this.getBody();
-    const { customer_title } = rBody;
+    const { customer_title } = this.getBody();
 
     if (
       customer_title === undefined ||
       customer_title === "" ||
-      customer_title.length > 256
+      customer_title.length > this.CUSTOMER_TITLE_MAX_LENGTH ||
+      this.bodyIsEmpty()
     ) {
       return this.setError(400, {} as OpenapiError);
     }
 
-    if (this.bodyIsEmpty()) return this.setError(400, {} as OpenapiError);
+    const projectId = this.getProjectId();
+    if (!projectId) return this.setError(401, {} as OpenapiError);
+
+    if (!campaign) return this.setError(404, {} as OpenapiError);
 
     this.setSuccess(200, await this.editCampaign(this.cp_id, this.getBody()));
   }
 
-  protected async editCampaign(
+  private bodyIsEmpty() {
+    return Object.keys(this.getBody()).length === 0;
+  }
+
+  private async editCampaign(
     campaignId: number,
     patchRequest: StoplightOperations["patch-campaigns"]["requestBody"]["content"]["application/json"]
   ): Promise<StoplightComponents["schemas"]["Campaign"]> {
@@ -53,9 +55,7 @@ export default class Route extends CampaignRoute<{
       ", "
     )} WHERE id = ?`;
 
-    const updateCampaignSql = db.format(updateCampaignQuery, [campaignId]);
-
-    await db.query(updateCampaignSql);
+    await db.query(db.format(updateCampaignQuery, [campaignId]));
 
     // Get the updated campaign
     const campaign = await getCampaign({ campaignId });
