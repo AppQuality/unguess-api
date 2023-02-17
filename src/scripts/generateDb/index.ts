@@ -66,16 +66,28 @@ const path = `./src/features/tables/${database}`;
 
   let types = `import { Knex } from "knex"; declare module "knex/types/tables" {`;
   let typeLinks = ``;
+  let tableImport = ``;
+  let tableInit = ``;
   files.forEach((file) => {
     fs.writeFileSync(`${path}/${file.filename}.ts`, file.content);
     types += `interface i${snakeToPascal(file.tableName)} ${file.types}`;
     typeLinks += `${file.tableName}: i${snakeToPascal(file.tableName)};`;
+    tableImport += `import ${snakeToPascal(file.tableName)} from "${path}/${
+      file.filename
+    }";`;
+    tableInit += `${snakeToPascal(file.tableName)}.create();`;
   });
   types += ` interface Tables {${typeLinks}} }`;
 
   fs.writeFileSync(
     `./src/${database}TableTypes.ts`,
     prettier.format(types, { parser: "typescript" })
+  );
+  fs.writeFileSync(
+    `${path}.ts`,
+    prettier.format(`${tableImport}; export default () => {${tableInit}}`, {
+      parser: "typescript",
+    })
   );
 
   fs.readdirSync(path).forEach((file) => {
