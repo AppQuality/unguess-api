@@ -73,9 +73,9 @@ const path = `./src/features/tables/${database}`;
     fs.writeFileSync(`${path}/${file.filename}.ts`, file.content);
     types += `interface i${snakeToPascal(file.tableName)} ${file.types}`;
     typeLinks += `${file.tableName}: i${snakeToPascal(file.tableName)};`;
-    tableImport += `import ${snakeToPascal(file.tableName)} from "${path}/${
-      file.filename
-    }";`;
+    tableImport += `import ${snakeToPascal(
+      file.tableName
+    )} from "./${database}/${file.filename}";`;
     tableInitCreate += `await ${snakeToPascal(file.tableName)}.create();`;
     tableInitDrop += `await ${snakeToPascal(file.tableName)}.drop();`;
   });
@@ -90,7 +90,7 @@ const path = `./src/features/tables/${database}`;
     prettier.format(
       `
     ${tableImport}; 
-    
+
     export const create = async () => {${tableInitCreate}};
     export const drop = async () => {${tableInitDrop}};
     `,
