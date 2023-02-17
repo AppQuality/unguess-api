@@ -3,6 +3,14 @@ import WpUgCampaignReadStatus from "@src/features/tables/unguess/WpUgCampaignRea
 import WpAppqCampaignAdditionalFields from "@src/features/tables/tryber/WpAppqCampaignAdditionalFields";
 import WpAppqCampaignAdditionalFieldsData from "@src/features/tables/tryber/WpAppqCampaignAdditionalFieldsData";
 import { unguess, tryber } from "@src/features/knex";
+import {
+  create as tryberCreate,
+  drop as tryberDrop,
+} from "@src/features/tables/tryber";
+import {
+  create as unguessCreate,
+  drop as unguessDrop,
+} from "@src/features/tables/unguess";
 
 expect.extend({
   toBeNow(received: number, precision: number = 0) {
@@ -16,15 +24,13 @@ expect.extend({
 
 beforeAll(async () => {
   await dbAdapter.create();
-  await WpUgCampaignReadStatus.create();
-  await WpAppqCampaignAdditionalFields.create();
-  await WpAppqCampaignAdditionalFieldsData.create();
+  await tryberCreate();
+  await unguessCreate();
 });
 afterAll(async () => {
   await dbAdapter.drop();
-  await WpUgCampaignReadStatus.drop();
-  await WpAppqCampaignAdditionalFields.drop();
-  await WpAppqCampaignAdditionalFieldsData.drop();
+  await tryberDrop();
+  await unguessDrop();
   await unguess.destroy();
   await tryber.destroy();
 });

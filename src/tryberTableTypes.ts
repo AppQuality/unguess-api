@@ -43,19 +43,16 @@ declare module "knex/types/tables" {
   interface iWpAppqAdditionalBugReplicabilities {
     id: number;
     campaign_id: number;
-    version_id: number;
     bug_replicability_id: number;
   }
   interface iWpAppqAdditionalBugSeverities {
     id: number;
     campaign_id: number;
-    version_id: number;
     bug_severity_id: number;
   }
   interface iWpAppqAdditionalBugTypes {
     id: number;
     campaign_id: number;
-    version_id: number;
     bug_type_id: number;
   }
   interface iWpAppqAdminCommunication {
@@ -74,142 +71,6 @@ declare module "knex/types/tables" {
     dem_id: number;
     creation_date: string;
     is_read: number;
-  }
-  interface iWpAppqAdvCampaignCountry {
-    id: number;
-    name: string;
-    code: string;
-    sign: string;
-  }
-  interface iWpAppqAdvCampaignCta {
-    id: number;
-    code: string;
-    dtm_cta: string;
-    cta_behaviour: string;
-    master_key: string;
-    master_key_it: string;
-  }
-  interface iWpAppqAdvCampaignLanguage {
-    id: number;
-    name: string;
-    code: string;
-  }
-  interface iWpAppqAdvCampaignLevel {
-    id: number;
-    level1: string;
-    level2: string;
-    level3: string;
-    level4: string;
-    assetId: string;
-    source: string;
-  }
-  interface iWpAppqAdvCampaignResult {
-    rule_id: number;
-    cp_id: number;
-    lead_hash: boolean;
-    lead: string;
-    status_id: number;
-    creation: string;
-    update: string;
-    pm_id: number;
-    note: string;
-  }
-  interface iWpAppqAdvCampaignRule {
-    id: number;
-    mk_field: string;
-    co_field: string;
-    validation_type: string;
-    validation: string;
-    co_activation_field: string;
-    co_activation_value: string;
-    value_if_error: number;
-    creation: string;
-    update: string;
-    note: string;
-    can_autoclose: number;
-  }
-  interface iWpAppqAdvDisclaimer {
-    id: number;
-    country: string;
-    language: string;
-    disclaimer: number;
-  }
-  interface iWpAppqAdvFieldsPosition {
-    field_name: string;
-    position: number;
-  }
-  interface iWpAppqAdvOptions {
-    email: string;
-    prj_id: number;
-    email_cc: string;
-    pm_id: number;
-  }
-  interface iWpAppqArenaApp {
-    id: number;
-    name: string;
-    customer: string;
-    description: string;
-    is_active: number;
-    is_published_on_bug_arena: number;
-    app_logo: string;
-    content_info: string;
-    id_creator: number;
-    id_modifier: number;
-    created_on: string;
-    last_edit: string;
-    visibility_type: number;
-    approved_tester: string;
-    customer_id: number;
-    pm_id: number;
-    project_id: number;
-    customer_title: string;
-  }
-  interface iWpAppqArenaVersion {
-    id: number;
-    bundle_id: string;
-    name: string;
-    code: string;
-    platform_id: number;
-    out_of_scope: string;
-    whats_new: string;
-    is_published_on_bug_arena: number;
-    app_id: number;
-    id_creator: number;
-    id_modifier: number;
-    pricing: string;
-    is_active: number;
-    applink: string;
-    created_on: string;
-    last_edit: string;
-    campaign_pts: number;
-    visibility_type: number;
-    approved_tester: string;
-    min_allowed_media: number;
-    additional_info: string;
-    is_website: number;
-  }
-  interface iWpAppqBtComponent {
-    cp_id: number;
-    component_name: string;
-    component_key: string;
-  }
-  interface iWpAppqBtField {
-    cp_id: number;
-    field_name: string;
-    field_key: string;
-    field_array_key: string;
-    field_value_type: string;
-    type: string;
-    string_value: string;
-    mapping_id: number;
-  }
-  interface iWpAppqBtMapping {
-    id: number;
-    mapping_id: number;
-    campaign_id: number;
-    jira_field: string;
-    out_value: string;
-    in_value: string;
   }
   interface iWpAppqBugLink {
     id: number;
@@ -423,7 +284,6 @@ declare module "knex/types/tables" {
     id: number;
     tester_id: number;
     campaign_id: number;
-    version_id: number;
     url: string;
     creation: string;
     update: string;
@@ -640,54 +500,6 @@ declare module "knex/types/tables" {
     display_name: string;
     category: string;
   }
-  interface iWpAppqEntryTestQuiz {
-    id: number;
-    campaign_id: number;
-    title: string;
-    description: string;
-    expected: string;
-    actual: string;
-    available_types: string;
-    available_severities: string;
-    accepted_t: string;
-    accepted_s: string;
-    media_link: string;
-  }
-  interface iWpAppqEntryTestResponses {
-    id: number;
-    question_id: number;
-    tester_id: number;
-    selected_t: number;
-    selected_s: number;
-    creation_date: string;
-    update_date: string;
-  }
-  interface iWpAppqEntryTestResponsesRev {
-    id: number;
-    question_id: number;
-    tester_id: number;
-    selected_t: number;
-    selected_s: number;
-    creation_date: string;
-    update_date: string;
-  }
-  interface iWpAppqEvdApikeyCredentials {
-    id: number;
-    api_key: string;
-  }
-  interface iWpAppqEvdBasicCredentials {
-    id: number;
-    username: string;
-    password: string;
-  }
-  interface iWpAppqEvdBitbucketSettings {
-    id: number;
-    auth_method: string;
-  }
-  interface iWpAppqEvdBitbucketSync {
-    id: number;
-    issue_key: string;
-  }
   interface iWpAppqEvdBug {
     id: number;
     internal_id: string;
@@ -715,7 +527,6 @@ declare module "knex/types/tables" {
     os_version: string;
     last_seen_date: string;
     last_seen_time: string;
-    version_id: number;
     reviewer: number;
     is_perfect: number;
     last_editor_id: number;
@@ -749,7 +560,6 @@ declare module "knex/types/tables" {
     expected_result: string;
     current_result: string;
     campaign_id: number;
-    version_id: number;
     status_id: number;
     publish: number;
     status_reason: string;
@@ -787,19 +597,6 @@ declare module "knex/types/tables" {
     name: string;
     description: string;
     is_enabled: number;
-  }
-  interface iWpAppqEvdBugtrackerSettings {
-    id: number;
-    campaign_id: number;
-    bug_tracker: string;
-    settings_id: number;
-    version_id: number;
-  }
-  interface iWpAppqEvdBugtrackerSync {
-    id: number;
-    bug_id: number;
-    bug_tracker: string;
-    sync_id: number;
   }
   interface iWpAppqEvdCampaign {
     id: number;
@@ -889,35 +686,6 @@ declare module "knex/types/tables" {
     family: string;
     status_details: string;
   }
-  interface iWpAppqEvdCredentials {
-    id: number;
-    campaign_id: number;
-    auth_method: string;
-    base_url: string;
-    project_key: string;
-    bug_tracker: string;
-    credentials_id: number;
-    version_id: number;
-  }
-  interface iWpAppqEvdJiraSettings {
-    id: number;
-    auth_method: string;
-    custom_fields: number;
-  }
-  interface iWpAppqEvdJiraSync {
-    id: number;
-    issue_key: string;
-  }
-  interface iWpAppqEvdOauth1Credentials {
-    id: number;
-    consumer_key: string;
-    private_key: string;
-  }
-  interface iWpAppqEvdOauth2Credentials {
-    id: number;
-    client_id: string;
-    consumer_key: string;
-  }
   interface iWpAppqEvdPlatform {
     id: number;
     name: string;
@@ -963,15 +731,6 @@ declare module "knex/types/tables" {
     blacklisted: number;
     onboarding_complete: number;
   }
-  interface iWpAppqEvdRedmineSettings {
-    id: number;
-    auth_method: string;
-    custom_fields: number;
-  }
-  interface iWpAppqEvdRedmineSync {
-    id: number;
-    issue_key: string;
-  }
   interface iWpAppqEvdSeverity {
     id: number;
     name: string;
@@ -1005,21 +764,6 @@ declare module "knex/types/tables" {
     creation_date: string;
     amount: number;
     bug_id: number;
-    version_id: number;
-  }
-  interface iWpAppqFacebookLeadsAds {
-    id: number;
-    ads_id: number;
-    ad_title: string;
-    fb_status: string;
-    fb_creation: string;
-    auto_signup: number;
-    cron_period: string;
-  }
-  interface iWpAppqFacebookLeadsImport {
-    id: number;
-    form_id: number;
-    creation_date: string;
   }
   interface iWpAppqFiscalProfile {
     id: number;
@@ -1153,7 +897,6 @@ declare module "knex/types/tables" {
     id: number;
     tester_id: number;
     campaign_id: number;
-    version_id: number;
     work_type: string;
     note: string;
     amount: number;
@@ -1586,48 +1329,6 @@ declare module "knex/types/tables" {
     errors_details: string;
     version: number;
   }
-  interface iWpCliCookieScan {
-    id_cli_cookie_scan: number;
-    status: number;
-    created_at: number;
-    total_url: number;
-    total_cookies: number;
-    current_action: string;
-    current_offset: number;
-  }
-  interface iWpCliCookieScanCategories {
-    id_cli_cookie_category: number;
-    cli_cookie_category_name: string;
-    cli_cookie_category_description: string;
-  }
-  interface iWpCliCookieScanCookies {
-    id_cli_cookie_scan_cookies: number;
-    id_cli_cookie_scan: number;
-    id_cli_cookie_scan_url: number;
-    cookie_id: string;
-    expiry: string;
-    type: string;
-    category: string;
-    category_id: number;
-    description: string;
-  }
-  interface iWpCliCookieScanUrl {
-    id_cli_cookie_scan_url: number;
-    id_cli_cookie_scan: number;
-    url: string;
-    scanned: number;
-    total_cookies: number;
-  }
-  interface iWpCliScripts {
-    id: number;
-    cliscript_title: string;
-    cliscript_category: string;
-    cliscript_type: number;
-    cliscript_status: string;
-    cliscript_description: string;
-    cliscript_key: string;
-    type: number;
-  }
   interface iWpCommentmeta {
     meta_id: number;
     comment_id: number;
@@ -1918,95 +1619,6 @@ declare module "knex/types/tables" {
     email: string;
     insert_date: string;
   }
-  interface iWpYoastIndexable {
-    id: number;
-    permalink: string;
-    permalink_hash: string;
-    object_id: number;
-    object_type: string;
-    object_sub_type: string;
-    author_id: number;
-    post_parent: number;
-    title: string;
-    description: string;
-    breadcrumb_title: string;
-    post_status: string;
-    is_public: number;
-    is_protected: number;
-    has_public_posts: number;
-    number_of_pages: number;
-    canonical: string;
-    primary_focus_keyword: string;
-    primary_focus_keyword_score: number;
-    readability_score: number;
-    is_cornerstone: number;
-    is_robots_noindex: number;
-    is_robots_nofollow: number;
-    is_robots_noarchive: number;
-    is_robots_noimageindex: number;
-    is_robots_nosnippet: number;
-    twitter_title: string;
-    twitter_image: string;
-    twitter_description: string;
-    twitter_image_id: string;
-    twitter_image_source: string;
-    open_graph_title: string;
-    open_graph_description: string;
-    open_graph_image: string;
-    open_graph_image_id: string;
-    open_graph_image_source: string;
-    open_graph_image_meta: string;
-    link_count: number;
-    incoming_link_count: number;
-    prominent_words_version: number;
-    created_at: string;
-    updated_at: string;
-    blog_id: number;
-    language: string;
-    region: string;
-    schema_page_type: string;
-    schema_article_type: string;
-    has_ancestors: number;
-    estimated_reading_time_minutes: number;
-  }
-  interface iWpYoastIndexableHierarchy {
-    indexable_id: number;
-    ancestor_id: number;
-    depth: number;
-    blog_id: number;
-  }
-  interface iWpYoastMigrations {
-    id: number;
-    version: string;
-  }
-  interface iWpYoastPrimaryTerm {
-    id: number;
-    post_id: number;
-    term_id: number;
-    taxonomy: string;
-    created_at: string;
-    updated_at: string;
-    blog_id: number;
-  }
-  interface iWpYoastSeoLinks {
-    id: number;
-    url: string;
-    post_id: number;
-    target_post_id: number;
-    type: string;
-    indexable_id: number;
-    target_indexable_id: number;
-    height: number;
-    width: number;
-    size: number;
-    language: string;
-    region: string;
-  }
-  interface iWpYoastSeoMeta {
-    object_id: number;
-    internal_link_count: number;
-    incoming_link_count: number;
-  }
   interface Tables {
     knex_migrations: iKnexMigrations;
     knex_migrations_lock: iKnexMigrationsLock;
@@ -2019,20 +1631,6 @@ declare module "knex/types/tables" {
     wp_appq_additional_bug_types: iWpAppqAdditionalBugTypes;
     wp_appq_admin_communication: iWpAppqAdminCommunication;
     wp_appq_admin_email: iWpAppqAdminEmail;
-    wp_appq_adv_campaign_country: iWpAppqAdvCampaignCountry;
-    wp_appq_adv_campaign_cta: iWpAppqAdvCampaignCta;
-    wp_appq_adv_campaign_language: iWpAppqAdvCampaignLanguage;
-    wp_appq_adv_campaign_level: iWpAppqAdvCampaignLevel;
-    wp_appq_adv_campaign_result: iWpAppqAdvCampaignResult;
-    wp_appq_adv_campaign_rule: iWpAppqAdvCampaignRule;
-    wp_appq_adv_disclaimer: iWpAppqAdvDisclaimer;
-    wp_appq_adv_fields_position: iWpAppqAdvFieldsPosition;
-    wp_appq_adv_options: iWpAppqAdvOptions;
-    wp_appq_arena_app: iWpAppqArenaApp;
-    wp_appq_arena_version: iWpAppqArenaVersion;
-    wp_appq_bt_component: iWpAppqBtComponent;
-    wp_appq_bt_field: iWpAppqBtField;
-    wp_appq_bt_mapping: iWpAppqBtMapping;
     wp_appq_bug_link: iWpAppqBugLink;
     wp_appq_bug_read_status: iWpAppqBugReadStatus;
     wp_appq_bug_taxonomy: iWpAppqBugTaxonomy;
@@ -2084,38 +1682,20 @@ declare module "knex/types/tables" {
     wp_appq_customer_account_invitations: iWpAppqCustomerAccountInvitations;
     wp_appq_education: iWpAppqEducation;
     wp_appq_employment: iWpAppqEmployment;
-    wp_appq_entry_test_quiz: iWpAppqEntryTestQuiz;
-    wp_appq_entry_test_responses: iWpAppqEntryTestResponses;
-    wp_appq_entry_test_responses_rev: iWpAppqEntryTestResponsesRev;
-    wp_appq_evd_apikey_credentials: iWpAppqEvdApikeyCredentials;
-    wp_appq_evd_basic_credentials: iWpAppqEvdBasicCredentials;
-    wp_appq_evd_bitbucket_settings: iWpAppqEvdBitbucketSettings;
-    wp_appq_evd_bitbucket_sync: iWpAppqEvdBitbucketSync;
     wp_appq_evd_bug: iWpAppqEvdBug;
     wp_appq_evd_bug_media: iWpAppqEvdBugMedia;
     wp_appq_evd_bug_replicability: iWpAppqEvdBugReplicability;
     wp_appq_evd_bug_rev: iWpAppqEvdBugRev;
     wp_appq_evd_bug_status: iWpAppqEvdBugStatus;
     wp_appq_evd_bug_type: iWpAppqEvdBugType;
-    wp_appq_evd_bugtracker_settings: iWpAppqEvdBugtrackerSettings;
-    wp_appq_evd_bugtracker_sync: iWpAppqEvdBugtrackerSync;
     wp_appq_evd_campaign: iWpAppqEvdCampaign;
     wp_appq_evd_campaign_rev: iWpAppqEvdCampaignRev;
-    wp_appq_evd_credentials: iWpAppqEvdCredentials;
-    wp_appq_evd_jira_settings: iWpAppqEvdJiraSettings;
-    wp_appq_evd_jira_sync: iWpAppqEvdJiraSync;
-    wp_appq_evd_oauth1_credentials: iWpAppqEvdOauth1Credentials;
-    wp_appq_evd_oauth2_credentials: iWpAppqEvdOauth2Credentials;
     wp_appq_evd_platform: iWpAppqEvdPlatform;
     wp_appq_evd_profile: iWpAppqEvdProfile;
-    wp_appq_evd_redmine_settings: iWpAppqEvdRedmineSettings;
-    wp_appq_evd_redmine_sync: iWpAppqEvdRedmineSync;
     wp_appq_evd_severity: iWpAppqEvdSeverity;
     wp_appq_event: iWpAppqEvent;
     wp_appq_event_transactional_mail: iWpAppqEventTransactionalMail;
     wp_appq_exp_points: iWpAppqExpPoints;
-    wp_appq_facebook_leads_ads: iWpAppqFacebookLeadsAds;
-    wp_appq_facebook_leads_import: iWpAppqFacebookLeadsImport;
     wp_appq_fiscal_profile: iWpAppqFiscalProfile;
     wp_appq_integration_center_bugs: iWpAppqIntegrationCenterBugs;
     wp_appq_integration_center_config: iWpAppqIntegrationCenterConfig;
@@ -2178,11 +1758,6 @@ declare module "knex/types/tables" {
     wp_appq_user_to_project: iWpAppqUserToProject;
     wp_cd_test_question: iWpCdTestQuestion;
     wp_cd_test_results: iWpCdTestResults;
-    wp_cli_cookie_scan: iWpCliCookieScan;
-    wp_cli_cookie_scan_categories: iWpCliCookieScanCategories;
-    wp_cli_cookie_scan_cookies: iWpCliCookieScanCookies;
-    wp_cli_cookie_scan_url: iWpCliCookieScanUrl;
-    wp_cli_scripts: iWpCliScripts;
     wp_commentmeta: iWpCommentmeta;
     wp_comments: iWpComments;
     wp_crowd_appq_device: iWpCrowdAppqDevice;
@@ -2211,11 +1786,5 @@ declare module "knex/types/tables" {
     wp_usermeta: iWpUsermeta;
     wp_users: iWpUsers;
     wp_wpmm_subscribers: iWpWpmmSubscribers;
-    wp_yoast_indexable: iWpYoastIndexable;
-    wp_yoast_indexable_hierarchy: iWpYoastIndexableHierarchy;
-    wp_yoast_migrations: iWpYoastMigrations;
-    wp_yoast_primary_term: iWpYoastPrimaryTerm;
-    wp_yoast_seo_links: iWpYoastSeoLinks;
-    wp_yoast_seo_meta: iWpYoastSeoMeta;
   }
 }
