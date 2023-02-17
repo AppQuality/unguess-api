@@ -19,6 +19,17 @@ export default class Route extends CampaignRoute<{
     const projectId = this.getProjectId();
     if (!projectId) return this.setError(401, {} as OpenapiError);
 
+    const rBody = this.getBody();
+    const { customer_title } = rBody;
+
+    if (
+      customer_title === undefined ||
+      customer_title === "" ||
+      customer_title.length > 256
+    ) {
+      return this.setError(400, {} as OpenapiError);
+    }
+
     if (this.bodyIsEmpty()) return this.setError(400, {} as OpenapiError);
 
     this.setSuccess(200, await this.editCampaign(this.cp_id, this.getBody()));
@@ -28,13 +39,6 @@ export default class Route extends CampaignRoute<{
     campaignId: number,
     patchRequest: StoplightOperations["patch-campaigns"]["requestBody"]["content"]["application/json"]
   ): Promise<StoplightComponents["schemas"]["Campaign"]> {
-    if (
-      !patchRequest.customer_title ||
-      patchRequest.customer_title.length > 256
-    ) {
-      this.setError(400, {} as OpenapiError);
-    }
-
     // Get campaign fields and values to update
     const campaignFields = Object.keys(patchRequest);
     const campaignValues = Object.values(patchRequest);
@@ -59,51 +63,3 @@ export default class Route extends CampaignRoute<{
     return campaign as StoplightComponents["schemas"]["Campaign"];
   }
 }
-
-/* export default async (
-  c: Context,
-  req: OpenapiRequest,
-  res: OpenapiResponse
-) => {
-  let user = req.user;
-  let error = {
-    code: 500,
-    message: ERROR_MESSAGE,
-    error: true,
-  } as StoplightComponents["schemas"]["Error"];
-  let request_body: StoplightComponents["requestBodies"]["Campaign"]["content"]["application/json"] =
-    req.body;
-
-  let cid = parseInt(c.request.params.cid as string);
-
-  res.status_code = 200;
-
-  try {
-    // Check if cp exists
-    const campaign = await getCampaign({ campaignId: cid });
-
-    if (!campaign) {
-      throw { ...error, code: 400 };
-    }
-
-    // Check if user has permission to edit the campaign
-    await getProjectById({
-      projectId: campaign.project.id,
-      user: user,
-    });
-
-    const campaignPatched = await editCampaign(cid, request_body);
-
-    return campaignPatched as StoplightComponents["schemas"]["Campaign"];
-  } catch (e: any) {
-    if (e.code) {
-      error.code = e.code;
-      res.status_code = e.code;
-    } else {
-      error.code = 500;
-      res.status_code = 500;
-    }
-
-    return error;
-  }
-}; */

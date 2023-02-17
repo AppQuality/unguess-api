@@ -57,9 +57,7 @@ export default class Route<T extends RouteClassTypes> {
   }
 
   protected bodyIsEmpty() {
-    if (!this.body || this.body === undefined) {
-      return true;
-    }
+    return !this.getBody() || Object.keys(this.getBody()).length < 1;
   }
 
   protected getParameters() {
