@@ -58,7 +58,7 @@ export default class Route extends UserRoute<{
         return this.setError(403, {} as OpenapiError);
 
       // Create the campaign
-      let campaign = await createCampaign(validated_request_body);
+      const campaign = await createCampaign(validated_request_body);
 
       await this.updateCoinPackages(cost, workspace.id, campaign.id);
 
