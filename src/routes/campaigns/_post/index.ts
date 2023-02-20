@@ -20,15 +20,8 @@ export default class Route extends UserRoute<{
   body: StoplightOperations["post-campaigns"]["requestBody"]["content"]["application/json"];
   response: StoplightOperations["post-campaigns"]["responses"]["200"]["content"]["application/json"];
 }> {
-  private CUSTOMER_TITLE_MAX_LENGTH = 256;
-
   protected async filter() {
     if (!(await super.filter())) return false;
-
-    if (this.isCustomerTitleEmpty() || this.isBodyEmpty()) {
-      this.setError(400, {} as OpenapiError);
-      return false;
-    }
 
     if (!(await this.isUserAuthorizedProject())) {
       this.setError(403, { message: "Something went wrong!" } as OpenapiError);
@@ -68,19 +61,6 @@ export default class Route extends UserRoute<{
       const err = error as OpenapiError;
       this.setError(err.code as number, err);
     }
-  }
-
-  private isCustomerTitleEmpty() {
-    const { customer_title } = this.getBody();
-    return (
-      customer_title === undefined ||
-      customer_title === "" ||
-      customer_title.length > this.CUSTOMER_TITLE_MAX_LENGTH
-    );
-  }
-
-  private isBodyEmpty() {
-    return Object.keys(this.getBody()).length === 0;
   }
 
   private async isUserAuthorizedProject() {
