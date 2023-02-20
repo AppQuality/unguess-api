@@ -252,6 +252,7 @@ describe("POST /campaigns", () => {
         platforms: [AndroidPhoneBody, WindowsPCBody],
         project_id: 999,
       });
+    console.log(response.body);
     expect(response.status).toBe(403);
   });
 

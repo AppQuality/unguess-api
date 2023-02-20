@@ -23,7 +23,7 @@ export default class CampaignRoute<
   constructor(configuration: RouteClassConfiguration) {
     super(configuration);
 
-    const { cid } = this.getParameters();
+    const cid: string = this.getParameters()?.cid;
 
     this.cp_id = parseInt(cid);
   }
