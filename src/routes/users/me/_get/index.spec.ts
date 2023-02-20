@@ -128,7 +128,7 @@ describe("GET /users/me", () => {
   });
 
   //Should return the profile picture
-  it("Should return the user enabled features", async () => {
+  it("Should return the user picture", async () => {
     const response = await request(app)
       .get("/users/me")
       .set("authorization", "Bearer user");
