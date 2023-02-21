@@ -36,10 +36,9 @@ export default class Route extends CampaignRoute<{
   }
 
   private async editCampaign() {
-    const patchRequest = this.getBody();
     // Get campaign fields and values to update
-    const campaignFields = Object.keys(patchRequest);
-    const campaignValues = Object.values(patchRequest);
+    const campaignFields = Object.keys(this.getBody());
+    const campaignValues = Object.values(this.getBody());
 
     // Create array of fields and values to updateCampaignQueryupdate
     const updateCampaignFields = campaignFields.map(
