@@ -1,18 +1,10 @@
-/** OPENAPI-ROUTE: get-templates */
-import { Context } from "openapi-backend";
+/** OPENAPI-CLASS: get-templates */
+
+import UserRoute from "@src/features/routes/UserRoute";
 import * as db from "@src/features/db";
 import { TemplateParams } from "@src/__mocks__/database/templates";
 import { ERROR_MESSAGE } from "@src/utils/constants";
-
-interface GetTemplatesArgs {
-  filterBy?: { [key: string]: string | string[] };
-  orderBy?: string;
-  order?: string;
-}
-
-interface TemplateObject extends TemplateParams {
-  categoryName?: string;
-}
+import { Context } from "openapi-backend";
 
 const orderableColumns = ["id", "title", "category_id", "locale"];
 const filterableColumns = [
@@ -21,6 +13,12 @@ const filterableColumns = [
   "requires_login",
   "device_type",
 ];
+
+interface GetTemplatesArgs {
+  filterBy?: { [key: string]: string | string[] };
+  orderBy?: string;
+  order?: string;
+}
 
 const getTemplates = async ({
   filterBy,
@@ -69,57 +67,9 @@ const getTemplates = async ({
   return templates.length ? templates : [];
 };
 
-export default async (
-  c: Context,
-  req: OpenapiRequest,
-  res: OpenapiResponse
-) => {
-  let error = {
-    error: true,
-    message: ERROR_MESSAGE,
-  } as StoplightComponents["schemas"]["Error"];
-
-  try {
-    res.status_code = 200;
-    const order =
-      c.request.query.order &&
-      ["ASC", "DESC"].includes((c.request.query.order as string).toUpperCase())
-        ? (c.request.query.order as string).toUpperCase()
-        : "ASC";
-
-    const orderBy =
-      c.request.query.orderBy &&
-      orderableColumns.includes(
-        (c.request.query.orderBy as string).toLowerCase()
-      )
-        ? (c.request.query.orderBy as string).toLowerCase()
-        : "id";
-
-    let templates = await getTemplates({
-      ...(req.query.filterBy !== undefined && {
-        filterBy: req.query.filterBy as { [key: string]: string | string[] },
-      }),
-      ...(order && { order: order }),
-      ...(orderBy && { orderBy: orderBy }),
-    });
-
-    if (templates.length) {
-      return prepareItems(templates);
-    }
-
-    return [];
-  } catch (e: any) {
-    if (e.code) {
-      error.code = e.code;
-      res.status_code = e.code;
-    } else {
-      error.code = 500;
-      res.status_code = 500;
-    }
-
-    return error;
-  }
-};
+interface TemplateObject extends TemplateParams {
+  categoryName?: string;
+}
 
 const prepareItems = (items: TemplateObject[]) => {
   return items.map((item: TemplateObject) => ({
@@ -140,3 +90,66 @@ const prepareItems = (items: TemplateObject[]) => {
     ...(item.image && { image: item.image }),
   }));
 };
+
+export default class Route extends UserRoute<{
+  response: StoplightOperations["get-templates"]["responses"]["200"]["content"]["application/json"];
+  query: StoplightOperations["get-templates"]["parameters"]["query"];
+}> {
+  private request: OpenapiRequest;
+  private response: OpenapiResponse;
+  private context: Context;
+  private order: string | string[];
+
+  constructor(config: RouteClassConfiguration) {
+    super(config);
+    this.request = this.configuration.request;
+    this.response = this.configuration.response;
+    this.context = this.configuration.context;
+    this.order = this.context.request.query.order;
+  }
+
+  protected async prepare() {
+    let error = {
+      error: true,
+      message: ERROR_MESSAGE,
+    } as StoplightComponents["schemas"]["Error"];
+
+    try {
+      const order =
+        this.order &&
+        ["ASC", "DESC"].includes((this.order as string).toUpperCase())
+          ? (this.context.request.query.order as string).toUpperCase()
+          : "ASC";
+
+      const orderBy =
+        this.context.request.query.orderBy &&
+        orderableColumns.includes(
+          (this.context.request.query.orderBy as string).toLowerCase()
+        )
+          ? (this.context.request.query.orderBy as string).toLowerCase()
+          : "id";
+
+      let templates = await getTemplates({
+        ...(this.request.query.filterBy !== undefined && {
+          filterBy: this.request.query.filterBy as {
+            [key: string]: string | string[];
+          },
+        }),
+        ...(order && { order: order }),
+        ...(orderBy && { orderBy: orderBy }),
+      });
+
+      if (templates.length) {
+        return this.setSuccess(200, prepareItems(templates) as any);
+      }
+
+      this.setSuccess(200, []);
+    } catch (e: any) {
+      if (e.code) {
+        this.setError(e.code, {} as OpenapiError);
+      } else {
+        this.setError(500, {} as OpenapiError);
+      }
+    }
+  }
+}
