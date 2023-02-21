@@ -20,6 +20,56 @@ export default class Route extends UserRoute<{
   body: StoplightOperations["post-campaigns"]["requestBody"]["content"]["application/json"];
   response: StoplightOperations["post-campaigns"]["responses"]["200"]["content"]["application/json"];
 }> {
+  private _validatedBody:
+    | Awaited<ReturnType<typeof checkCampaignRequest>>
+    | undefined;
+  private _workspaceId: number | undefined;
+  private _cost: number | false = false;
+  private availableCoins: number = 0;
+
+  protected async init() {
+    await super.init();
+    try {
+      this._validatedBody = await checkCampaignRequest(this.getBody());
+      if (!this._validatedBody) throw new Error("Invalid request body");
+
+      const workspace = await getWorkspace({
+        workspaceId: this._validatedBody.customer_id,
+        user: this.getUser(),
+      });
+      this._workspaceId = workspace.id;
+      this.availableCoins = workspace.coins || 0;
+      this._cost = await getExpressCost({
+        slug: this.getBody().express_slug,
+      });
+    } catch (error) {
+      const err = error as OpenapiError;
+      this.setError(err.code as number, err);
+      throw error;
+    }
+  }
+
+  get validatedBody() {
+    if (typeof this._validatedBody === "undefined")
+      throw new Error("Invalid request body");
+    return this._validatedBody;
+  }
+
+  get workspaceId() {
+    if (typeof this._workspaceId === "undefined")
+      throw new Error("Invalid workspace id");
+    return this._workspaceId;
+  }
+
+  get cost() {
+    if (this._cost === false) throw new Error("Invalid cost");
+    return this._cost;
+  }
+
+  get isFree() {
+    return this.cost === 0;
+  }
+
   protected async filter() {
     if (!(await super.filter())) return false;
 
@@ -28,39 +78,12 @@ export default class Route extends UserRoute<{
       return false;
     }
 
-    return true;
-  }
-
-  protected async prepare() {
-    try {
-      let validated_request_body = await checkCampaignRequest(this.getBody());
-
-      const workspace = await getWorkspace({
-        workspaceId: validated_request_body.customer_id,
-        user: this.getUser(),
-      });
-
-      const cost = await getExpressCost({
-        slug: this.getBody().express_slug,
-      });
-
-      // Throw error if express is not defined
-      if (cost === false) return this.setError(400, {} as OpenapiError);
-
-      if (!checkAvailableCoins({ coins: workspace.coins, cost: cost }))
-        return this.setError(403, {} as OpenapiError);
-
-      // Create the campaign
-      const campaign = await createCampaign(validated_request_body);
-
-      await this.updateCoinPackages(cost, workspace.id, campaign.id);
-
-      await this.addUseCases(campaign.id);
-      this.setSuccess(200, campaign);
-    } catch (error) {
-      const err = error as OpenapiError;
-      this.setError(err.code as number, err);
+    if (!(await this.isCostValid())) {
+      this.setError(403, { message: "Something went wrong!" } as OpenapiError);
+      return false;
     }
+
+    return true;
   }
 
   private async isUserAuthorizedProject() {
@@ -75,49 +98,59 @@ export default class Route extends UserRoute<{
     }
   }
 
-  private async updateCoinPackages(
-    cost: number,
-    workspaceId: number,
-    campaignId: number
-  ) {
-    let updatedCoinsPackages: StoplightComponents["schemas"]["Coin"][] = [];
-
-    if (cost) {
-      updatedCoinsPackages = await updateWorkspaceCoins({
-        workspaceId: workspaceId,
-        cost: cost,
+  private async isCostValid() {
+    try {
+      return checkAvailableCoins({
+        coins: this.availableCoins,
+        cost: this.cost,
       });
+    } catch (e) {
+      return false;
     }
+  }
 
-    // Insert coins transaction
-    if (updatedCoinsPackages.length) {
-      for (const pack of updatedCoinsPackages) {
-        await updateWorkspaceCoinsTransaction({
-          workspaceId: workspaceId,
-          user: this.getUser(),
-          quantity: cost,
-          campaignId: campaignId,
-          ...(cost && { coinsPackageId: pack.id }),
-        });
-      }
+  protected async prepare() {
+    const campaign = await createCampaign(this.validatedBody);
+
+    await this.updateCoinPackages(campaign.id);
+
+    try {
+      await this.addUseCases(campaign.id);
+    } catch (e) {
+      this.setError(400, e as OpenapiError);
+    }
+    this.setSuccess(200, campaign);
+  }
+
+  private async updateCoinPackages(campaignId: number) {
+    if (this.isFree) return;
+
+    const updatedCoinsPackages = await updateWorkspaceCoins({
+      workspaceId: this.workspaceId,
+      cost: this.cost,
+    });
+
+    for (const pack of updatedCoinsPackages) {
+      await updateWorkspaceCoinsTransaction({
+        workspaceId: this.workspaceId,
+        user: this.getUser(),
+        quantity: this.cost,
+        campaignId: campaignId,
+        coinsPackageId: pack.id,
+      });
     }
   }
 
   private async addUseCases(campaignId: number) {
-    if (this.getBody().use_cases?.length) {
-      const useCases = await createUseCases(this.getBody().use_cases);
-      // Get useCases ids
-      const useCasesIds = useCases.map((useCase) => useCase.id);
-      if (useCasesIds.length > 0) {
-        const updateSql = `UPDATE wp_appq_campaign_task SET campaign_id = ${campaignId} WHERE id IN (${useCasesIds.join(
-          " ,"
-        )})`;
-        await db.query(updateSql);
-      } else {
-        this.setError(400, {
-          message: "Something went wrong!",
-        } as OpenapiError);
-      }
-    }
+    if (!this.getBody().use_cases?.length) return;
+
+    const useCases = await createUseCases(this.getBody().use_cases);
+    if (useCases.length === 0) throw new Error("Something went wrong!");
+    const useCasesIds = useCases.map((useCase) => useCase.id);
+    await db.query(
+      `UPDATE wp_appq_campaign_task 
+      SET campaign_id = ${campaignId} 
+      WHERE id IN (${useCasesIds.join(" ,")})`
+    );
   }
 }
