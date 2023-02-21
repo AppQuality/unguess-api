@@ -23,9 +23,11 @@ export default class CampaignRoute<
   constructor(configuration: RouteClassConfiguration) {
     super(configuration);
 
-    const cid: string = this.getParameters()?.cid;
+    const params = this.getParameters();
 
-    this.cp_id = parseInt(cid);
+    if (!params.cid) throw new Error("Missing campaign id");
+
+    this.cp_id = parseInt(params.cid);
   }
 
   protected async init(): Promise<void> {
@@ -135,7 +137,4 @@ export default class CampaignRoute<
     }
     return [this.APPROVED_STATUS_ID];
   }
-
-  /* Might need */
-  protected getCampaign() {}
 }
