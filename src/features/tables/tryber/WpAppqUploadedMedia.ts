@@ -11,7 +11,7 @@ class Table {
       function (table) {
         table.increments("id").notNullable();
         table.string("url").notNullable();
-        table.string("creation_date").notNullable();
+        table.datetime("creation_date").notNullable();
       }
     );
   }

@@ -15,7 +15,7 @@ class Table {
       table.integer("position").notNullable().defaultTo(0);
       table.integer("last_count").notNullable().defaultTo(0);
       table
-        .string("last_access")
+        .datetime("last_access")
         .notNullable()
         .defaultTo("1970-01-01 00:00:00");
       table.integer("group_id").notNullable().defaultTo(0);

@@ -8,7 +8,7 @@ class Table {
   public create() {
     return tryber.schema.createTable("wp_redirection_404", function (table) {
       table.increments("id").notNullable();
-      table.string("created").notNullable();
+      table.datetime("created").notNullable();
       table.string("url").notNullable();
       table.string("domain");
       table.string("agent");

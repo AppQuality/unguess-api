@@ -9,7 +9,7 @@ class Table {
     return tryber.schema.createTable("wp_wpmm_subscribers", function (table) {
       table.increments("id_subscriber").notNullable();
       table.string("email").notNullable();
-      table.string("insert_date").notNullable();
+      table.datetime("insert_date").notNullable();
     });
   }
   public drop() {

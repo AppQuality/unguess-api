@@ -9,9 +9,12 @@ class Table {
     return unguess.schema.createTable("wp_posts", function (table) {
       table.increments("ID").notNullable();
       table.integer("post_author").notNullable().defaultTo(0);
-      table.string("post_date").notNullable().defaultTo("0000-00-00 00:00:00");
       table
-        .string("post_date_gmt")
+        .datetime("post_date")
+        .notNullable()
+        .defaultTo("0000-00-00 00:00:00");
+      table
+        .datetime("post_date_gmt")
         .notNullable()
         .defaultTo("0000-00-00 00:00:00");
       table.string("post_content").notNullable();
@@ -25,11 +28,11 @@ class Table {
       table.string("to_ping").notNullable();
       table.string("pinged").notNullable();
       table
-        .string("post_modified")
+        .datetime("post_modified")
         .notNullable()
         .defaultTo("0000-00-00 00:00:00");
       table
-        .string("post_modified_gmt")
+        .datetime("post_modified_gmt")
         .notNullable()
         .defaultTo("0000-00-00 00:00:00");
       table.string("post_content_filtered").notNullable();

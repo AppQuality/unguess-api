@@ -13,8 +13,8 @@ class Table {
       table.integer("uploader_id");
       table.string("description");
       table.string("url");
-      table.string("creation_date").notNullable().defaultTo(tryber.fn.now());
-      table.string("update_date");
+      table.datetime("creation_date").notNullable().defaultTo(tryber.fn.now());
+      table.datetime("update_date");
     });
   }
   public drop() {

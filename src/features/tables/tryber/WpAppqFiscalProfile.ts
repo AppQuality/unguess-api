@@ -15,7 +15,7 @@ class Table {
         table.string("name").notNullable();
         table.string("surname").notNullable();
         table.string("sex").notNullable();
-        table.string("birth_date").notNullable();
+        table.datetime("birth_date").notNullable();
         table.string("birth_city");
         table.string("birth_province");
         table.string("birth_country");

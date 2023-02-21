@@ -17,7 +17,7 @@ class Table {
       table.string("tester_ip");
       table.string("rawRequest");
       table.string("pretty_data");
-      table.string("creation_date");
+      table.datetime("creation_date");
     });
   }
   public drop() {

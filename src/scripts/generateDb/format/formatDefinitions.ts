@@ -48,7 +48,6 @@ const getColumnCreationFunction = (column: RowDataPacket) => {
     case "tinytext":
     case "char":
     case "varchar":
-    case "datetime":
     case "date":
     case "time":
     case "enum":

@@ -9,9 +9,9 @@ class Table {
     return tryber.schema.createTable("wp_appq_evd_campaign", function (table) {
       table.increments("id").notNullable();
       table.integer("platform_id").notNullable();
-      table.string("start_date").notNullable();
-      table.string("end_date").notNullable();
-      table.string("close_date");
+      table.datetime("start_date").notNullable();
+      table.datetime("end_date").notNullable();
+      table.datetime("close_date");
       table.string("title").notNullable();
       table.string("description");
       table.integer("desired_number_of_testers").defaultTo(20);

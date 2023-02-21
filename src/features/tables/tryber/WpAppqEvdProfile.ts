@@ -13,7 +13,7 @@ class Table {
       table.string("surname");
       table.string("email").notNullable();
       table.integer("sex").notNullable().defaultTo(-1);
-      table.string("birth_date");
+      table.datetime("birth_date");
       table.string("phone_number");
       table.string("city");
       table.string("address");
@@ -32,7 +32,7 @@ class Table {
       table.integer("is_verified").notNullable().defaultTo(0);
       table.string("ln_login_token");
       table.integer("entry_test").notNullable().defaultTo(0);
-      table.string("entry_test_date");
+      table.datetime("entry_test_date");
       table.integer("employment_id").notNullable();
       table.integer("education_id").notNullable();
       table.string("state");

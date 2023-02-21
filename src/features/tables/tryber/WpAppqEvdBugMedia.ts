@@ -13,7 +13,7 @@ class Table {
       table.string("description");
       table.string("location");
       table.integer("bug_id").notNullable();
-      table.string("uploaded");
+      table.datetime("uploaded");
     });
   }
   public drop() {

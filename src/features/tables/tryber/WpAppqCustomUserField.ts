@@ -20,7 +20,7 @@ class Table {
         table.integer("allow_other").notNullable().defaultTo(1);
         table.integer("enabled").notNullable().defaultTo(0);
         table.integer("custom_user_field_group_id").notNullable();
-        table.string("created_time").defaultTo(tryber.fn.now());
+        table.datetime("created_time").defaultTo(tryber.fn.now());
         table.string("options");
       }
     );

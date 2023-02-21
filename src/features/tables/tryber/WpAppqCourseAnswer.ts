@@ -10,7 +10,7 @@ class Table {
       table.increments("id").notNullable();
       table.integer("question_id").notNullable();
       table.string("option_name");
-      table.string("completion_date");
+      table.datetime("completion_date");
       table.integer("is_correct").defaultTo(0);
     });
   }

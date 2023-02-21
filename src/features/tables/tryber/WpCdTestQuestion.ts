@@ -9,11 +9,11 @@ class Table {
     return tryber.schema.createTable("wp_cd_test_question", function (table) {
       table.increments("id").notNullable();
       table
-        .string("creation_time")
+        .datetime("creation_time")
         .notNullable()
         .defaultTo("0000-00-00 00:00:01");
       table
-        .string("update_time")
+        .datetime("update_time")
         .notNullable()
         .defaultTo("0000-00-00 00:00:01");
       table.string("title").notNullable();

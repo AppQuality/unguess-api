@@ -14,7 +14,7 @@ class Table {
       table.string("user_email").notNullable().defaultTo("");
       table.string("user_url").notNullable().defaultTo("");
       table
-        .string("user_registered")
+        .datetime("user_registered")
         .notNullable()
         .defaultTo("0000-00-00 00:00:00");
       table.string("user_activation_key").notNullable().defaultTo("");

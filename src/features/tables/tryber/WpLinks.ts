@@ -17,7 +17,7 @@ class Table {
       table.integer("link_owner").notNullable().defaultTo(1);
       table.integer("link_rating").notNullable().defaultTo(0);
       table
-        .string("link_updated")
+        .datetime("link_updated")
         .notNullable()
         .defaultTo("0000-00-00 00:00:00");
       table.string("link_rel").notNullable().defaultTo("");

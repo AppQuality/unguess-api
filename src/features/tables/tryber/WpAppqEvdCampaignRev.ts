@@ -12,9 +12,9 @@ class Table {
         table.increments("id").notNullable();
         table.integer("campaign_id").notNullable().defaultTo(-1);
         table.integer("platform_id").notNullable();
-        table.string("start_date").notNullable();
-        table.string("end_date").notNullable();
-        table.string("close_date");
+        table.datetime("start_date").notNullable();
+        table.datetime("end_date").notNullable();
+        table.datetime("close_date");
         table.string("title").notNullable();
         table.string("customer_title").notNullable();
         table.string("description");

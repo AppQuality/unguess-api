@@ -17,12 +17,12 @@ export async function down(knex: Knex): Promise<void> {
     table.integer("source_amount");
     table.integer("target_amount");
     table.string("type");
-    table.string("created_time").defaultTo(knex.fn.now());
-    table.string("modification_time");
+    table.datetime("created_time").defaultTo(knex.fn.now());
+    table.datetime("modification_time");
     table.integer("created_by_user_id");
     table.integer("operator_id");
     table.string("rate");
-    table.string("delivery_estimate");
+    table.datetime("delivery_estimate");
     table.integer("fee");
   });
   await knex.schema.createTable(
@@ -35,8 +35,8 @@ export async function down(knex: Knex): Promise<void> {
       table.string("type");
       table.string("legal_type");
       table.integer("tw_account_id");
-      table.string("created_time").defaultTo(knex.fn.now());
-      table.string("modification_time");
+      table.datetime("created_time").defaultTo(knex.fn.now());
+      table.datetime("modification_time");
     }
   );
   await knex.schema.createTable(
@@ -56,8 +56,8 @@ export async function down(knex: Knex): Promise<void> {
       table.integer("target_amount");
       table.string("type");
       table.string("error_code");
-      table.string("created_time").defaultTo(knex.fn.now());
-      table.string("modification_time");
+      table.datetime("created_time").defaultTo(knex.fn.now());
+      table.datetime("modification_time");
     }
   );
   await knex.schema.createTable(
@@ -66,8 +66,8 @@ export async function down(knex: Knex): Promise<void> {
       table.increments("id").notNullable();
       table.string("payout_batch_id");
       table.integer("operator_id");
-      table.string("creation_time");
-      table.string("completed_time");
+      table.datetime("creation_time");
+      table.datetime("completed_time");
       table.string("status");
       table.integer("amount_value");
       table.string("amount_currency");
@@ -85,7 +85,7 @@ export async function down(knex: Knex): Promise<void> {
     table.string("transaction_id");
     table.string("transaction_status");
     table.string("payout_item_id");
-    table.string("time_processed");
+    table.datetime("time_processed");
     table.string("receiver");
     table.integer("amount_value");
     table.string("amount_currency");

@@ -19,8 +19,8 @@ class Table {
       table.integer("publish").defaultTo(1);
       table.string("status_reason");
       table.integer("severity_id").defaultTo(1);
-      table.string("created");
-      table.string("updated");
+      table.datetime("created");
+      table.datetime("updated");
       table.integer("bug_replicability_id");
       table.integer("bug_type_id");
       table.string("last_seen");

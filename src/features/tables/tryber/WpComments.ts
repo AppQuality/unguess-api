@@ -14,11 +14,11 @@ class Table {
       table.string("comment_author_url").notNullable().defaultTo("");
       table.string("comment_author_IP").notNullable().defaultTo("");
       table
-        .string("comment_date")
+        .datetime("comment_date")
         .notNullable()
         .defaultTo("0000-00-00 00:00:00");
       table
-        .string("comment_date_gmt")
+        .datetime("comment_date_gmt")
         .notNullable()
         .defaultTo("0000-00-00 00:00:00");
       table.string("comment_content").notNullable();

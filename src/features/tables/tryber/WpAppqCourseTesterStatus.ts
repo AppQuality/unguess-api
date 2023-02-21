@@ -11,8 +11,8 @@ class Table {
       function (table) {
         table.integer("tester_id").notNullable();
         table.integer("course_id").notNullable();
-        table.string("start_date");
-        table.string("completion_date");
+        table.datetime("start_date");
+        table.datetime("completion_date");
         table.integer("is_completed").notNullable().defaultTo(0);
         table.integer("last_lesson_id").notNullable().defaultTo(0);
         table.unique(["tester_id", "course_id"]);

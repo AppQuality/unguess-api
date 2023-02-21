@@ -12,7 +12,7 @@ class Table {
         table.increments("id").notNullable();
         table.integer("tester_id").notNullable();
         table.integer("level_id").notNullable();
-        table.string("start_date").notNullable().defaultTo(tryber.fn.now());
+        table.datetime("start_date").notNullable().defaultTo(tryber.fn.now());
       }
     );
   }

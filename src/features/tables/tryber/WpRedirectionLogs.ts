@@ -8,7 +8,7 @@ class Table {
   public create() {
     return tryber.schema.createTable("wp_redirection_logs", function (table) {
       table.increments("id").notNullable();
-      table.string("created").notNullable();
+      table.datetime("created").notNullable();
       table.string("url").notNullable();
       table.string("domain");
       table.string("sent_to");
