@@ -5,29 +5,43 @@ import { getProjectById } from "@src/utils/projects";
 
 export default class Route extends UserRoute<{
   response: StoplightOperations["get-campaigns-cid-meta"]["responses"]["200"]["content"]["application/json"];
-  query: StoplightOperations["get-campaigns-cid-meta"]["parameters"]["path"];
+  parameters: StoplightOperations["get-campaigns-cid-meta"]["parameters"];
 }> {
-  private campaignId: number;
+  private params: any;
+  private campaignId: any;
   private campaign: any;
   private meta: any;
 
   constructor(config: RouteClassConfiguration) {
     super(config);
-    this.campaignId = this.getQuery().cid;
+    this.params = this.getParameters();
+    this.campaignId = this.params.cid;
   }
-  protected async filter(): Promise<boolean> {
-    this.campaign = await getCampaign({
-      campaignId: this.campaignId,
-    });
+
+  protected async filter() {
+    if (!(await super.filter())) return false;
+
+    this.campaign = await getCampaign({ campaignId: this.campaignId });
+
     if (!this.campaign) {
+      this.setError(400, {
+        code: 400,
+        message: "Campaign not found",
+      } as OpenapiError);
+      return false;
+    }
+
+    const { id: projectId } = await getProjectById({
+      projectId: this.campaign.project.id,
+      user: this.getUser(),
+    });
+
+    if (!projectId) {
       this.setError(403, {} as OpenapiError);
       return false;
     }
 
-    this.meta = await getProjectById({
-      projectId: this.campaign.project.id,
-      user: this.getUser(),
-    });
+    this.meta = await getCampaignMeta(this.campaign);
 
     if (!this.meta) {
       this.setError(403, {} as OpenapiError);
