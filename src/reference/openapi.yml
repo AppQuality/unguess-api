@@ -2605,9 +2605,6 @@ components:
       required: false
       schema:
         type: string
-        enum:
-          - ASC
-          - DESC
       description: 'Order value (ASC, DESC)'
     orderBy:
       name: orderBy
