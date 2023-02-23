@@ -18,13 +18,16 @@ export default class CampaignRoute<
   protected baseBugInternalId: string = "";
   private NEED_REVIEW_STATUS_ID = 4;
   private APPROVED_STATUS_ID = 2;
+  public CUSTOMER_TITLE_MAX_LENGTH = 256;
 
   constructor(configuration: RouteClassConfiguration) {
     super(configuration);
 
-    const { cid } = this.getParameters();
+    const params = this.getParameters();
 
-    this.cp_id = parseInt(cid);
+    if (!params.cid) throw new Error("Missing campaign id");
+
+    this.cp_id = parseInt(params.cid);
   }
 
   protected async init(): Promise<void> {

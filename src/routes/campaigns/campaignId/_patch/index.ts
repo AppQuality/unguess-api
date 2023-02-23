@@ -1,53 +1,66 @@
-/** OPENAPI-ROUTE: patch-campaigns */
-import { Context } from "openapi-backend";
-import { ERROR_MESSAGE } from "@src/utils/constants";
-import { editCampaign, getCampaign } from "@src/utils/campaigns";
-import { getProjectById } from "@src/utils/projects";
+/** OPENAPI-CLASS: patch-campaigns */
+import { getCampaign } from "@src/utils/campaigns";
+import CampaignRoute from "@src/features/routes/CampaignRoute";
+import * as db from "@src/features/db";
 
-export default async (
-  c: Context,
-  req: OpenapiRequest,
-  res: OpenapiResponse
-) => {
-  let user = req.user;
-  let error = {
-    code: 500,
-    message: ERROR_MESSAGE,
-    error: true,
-  } as StoplightComponents["schemas"]["Error"];
-  let request_body: StoplightComponents["requestBodies"]["Campaign"]["content"]["application/json"] =
-    req.body;
+export default class Route extends CampaignRoute<{
+  response: StoplightOperations["patch-campaigns"]["responses"]["200"]["content"]["application/json"];
+  parameters: StoplightOperations["patch-campaigns"]["parameters"]["path"];
+  body: StoplightOperations["patch-campaigns"]["requestBody"]["content"]["application/json"];
+}> {
+  protected async filter() {
+    if (!(await super.filter())) return false;
 
-  let cid = parseInt(c.request.params.cid as string);
-
-  res.status_code = 200;
-
-  try {
-    // Check if cp exists
-    const campaign = await getCampaign({ campaignId: cid });
-
-    if (!campaign) {
-      throw { ...error, code: 400 };
+    if (this.isCustomerTitleEmpty() || this.isBodyEmpty()) {
+      this.setError(400, {} as OpenapiError);
+      return false;
     }
-
-    // Check if user has permission to edit the campaign
-    await getProjectById({
-      projectId: campaign.project.id,
-      user: user,
-    });
-
-    const campaignPatched = await editCampaign(cid, request_body);
-
-    return campaignPatched as StoplightComponents["schemas"]["Campaign"];
-  } catch (e: any) {
-    if (e.code) {
-      error.code = e.code;
-      res.status_code = e.code;
-    } else {
-      error.code = 500;
-      res.status_code = 500;
-    }
-
-    return error;
+    return true;
   }
-};
+
+  private isCustomerTitleEmpty() {
+    const { customer_title } = this.getBody();
+    return (
+      customer_title === undefined ||
+      customer_title === "" ||
+      customer_title.length > this.CUSTOMER_TITLE_MAX_LENGTH
+    );
+  }
+
+  private isBodyEmpty() {
+    return Object.keys(this.getBody()).length === 0;
+  }
+
+  protected async prepare() {
+    this.setSuccess(200, await this.editCampaign());
+  }
+
+  private async editCampaign() {
+    // Get campaign fields and values to update
+    const campaignFields = Object.keys(this.getBody());
+    const campaignValues = Object.values(this.getBody());
+
+    // Create array of fields and values to updateCampaignQueryupdate
+    const updateCampaignFields = campaignFields.map(
+      (field, index) => `${field} = '${db.escape(campaignValues[index])}'`
+    );
+
+    // Update campaign query
+    await db.query(
+      db.format(
+        `
+      UPDATE wp_appq_evd_campaign 
+      SET ${updateCampaignFields.join(", ")} 
+      WHERE id = ?`,
+        [this.cp_id]
+      )
+    );
+
+    // Get the updated campaign
+    const campaign = await getCampaign({ campaignId: this.cp_id });
+
+    if (!campaign) throw Error("No campaign");
+
+    return campaign;
+  }
+}

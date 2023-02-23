@@ -1,21 +1,39 @@
 import app from "@src/app";
 import request from "supertest";
-
+import { getGravatar } from "@src/utils/users";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import companyBasic from "@src/__mocks__/database/companyBasic";
 
-describe("GET /users/me", () => {
-  beforeAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        //Company without projects
-        await dbAdapter.add(companyBasic);
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
+jest.mock("@src/utils/users", () => ({
+  ...jest.requireActual("@src/utils/users"),
+  getGravatar: jest.fn(),
+}));
 
-      resolve(true);
+const mockedGetGravatar = getGravatar as jest.MockedFunction<
+  typeof getGravatar
+>;
+
+describe("GET /users/me", () => {
+  mockedGetGravatar.mockImplementation(
+    async (email) => `https://gravatar.com/avatar/${email}`
+  );
+
+  beforeAll(async () => {
+    await dbAdapter.add({
+      ...companyBasic,
+      features: [
+        {
+          id: 1,
+          slug: "flying",
+          display_name: "Flying",
+        },
+      ],
+      userToFeatures: [
+        {
+          unguess_wp_user_id: 1,
+          feature_id: 1,
+        },
+      ],
     });
   });
 
@@ -58,10 +76,64 @@ describe("GET /users/me", () => {
     expect(response.body.name).not.toBe("Name Surname");
   });
 
-  it("Should return the user workspaces", async () => {
+  it("Should return the user role", async () => {
     const response = await request(app)
       .get("/users/me")
       .set("authorization", "Bearer user");
     expect(response.body.role).toBe("customer");
+  });
+
+  it("Should return the user email", async () => {
+    const response = await request(app)
+      .get("/users/me")
+      .set("authorization", "Bearer user");
+    expect(response.body.email).toBe("mario.rossi@example.com");
+  });
+
+  //Should return the user name and surname
+  it("Should return the user name as name and surname", async () => {
+    const response = await request(app)
+      .get("/users/me")
+      .set("authorization", "Bearer user");
+    expect(response.body.name).toBe("Mario Rossi");
+  });
+
+  //Should return the unguess wordpress id
+  it("Should return the user tryber_wp_user_id", async () => {
+    const response = await request(app)
+      .get("/users/me")
+      .set("authorization", "Bearer user");
+    expect(response.body.tryber_wp_user_id).toBe(1);
+  });
+
+  //Should return the unguess wordpress id
+  it("Should return the user unguess_wp_user_id", async () => {
+    const response = await request(app)
+      .get("/users/me")
+      .set("authorization", "Bearer user");
+    expect(response.body.unguess_wp_user_id).toBe(1);
+  });
+
+  //Should return the list of enabled features
+  it("Should return the user enabled features", async () => {
+    const response = await request(app)
+      .get("/users/me")
+      .set("authorization", "Bearer user");
+    expect(response.body.features).toEqual([
+      {
+        slug: "flying",
+        name: "Flying",
+      },
+    ]);
+  });
+
+  //Should return the profile picture
+  it("Should return the user picture", async () => {
+    const response = await request(app)
+      .get("/users/me")
+      .set("authorization", "Bearer user");
+    expect(response.body.picture).toEqual(
+      `https://gravatar.com/avatar/mario.rossi@example.com`
+    );
   });
 });

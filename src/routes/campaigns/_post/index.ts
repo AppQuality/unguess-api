@@ -1,128 +1,156 @@
-/** OPENAPI-ROUTE: post-campaigns */
-import { Context } from "openapi-backend";
-import { ERROR_MESSAGE } from "@src/utils/constants";
+/** OPENAPI-CLASS: post-campaigns */
+
 import {
   checkCampaignRequest,
   createCampaign,
   createUseCases,
 } from "@src/utils/campaigns";
 import { getProjectById } from "@src/utils/projects";
-import { checkAvailableCoins, getExpressCost } from "@src/utils/workspaces";
-import { getWorkspace } from "@src/utils/workspaces";
-import { updateWorkspaceCoins } from "@src/utils/workspaces";
-import { updateWorkspaceCoinsTransaction } from "@src/utils/workspaces";
+import {
+  checkAvailableCoins,
+  getExpressCost,
+  getWorkspace,
+  updateWorkspaceCoins,
+  updateWorkspaceCoinsTransaction,
+} from "@src/utils/workspaces";
+import UserRoute from "@src/features/routes/UserRoute";
 import * as db from "@src/features/db";
 
-export default async (
-  c: Context,
-  req: OpenapiRequest,
-  res: OpenapiResponse
-) => {
-  let user = req.user;
-  let error = {
-    code: 500,
-    message: ERROR_MESSAGE,
-    error: true,
-  } as StoplightComponents["schemas"]["Error"];
-  let request_body: StoplightComponents["requestBodies"]["Campaign"]["content"]["application/json"] =
-    req.body;
+export default class Route extends UserRoute<{
+  body: StoplightOperations["post-campaigns"]["requestBody"]["content"]["application/json"];
+  response: StoplightOperations["post-campaigns"]["responses"]["200"]["content"]["application/json"];
+}> {
+  private _validatedBody:
+    | Awaited<ReturnType<typeof checkCampaignRequest>>
+    | undefined;
+  private _workspaceId: number | undefined;
+  private _cost: number | false = false;
+  private availableCoins: number = 0;
 
-  let useCases: Array<
-    { id: number } & StoplightComponents["schemas"]["UseCase"]
-  > = [];
-  res.status_code = 200;
+  protected async init() {
+    await super.init();
+    try {
+      this._validatedBody = await checkCampaignRequest(this.getBody());
+      if (!this._validatedBody) throw new Error("Invalid request body");
 
-  try {
-    // Check request
-    let validated_request_body = await checkCampaignRequest(request_body);
+      const workspace = await getWorkspace({
+        workspaceId: this._validatedBody.customer_id,
+        user: this.getUser(),
+      });
+      this._workspaceId = workspace.id;
+      this.availableCoins = workspace.coins || 0;
+      this._cost = await getExpressCost({
+        slug: this.getBody().express_slug,
+      });
+    } catch (error) {
+      const err = error as OpenapiError;
+      this.setError(err.code as number, err);
+      throw error;
+    }
+  }
 
-    // Try to get the project checking all the permissions
-    await getProjectById({
-      user: user,
-      projectId: validated_request_body.project_id,
+  get validatedBody() {
+    if (typeof this._validatedBody === "undefined")
+      throw new Error("Invalid request body");
+    return this._validatedBody;
+  }
+
+  get workspaceId() {
+    if (typeof this._workspaceId === "undefined")
+      throw new Error("Invalid workspace id");
+    return this._workspaceId;
+  }
+
+  get cost() {
+    if (this._cost === false) throw new Error("Invalid cost");
+    return this._cost;
+  }
+
+  get isFree() {
+    return this.cost === 0;
+  }
+
+  protected async filter() {
+    if (!(await super.filter())) return false;
+
+    if (!(await this.isUserAuthorizedProject())) {
+      this.setError(403, { message: "Something went wrong!" } as OpenapiError);
+      return false;
+    }
+
+    if (!(await this.isCostValid())) {
+      this.setError(403, { message: "Something went wrong!" } as OpenapiError);
+      return false;
+    }
+
+    return true;
+  }
+
+  private async isUserAuthorizedProject() {
+    try {
+      await getProjectById({
+        user: this.getUser(),
+        projectId: this.getBody().project_id,
+      });
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  private async isCostValid() {
+    try {
+      return checkAvailableCoins({
+        coins: this.availableCoins,
+        cost: this.cost,
+      });
+    } catch (e) {
+      return false;
+    }
+  }
+
+  protected async prepare() {
+    const campaign = await createCampaign(this.validatedBody);
+
+    await this.updateCoinPackages(campaign.id);
+
+    try {
+      await this.addUseCases(campaign.id);
+    } catch (e) {
+      this.setError(400, e as OpenapiError);
+    }
+    this.setSuccess(200, campaign);
+  }
+
+  private async updateCoinPackages(campaignId: number) {
+    if (this.isFree) return;
+
+    const updatedCoinsPackages = await updateWorkspaceCoins({
+      workspaceId: this.workspaceId,
+      cost: this.cost,
     });
 
-    // Retrieve and check workspace
-    const workspace = await getWorkspace({
-      workspaceId: request_body.customer_id,
-      user: user,
-    });
-
-    // Get express cost based on express slug
-    const cost = await getExpressCost({
-      slug: validated_request_body.express_slug,
-    });
-
-    // Throw error if express is not defined
-    if (cost === false)
-      throw {
-        ...error,
-        message: "something went wrong in xps costs",
-        code: 400,
-      };
-
-    // Check express coins availability
-    if (!checkAvailableCoins({ coins: workspace.coins, cost: cost }))
-      throw { ...error, message: "coins issues", code: 403 };
-
-    // Deduct express coin(s) if express is not free (has cost)
-    let updatedCoinsPackages: StoplightComponents["schemas"]["Coin"][] = [];
-
-    if (cost) {
-      updatedCoinsPackages = await updateWorkspaceCoins({
-        workspaceId: workspace.id,
-        cost: cost,
+    for (const pack of updatedCoinsPackages) {
+      await updateWorkspaceCoinsTransaction({
+        workspaceId: this.workspaceId,
+        user: this.getUser(),
+        quantity: this.cost,
+        campaignId: campaignId,
+        coinsPackageId: pack.id,
       });
     }
-
-    if (request_body.use_cases) {
-      useCases = await createUseCases(request_body.use_cases);
-    }
-
-    // Create the campaign
-    let campaign = await createCampaign(validated_request_body);
-
-    // Insert coins transaction
-    if (updatedCoinsPackages.length) {
-      for (const pack of updatedCoinsPackages) {
-        await updateWorkspaceCoinsTransaction({
-          workspaceId: workspace.id,
-          user: user,
-          quantity: cost,
-          campaignId: campaign.id,
-          ...(cost && { coinsPackageId: pack.id }),
-        });
-      }
-    }
-
-    // Update useCase setting cp id
-    if (request_body.use_cases?.length) {
-      // Get useCases ids
-      const useCasesIds = useCases.map((useCase) => useCase.id);
-      if (useCasesIds.length > 0) {
-        const updateSql = `UPDATE wp_appq_campaign_task SET campaign_id = ${
-          campaign.id
-        } WHERE id IN (${useCasesIds.join(" ,")})`;
-
-        await db.query(updateSql);
-      } else {
-        throw {
-          ...error,
-          message: "something went wrong in usecase update",
-          code: 400,
-        };
-      }
-    }
-
-    return campaign as StoplightComponents["schemas"]["Campaign"];
-  } catch (e: any) {
-    if (e.code && typeof e.code === "number") {
-      error.code = e.code;
-      res.status_code = e.code;
-    } else {
-      error.code = 500;
-      res.status_code = 500;
-    }
-    return error;
   }
-};
+
+  private async addUseCases(campaignId: number) {
+    if (!this.getBody().use_cases?.length) return;
+
+    const useCases = await createUseCases(this.getBody().use_cases);
+    if (useCases.length === 0) throw new Error("Something went wrong!");
+    const useCasesIds = useCases.map((useCase) => useCase.id);
+    await db.query(
+      `UPDATE wp_appq_campaign_task 
+      SET campaign_id = ${campaignId} 
+      WHERE id IN (${useCasesIds.join(" ,")})`
+    );
+  }
+}
