@@ -1,71 +1,46 @@
-/** OPENAPI-ROUTE: get-campaigns-cid-meta */
-import { Context } from "openapi-backend";
-import {
-  getCampaign,
-  getCampaignMeta,
-  getWidgetBugsByDevice,
-  getWidgetBugsByUseCase,
-} from "@src/utils/campaigns";
-import { ERROR_MESSAGE } from "@src/utils/constants";
+/** OPENAPI-CLASS: get-campaigns-cid-meta */
+import UserRoute from "@src/features/routes/UserRoute";
+import { getCampaign, getCampaignMeta } from "@src/utils/campaigns";
 import { getProjectById } from "@src/utils/projects";
 
-export default async (
-  c: Context,
-  req: OpenapiRequest,
-  res: OpenapiResponse
-) => {
-  const user = req.user;
+export default class Route extends UserRoute<{
+  response: StoplightOperations["get-campaigns-cid-meta"]["responses"]["200"]["content"]["application/json"];
+  query: StoplightOperations["get-campaigns-cid-meta"]["parameters"]["path"];
+}> {
+  private campaignId: number;
+  private campaign: any;
+  private meta: any;
 
-  const error = {
-    code: 500,
-    message: ERROR_MESSAGE,
-    error: true,
-  } as StoplightComponents["schemas"]["Error"];
-
-  const cid = parseInt(c.request.params.cid as string);
-
-  res.status_code = 200;
-
-  try {
-    if (!cid) {
-      throw {
-        ...error,
-        code: 400,
-        message: "Missing campaign id",
-      };
-    }
-
-    // Check if the campaign exists
-    const campaign = await getCampaign({
-      campaignId: cid,
-    });
-
-    if (!campaign) {
-      throw {
-        ...error,
-        code: 403,
-        message:
-          "Campaign doesn't exist or you don't have permission to view it",
-      };
-    }
-
-    // Check if user has permission to access the campaign
-    await getProjectById({
-      projectId: campaign.project.id,
-      user: user,
-    });
-
-    const meta = await getCampaignMeta(campaign);
-
-    return {
-      ...campaign,
-      ...meta,
-    };
-  } catch (e: any) {
-    res.status_code = e.code || 500;
-    error.code = e.code || 500;
-    error.message = e.message || ERROR_MESSAGE;
-
-    return error;
+  constructor(config: RouteClassConfiguration) {
+    super(config);
+    this.campaignId = this.getQuery().cid;
   }
-};
+  protected async filter(): Promise<boolean> {
+    this.campaign = await getCampaign({
+      campaignId: this.campaignId,
+    });
+    if (!this.campaign) {
+      this.setError(403, {} as OpenapiError);
+      return false;
+    }
+
+    this.meta = await getProjectById({
+      projectId: this.campaign.project.id,
+      user: this.getUser(),
+    });
+
+    if (!this.meta) {
+      this.setError(403, {} as OpenapiError);
+      return false;
+    }
+
+    return true;
+  }
+
+  protected async prepare() {
+    return this.setSuccess(200, {
+      ...this.campaign,
+      ...this.meta,
+    });
+  }
+}
