@@ -2,8 +2,9 @@ name: Push image to ECR
 
 on:
   push:
-    branches:
-      - "*"
+    branches: [develop]
+  pull_request:
+    branches: [develop, master]
   workflow_dispatch:
 
 jobs:
