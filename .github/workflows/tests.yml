@@ -16,5 +16,10 @@ jobs:
         with:
           node-version: 16.x
           cache: 'npm'
-      - run: yarn --frozen-lockfile
-      - run: yarn test
+      - name: Install dependencies
+        run: |
+          echo //registry.npmjs.org/:_authToken=${NPM_TOKEN} > .npmrc
+          yarn --frozen-lockfile
+      - name: Run tests
+        run: |
+          yarn test
