@@ -1,28 +1,27 @@
-import app from "@src/app";
-import request from "supertest";
-import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
-import bugs, { BugsParams } from "@src/__mocks__/database/bugs";
 import bugMedia from "@src/__mocks__/database/bug_media";
-import bugSeverity from "@src/__mocks__/database/bug_severity";
-import bugReplicability from "@src/__mocks__/database/bug_replicability";
-import bugType from "@src/__mocks__/database/bug_type";
-import bugStatus from "@src/__mocks__/database/bug_status";
-import tags from "@src/__mocks__/database/bug_tags";
-import devices, { DeviceParams } from "@src/__mocks__/database/device";
-import WpAppqCampaignAdditionalFields from "@src/features/tables/tryber/WpAppqCampaignAdditionalFields";
-import WpAppqCampaignAdditionalFieldsData from "@src/features/tables/tryber/WpAppqCampaignAdditionalFieldsData";
-import CampaignMeta from "@src/__mocks__/database/campaign_meta";
-import useCases, { UseCaseParams } from "@src/__mocks__/database/use_cases";
-import readStatus from "@src/__mocks__/database/bug_read_status";
 import bugPriorities, {
   BugPriorityParams,
 } from "@src/__mocks__/database/bug_priority";
+import readStatus from "@src/__mocks__/database/bug_read_status";
+import bugReplicability from "@src/__mocks__/database/bug_replicability";
+import bugSeverity from "@src/__mocks__/database/bug_severity";
+import bugStatus from "@src/__mocks__/database/bug_status";
+import tags from "@src/__mocks__/database/bug_tags";
+import bugType from "@src/__mocks__/database/bug_type";
+import bugs, { BugsParams } from "@src/__mocks__/database/bugs";
+import CampaignMeta from "@src/__mocks__/database/campaign_meta";
+import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
+import devices, { DeviceParams } from "@src/__mocks__/database/device";
 import priorities from "@src/__mocks__/database/priority";
 import bugCustomStatuses, {
   BugCustomStatusParams,
 } from "@src/__mocks__/database/bug_custom_status";
 import customStatuses from "@src/__mocks__/database/custom_status";
+import useCases, { UseCaseParams } from "@src/__mocks__/database/use_cases";
+import app from "@src/app";
+import { tryber } from "@src/features/database";
+import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
+import request from "supertest";
 
 const customer_1 = {
   id: 999,
@@ -284,10 +283,14 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
     await bugMedia.insert(bug_media_other_type);
     await tags.insert(tag_1);
     await tags.insert(tag_2);
-    await WpAppqCampaignAdditionalFields.do().insert(field_1);
-    await WpAppqCampaignAdditionalFields.do().insert(field_2);
-    await WpAppqCampaignAdditionalFieldsData.do().insert(field_1_data);
-    await WpAppqCampaignAdditionalFieldsData.do().insert(field_2_data);
+    await tryber.tables.WpAppqCampaignAdditionalFields.do().insert(field_1);
+    await tryber.tables.WpAppqCampaignAdditionalFields.do().insert(field_2);
+    await tryber.tables.WpAppqCampaignAdditionalFieldsData.do().insert(
+      field_1_data
+    );
+    await tryber.tables.WpAppqCampaignAdditionalFieldsData.do().insert(
+      field_2_data
+    );
     await useCases.insert(usecase_1);
 
     await priorities.addDefaultItems();
@@ -314,8 +317,8 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
     await devices.clear();
     await bugMedia.clear();
     await tags.clear();
-    await WpAppqCampaignAdditionalFields.do().delete();
-    await WpAppqCampaignAdditionalFieldsData.do().delete();
+    await tryber.tables.WpAppqCampaignAdditionalFields.do().delete();
+    await tryber.tables.WpAppqCampaignAdditionalFieldsData.do().delete();
     await useCases.clear();
     await CampaignMeta.clear();
     await bugSeverity.clear();
@@ -565,6 +568,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer user");
+    console.log(response.body);
     expect(response.status).toBe(200);
     expect(response.body.reporter).toEqual({
       tester_id: profile_1.id,

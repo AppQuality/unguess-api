@@ -1,7 +1,10 @@
 import knex from "knex";
 import config from "../config";
 
-export const unguess = knex({
+import unguessDb from "@appquality/unguess-database";
+import tryberDb from "@appquality/tryber-database";
+
+export const unguess = unguessDb({
   client: "mysql",
   connection: {
     host: config.unguessDb.host,
@@ -12,7 +15,7 @@ export const unguess = knex({
   pool: { min: 0, max: 7 },
 });
 
-export const tryber = knex({
+export const tryber = tryberDb({
   client: "mysql",
   connection: {
     host: config.db.host,

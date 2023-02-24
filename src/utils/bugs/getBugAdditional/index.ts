@@ -1,10 +1,9 @@
-import WpAdditionalFields from "@src/features/tables/tryber/WpAppqCampaignAdditionalFields";
-import { tryber } from "@src/features/knex";
+import { tryber } from "@src/features/database";
 
 export const getBugAdditional = async (
   bugId: number
 ): Promise<StoplightComponents["schemas"]["BugAdditionalField"][] | false> => {
-  const results = await WpAdditionalFields.do()
+  const results = await tryber.tables.WpAppqCampaignAdditionalFields.do()
     .select("id", tryber.ref("title").as("name"), "value", "validation", "type")
     .join(
       "wp_appq_campaign_additional_fields_data",

@@ -1,7 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import campaignReadStatuses from "@src/features/tables/unguess/WpUgCampaignReadStatus";
+import { unguess } from "@src/features/database";
 
 describe("POST /analytics/views/campaigns/{cid}", () => {
   beforeAll(async () => {
@@ -19,7 +19,7 @@ describe("POST /analytics/views/campaigns/{cid}", () => {
     });
   });
   afterEach(async () => {
-    await campaignReadStatuses.do().delete();
+    await unguess.tables.WpUgCampaignReadStatus.do().delete();
   });
 
   it("Should return 403 if user is not authenticated", async () => {
@@ -49,9 +49,8 @@ describe("POST /analytics/views/campaigns/{cid}", () => {
   });
 
   it("Should create a read status on view", async () => {
-    const itemsBeforePost = await campaignReadStatuses
-      .do()
-      .select("campaign_id");
+    const itemsBeforePost =
+      await unguess.tables.WpUgCampaignReadStatus.do().select("campaign_id");
     console.log(itemsBeforePost);
     expect(itemsBeforePost.length, "There should be no views before post").toBe(
       0
@@ -61,8 +60,7 @@ describe("POST /analytics/views/campaigns/{cid}", () => {
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
 
-    const itemsAfterPost = await campaignReadStatuses
-      .do()
+    const itemsAfterPost = await unguess.tables.WpUgCampaignReadStatus.do()
       .select("campaign_id")
       .select("unguess_wp_user_id");
     console.log(itemsAfterPost);
@@ -77,7 +75,8 @@ describe("POST /analytics/views/campaigns/{cid}", () => {
   });
 
   it("Should not insert a read status if already exists", async () => {
-    const itemsBeforePost = await campaignReadStatuses.do().select();
+    const itemsBeforePost =
+      await unguess.tables.WpUgCampaignReadStatus.do().select();
     expect(itemsBeforePost.length, "There should be no views before post").toBe(
       0
     );
@@ -85,7 +84,8 @@ describe("POST /analytics/views/campaigns/{cid}", () => {
       .post("/analytics/views/campaigns/1")
       .set("Authorization", "Bearer user");
 
-    const itemsAfterFirstPost = await campaignReadStatuses.do().select();
+    const itemsAfterFirstPost =
+      await unguess.tables.WpUgCampaignReadStatus.do().select();
     expect(
       itemsAfterFirstPost.length,
       "There should be a single view after first post"
@@ -96,7 +96,8 @@ describe("POST /analytics/views/campaigns/{cid}", () => {
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
 
-    const itemsAfterSecondPost = await campaignReadStatuses.do().select();
+    const itemsAfterSecondPost =
+      await unguess.tables.WpUgCampaignReadStatus.do().select();
     expect(
       itemsAfterSecondPost.length,
       "There should be a single view after second post"
@@ -109,7 +110,8 @@ describe("POST /analytics/views/campaigns/{cid}", () => {
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
 
-    const itemsAfterPost = await campaignReadStatuses.do().select();
+    const itemsAfterPost =
+      await unguess.tables.WpUgCampaignReadStatus.do().select();
     expect(
       itemsAfterPost.length,
       "There should be a single view after post"

@@ -1,15 +1,13 @@
 /** OPENAPI-CLASS: post-analytics-views-campaigns-cid */
 import CampaignRoute from "@src/features/routes/CampaignRoute";
-import { unguess } from "@src/features/knex";
-import campaignReadStatuses from "@src/features/tables/unguess/WpUgCampaignReadStatus";
+import { unguess } from "@src/features/database";
 
 export default class Route extends CampaignRoute<{
   response: StoplightOperations["post-analytics-views-campaigns-cid"]["responses"]["200"]["content"]["application/json"];
   parameters: StoplightOperations["post-analytics-views-campaigns-cid"]["parameters"]["path"];
 }> {
   protected async prepare(): Promise<void> {
-    await campaignReadStatuses
-      .do()
+    await unguess.tables.WpUgCampaignReadStatus.do()
       .insert({
         is_read: 1,
         last_read_on: unguess.fn.now(),

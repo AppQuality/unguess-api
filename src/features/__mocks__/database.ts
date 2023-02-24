@@ -1,6 +1,8 @@
 import knex from "knex";
+import unguessDb from "@appquality/unguess-database";
+import tryberDb from "@appquality/tryber-database";
 
-export const unguess = knex({
+export const unguess = unguessDb({
   client: "better-sqlite3",
   connection: {
     filename: ":memory:",
@@ -8,7 +10,7 @@ export const unguess = knex({
   useNullAsDefault: true,
 });
 
-export const tryber = knex({
+export const tryber = tryberDb({
   client: "better-sqlite3",
   connection: {
     filename: ":memory:",
