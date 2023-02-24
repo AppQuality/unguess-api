@@ -16,7 +16,7 @@ jobs:
           node-version: 16
       - name: Install dependencies
         run: |
-          echo //registry.npmjs.org/:_authToken=${NPM_TOKEN} > .npmrc
+          echo //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }} > .npmrc
           yarn --frozen-lockfile
       - name: "Generate Coverage"
         run: |
