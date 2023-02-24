@@ -135,7 +135,6 @@ describe("GET /campaigns/{cid}/meta", () => {
     const response = await request(app)
       .get(`/campaigns/999999/meta`)
       .set("Authorization", "Bearer user");
-    console.log("test", response.body);
     expect(response.status).toBe(400);
   });
 
