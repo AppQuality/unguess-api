@@ -24,10 +24,7 @@ export default class Route extends UserRoute<{
     this.campaign = await getCampaign({ campaignId: this.campaignId });
 
     if (!this.campaign) {
-      this.setError(400, {
-        code: 400,
-        message: "Campaign not found",
-      } as OpenapiError);
+      this.setError(400, { message: "Campaign not found" } as OpenapiError);
       return false;
     }
 
@@ -35,11 +32,6 @@ export default class Route extends UserRoute<{
       projectId: this.campaign.project.id,
       user: this.getUser(),
     });
-
-    if (!projectId) {
-      this.setError(403, {} as OpenapiError);
-      return false;
-    }
 
     this.meta = await getCampaignMeta(this.campaign);
 

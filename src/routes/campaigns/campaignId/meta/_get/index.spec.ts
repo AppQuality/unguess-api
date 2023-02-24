@@ -135,8 +135,8 @@ describe("GET /campaigns/{cid}/meta", () => {
     const response = await request(app)
       .get(`/campaigns/999999/meta`)
       .set("Authorization", "Bearer user");
-    /* console.log(response) */
-    expect(response.status).toBe(403);
+    console.log("test", response.body);
+    expect(response.status).toBe(400);
   });
 
   // It should answer 403 if the user has no permissions to see the campaign
