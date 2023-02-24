@@ -1,52 +1,21 @@
 /** OPENAPI-CLASS: get-campaigns-cid-meta */
-import UserRoute from "@src/features/routes/UserRoute";
+import CampaignRoute from "@src/features/routes/CampaignRoute";
 import { getCampaign, getCampaignMeta } from "@src/utils/campaigns";
-import { getProjectById } from "@src/utils/projects";
 
-export default class Route extends UserRoute<{
+export default class Route extends CampaignRoute<{
   response: StoplightOperations["get-campaigns-cid-meta"]["responses"]["200"]["content"]["application/json"];
-  parameters: StoplightOperations["get-campaigns-cid-meta"]["parameters"];
+  parameters: StoplightOperations["get-campaigns-cid-meta"]["parameters"]["path"];
 }> {
-  private params: any;
-  private campaignId: any;
-  private campaign: any;
-  private meta: any;
-
-  constructor(config: RouteClassConfiguration) {
-    super(config);
-    this.params = this.getParameters();
-    this.campaignId = this.params.cid;
-  }
-
-  protected async filter() {
-    if (!(await super.filter())) return false;
-
-    this.campaign = await getCampaign({ campaignId: this.campaignId });
-
-    if (!this.campaign) {
-      this.setError(400, { message: "Campaign not found" } as OpenapiError);
-      return false;
-    }
-
-    const { id: projectId } = await getProjectById({
-      projectId: this.campaign.project.id,
-      user: this.getUser(),
-    });
-
-    this.meta = await getCampaignMeta(this.campaign);
-
-    if (!this.meta) {
-      this.setError(403, {} as OpenapiError);
-      return false;
-    }
-
-    return true;
-  }
-
   protected async prepare() {
+    const campaign = await getCampaign({ campaignId: this.cp_id });
+    if (!campaign) return this.setError(403, {} as OpenapiError);
+
+    const meta = await getCampaignMeta(campaign);
+    if (!meta) return this.setError(403, {} as OpenapiError);
+
     return this.setSuccess(200, {
-      ...this.campaign,
-      ...this.meta,
+      ...campaign,
+      ...meta,
     });
   }
 }
