@@ -78,12 +78,16 @@ export default class Route extends UserRoute<{
       return false;
     }
 
-    if (!(await this.isCostValid())) {
+    if (!(await this.isCostValid()) && !this.isAdmin()) {
       this.setError(403, { message: "Something went wrong!" } as OpenapiError);
       return false;
     }
 
     return true;
+  }
+
+  private isAdmin() {
+    return this.getUser().role === "administrator";
   }
 
   private async isUserAuthorizedProject() {
@@ -112,7 +116,7 @@ export default class Route extends UserRoute<{
   protected async prepare() {
     const campaign = await createCampaign(this.validatedBody);
 
-    await this.updateCoinPackages(campaign.id);
+    if (!this.isAdmin()) await this.updateCoinPackages(campaign.id);
 
     try {
       await this.addUseCases(campaign.id);
