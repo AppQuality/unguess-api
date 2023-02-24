@@ -78,7 +78,7 @@ export default class Route extends UserRoute<{
       return false;
     }
 
-    if (!(await this.isCostValid()) && !this.isAdmin()) {
+    if (!this.isAdmin() && !(await this.isCostValid())) {
       this.setError(403, { message: "Something went wrong!" } as OpenapiError);
       return false;
     }
