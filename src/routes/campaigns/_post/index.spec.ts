@@ -583,5 +583,28 @@ describe("POST /campaigns", () => {
     expect(response.status).toBe(400);
   });
 
+  it("Should not change coins if post a campaign as admin", async () => {
+    const responseBefore = await request(app)
+      .get(`/workspaces/${campaign_request_1.customer_id}/coins`)
+      .set("Authorization", "Bearer admin");
+    const coinsPackagesBefore = responseBefore.body.items.map(
+      (item: { amount: number }) => item.amount
+    );
+    await request(app)
+      .post("/campaigns")
+      .set("Authorization", "Bearer admin")
+      .send({
+        ...campaign_request_1,
+        platforms: [AndroidPhoneBody, WindowsPCBody],
+      });
+    const responseAfter = await request(app)
+      .get(`/workspaces/${campaign_request_1.customer_id}/coins`)
+      .set("Authorization", "Bearer admin");
+    const coinsPackagesAter = responseAfter.body.items.map(
+      (item: { amount: number }) => item.amount
+    );
+    expect(coinsPackagesBefore).toEqual(coinsPackagesAter);
+  });
+
   // end of tests
 });
