@@ -544,12 +544,7 @@ paths:
       description: ''
   '/campaigns/{cid}/meta':
     parameters:
-      - name: cid
-        in: path
-        required: true
-        schema:
-          type: number
-        description: Campaign id
+      - $ref: '#/components/parameters/cid'
     get:
       summary: Get Campaign meta info
       tags: []

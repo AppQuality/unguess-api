@@ -93,7 +93,7 @@ export interface paths {
     parameters: {
       path: {
         /** Campaign id */
-        cid: number;
+        cid: components["parameters"]["cid"];
       };
     };
   };
@@ -1127,7 +1127,7 @@ export interface operations {
     parameters: {
       path: {
         /** Campaign id */
-        cid: number;
+        cid: components["parameters"]["cid"];
       };
     };
     responses: {

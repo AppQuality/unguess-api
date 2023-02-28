@@ -1,142 +1,134 @@
-/** OPENAPI-ROUTE: get-templates */
-import { Context } from "openapi-backend";
+/** OPENAPI-CLASS: get-templates */
+import UserRoute from "@src/features/routes/UserRoute";
 import * as db from "@src/features/db";
-import { TemplateParams } from "@src/__mocks__/database/templates";
-import { ERROR_MESSAGE } from "@src/utils/constants";
 
-interface GetTemplatesArgs {
-  filterBy?: { [key: string]: string | string[] };
-  orderBy?: string;
-  order?: string;
-}
+type templateFromDb = {
+  id: number;
+  title: string;
+  description: string;
+  content: string;
+  category_id: number;
+  categoryName: string | null;
+  locale?: "en" | "it";
+  requires_login: boolean;
+  device_type?: "webapp" | "mobileapp";
+  image?: string;
+};
 
-interface TemplateObject extends TemplateParams {
-  categoryName?: string;
-}
+export default class Route extends UserRoute<{
+  response: StoplightOperations["get-templates"]["responses"]["200"]["content"]["application/json"];
+  query: StoplightOperations["get-templates"]["parameters"]["query"];
+}> {
+  private order: StoplightOperations["get-templates"]["parameters"]["query"]["order"];
+  private orderBy: StoplightOperations["get-templates"]["parameters"]["query"]["orderBy"];
+  private filterBy: PartialRecord<(typeof this.FILTER_KEYS)[number], string>;
+  private ORDERABLE_COLUMNS = [
+    "id" as const,
+    "title" as const,
+    "category_id" as const,
+    "locale" as const,
+  ];
+  private FILTER_KEYS = [
+    "category_id" as const,
+    "locale" as const,
+    "requires_login" as const,
+    "device_type" as const,
+  ];
 
-const orderableColumns = ["id", "title", "category_id", "locale"];
-const filterableColumns = [
-  "category_id",
-  "locale",
-  "requires_login",
-  "device_type",
-];
+  constructor(config: RouteClassConfiguration) {
+    super(config);
+    this.order = this.getQuery().order;
 
-const getTemplates = async ({
-  filterBy,
-  orderBy,
-  order,
-}: GetTemplatesArgs): Promise<StoplightComponents["schemas"]["Template"][]> => {
-  const queryData: string[] = [];
+    this.orderBy = this.getOrderBy();
+    this.filterBy = this.getFilterBy();
+  }
 
-  let query =
-    "SELECT t.*, c.name as categoryName FROM wp_ug_templates as t LEFT JOIN wp_ug_template_categories as c ON (t.category_id = c.id)";
+  private getOrderBy() {
+    const orderBy = this.getQuery().orderBy;
+    if (orderBy && this.ORDERABLE_COLUMNS.includes(orderBy as any)) {
+      return orderBy;
+    }
+  }
 
-  if (filterBy) {
-    let acceptedFilters = filterableColumns.filter((f) =>
-      Object.keys(filterBy).includes(f)
+  private getFilterBy() {
+    let result: PartialRecord<(typeof this.FILTER_KEYS)[number], string> = {};
+    if (!this.getQuery().filterBy) {
+      return result;
+    }
+    const filters = this.getQuery().filterBy as {
+      [key: string]: string;
+    };
+    for (const validKey of this.FILTER_KEYS) {
+      if (Object.keys(filters).includes(validKey)) {
+        result[validKey as (typeof this.FILTER_KEYS)[number]] =
+          filters[validKey];
+      }
+    }
+    return result;
+  }
+
+  protected async prepare() {
+    const templates = await this.getTemplates();
+    return this.setSuccess(
+      200,
+      templates.map((item) => ({
+        id: item.id,
+        title: item.title,
+        description: item.description,
+        content: item.content,
+        category: { id: -1, name: "Uncategorized" },
+        ...(item.categoryName && {
+          category: {
+            id: item.category_id,
+            name: item.categoryName,
+          },
+        }),
+        locale: item.locale,
+        requiresLogin: !!item.requires_login,
+        device_type: item.device_type,
+        ...(item.image && { image: item.image }),
+      }))
     );
+  }
 
-    //check filter
-    if (acceptedFilters.length) {
-      acceptedFilters = acceptedFilters.map((k) => {
-        const v = filterBy[k];
+  private async getTemplates() {
+    const templates: templateFromDb[] = await db.query(
+      ` 
+    SELECT t.id, t.title, t.description, t.content, t.category_id, c.name as categoryName,
+    t.locale, t.requires_login, t.device_type, t.image 
+    FROM wp_ug_templates as t 
+    LEFT JOIN wp_ug_template_categories as c 
+    ON (t.category_id = c.id)
+    ${this.getWhereClause()}
+    ${this.getOrderClause()}
+    `,
+      "unguess"
+    );
+    return templates;
+  }
+
+  private getOrderClause() {
+    if (!this.order) return "";
+    if (!this.orderBy) return "";
+
+    return ` ORDER BY t.${this.orderBy} ${this.order}`;
+  }
+
+  private getWhereClause() {
+    if (!this.filterBy || !Object.keys(this.filterBy).length) return "";
+    const andClauses = Object.keys(this.filterBy)
+      .map((k) => {
+        const v = this.filterBy[k as keyof Route["filterBy"]];
+        if (!v) return "";
+        if (Number.isInteger(v)) {
+          return db.format(`t.${k}=?`, [v.toString()]);
+        }
         if (typeof v === "string") {
-          queryData.push(v);
-          return `t.${k}=?`;
-        } else if (Number.isInteger(v)) {
-          queryData.push(v.toString());
-          return `t.${k}=?`;
+          return db.format(`t.${k}=?`, [v]);
         }
         return "";
-      });
-      query += " WHERE " + Object.values(acceptedFilters).join(" AND ");
-    }
+      })
+      .join(" AND ");
+    return " WHERE " + andClauses;
   }
-
-  if (order && orderBy) {
-    if (orderableColumns.includes(orderBy)) {
-      query += ` ORDER BY t.${orderBy} ${order}`;
-    }
-  }
-
-  if (queryData.length) {
-    query = db.format(query, queryData);
-  }
-
-  let templates = await db.query(query, "unguess");
-
-  return templates.length ? templates : [];
-};
-
-export default async (
-  c: Context,
-  req: OpenapiRequest,
-  res: OpenapiResponse
-) => {
-  let error = {
-    error: true,
-    message: ERROR_MESSAGE,
-  } as StoplightComponents["schemas"]["Error"];
-
-  try {
-    res.status_code = 200;
-    const order =
-      c.request.query.order &&
-      ["ASC", "DESC"].includes((c.request.query.order as string).toUpperCase())
-        ? (c.request.query.order as string).toUpperCase()
-        : "ASC";
-
-    const orderBy =
-      c.request.query.orderBy &&
-      orderableColumns.includes(
-        (c.request.query.orderBy as string).toLowerCase()
-      )
-        ? (c.request.query.orderBy as string).toLowerCase()
-        : "id";
-
-    let templates = await getTemplates({
-      ...(req.query.filterBy !== undefined && {
-        filterBy: req.query.filterBy as { [key: string]: string | string[] },
-      }),
-      ...(order && { order: order }),
-      ...(orderBy && { orderBy: orderBy }),
-    });
-
-    if (templates.length) {
-      return prepareItems(templates);
-    }
-
-    return [];
-  } catch (e: any) {
-    if (e.code) {
-      error.code = e.code;
-      res.status_code = e.code;
-    } else {
-      error.code = 500;
-      res.status_code = 500;
-    }
-
-    return error;
-  }
-};
-
-const prepareItems = (items: TemplateObject[]) => {
-  return items.map((item: TemplateObject) => ({
-    id: item.id,
-    title: item.title,
-    description: item.description,
-    content: item.content,
-    category: { id: -1, name: "Uncategorized" },
-    ...(item.categoryName && {
-      category: {
-        id: item.category_id,
-        name: item.categoryName,
-      },
-    }),
-    locale: item.locale,
-    requiresLogin: !!item.requires_login,
-    device_type: item.device_type,
-    ...(item.image && { image: item.image }),
-  }));
-};
+}
