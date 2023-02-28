@@ -2,7 +2,7 @@ import debugMessage from "@src/features/debugMessage";
 import fs from "fs";
 import glob from "glob";
 import OpenAPIBackend, { Context } from "openapi-backend";
-import Comments from "parse-comments";
+import { parse } from "comment-parser";
 
 type RouteObject = {
   name: string;
@@ -103,22 +103,21 @@ class RouteComment {
   constructor(file: string) {
     const comments = this.extractFileContent(file);
     const routeComment = comments.find((comment) =>
-      comment.value.includes("OPENAPI-ROUTE")
+      comment.description.includes("OPENAPI-ROUTE")
     );
     if (!routeComment) this.operation = false;
-    else this.operation = routeComment.value.split(":")[1].trim();
+    else this.operation = routeComment.description.split(":")[1].trim();
 
     const classComment = comments.find((comment) =>
-      comment.value.includes("OPENAPI-CLASS")
+      comment.description.includes("OPENAPI-CLASS")
     );
     if (!classComment) this.operationClass = false;
-    else this.operationClass = classComment.value.split(":")[1].trim();
+    else this.operationClass = classComment.description.split(":")[1].trim();
   }
 
   extractFileContent(file: string) {
-    const comments = new Comments();
     const fileContent = fs.readFileSync(file, "utf8");
-    return comments.parse(fileContent);
+    return parse(fileContent);
   }
 }
 
