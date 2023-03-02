@@ -1,49 +1,40 @@
-/** OPENAPI-ROUTE: get-users-me */
-import { Context } from "openapi-backend";
+/** OPENAPI-CLASS: get-users-me */
 import * as db from "@src/features/db";
 import { getGravatar } from "@src/utils/users";
 import getUserFeatures from "@src/features/wp/getUserFeatures";
+import UserRoute from "@src/features/routes/UserRoute";
 
-export default async (
-  c: Context,
-  req: OpenapiRequest,
-  res: OpenapiResponse
-) => {
-  let user = req.user;
+export default class Route extends UserRoute<{
+  response: StoplightOperations["get-users-me"]["responses"]["200"]["content"]["application/json"];
+}> {
+  protected async prepare() {
+    const user = this.getUser();
+    const picUrl = await getGravatar(user.email);
+    const features = await getUserFeatures(this.getWordpressId("unguess"));
 
-  res.status_code = 200;
-
-  //Get User Profile (wp_appq_evd_profile)
-  let profileData = await getProfile(user.profile_id);
-
-  return formattedUser(user, profileData);
-};
-
-const getProfile = async (profile_id: number | undefined): Promise<any> => {
-  const emptyProfile = { name: "name", surname: "surname" };
-
-  if (profile_id) {
-    const profileSql = "SELECT * FROM wp_appq_evd_profile WHERE id = ?";
-    let profile = await db.query(db.format(profileSql, [profile_id]), "tryber");
-
-    return profile ? profile[0] : emptyProfile;
+    this.setSuccess(200, {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      profile_id: user.profile_id,
+      tryber_wp_user_id: user.tryber_wp_user_id,
+      unguess_wp_user_id: user.unguess_wp_user_id,
+      name: await this.getProfileName(),
+      ...(picUrl && { picture: picUrl }),
+      ...(features && { features: features }),
+    });
   }
 
-  return emptyProfile;
-};
+  private async getProfileName() {
+    const profile: { name: string; surname: string }[] = await db.query(
+      db.format(`SELECT name,surname FROM wp_appq_evd_profile WHERE id = ?`, [
+        this.getUserId(),
+      ]),
+      "tryber"
+    );
 
-const formattedUser = async (user: any, profile: any): Promise<any> => {
-  const picUrl = await getGravatar(user.email);
-  const features = await getUserFeatures(user.unguess_wp_user_id);
-  return {
-    id: user.id,
-    email: user.email,
-    role: user.role,
-    profile_id: user.profile_id,
-    tryber_wp_user_id: user.tryber_wp_user_id,
-    unguess_wp_user_id: user.unguess_wp_user_id,
-    name: profile.name + " " + profile.surname,
-    ...(picUrl && { picture: picUrl }),
-    ...(features && { features: features }),
-  };
-};
+    if (!profile.length) return "name surname";
+
+    return `${profile[0].name} ${profile[0].surname}`;
+  }
+}
