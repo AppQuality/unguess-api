@@ -282,6 +282,7 @@ export interface components {
       severity: components["schemas"]["BugSeverity"];
       type: components["schemas"]["BugType"];
       replicability: components["schemas"]["BugReplicability"];
+      priority?: components["schemas"]["BugPriority"];
       created: string;
       occurred_date: string;
       updated?: string;
@@ -347,6 +348,11 @@ export interface components {
     };
     /** BugStatus */
     BugStatus: {
+      id: number;
+      name: string;
+    };
+    /** BugPriority */
+    BugPriority: {
       id: number;
       name: string;
     };
