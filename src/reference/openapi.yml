@@ -1508,6 +1508,8 @@ components:
           $ref: '#/components/schemas/BugType'
         replicability:
           $ref: '#/components/schemas/BugReplicability'
+        priority:
+          $ref: '#/components/schemas/BugPriority'
         created:
           type: string
         occurred_date:
@@ -1652,6 +1654,19 @@ components:
         - name
     BugStatus:
       title: BugStatus
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
+    BugPriority:
+      title: BugPriority
+      x-stoplight:
+        id: npmmozc9uhsjh
       type: object
       properties:
         id:
