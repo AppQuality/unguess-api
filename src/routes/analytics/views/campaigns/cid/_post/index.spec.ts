@@ -51,7 +51,6 @@ describe("POST /analytics/views/campaigns/{cid}", () => {
   it("Should create a read status on view", async () => {
     const itemsBeforePost =
       await unguess.tables.WpUgCampaignReadStatus.do().select("campaign_id");
-    console.log(itemsBeforePost);
     expect(itemsBeforePost.length, "There should be no views before post").toBe(
       0
     );
@@ -63,7 +62,6 @@ describe("POST /analytics/views/campaigns/{cid}", () => {
     const itemsAfterPost = await unguess.tables.WpUgCampaignReadStatus.do()
       .select("campaign_id")
       .select("unguess_wp_user_id");
-    console.log(itemsAfterPost);
     expect(
       itemsAfterPost.length,
       "There should be a single view after post"
