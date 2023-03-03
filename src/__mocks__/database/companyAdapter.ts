@@ -31,6 +31,10 @@ import {
   table as coinsTransactionsTable,
   data as coinsTransactionsData,
 } from "./coins_transactions";
+
+import priorities from "./priority";
+import bugsPriorities from "./bug_priority";
+
 import campaignOutputs from "./cp_outputs_view";
 import { table as expressTable, data as expressData } from "./express";
 import defaultUsers from "@src/__mocks__/database/seed/users.json";
@@ -131,6 +135,8 @@ export const adapter = {
     await customerUniqueBugsRead.mock();
     await bugsReadStatus.mock();
     await campaignReadStatuses.mock();
+    await priorities.mock();
+    await bugsPriorities.mock();
   },
   drop: async () => {
     await profileTable.drop();
@@ -182,6 +188,8 @@ export const adapter = {
     await customerUniqueBugsRead.dropMock();
     await bugsReadStatus.dropMock();
     await campaignReadStatuses.dropMock();
+    await priorities.dropMock();
+    await bugsPriorities.dropMock();
   },
 
   clear: async () => {
@@ -209,6 +217,9 @@ export const adapter = {
     await useCaseGroup.clear();
     await bugs.clear();
     await campaignReadStatuses.clear();
+    await userTaskMedia.clear();
+    await priorities.clear();
+    await bugsPriorities.clear();
   },
   addCampaignWithProject: async ({
     campaign_id,

@@ -74,7 +74,7 @@ const campaign_2 = {
   project_id: 2,
 };
 
-describe("GET /campaigns/{cid}/severities", () => {
+describe("GET /campaigns/{cid}/priorities", () => {
   beforeAll(async () => {
     await dbAdapter.add({
       campaignTypes: [campaign_type_1],
@@ -90,7 +90,7 @@ describe("GET /campaigns/{cid}/severities", () => {
   // It should answer 403 if user is not logged in
   it("Should answer 403 if user is not logged in", async () => {
     const response = await request(app).get(
-      `/campaigns/${campaign_1.id}/severities`
+      `/campaigns/${campaign_1.id}/priorities`
     );
 
     expect(response.status).toBe(403);
@@ -99,7 +99,7 @@ describe("GET /campaigns/{cid}/severities", () => {
   // It should fail if the campaign does not exist
   it("Should fail if the campaign does not exist", async () => {
     const response = await request(app)
-      .get(`/campaigns/999/severities`)
+      .get(`/campaigns/999/priorities`)
       .set("Authorization", "Bearer user");
 
     expect(response.status).toBe(400);
@@ -108,7 +108,7 @@ describe("GET /campaigns/{cid}/severities", () => {
   // it should return 200 if the user is the owner
   it("Should return 200 if the user is the owner", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/severities`)
+      .get(`/campaigns/${campaign_1.id}/priorities`)
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
   });
@@ -116,7 +116,7 @@ describe("GET /campaigns/{cid}/severities", () => {
   // it Should fail if the user is NOT the owner
   it("Should fail if the user is not the owner", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_2.id}/severities`)
+      .get(`/campaigns/${campaign_2.id}/priorities`)
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(403);
   });

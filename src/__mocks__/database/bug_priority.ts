@@ -12,7 +12,8 @@ const defaultItem: BugPriorityParams = {
 class BugPriorities extends Table<BugPriorityParams> {
   protected name = "wp_ug_priority_to_bug";
   protected columns = [
-    "bug_id INTEGER PRIMARY KEY NOT NULL",
+    "id INTEGER PRIMARY KEY AUTOINCREMENT",
+    "bug_id INTEGER NOT NULL UNIQUE",
     "priority_id INTEGER NOT NULL",
   ];
   constructor() {
