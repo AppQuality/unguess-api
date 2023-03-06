@@ -355,6 +355,10 @@ paths:
                       required:
                         - tag_id
                         - tag_name
+                  priority:
+                    $ref: '#/components/schemas/BugPriority'
+                    x-stoplight:
+                      id: h7y0q4jv95fa9
               examples:
                 oneTagResponse:
                   value:
@@ -385,6 +389,10 @@ paths:
                         required:
                           - tag_name
                     type: object
+                priority_id:
+                  x-stoplight:
+                    id: hwme35c0ad9nd
+                  type: number
             examples:
               possibleTagEntries:
                 value:
