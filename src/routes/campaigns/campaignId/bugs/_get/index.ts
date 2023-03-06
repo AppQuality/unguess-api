@@ -234,7 +234,7 @@ export default class BugsRoute extends CampaignRoute<{
       JOIN wp_ug_priority p ON (pb.priority_id = p.id)
       where pb.bug_id IN (${bugs.map((bug) => bug.id).join(",")})
       `,
-      "tryber"
+      "unguess"
     );
 
     if (!priorities) return [];
