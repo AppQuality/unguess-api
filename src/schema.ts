@@ -143,6 +143,15 @@ export interface paths {
       };
     };
   };
+  "/campaigns/{cid}/priorities": {
+    get: operations["get-campaigns-cid-priorities"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+  };
   "/campaigns/{cid}/usecases": {
     get: operations["get-campaigns-cid-usecases"];
     parameters: {
@@ -282,6 +291,7 @@ export interface components {
       severity: components["schemas"]["BugSeverity"];
       type: components["schemas"]["BugType"];
       replicability: components["schemas"]["BugReplicability"];
+      priority?: components["schemas"]["BugPriority"];
       created: string;
       occurred_date: string;
       updated?: string;
@@ -347,6 +357,11 @@ export interface components {
     };
     /** BugStatus */
     BugStatus: {
+      id: number;
+      name: string;
+    };
+    /** BugPriority */
+    BugPriority: {
       id: number;
       name: string;
     };
@@ -1242,6 +1257,25 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["BugSeverity"][];
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  "get-campaigns-cid-priorities": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["BugPriority"][];
         };
       };
       400: components["responses"]["Error"];
