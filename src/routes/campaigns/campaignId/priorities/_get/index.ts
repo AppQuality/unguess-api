@@ -10,9 +10,17 @@ export default class Route extends CampaignRoute<{
 
   protected async init(): Promise<void> {
     await super.init();
+    this.priorities = await db.query(
+      "SELECT id, name FROM wp_ug_priority ORDER BY id"
+    );
   }
 
-  protected async prepare(): Promise<void> {}
+  protected async prepare(): Promise<void> {
+    
+    return this.setSuccess(200, this.priorities);
+  }
 
-  private async getCampaignPriorities() {}
+  private async getCampaignPriorities() {
+    
+  }
 }
