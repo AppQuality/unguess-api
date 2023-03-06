@@ -2,6 +2,10 @@
 import * as db from "@src/features/db";
 import { getBugById } from "@src/utils/bugs";
 import BugsRoute from "@src/features/routes/BugRoute";
+import { DEFAULT_BUG_PRIORITY } from "@src/utils/constants";
+
+type Bug =
+  StoplightOperations["get-campaigns-single-bug"]["responses"]["200"]["content"]["application/json"];
 
 export default class Route extends BugsRoute<{
   response: StoplightOperations["get-campaigns-single-bug"]["responses"]["200"]["content"]["application/json"];
@@ -28,7 +32,9 @@ export default class Route extends BugsRoute<{
       showNeedReview: this.shouldShowNeedReview(),
     });
     await this.setBugAsRead();
-    this.setSuccess(200, bug);
+
+    const enhancedBug = await this.enhanceBug(bug);
+    this.setSuccess(200, enhancedBug);
   }
 
   private async setBugAsRead() {
@@ -63,5 +69,26 @@ export default class Route extends BugsRoute<{
     );
     if (!result.length) return undefined;
     return result[0].is_read === 1;
+  }
+
+  private async getPriority() {
+    const result = await db.query(
+      db.format(
+        "SELECT p.id, p.name FROM wp_ug_priority p JOIN wp_ug_priority_to_bug pb ON (pb.priority_id = p.id) WHERE pb.bug_id=?",
+        [this.bug_id]
+      ),
+      "unguess"
+    );
+    if (!result.length) return DEFAULT_BUG_PRIORITY;
+    return result[0] as { id: number; name: string };
+  }
+
+  private async enhanceBug(bug: Bug) {
+    const priority = await this.getPriority();
+
+    return {
+      ...bug,
+      priority,
+    };
   }
 }
