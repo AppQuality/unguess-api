@@ -122,14 +122,21 @@ describe("GET /campaigns/{cid}/priorities", () => {
   });
 
   // It should return the list of priorities
-  it("Should return the list of priorities", async () => {
+  it("Should return the list of priorities ordered by id DESC", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_2.id}/priorities`)
+      .get(`/campaigns/${campaign_1.id}/priorities`)
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
 
     const { body } = response;
 
-    expect(body).toEqual(priorities.getDefaultItems());
+    expect(body).toEqual(priorities.getDefaultItems().sort((t1, t2) => t2.id - t1.id));
+  });
+
+  it("Should not return the list of priorities for a campaign where the user is not an owner", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_2.id}/priorities`)
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(403);
   });
 });
