@@ -1,4 +1,4 @@
-import Table from "./tryber_table";
+import Table from "./unguess_table";
 
 type PriorityParams = {
   id?: number;
