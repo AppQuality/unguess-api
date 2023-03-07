@@ -111,7 +111,6 @@ const bug_1: BugsParams = {
   updated: "2021-10-19 12:57:57.0",
   dev_id: device_1.id,
   severity_id: 1,
-  priority_id: 1,
   bug_replicability_id: 1,
   bug_type_id: 1,
   application_section_id: usecase_1.id,
