@@ -1,5 +1,5 @@
 /** OPENAPI-CLASS: patch-campaigns-cid-bugs-bid */
-import { ERROR_MESSAGE } from "@src/utils/constants";
+import { DEFAULT_BUG_PRIORITY, ERROR_MESSAGE } from "@src/utils/constants";
 import { getCampaign } from "@src/utils/campaigns";
 import UserRoute from "@src/features/routes/UserRoute";
 import { getProjectById } from "@src/utils/projects";
