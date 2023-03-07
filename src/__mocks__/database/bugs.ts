@@ -13,7 +13,6 @@ type BugsParams = {
   publish?: number;
   status_reason?: string;
   severity_id?: number;
-  priority_id?: number;
   created?: string;
   updated?: string;
   bug_replicability_id?: number;
@@ -69,7 +68,6 @@ class Bugs extends Table<BugsParams> {
     "publish INTEGER DEFAULT 1",
     "status_reason VARCHAR(3000)",
     "severity_id INTEGER DEFAULT 1",
-    "priority_id INTEGER DEFAULT 3",
     "created datetime NOT NULL DEFAULT CURRENT_TIMESTAMP",
     "updated datetime",
     "bug_replicability_id INTEGER",
