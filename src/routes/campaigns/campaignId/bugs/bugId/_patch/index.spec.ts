@@ -111,7 +111,6 @@ const bug_1: BugsParams = {
   updated: "2021-10-19 12:57:57.0",
   dev_id: device_1.id,
   severity_id: 1,
-  priority_id: 1,
   bug_replicability_id: 1,
   bug_type_id: 1,
   application_section_id: usecase_1.id,
@@ -212,18 +211,18 @@ const priority_3 = {
 };
 
 const bug_priority_1 = {
-  bug_id: 1,
-  priority_id: 1,
+  bug_id: bug_1.id,
+  priority_id: priority_1.id,
 };
 
 const bug_priority_2 = {
-  bug_id: 2,
-  priority_id: 3,
+  bug_id: bug_2.id,
+  priority_id: priority_2.id,
 };
 
 const bug_priority_3 = {
-  bug_id: 3,
-  priority_id: 5,
+  bug_id: bug_3.id,
+  priority_id: priority_3.id,
 }
 
 describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
@@ -368,7 +367,7 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     ).toEqual(true);
   });
 
-  // Should return bug with the default priority
+  // Should return an error 403 if the priority does not exists
   it("It should return an error 403 if the priority does not exists", async () => {
     const response = await request(app)
       .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
