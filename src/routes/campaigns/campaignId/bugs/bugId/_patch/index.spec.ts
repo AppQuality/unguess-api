@@ -1,7 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
+import { DEFAULT_BUG_PRIORITY, FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 import bugType from "@src/__mocks__/database/bug_type";
 import bugs, { BugsParams } from "@src/__mocks__/database/bugs";
 import severities from "@src/__mocks__/database/bug_severity";
@@ -10,6 +10,8 @@ import statuses from "@src/__mocks__/database/bug_status";
 import devices, { DeviceParams } from "@src/__mocks__/database/device";
 import usecases, { UseCaseParams } from "@src/__mocks__/database/use_cases";
 import tags from "@src/__mocks__/database/bug_tags";
+import bug_priorities from "@src/__mocks__/database/bug_priority";
+import priorities from "@src/__mocks__/database/priority";
 
 const campaign_type_1 = {
   id: 1,
@@ -109,6 +111,7 @@ const bug_1: BugsParams = {
   updated: "2021-10-19 12:57:57.0",
   dev_id: device_1.id,
   severity_id: 1,
+  priority_id: 1,
   bug_replicability_id: 1,
   bug_type_id: 1,
   application_section_id: usecase_1.id,
@@ -193,6 +196,36 @@ const tag_3 = {
   bug_id: bug_3.id,
 };
 
+const priority_1 = {
+  id: 1,
+  name: "lowest",
+};
+
+const priority_2 = {
+  id: 3,
+  name: "medium",
+};
+
+const priority_3 = {
+  id: 5,
+  name: "highest",
+};
+
+const bug_priority_1 = {
+  bug_id: 1,
+  priority_id: 1,
+};
+
+const bug_priority_2 = {
+  bug_id: 2,
+  priority_id: 3,
+};
+
+const bug_priority_3 = {
+  bug_id: 3,
+  priority_id: 5,
+}
+
 describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
   beforeAll(async () => {
     await dbAdapter.add({
@@ -214,6 +247,10 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     await tags.insert(tag_1);
     await tags.insert(tag_2_other_cp);
     await tags.insert(tag_3);
+    await bug_priorities.insert(bug_priority_1);
+    await bug_priorities.insert(bug_priority_2);
+    await bug_priorities.insert(bug_priority_3);
+    await priorities.addDefaultItems();
   });
 
   // It should answer 403 if user is not logged in
@@ -329,6 +366,29 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     expect(
       response.body.tags[0].tag_id !== response.body.tags[1].tag_id
     ).toEqual(true);
+  });
+
+  // Should return bug with the default priority
+  it("It should return an error 403 if the priority does not exists", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user")
+      .send({ priority_id: 999 });
+
+    expect(response.status).toBe(403);
+  });
+
+  // It should return the updated priority
+  it("It should return the updated priority", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user")
+      .send({ priority_id: bug_priority_1.priority_id });
+
+    expect(response.status).toBe(200);
+    expect(response.body.priority).toEqual(
+      expect.objectContaining(priority_1),
+    );
   });
 
   // --- End of file
