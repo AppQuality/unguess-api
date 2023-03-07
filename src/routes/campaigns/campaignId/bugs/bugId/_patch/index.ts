@@ -7,6 +7,7 @@ import { getBugById } from "@src/utils/bugs";
 import * as db from "@src/features/db";
 
 type Priority = StoplightOperations["patch-campaigns-cid-bugs-bid"]["responses"]["200"]["content"]["application/json"]["priority"]
+type Pid = number;
 
 export default class Route extends UserRoute<{
   parameters: StoplightOperations["patch-campaigns-cid-bugs-bid"]["parameters"]["path"];
@@ -16,7 +17,7 @@ export default class Route extends UserRoute<{
   private cid: number;
   private bid: number;
   private tags: ({ tag_id: number } | { tag_name: string })[];
-  private pid: number | undefined;
+  private pid: Pid | undefined;
 
   constructor(configuration: RouteClassConfiguration) {
     super(configuration);
@@ -91,23 +92,28 @@ export default class Route extends UserRoute<{
 
       if (!result) {
         return this.setError(403, {} as OpenapiError);
+      };
+
+      if (!await this.checkIfBugIdExistsInBugPriority()) {
+        await this.addPriorityToBugPriority(result.id);
       }
 
-      await this.addPriorityIdToBug(result.id);
+      else {
+        await this.updatePriorityToBugPriority(result.id);
+      }
+
       const [foundPid] = await this.getBugPriority();
-
-      if (foundPid.priority_id !== result.id) throw new Error('Could not update entry in Database');
-
-      this.setError(500, {
-        message: "Something went wrong! Could not save the data."
-      } as OpenapiError);
+      if (foundPid.priority_id !== this.pid)
+        throw new Error('Could not update entry in Database');
 
       return this.setSuccess(200, {
         tags: bugTags,
         priority: result
       });
 
-    } catch (error) {
+    }
+
+    catch (error) {
       return this.setError(500,
         {
           message: "Something went wrong! Unable to update data"
@@ -206,26 +212,44 @@ export default class Route extends UserRoute<{
     );
   }
 
-  private async addPriorityIdToBug(pid: number): Promise<void> {
-    await db.query(db.format(
-      `
-      UPDATE wp_appq_evd_bug
-      SET
-        priority_id = ?
-      WHERE 
-        id = ? AND campaign_id = ?
-    `, [pid, this.bid, this.cid]
-    ));
-  }
+  private async checkIfBugIdExistsInBugPriority(): Promise<Boolean> {
+    const [result] = await db.query(
+      db.format(
+        `SELECT bug_id 
+        FROM wp_ug_priority_to_bug
+        WHERE bug_id = ?
+        `, [this.bid]
+      ), "unguess"
+    );
+    if (result) return true;
+    return false;
+  };
 
   private async getBugPriority(): Promise<{ priority_id: number }[]> {
     return await db.query(db.format(
       `
         SELECT priority_id
-        FROM wp_appq_evd_bug
-        WHERE 
-          id = ? AND campaign_id = ?
-      `, [this.bid, this.cid]
-    ));
-  }
+        FROM wp_ug_priority_to_bug
+        WHERE bug_id = ? 
+      `, [this.bid]
+    ), "unguess");
+  };
+
+  private async addPriorityToBugPriority(pid: Pid): Promise<void> {
+    await db.query(db.format(
+      `
+        INSERT INTO wp_ug_priority_to_bug (bug_id, priority_id)
+        VALUES (?, ?)
+      `, [this.bid, pid]
+    ), "unguess");
+  };
+
+  private async updatePriorityToBugPriority(pid: Pid): Promise<void> {
+    await db.query(db.format(`
+      UPDATE wp_ug_priority_to_bug
+      SET priority_id = ?
+      WHERE bug_id = ?
+    `, [pid, this.bid]
+    ), "unguess");
+  };
 }
