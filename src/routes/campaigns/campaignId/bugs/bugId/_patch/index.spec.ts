@@ -1,10 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import {
-  DEFAULT_BUG_PRIORITY,
-  FUNCTIONAL_CAMPAIGN_TYPE_ID,
-} from "@src/utils/constants";
+import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 import bugType from "@src/__mocks__/database/bug_type";
 import bugs, { BugsParams } from "@src/__mocks__/database/bugs";
 import severities from "@src/__mocks__/database/bug_severity";
