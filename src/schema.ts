@@ -1046,6 +1046,7 @@ export interface operations {
               tag_id: number;
               tag_name: string;
             }[];
+            priority?: components["schemas"]["BugPriority"];
           };
         };
       };
@@ -1061,6 +1062,7 @@ export interface operations {
                 tag_name: string;
               }
           )[];
+          priority_id?: number;
         };
       };
     };
