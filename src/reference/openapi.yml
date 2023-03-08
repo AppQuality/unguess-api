@@ -355,6 +355,8 @@ paths:
                       required:
                         - tag_id
                         - tag_name
+                  priority:
+                    $ref: '#/components/schemas/BugPriority'
               examples:
                 oneTagResponse:
                   value:
@@ -385,6 +387,8 @@ paths:
                         required:
                           - tag_name
                     type: object
+                priority_id:
+                  type: number
             examples:
               possibleTagEntries:
                 value:
@@ -1701,8 +1705,6 @@ components:
         - name
     BugPriority:
       title: BugPriority
-      x-stoplight:
-        id: npmmozc9uhsjh
       type: object
       properties:
         id:

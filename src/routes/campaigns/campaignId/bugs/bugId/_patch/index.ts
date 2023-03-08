@@ -6,6 +6,9 @@ import { getProjectById } from "@src/utils/projects";
 import { getBugById } from "@src/utils/bugs";
 import * as db from "@src/features/db";
 
+type Priority = StoplightOperations["patch-campaigns-cid-bugs-bid"]["responses"]["200"]["content"]["application/json"]["priority"]
+type Pid = number;
+
 export default class Route extends UserRoute<{
   parameters: StoplightOperations["patch-campaigns-cid-bugs-bid"]["parameters"]["path"];
   body: StoplightOperations["patch-campaigns-cid-bugs-bid"]["requestBody"]["content"]["application/json"];
@@ -14,6 +17,7 @@ export default class Route extends UserRoute<{
   private cid: number;
   private bid: number;
   private tags: ({ tag_id: number } | { tag_name: string })[];
+  private pid: Pid | undefined;
 
   constructor(configuration: RouteClassConfiguration) {
     super(configuration);
@@ -21,6 +25,7 @@ export default class Route extends UserRoute<{
     this.cid = parseInt(params.cid);
     this.bid = parseInt(params.bid);
     this.tags = this.getTags();
+    this.pid = this.getBody().priority_id;
   }
 
   private getTags() {
@@ -76,8 +81,46 @@ export default class Route extends UserRoute<{
     await this.replaceTags();
 
     const bugTags = await this.getCurrentTags();
-    return this.setSuccess(200, { tags: bugTags });
-  }
+
+    if (!this.pid) return this.setSuccess(200, {
+      tags: bugTags
+    });
+
+    try {
+      const allPriorities = await this.getAllPriorities();
+      const [result] = allPriorities.filter((priority: Priority) => priority && priority.id === this.pid);
+
+      if (!result) {
+        return this.setError(403, {} as OpenapiError);
+      };
+
+      if (!await this.checkIfBugIdExistsInBugPriority()) {
+        await this.addPriorityToBugPriority(result.id);
+      }
+
+      else {
+        await this.updatePriorityToBugPriority(result.id);
+      }
+
+      const [foundPid] = await this.getBugPriority();
+      if (foundPid.priority_id !== this.pid)
+        throw new Error('Could not update entry in Database');
+
+      return this.setSuccess(200, {
+        tags: bugTags,
+        priority: result
+      });
+
+    }
+
+    catch (error) {
+      return this.setError(500,
+        {
+          message: "Something went wrong! Unable to update data"
+        } as OpenapiError
+      );
+    }
+  };
 
   private async getCurrentTags(
     { byBug }: { byBug: boolean } = { byBug: true }
@@ -161,4 +204,52 @@ export default class Route extends UserRoute<{
     if (!result.length) return 0;
     return result[0].id;
   }
+
+  private async getAllPriorities(): Promise<Priority[]> {
+    return await db.query(
+      "SELECT id, name FROM wp_ug_priority ORDER BY id",
+      "unguess"
+    );
+  }
+
+  private async checkIfBugIdExistsInBugPriority(): Promise<Boolean> {
+    const [result] = await db.query(
+      db.format(
+        `SELECT bug_id 
+        FROM wp_ug_priority_to_bug
+        WHERE bug_id = ?
+        `, [this.bid]
+      ), "unguess"
+    );
+    if (result) return true;
+    return false;
+  };
+
+  private async getBugPriority(): Promise<{ priority_id: number }[]> {
+    return await db.query(db.format(
+      `
+        SELECT priority_id
+        FROM wp_ug_priority_to_bug
+        WHERE bug_id = ? 
+      `, [this.bid]
+    ), "unguess");
+  };
+
+  private async addPriorityToBugPriority(pid: Pid): Promise<void> {
+    await db.query(db.format(
+      `
+        INSERT INTO wp_ug_priority_to_bug (bug_id, priority_id)
+        VALUES (?, ?)
+      `, [this.bid, pid]
+    ), "unguess");
+  };
+
+  private async updatePriorityToBugPriority(pid: Pid): Promise<void> {
+    await db.query(db.format(`
+      UPDATE wp_ug_priority_to_bug
+      SET priority_id = ?
+      WHERE bug_id = ?
+    `, [pid, this.bid]
+    ), "unguess");
+  };
 }
