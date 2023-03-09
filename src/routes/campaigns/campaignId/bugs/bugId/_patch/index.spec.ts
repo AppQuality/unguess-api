@@ -223,7 +223,7 @@ const bug_priority_2 = {
 const bug_priority_3 = {
   bug_id: bug_3.id,
   priority_id: priority_3.id,
-}
+};
 
 describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
   beforeAll(async () => {
@@ -388,6 +388,20 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     expect(response.body.priority).toEqual(
       expect.objectContaining(priority_1),
     );
+  });
+
+  // It should not update existing tags if no tags are provided while patching priority
+  it("It should not update existing tags if no tags are provided while patching priority", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user")
+      .send({ priority_id: bug_priority_1.priority_id });
+
+    expect(response.status).toBe(200);
+    expect(response.body.tags[0]).toEqual({
+      tag_id: tag_3.tag_id,
+      tag_name: tag_3.display_name
+    })
   });
 
   // --- End of file
