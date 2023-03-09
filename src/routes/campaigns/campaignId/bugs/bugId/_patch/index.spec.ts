@@ -415,8 +415,8 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     expect(response.body.priority).toBeUndefined();
   });
 
-  // It should not update existing tags if no tags are provided while patching priority
-  it("It should not update existing tags if no tags are provided while patching priority", async () => {
+  // It should keep existing tags if no tags field in body while patching priority
+  it("It should keep existing tags if no tags field in body while patching priority", async () => {
     const response = await request(app)
       .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer user")
