@@ -1,7 +1,7 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { DEFAULT_BUG_PRIORITY, FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
+import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 import bugType from "@src/__mocks__/database/bug_type";
 import bugs, { BugsParams } from "@src/__mocks__/database/bugs";
 import severities from "@src/__mocks__/database/bug_severity";
@@ -377,6 +377,16 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     expect(response.status).toBe(403);
   });
 
+  // Should return an error 400 if the priority is not a number
+  it("It should return an error 400 if the priority is not a number", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user")
+      .send({ priority_id: "not a number" });
+
+    expect(response.status).toBe(400);
+  });
+
   // It should return the updated priority
   it("It should return the updated priority", async () => {
     const response = await request(app)
@@ -385,9 +395,24 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
       .send({ priority_id: bug_priority_1.priority_id });
 
     expect(response.status).toBe(200);
-    expect(response.body.priority).toEqual(
-      expect.objectContaining(priority_1),
-    );
+    expect(response.body.priority).toEqual(expect.objectContaining(priority_1));
+  });
+
+  // It should not return the priority if not sent
+  it("It should not return the priority if not sent", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user")
+      .send({
+        tags: [
+          { tag_id: tag_3.tag_id },
+          { tag_name: "Tag to be add" },
+          { tag_id: tag_3.tag_id },
+        ],
+      });
+
+    expect(response.status).toBe(200);
+    expect(response.body.priority).toBeUndefined();
   });
 
   // It should not update existing tags if no tags are provided while patching priority
