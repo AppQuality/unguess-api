@@ -16,7 +16,7 @@ export default class Route extends UserRoute<{
 }> {
   private cid: number;
   private bid: number;
-  private tags: ({ tag_id: number } | { tag_name: string })[];
+  private tags: ({ tag_id: number } | { tag_name: string })[] | undefined;
   private pid: Pid | undefined;
 
   constructor(configuration: RouteClassConfiguration) {
@@ -30,7 +30,10 @@ export default class Route extends UserRoute<{
 
   private getTags() {
     const tags = this.getBody().tags;
-    if (!tags || tags?.length === 0) return [];
+
+    if (!tags) return undefined;
+    if (tags?.length === 0) return [];
+
     const tagsId = tags.map((tag) => {
       if ("tag_id" in tag) return tag.tag_id;
       return tag.tag_name;
@@ -78,10 +81,12 @@ export default class Route extends UserRoute<{
   }
 
   protected async prepare(): Promise<void> {
-    await this.replaceTags();
+
+    if (this.tags) {
+      await this.replaceTags();
+    }
 
     const bugTags = await this.getCurrentTags();
-
     if (!this.pid) return this.setSuccess(200, {
       tags: bugTags
     });
@@ -153,7 +158,7 @@ export default class Route extends UserRoute<{
     const tags = await this.getCurrentTags({ byBug: false });
     const maxTagId = await this.getMaxTagId();
     await this.clearTags();
-    if (!this.tags.length) return;
+    if (!this.tags || !this.tags.length) return;
 
     const values: string[] = [];
     let i = 1;

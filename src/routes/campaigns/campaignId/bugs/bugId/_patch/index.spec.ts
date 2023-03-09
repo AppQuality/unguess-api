@@ -415,5 +415,19 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     expect(response.body.priority).toBeUndefined();
   });
 
+  // It should keep existing tags if no tags field in body while patching priority
+  it("It should keep existing tags if no tags field in body while patching priority", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user")
+      .send({ priority_id: bug_priority_1.priority_id });
+
+    expect(response.status).toBe(200);
+    expect(response.body.tags[0]).toEqual({
+      tag_id: tag_3.tag_id,
+      tag_name: tag_3.display_name
+    })
+  });
+
   // --- End of file
 });
