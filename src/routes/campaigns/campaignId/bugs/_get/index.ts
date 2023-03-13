@@ -1,5 +1,6 @@
 /** OPENAPI-CLASS: get-campaigns-cid-bugs */
 import {
+  DEFAULT_BUG_PRIORITY,
   DEFAULT_ORDER_BY_PARAMETER,
   DEFAULT_ORDER_PARAMETER,
   ERROR_MESSAGE,
@@ -17,6 +18,11 @@ interface Tag {
   tag_name: string;
 }
 
+interface Priority {
+  id: number;
+  name: string;
+}
+
 export default class BugsRoute extends CampaignRoute<{
   response: StoplightOperations["get-campaigns-cid-bugs"]["responses"]["200"]["content"]["application/json"];
   parameters: StoplightOperations["get-campaigns-cid-bugs"]["parameters"]["path"];
@@ -26,9 +32,11 @@ export default class BugsRoute extends CampaignRoute<{
   private start: number = START_QUERY_PARAM_DEFAULT;
   private order: string = DEFAULT_ORDER_PARAMETER;
   private orderBy: string = DEFAULT_ORDER_BY_PARAMETER;
+  private defaultPriority: Priority = DEFAULT_BUG_PRIORITY;
 
   private isTitleRuleActive: boolean = false;
   private tags: (Tag & { bug_id: number })[] = [];
+  private priorities: (Priority & { bug_id: number })[] = [];
   private filterBy: { [key: string]: string | string[] } | undefined;
   private filterByTags: number[] | undefined;
   private filterByNoTags: boolean = false;
@@ -100,6 +108,7 @@ export default class BugsRoute extends CampaignRoute<{
 
     if (!bugs || !bugs.length) return this.emptyResponse();
 
+    this.priorities = await this.getPriorities(bugs);
     const enhancedBugs = this.enhanceBugs(bugs);
     const filtered = this.filterBugs(enhancedBugs);
     const paginated = this.paginateBugs(filtered);
@@ -213,6 +222,26 @@ export default class BugsRoute extends CampaignRoute<{
     return bugs;
   }
 
+  private async getPriorities(bugs: Awaited<ReturnType<typeof this.getBugs>>) {
+    if (!bugs || !bugs.length) return [];
+
+    const priorities: (Priority & { bug_id: number })[] = await db.query(
+      `SELECT 
+        p.id,
+        pb.bug_id,
+        p.name
+      FROM wp_ug_priority_to_bug pb
+      JOIN wp_ug_priority p ON (pb.priority_id = p.id)
+      where pb.bug_id IN (${bugs.map((bug) => bug.id).join(",")})
+      `,
+      "unguess"
+    );
+
+    if (!priorities) return [];
+
+    return priorities;
+  }
+
   private enhanceBugs(bugs: Awaited<ReturnType<typeof this.getBugs>>) {
     if (!bugs || !bugs.length) return [];
 
@@ -227,6 +256,7 @@ export default class BugsRoute extends CampaignRoute<{
           }));
         if (!tags.length) tags = undefined;
       }
+
       return {
         ...bug,
         title: getBugTitle({
@@ -256,8 +286,8 @@ export default class BugsRoute extends CampaignRoute<{
           ...(bug.uc_prefix && { prefix: bug.uc_prefix }),
         },
         device: getBugDevice(bug),
-
         siblings: this.getSiblingsOfBug(bug, bugs),
+        priority: this.getBugPriority(bug.id),
         ...(tags && { tags }),
       };
     });
@@ -287,6 +317,18 @@ export default class BugsRoute extends CampaignRoute<{
     }
   }
 
+  private getBugPriority(bug_id: number): Priority {
+    if (!this.priorities.length) return this.defaultPriority;
+
+    const priority = this.priorities.find(
+      (priority) => priority.bug_id === bug_id
+    );
+
+    return priority
+      ? { id: priority.id, name: priority.name }
+      : this.defaultPriority;
+  }
+
   private formatBugs(bugs: ReturnType<typeof this.paginateBugs>) {
     return bugs.map((bug) => {
       return {
@@ -313,6 +355,7 @@ export default class BugsRoute extends CampaignRoute<{
         read: bug.read_status ? true : false,
         tags: bug.tags,
         siblings: bug.siblings,
+        priority: bug.priority,
       };
     });
   }

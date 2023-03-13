@@ -355,6 +355,8 @@ paths:
                       required:
                         - tag_id
                         - tag_name
+                  priority:
+                    $ref: '#/components/schemas/BugPriority'
               examples:
                 oneTagResponse:
                   value:
@@ -385,6 +387,8 @@ paths:
                         required:
                           - tag_name
                     type: object
+                priority_id:
+                  type: number
             examples:
               possibleTagEntries:
                 value:
@@ -785,6 +789,42 @@ paths:
         '500':
           $ref: '#/components/responses/Error'
       operationId: get-campaigns-cid-severities
+      description: ''
+      security:
+        - JWT: []
+      parameters: []
+  '/campaigns/{cid}/priorities':
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Campaign id
+    get:
+      summary: Get Campaigns Priorities
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BugPriority'
+              examples:
+                Example 1:
+                  value:
+                    - id: 1
+                      name: string
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-priorities
       description: ''
       security:
         - JWT: []
@@ -1508,6 +1548,8 @@ components:
           $ref: '#/components/schemas/BugType'
         replicability:
           $ref: '#/components/schemas/BugReplicability'
+        priority:
+          $ref: '#/components/schemas/BugPriority'
         created:
           type: string
         occurred_date:
@@ -1652,6 +1694,17 @@ components:
         - name
     BugStatus:
       title: BugStatus
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
+    BugPriority:
+      title: BugPriority
       type: object
       properties:
         id:

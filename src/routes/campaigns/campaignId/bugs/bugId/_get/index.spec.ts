@@ -17,6 +17,10 @@ import additionalFieldData from "@src/__mocks__/database/campaign_additional_fie
 import CampaignMeta from "@src/__mocks__/database/campaign_meta";
 import useCases, { UseCaseParams } from "@src/__mocks__/database/use_cases";
 import readStatus from "@src/__mocks__/database/bug_read_status";
+import bugPriorities, {
+  BugPriorityParams,
+} from "@src/__mocks__/database/bug_priority";
+import priorities from "@src/__mocks__/database/priority";
 
 const customer_1 = {
   id: 999,
@@ -240,6 +244,11 @@ const field_2_data = {
   value: "Chrome",
 };
 
+const bug_1_highest_priority: BugPriorityParams = {
+  bug_id: bug_1.id,
+  priority_id: 5,
+};
+
 describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   beforeEach(async () => {
     await dbAdapter.add({
@@ -269,6 +278,9 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
     await additionalFieldData.insert(field_1_data);
     await additionalFieldData.insert(field_2_data);
     await useCases.insert(usecase_1);
+
+    await priorities.addDefaultItems();
+    await bugPriorities.insert(bug_1_highest_priority);
 
     await bugSeverity.addDefaultItems();
     await bugReplicability.addDefaultItems();
@@ -610,5 +622,38 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
     ]);
     expect(statusAfterSecondGet.length).toBe(1);
   });
+
+  it("Should return the priority property", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user");
+
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        id: bug_1.id,
+        priority: {
+          id: bug_1_highest_priority.priority_id,
+          name: "highest",
+        },
+      })
+    );
+  });
+
+  it("Should return the fallback medium priority if there isn't any", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_2.id}`)
+      .set("Authorization", "Bearer user");
+
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        id: bug_2.id,
+        priority: {
+          id: 3,
+          name: "medium",
+        },
+      })
+    );
+  });
+
   /** --- end of file */
 });

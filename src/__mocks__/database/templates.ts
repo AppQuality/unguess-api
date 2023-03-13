@@ -1,4 +1,4 @@
-import Table from "./table";
+import Table from "./unguess_table";
 
 type TemplateParams = {
   id?: number;
