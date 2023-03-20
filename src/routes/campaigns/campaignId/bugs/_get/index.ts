@@ -368,6 +368,7 @@ export default class BugsRoute extends CampaignRoute<{
       if (this.filterBugsByDuplicateStatus(bug) === false) return false;
       if (this.filterBugsByTags(bug) === false) return false;
       if (this.filterBugsBySeverity(bug) === false) return false;
+      if (this.filterBugsByPriority(bug) === false) return false;
       if (this.filterBugsByReplicability(bug) === false) return false;
       if (this.filterBugsByType(bug) === false) return false;
       if (this.filterBugsByUsecase(bug) === false) return false;
@@ -466,6 +467,22 @@ export default class BugsRoute extends CampaignRoute<{
       .filter((sevId) => sevId > 0);
 
     return severitiesToFilter.includes(bug.severity.id);
+  }
+
+  private filterBugsByPriority(
+    bug: Parameters<typeof this.filterBugs>[0][number]
+  ) {
+
+    if (!this.filterBy) return true;
+    if (!this.filterBy["priorities"]) return true;
+    if (typeof this.filterBy["priorities"] !== "string") return true;
+
+    const prioritiesToFilter = this.filterBy["priorities"]
+      .split(",")
+      .map((priorityId) => (parseInt(priorityId) > 0 ? parseInt(priorityId) : 0))
+      .filter((priorityId) => priorityId > 0);
+      
+    return prioritiesToFilter.includes(bug.priority.id);
   }
 
   private filterBugsByType(bug: Parameters<typeof this.filterBugs>[0][number]) {
