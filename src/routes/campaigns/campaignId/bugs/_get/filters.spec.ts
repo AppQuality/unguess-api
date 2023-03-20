@@ -13,6 +13,10 @@ import devices, { DeviceParams } from "@src/__mocks__/database/device";
 import bugsReadStatus from "@src/__mocks__/database/bug_read_status";
 import tags from "@src/__mocks__/database/bug_tags";
 import useCases from "@src/__mocks__/database/use_cases";
+import bugPriorities, {
+  BugPriorityParams,
+} from "@src/__mocks__/database/bug_priority";
+import priorities from "@src/__mocks__/database/priority";
 
 const customer_1 = {
   id: 999,
@@ -138,6 +142,11 @@ const bug_2: BugsParams = {
   os_version: device_3.os_version,
   severity_id: 2,
   application_section_id: 2,
+};
+
+const bug_1_highest_priority: BugPriorityParams = {
+  bug_id: bug_1.id,
+  priority_id: 5,
 };
 
 const bug_3: BugsParams = {
@@ -328,7 +337,9 @@ describe("GET /campaigns/{cid}/bugs", () => {
         await devices.insert(device_1);
         await devices.insert(device_2);
         await devices.insert(device_3);
+        await priorities.addDefaultItems();
 
+        await bugPriorities.insert(bug_1_highest_priority);
         await bugsReadStatus.insert({ wp_id: 1, bug_id: bug_2.id });
         await bugsReadStatus.insert({ wp_id: 2, bug_id: bug_2.id });
 
@@ -446,7 +457,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
       ])
     );
   });
-  
+
   it("Should return bugs filtered by notags", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs?filterBy[tags]=none`)
@@ -472,6 +483,46 @@ describe("GET /campaigns/{cid}/bugs", () => {
         expect.objectContaining({ id: bug_1.id }),
       ])
     );
+  });
+
+  it("Should return bugs filtered by priorities ids", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[priorities]=5`)
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: bug_1.id }),
+      ])
+    );
+  });
+
+  it("Should return bugs filtered by priorities ids even if a priority id does not exist", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[priorities]=5,99`)
+      .set("Authorization", "Bearer user");
+    expect(response.body.items.length).toBe(1);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: bug_1.id }),
+      ])
+    );
+  });
+
+  it("Should return an empty array filtered by non existing priority id", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[priorities]=99`)
+      .set("Authorization", "Bearer user");
+    expect(response.statusCode).toBe(200);
+    expect(response.body.items.length).toBe(0);
+  });
+
+  it("Should return all priorities in an array if priority field is empty", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[priorities]=`)
+      .set("Authorization", "Bearer user");
+    expect(response.statusCode).toBe(200);
+    expect(response.body.items.length).toBe(4);
   });
 
   it("Should return bugs filtered by replicabilities ids", async () => {
