@@ -277,6 +277,7 @@ const tag_1 = {
   campaign_id: campaign_1.id,
   bug_id: bug_1.id,
 };
+
 const tag_2 = {
   id: 2,
   tag_id: 1,
@@ -284,6 +285,7 @@ const tag_2 = {
   campaign_id: campaign_1.id,
   bug_id: bug_2.id,
 };
+
 const tag_4 = {
   id: 4,
   tag_id: 3,
@@ -373,6 +375,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
       })
     );
   });
+
   it("Should return only read bugs if filterBy has read filter as true", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs?filterBy[read]=true`)
@@ -412,6 +415,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
       ])
     );
   });
+
   it("Should return bugs filtered by tags ignoring invalid tags", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs?filterBy[tags]=1,3,pippo`)
@@ -442,6 +446,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
       ])
     );
   });
+  
   it("Should return bugs filtered by notags", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs?filterBy[tags]=none`)
