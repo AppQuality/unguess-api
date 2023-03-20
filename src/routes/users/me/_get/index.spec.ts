@@ -90,12 +90,12 @@ describe("GET /users/me", () => {
     expect(response.body.email).toBe("mario.rossi@example.com");
   });
 
-  //Should return the user name and surname
-  it("Should return the user name as name and surname", async () => {
+  //Should return the user name and surname of customer
+  it("Should return the user name of customer ", async () => {
     const response = await request(app)
       .get("/users/me")
-      .set("authorization", "Bearer user");
-    expect(response.body.name).toBe("Mario Rossi");
+      .set("authorization", "Bearer userWithLimitedPermissions");
+    expect(response.body.name).toBe("Paolo Verdi");
   });
 
   //Should return the unguess wordpress id
