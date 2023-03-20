@@ -25,6 +25,7 @@ export default {
     if (token === "userWithLimitedPermissions") {
       return {
         ...profiles[2],
+        id: profiles[2].wp_user_id,
         role: "customer",
         tryber_wp_user_id: profiles[2].wp_user_id,
         unguess_wp_user_id: profiles[2].wp_user_id,

@@ -4,6 +4,7 @@ export default class UserRoute<T extends RouteClassTypes> extends Route<T> {
   private userId: number;
   private tryberWpId: number;
   private unguessWpId: number;
+  private profileId: number;
   private user: UserType;
 
   constructor(
@@ -19,6 +20,7 @@ export default class UserRoute<T extends RouteClassTypes> extends Route<T> {
     this.userId = this.configuration.request.user.id;
     this.tryberWpId = this.configuration.request.user.tryber_wp_user_id;
     this.unguessWpId = this.configuration.request.user.unguess_wp_user_id;
+    this.profileId = this.configuration.request.user.profile_id;
     this.user = this.configuration.request.user;
   }
 
@@ -27,6 +29,9 @@ export default class UserRoute<T extends RouteClassTypes> extends Route<T> {
   }
   protected getUserId() {
     return this.userId;
+  }
+  protected getProfileId() {
+    return this.profileId;
   }
   protected getWordpressId(site?: "tryber" | "unguess") {
     if (site === "tryber") return this.tryberWpId;

@@ -28,7 +28,7 @@ export default class Route extends UserRoute<{
   private async getProfileName() {
     const profile: { name: string; surname: string }[] = await db.query(
       db.format(`SELECT name,surname FROM wp_appq_evd_profile WHERE id = ?`, [
-        this.getUserId(),
+        this.getProfileId(),
       ]),
       "tryber"
     );
