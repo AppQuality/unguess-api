@@ -6,6 +6,10 @@ import {
   ERROR_MESSAGE,
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
+  SEVERITY__ID,
+  PRIORITY__ID,
+  DESC,
+  ASC
 } from "@src/utils/constants";
 import { getBugTitle } from "@src/utils/campaigns/getTitleRule";
 import { getBugDevice } from "@src/utils/bugs/getBugDevice";
@@ -60,8 +64,16 @@ export default class BugsRoute extends CampaignRoute<{
 
   private setOrderBy() {
     const query = this.getQuery();
-    if (query.orderBy && ["severity_id"].includes(query.orderBy))
+
+    if (query.orderBy && [SEVERITY__ID].includes(query.orderBy)) {
       this.orderBy = query.orderBy;
+      return;
+    }
+
+    if (query.orderBy && [PRIORITY__ID].includes(query.orderBy)) {
+      this.orderBy = query.orderBy;
+      return;
+    }
   }
 
   private setOrder() {
@@ -111,7 +123,8 @@ export default class BugsRoute extends CampaignRoute<{
     this.priorities = await this.getPriorities(bugs);
     const enhancedBugs = this.enhanceBugs(bugs);
     const filtered = this.filterBugs(enhancedBugs);
-    const paginated = this.paginateBugs(filtered);
+    const ordered = this.handleApplicationOrderBy(filtered);
+    const paginated = this.paginateBugs(ordered);
     const formatted = this.formatBugs(paginated);
 
     return this.setSuccess(200, {
@@ -209,17 +222,44 @@ export default class BugsRoute extends CampaignRoute<{
       )})
       WHERE b.campaign_id = ${this.cp_id}
       AND b.publish = 1
-      AND ${
-        this.shouldShowNeedReview()
-          ? `(status.name = 'Approved' OR status.name = 'Need Review')`
-          : `status.name = 'Approved'`
+      AND ${this.shouldShowNeedReview()
+        ? `(status.name = 'Approved' OR status.name = 'Need Review')`
+        : `status.name = 'Approved'`
       }
-      ORDER BY b.${this.orderBy} ${this.order}`
+      ${this.orderBy !== PRIORITY__ID
+        ? `ORDER BY b.${this.orderBy} ${this.order}`
+        : ''
+      }`
     );
 
     if (!bugs) return false as const;
 
     return bugs;
+  }
+
+  private handleApplicationOrderBy = (
+    items: Awaited<ReturnType<typeof this.enhanceBugs>>
+  ): Awaited<ReturnType<typeof this.enhanceBugs>> => {
+
+    switch (this.orderBy) {
+      case PRIORITY__ID:
+        return items.sort(
+          (
+            {
+              priority: { id: sm }
+            },
+            {
+              priority: { id: lg }
+            }
+          ) => {
+            if (this.order === ASC) return (lg - sm);
+            else return -(lg - sm);
+          }
+        );
+
+      default:
+        return items;
+    }
   }
 
   private async getPriorities(bugs: Awaited<ReturnType<typeof this.getBugs>>) {
@@ -481,7 +521,7 @@ export default class BugsRoute extends CampaignRoute<{
       .split(",")
       .map((priorityId) => (parseInt(priorityId) > 0 ? parseInt(priorityId) : 0))
       .filter((priorityId) => priorityId > 0);
-      
+
     return prioritiesToFilter.includes(bug.priority.id);
   }
 
