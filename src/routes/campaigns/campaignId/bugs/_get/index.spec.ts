@@ -606,11 +606,9 @@ describe("GET /campaigns/{cid}/bugs", () => {
     );
   });
 
-  it("Should allow ordering by priority", async () => {
+  it("Should allow ordering by priority DESC", async () => {
     const response = await request(app)
-      .get(
-        `/campaigns/${campaign_1.id}/bugs?limit=10&start=0&order=DESC&orderBy=priority_id`
-      )
+      .get(`/campaigns/${campaign_1.id}/bugs?limit=10&start=0&order=DESC&orderBy=priority_id`)
       .set("Authorization", "Bearer user");
 
     expect(response.status).toBe(200);
@@ -625,6 +623,29 @@ describe("GET /campaigns/{cid}/bugs", () => {
           }),
           expect.objectContaining({
             id: bug_1.id,
+          }),
+        ],
+      })
+    );
+  });
+
+  it("Should allow ordering by priority ASC", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs?limit=10&start=0&order=ASC&orderBy=priority_id`)
+      .set("Authorization", "Bearer user");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject(
+      expect.objectContaining({
+        items: [
+          expect.objectContaining({
+            id: bug_1.id,
+          }),
+          expect.objectContaining({
+            id: bug_2.id,
+          }),
+          expect.objectContaining({
+            id: bug_9_no_tags.id,
           }),
         ],
       })
