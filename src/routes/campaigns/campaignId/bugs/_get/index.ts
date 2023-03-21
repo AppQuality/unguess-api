@@ -6,6 +6,10 @@ import {
   ERROR_MESSAGE,
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
+  SEVERITY__ID,
+  PRIORITY__ID,
+  DESC,
+  ASC
 } from "@src/utils/constants";
 import { getBugTitle } from "@src/utils/campaigns/getTitleRule";
 import { getBugDevice } from "@src/utils/bugs/getBugDevice";
@@ -22,9 +26,6 @@ interface Priority {
   id: number;
   name: string;
 }
-
-const SEVERITY__ID = "severity_id";
-const PRIORITY__ID = "priority_id";
 
 export default class BugsRoute extends CampaignRoute<{
   response: StoplightOperations["get-campaigns-cid-bugs"]["responses"]["200"]["content"]["application/json"];
@@ -240,6 +241,7 @@ export default class BugsRoute extends CampaignRoute<{
   private handleApplicationOrderBy = (
     items: Awaited<ReturnType<typeof this.enhanceBugs>>
   ): Awaited<ReturnType<typeof this.enhanceBugs>> => {
+
     switch (this.orderBy) {
       case PRIORITY__ID:
         return items.sort(
@@ -250,7 +252,13 @@ export default class BugsRoute extends CampaignRoute<{
             {
               priority: { id: lg }
             }
-          ) => this.order === 'DESC' ? (sm - lg) : (lg - sm)
+          ) => {
+            switch (this.order) {
+              case DESC: return -(lg - sm);
+              case ASC: return (lg - sm);
+              default: return (lg - sm);
+            }
+          }
         );
 
       default:

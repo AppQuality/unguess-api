@@ -614,7 +614,6 @@ describe("GET /campaigns/{cid}/bugs", () => {
       .set("Authorization", "Bearer user");
 
     expect(response.status).toBe(200);
-    console.log(response.body.items)
     expect(response.body).toMatchObject(
       expect.objectContaining({
         items: [

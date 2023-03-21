@@ -9,12 +9,19 @@ export const DT_CONSOLE = 4;
 export const DT_TV = 5;
 export const FUNCTIONAL_CAMPAIGN_TYPE_ID = 0;
 export const EXPERIENTIAL_CAMPAIGN_TYPE_ID = 1;
-export const DEFAULT_ORDER_PARAMETER = "DESC";
-export const DEFAULT_ORDER_BY_PARAMETER = "id";
 export const DEFAULT_BUG_PRIORITY = {
   id: 3,
   name: "medium",
 };
+
+/******* Related to Ordering *******/
+export const DEFAULT_ORDER_BY_PARAMETER = "id";
+export const SEVERITY__ID = "severity_id";
+export const PRIORITY__ID = "priority_id";
+export const DESC = 'DESC';
+export const ASC = 'ASC';
+export const DEFAULT_ORDER_PARAMETER = "DESC";
+/* *********************************** */
 
 export const DEFAULT_EXPRESS_COST = 1;
 
