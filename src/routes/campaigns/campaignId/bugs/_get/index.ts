@@ -112,7 +112,6 @@ export default class BugsRoute extends CampaignRoute<{
     try {
       bugs = await this.getBugs();
     } catch (e: any) {
-      console.log(e)
       return this.setError(500, {
         message: e.message || ERROR_MESSAGE,
         status_code: 500,
