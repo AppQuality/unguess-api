@@ -13,6 +13,10 @@ import devices, { DeviceParams } from "@src/__mocks__/database/device";
 import bugsReadStatus from "@src/__mocks__/database/bug_read_status";
 import usecases, { UseCaseParams } from "@src/__mocks__/database/use_cases";
 import tags from "@src/__mocks__/database/bug_tags";
+import bugPriorities, {
+  BugPriorityParams,
+} from "@src/__mocks__/database/bug_priority";
+import priorities from "@src/__mocks__/database/priority";
 
 const customer_1 = {
   id: 999,
@@ -361,6 +365,11 @@ const tag_4 = {
   bug_id: bug_2.id,
 };
 
+const bug_1_highest_priority: BugPriorityParams = {
+  bug_id: bug_1.id,
+  priority_id: 5,
+};
+
 describe("GET /campaigns/{cid}/bugs", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
@@ -391,6 +400,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
         await bugs.insert(bug_9_no_tags);
         await bugMedia.insert(bug_media_1);
         await bugSeverity.addDefaultItems();
+        await priorities.addDefaultItems();
         await bugReplicability.addDefaultItems();
         await bugType.addDefaultItems();
         await bugStatus.addDefaultItems();
@@ -400,6 +410,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
 
         await bugsReadStatus.insert({ wp_id: 1, bug_id: bug_2.id });
         await bugsReadStatus.insert({ wp_id: 2, bug_id: bug_2.id });
+        await bugPriorities.insert(bug_1_highest_priority);
 
         await tags.insert(tag_1);
         await tags.insert(tag_2);
@@ -586,6 +597,32 @@ describe("GET /campaigns/{cid}/bugs", () => {
           }),
           expect.objectContaining({
             id: bug_2.id,
+          }),
+          expect.objectContaining({
+            id: bug_1.id,
+          }),
+        ],
+      })
+    );
+  });
+
+  it("Should allow ordering by priority", async () => {
+    const response = await request(app)
+      .get(
+        `/campaigns/${campaign_1.id}/bugs?limit=10&start=0&order=DESC&orderBy=priority_id`
+      )
+      .set("Authorization", "Bearer user");
+
+    expect(response.status).toBe(200);
+    console.log(response.body.items)
+    expect(response.body).toMatchObject(
+      expect.objectContaining({
+        items: [
+          expect.objectContaining({
+            id: bug_2.id,
+          }),
+          expect.objectContaining({
+            id: bug_9_no_tags.id,
           }),
           expect.objectContaining({
             id: bug_1.id,
