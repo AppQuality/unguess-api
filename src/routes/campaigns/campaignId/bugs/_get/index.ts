@@ -252,12 +252,8 @@ export default class BugsRoute extends CampaignRoute<{
               priority: { id: lg }
             }
           ) => {
-            console.log("order: ", this.order)
-            switch (this.order) {
-              case DESC: return -(lg - sm);
-              case ASC: return (lg - sm);
-              default: return -(lg - sm);
-            }
+            if (this.order === ASC) return (lg - sm);
+            else return -(lg - sm);
           }
         );
 
