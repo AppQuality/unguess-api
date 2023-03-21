@@ -256,7 +256,7 @@ export default class BugsRoute extends CampaignRoute<{
             switch (this.order) {
               case DESC: return -(lg - sm);
               case ASC: return (lg - sm);
-              default: return (lg - sm);
+              default: return -(lg - sm);
             }
           }
         );
