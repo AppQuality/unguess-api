@@ -9,7 +9,7 @@ import {
   SEVERITY__ID,
   PRIORITY__ID,
   DESC,
-  ASC
+  ASC,
 } from "@src/utils/constants";
 import { getBugTitle } from "@src/utils/campaigns/getTitleRule";
 import { getBugDevice } from "@src/utils/bugs/getBugDevice";
@@ -222,13 +222,15 @@ export default class BugsRoute extends CampaignRoute<{
       )})
       WHERE b.campaign_id = ${this.cp_id}
       AND b.publish = 1
-      AND ${this.shouldShowNeedReview()
-        ? `(status.name = 'Approved' OR status.name = 'Need Review')`
-        : `status.name = 'Approved'`
+      AND ${
+        this.shouldShowNeedReview()
+          ? `(status.name = 'Approved' OR status.name = 'Need Review')`
+          : `status.name = 'Approved'`
       }
-      ${this.orderBy !== PRIORITY__ID
-        ? `ORDER BY b.${this.orderBy} ${this.order}`
-        : ''
+      ${
+        this.orderBy !== PRIORITY__ID
+          ? `ORDER BY b.${this.orderBy} ${this.order}`
+          : ""
       }`
     );
 
@@ -240,19 +242,11 @@ export default class BugsRoute extends CampaignRoute<{
   private handleApplicationOrderBy = (
     items: Awaited<ReturnType<typeof this.enhanceBugs>>
   ): Awaited<ReturnType<typeof this.enhanceBugs>> => {
-
     switch (this.orderBy) {
       case PRIORITY__ID:
         return items.sort(
-          (
-            {
-              priority: { id: sm }
-            },
-            {
-              priority: { id: lg }
-            }
-          ) => {
-            if (this.order === ASC) return (lg - sm);
+          ({ priority: { id: sm } }, { priority: { id: lg } }) => {
+            if (this.order === DESC) return lg - sm;
             else return -(lg - sm);
           }
         );
@@ -260,7 +254,7 @@ export default class BugsRoute extends CampaignRoute<{
       default:
         return items;
     }
-  }
+  };
 
   private async getPriorities(bugs: Awaited<ReturnType<typeof this.getBugs>>) {
     if (!bugs || !bugs.length) return [];
@@ -512,14 +506,15 @@ export default class BugsRoute extends CampaignRoute<{
   private filterBugsByPriority(
     bug: Parameters<typeof this.filterBugs>[0][number]
   ) {
-
     if (!this.filterBy) return true;
     if (!this.filterBy["priorities"]) return true;
     if (typeof this.filterBy["priorities"] !== "string") return true;
 
     const prioritiesToFilter = this.filterBy["priorities"]
       .split(",")
-      .map((priorityId) => (parseInt(priorityId) > 0 ? parseInt(priorityId) : 0))
+      .map((priorityId) =>
+        parseInt(priorityId) > 0 ? parseInt(priorityId) : 0
+      )
       .filter((priorityId) => priorityId > 0);
 
     return prioritiesToFilter.includes(bug.priority.id);
