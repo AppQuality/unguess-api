@@ -1047,6 +1047,7 @@ export interface operations {
               tag_name: string;
             }[];
             priority?: components["schemas"]["BugPriority"];
+            status?: components["schemas"]["BugStatus"];
           };
         };
       };
