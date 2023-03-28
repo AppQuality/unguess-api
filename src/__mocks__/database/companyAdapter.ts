@@ -35,6 +35,8 @@ import {
 import priorities from "./priority";
 import bugsPriorities from "./bug_priority";
 
+import statuses from "./status";
+
 import campaignOutputs from "./cp_outputs_view";
 import { table as expressTable, data as expressData } from "./express";
 import defaultUsers from "@src/__mocks__/database/seed/users.json";
@@ -137,6 +139,7 @@ export const adapter = {
     await campaignReadStatuses.mock();
     await priorities.mock();
     await bugsPriorities.mock();
+    await statuses.mock();
   },
   drop: async () => {
     await profileTable.drop();
@@ -190,6 +193,7 @@ export const adapter = {
     await campaignReadStatuses.dropMock();
     await priorities.dropMock();
     await bugsPriorities.dropMock();
+    await statuses.dropMock();
   },
 
   clear: async () => {
@@ -220,6 +224,7 @@ export const adapter = {
     await userTaskMedia.clear();
     await priorities.clear();
     await bugsPriorities.clear();
+    await statuses.clear();
   },
   addCampaignWithProject: async ({
     campaign_id,
