@@ -374,11 +374,6 @@ export interface components {
       id: number;
       name: string;
     };
-    /** BugPriority */
-    "BugPriority - copy": {
-      id: number;
-      name: string;
-    };
     /** BugTag */
     BugTag: {
       id: number;

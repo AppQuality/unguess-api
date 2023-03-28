@@ -11,7 +11,7 @@ const defaultItem: StatusParams = {
 };
 
 class Statuses extends Table<StatusParams> {
-  protected name = "wp_ug_status";
+  protected name = "ug_bug_custom_status";
   protected columns = ["id INTEGER PRIMARY KEY NOT NULL", "name VARCHAR(45)"];
   constructor() {
     super(defaultItem);

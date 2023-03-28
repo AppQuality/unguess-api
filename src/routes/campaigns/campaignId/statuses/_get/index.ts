@@ -11,7 +11,7 @@ export default class Route extends CampaignRoute<{
   protected async init(): Promise<void> {
     await super.init();
     this.priorities = await db.query(
-      "SELECT id, name FROM wp_ug_status ORDER BY id DESC", 
+      "SELECT id, name FROM ug_bug_custom_status ORDER BY id DESC", 
       "unguess"
     );
   }
