@@ -389,6 +389,10 @@ paths:
                     type: object
                 priority_id:
                   type: number
+                status_id:
+                  type: number
+                  x-stoplight:
+                    id: v0yancupl0qkg
             examples:
               possibleTagEntries:
                 value:
