@@ -1063,6 +1063,7 @@ export interface operations {
               }
           )[];
           priority_id?: number;
+          status_id?: number;
         };
       };
     };
