@@ -357,6 +357,10 @@ paths:
                         - tag_name
                   priority:
                     $ref: '#/components/schemas/BugPriority'
+                  status:
+                    $ref: '#/components/schemas/BugStatus'
+                    x-stoplight:
+                      id: yr73zj2symqgw
               examples:
                 oneTagResponse:
                   value:
