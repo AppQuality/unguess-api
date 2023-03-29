@@ -1750,19 +1750,6 @@ components:
       required:
         - id
         - name
-    BugPriority - copy:
-      title: BugPriority
-      x-stoplight:
-        id: vgqyu64fade9e
-      type: object
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-      required:
-        - id
-        - name
     BugTag:
       title: BugTag
       type: object
