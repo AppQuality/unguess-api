@@ -369,6 +369,11 @@ export interface components {
       id: number;
       name: string;
     };
+    /** CustomBugStatus */
+    CustomBugStatus: {
+      id: number;
+      name: string;
+    };
     /** BugPriority */
     BugPriority: {
       id: number;
@@ -1056,7 +1061,7 @@ export interface operations {
               tag_name: string;
             }[];
             priority?: components["schemas"]["BugPriority"];
-            status?: components["schemas"]["BugStatus"];
+            customStatus?: components["schemas"]["CustomBugStatus"];
           };
         };
       };
@@ -1307,7 +1312,7 @@ export interface operations {
       /** OK */
       200: {
         content: {
-          "application/json": components["schemas"]["BugStatus"][];
+          "application/json": components["schemas"]["CustomBugStatus"][];
         };
       };
       400: components["responses"]["Error"];

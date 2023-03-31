@@ -9,7 +9,7 @@ import * as db from "@src/features/db";
 type Field = 'tags' | 'priority_id' | 'status_id';
 type Priority = StoplightOperations["patch-campaigns-cid-bugs-bid"]["responses"]["200"]["content"]["application/json"]["priority"]
 type Pid = number;
-type Status = StoplightOperations["patch-campaigns-cid-bugs-bid"]["responses"]["200"]["content"]["application/json"]["status"]
+type Status = StoplightOperations["patch-campaigns-cid-bugs-bid"]["responses"]["200"]["content"]["application/json"]["customStatus"]
 type Sid = number;
 
 export default class Route extends UserRoute<{
@@ -98,7 +98,7 @@ export default class Route extends UserRoute<{
       return this.setSuccess(200, {
         tags: rTags,
         priority: rPriority,
-        status: rStatus
+        customStatus: rStatus
       })
     }
 

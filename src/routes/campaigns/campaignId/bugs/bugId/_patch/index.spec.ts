@@ -493,7 +493,7 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
       .send({ status_id: bug_status_1.status_id });
 
     expect(response.status).toBe(200);
-    expect(response.body.status).toEqual(expect.objectContaining(status_1));
+    expect(response.body.customStatus).toEqual(expect.objectContaining(status_1));
   });
 
   // It should not return the status if not sent
