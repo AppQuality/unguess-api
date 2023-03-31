@@ -10,8 +10,8 @@ const defaultItem: StatusParams = {
   name: "status",
 };
 
-class Statuses extends Table<StatusParams> {
-  protected name = "wp_ug_status";
+class CustomStatuses extends Table<StatusParams> {
+  protected name = "unguess_custom_status";
   protected columns = ["id INTEGER PRIMARY KEY NOT NULL", "name VARCHAR(45)"];
   constructor() {
     super(defaultItem);
@@ -87,6 +87,6 @@ class Statuses extends Table<StatusParams> {
     ];
   }
 }
-const statuses = new Statuses();
-export default statuses;
+const customStatuses = new CustomStatuses();
+export default customStatuses;
 export type { StatusParams };

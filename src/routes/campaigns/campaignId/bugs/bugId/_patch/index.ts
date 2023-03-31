@@ -6,8 +6,11 @@ import { getProjectById } from "@src/utils/projects";
 import { getBugById } from "@src/utils/bugs";
 import * as db from "@src/features/db";
 
+type Field = 'tags' | 'priority_id' | 'status_id';
 type Priority = StoplightOperations["patch-campaigns-cid-bugs-bid"]["responses"]["200"]["content"]["application/json"]["priority"]
 type Pid = number;
+type Status = StoplightOperations["patch-campaigns-cid-bugs-bid"]["responses"]["200"]["content"]["application/json"]["status"]
+type Sid = number;
 
 export default class Route extends UserRoute<{
   parameters: StoplightOperations["patch-campaigns-cid-bugs-bid"]["parameters"]["path"];
@@ -18,14 +21,18 @@ export default class Route extends UserRoute<{
   private bid: number;
   private tags: ({ tag_id: number } | { tag_name: string })[] | undefined;
   private pid: Pid | undefined;
+  private sid: Sid | undefined;
+  private fields: Field[];
 
   constructor(configuration: RouteClassConfiguration) {
     super(configuration);
-    const params = this.getParameters();
-    this.cid = parseInt(params.cid);
-    this.bid = parseInt(params.bid);
+
+    this.fields = Object.keys(this.getBody()) as Field[];
+    this.cid = parseInt(this.getParameters().cid);
+    this.bid = parseInt(this.getParameters().bid);
     this.tags = this.getTags();
     this.pid = this.getBody().priority_id;
+    this.sid = this.getBody().status_id;
   }
 
   private getTags() {
@@ -81,51 +88,68 @@ export default class Route extends UserRoute<{
   }
 
   protected async prepare(): Promise<void> {
-
-    if (this.tags) {
-      await this.replaceTags();
-    }
-
-    const bugTags = await this.getCurrentTags();
-    if (!this.pid) return this.setSuccess(200, {
-      tags: bugTags
-    });
-
     try {
-      const allPriorities = await this.getAllPriorities();
-      const [result] = allPriorities.filter((priority: Priority) => priority && priority.id === this.pid);
-
-      if (!result) {
-        return this.setError(403, {} as OpenapiError);
-      };
-
-      if (!await this.checkIfBugIdExistsInBugPriority()) {
-        await this.addPriorityToBugPriority(result.id);
-      }
-
-      else {
-        await this.updatePriorityToBugPriority(result.id);
-      }
-
-      const [foundPid] = await this.getBugPriority();
-      if (foundPid.priority_id !== this.pid)
-        throw new Error('Could not update entry in Database');
+      const [rTags, rPriority, rStatus] = await Promise.all([
+        this.tagsPatch(),
+        this.priorityPatch(),
+        this.statusPatch()
+      ]);
 
       return this.setSuccess(200, {
-        tags: bugTags,
-        priority: result
-      });
-
+        tags: rTags,
+        priority: rPriority,
+        status: rStatus
+      })
     }
 
     catch (error) {
-      return this.setError(500,
-        {
-          message: "Something went wrong! Unable to update data"
-        } as OpenapiError
-      );
+      switch (error) {
+        case 'NOT_FOUND': return this.setError(403, {} as OpenapiError);
+        default: return this.setError(500,
+          {
+            message: "Something went wrong! Unable to update data"
+          } as OpenapiError
+        );
+
+      }
     }
   };
+
+  private async priorityPatch() {
+
+    if (!this.fields.includes('priority_id')) return;
+    const allPriorities = await this.getAllPriorities();
+    const [result] = allPriorities.filter((priority: Priority) => priority && priority.id === this.pid);
+    if (!result) return Promise.reject('NOT_FOUND');
+
+    if (!await this.checkIfBugIdExistsInBugPriority()) { await this.addPriorityToBugPriority(result.id) }
+    else { this.updatePriorityToBugPriority(result.id) }
+    const [{ priority_id }] = await this.getBugPriority();
+
+    if (priority_id !== this.pid) return Promise.reject('NOT_UPDATED');
+
+    return Promise.resolve(result);
+  };
+
+  private async statusPatch() {
+
+    if (!this.fields.includes('status_id')) return;
+    const allStatuses = await this.getAllStatuses();
+    const [result] = allStatuses.filter((status: Status) => status && status.id === this.sid);
+    if (!result) return Promise.reject('NOT_FOUND');
+
+    if (!await this.checkIfBugIdExistsInBugStatus()) { await this.addStatusToBugStatus(result.id) }
+    else { this.updateStatusToBugStatus(result.id) }
+    const [{ status_id }] = await this.getBugStatus();
+    if (status_id !== this.sid) return Promise.reject('NOT_UPDATED');
+
+    return Promise.resolve(result);
+  };
+
+  private async tagsPatch() {
+    if (this.tags) await this.replaceTags();
+    return await this.getCurrentTags();
+  }
 
   private async getCurrentTags(
     { byBug }: { byBug: boolean } = { byBug: true }
@@ -233,9 +257,9 @@ export default class Route extends UserRoute<{
   private async getBugPriority(): Promise<{ priority_id: number }[]> {
     return await db.query(db.format(
       `
-        SELECT priority_id
-        FROM wp_ug_priority_to_bug
-        WHERE bug_id = ? 
+      SELECT priority_id
+      FROM wp_ug_priority_to_bug
+      WHERE bug_id = ? 
       `, [this.bid]
     ), "unguess");
   };
@@ -257,4 +281,52 @@ export default class Route extends UserRoute<{
     `, [pid, this.bid]
     ), "unguess");
   };
-}
+
+  private async getAllStatuses(): Promise<Status[]> {
+    return await db.query(
+      "SELECT id, name FROM unguess_custom_status ORDER BY id",
+      "unguess"
+    );
+  }
+
+  private async checkIfBugIdExistsInBugStatus(): Promise<Boolean> {
+    const [result] = await db.query(
+      db.format(
+        `SELECT bug_id 
+        FROM unguess_custom_status_to_bug
+        WHERE bug_id = ?
+        `, [this.bid]
+      ), "unguess"
+    );
+    if (result) return true;
+    return false;
+  };
+
+  private async addStatusToBugStatus(sid: Sid): Promise<void> {
+    await db.query(db.format(
+      `
+        INSERT INTO unguess_custom_status_to_bug (bug_id, status_id)
+        VALUES (?, ?)
+      `, [this.bid, sid]
+    ), "unguess");
+  };
+
+  private async updateStatusToBugStatus(sid: Sid): Promise<void> {
+    await db.query(db.format(`
+      UPDATE unguess_custom_status_to_bug
+      SET status_id = ?
+      WHERE bug_id = ?
+    `, [sid, this.bid]
+    ), "unguess");
+  };
+
+  private async getBugStatus(): Promise<{ status_id: number }[]> {
+    return await db.query(db.format(
+      `
+      SELECT status_id
+      FROM unguess_custom_status_to_bug
+      WHERE bug_id = ? 
+      `, [this.bid]
+    ), "unguess");
+  };
+};
