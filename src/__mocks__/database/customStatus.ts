@@ -85,7 +85,11 @@ class CustomStatuses extends Table<StatusParams> {
         name: "not a bug",
       }
     ];
-  }
+  };
+
+  sortedDefaultItems(how?: 'ASC' | 'DESC') {
+    return this.getDefaultItems().sort((t1, t2) => how === 'ASC' ? t1.id - t2.id : t2.id - t1.id)
+  };
 }
 const customStatuses = new CustomStatuses();
 export default customStatuses;
