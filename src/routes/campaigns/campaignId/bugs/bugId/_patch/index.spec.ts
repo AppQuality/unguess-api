@@ -471,7 +471,7 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
       .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer user")
       .send({ status_id: 99 });
-      
+
     expect(response.status).toBe(403);
   });
 
@@ -514,8 +514,8 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     expect(response.body.status).toBeUndefined();
   });
 
-  // It should keep existing tags if no tags field in body while patching status
-  it("It should keep existing tags if no tags field in body while patching status", async () => {
+  // It should keep existing entries if no update field in body while patching status
+  it("It should keep existing entries if no update field in body while patching status", async () => {
     const response = await request(app)
       .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer user")
