@@ -1,5 +1,5 @@
 /** OPENAPI-CLASS: patch-campaigns-cid-bugs-bid */
-import { ERROR_MESSAGE } from "@src/utils/constants";
+import { ERROR_MESSAGE, NOT_FOUND, NOT_UPDATED } from "@src/utils/constants";
 import { getCampaign } from "@src/utils/campaigns";
 import UserRoute from "@src/features/routes/UserRoute";
 import { getProjectById } from "@src/utils/projects";
@@ -104,7 +104,7 @@ export default class Route extends UserRoute<{
 
     catch (error) {
       switch (error) {
-        case 'NOT_FOUND': return this.setError(403, {} as OpenapiError);
+        case NOT_FOUND: return this.setError(403, {} as OpenapiError);
         default: return this.setError(500,
           {
             message: "Something went wrong! Unable to update data"
@@ -120,13 +120,13 @@ export default class Route extends UserRoute<{
     if (!this.fields.includes('priority_id')) return;
     const allPriorities = await this.getAllPriorities();
     const [result] = allPriorities.filter((priority: Priority) => priority && priority.id === this.pid);
-    if (!result) return Promise.reject('NOT_FOUND');
+    if (!result) return Promise.reject(NOT_FOUND);
 
     if (!await this.checkIfBugIdExistsInBugPriority()) { await this.addPriorityToBugPriority(result.id) }
     else { this.updatePriorityToBugPriority(result.id) }
     const [{ priority_id }] = await this.getBugPriority();
 
-    if (priority_id !== this.pid) return Promise.reject('NOT_UPDATED');
+    if (priority_id !== this.pid) return Promise.reject(NOT_UPDATED);
 
     return Promise.resolve(result);
   };
@@ -136,12 +136,12 @@ export default class Route extends UserRoute<{
     if (!this.fields.includes('status_id')) return;
     const allStatuses = await this.getAllStatuses();
     const [result] = allStatuses.filter((status: Status) => status && status.id === this.sid);
-    if (!result) return Promise.reject('NOT_FOUND');
+    if (!result) return Promise.reject(NOT_FOUND);
 
     if (!await this.checkIfBugIdExistsInBugStatus()) { await this.addStatusToBugStatus(result.id) }
     else { this.updateStatusToBugStatus(result.id) }
     const [{ status_id }] = await this.getBugStatus();
-    if (status_id !== this.sid) return Promise.reject('NOT_UPDATED');
+    if (status_id !== this.sid) return Promise.reject(NOT_UPDATED);
 
     return Promise.resolve(result);
   };

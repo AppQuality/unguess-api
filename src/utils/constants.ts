@@ -42,3 +42,6 @@ export const fallBackCsmProfile: StoplightComponents["schemas"]["Workspace"]["cs
     profile_id: 20739,
     url: "https://meetings.hubspot.com/gianluca-peretti",
   };
+
+export const NOT_FOUND = 'NOT_FOUND';
+export const NOT_UPDATED = 'NOT_UPDATED';
