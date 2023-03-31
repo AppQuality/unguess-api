@@ -358,7 +358,7 @@ paths:
                   priority:
                     $ref: '#/components/schemas/BugPriority'
                   status:
-                    $ref: '#/components/schemas/BugStatus'
+                    $ref: '#/components/schemas/CustomBugStatus'
                     x-stoplight:
                       id: yr73zj2symqgw
               examples:
