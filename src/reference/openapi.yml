@@ -862,10 +862,6 @@ paths:
                   value:
                     - id: 1
                       name: string
-            application/xml:
-              schema:
-                type: object
-                properties: {}
         '400':
           $ref: '#/components/responses/Error'
         '403':
