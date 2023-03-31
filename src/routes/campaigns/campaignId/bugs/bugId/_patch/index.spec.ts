@@ -12,6 +12,8 @@ import usecases, { UseCaseParams } from "@src/__mocks__/database/use_cases";
 import tags from "@src/__mocks__/database/bug_tags";
 import bug_priorities from "@src/__mocks__/database/bug_priority";
 import priorities from "@src/__mocks__/database/priority";
+import bug_statuses from "@src/__mocks__/database/custom_bug_status";
+import customStatus from "@src/__mocks__/database/customStatus";
 
 const campaign_type_1 = {
   id: 1,
@@ -225,6 +227,37 @@ const bug_priority_3 = {
   priority_id: priority_3.id,
 };
 
+
+const status_1 = {
+  id: 1,
+  name: "to do",
+};
+
+const status_2 = {
+  id: 2,
+  name: "to be imported",
+};
+
+const status_3 = {
+  id: 3,
+  name: "open",
+};
+
+const bug_status_1 = {
+  bug_id: bug_1.id,
+  status_id: status_1.id,
+};
+
+const bug_status_2 = {
+  bug_id: bug_2.id,
+  status_id: status_2.id,
+};
+
+const bug_status_3 = {
+  bug_id: bug_3.id,
+  status_id: status_3.id,
+};
+
 describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
   beforeAll(async () => {
     await dbAdapter.add({
@@ -250,6 +283,10 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     await bug_priorities.insert(bug_priority_2);
     await bug_priorities.insert(bug_priority_3);
     await priorities.addDefaultItems();
+    await bug_statuses.insert(bug_status_1);
+    await bug_statuses.insert(bug_status_2);
+    await bug_statuses.insert(bug_status_3);
+    await customStatus.addDefaultItems();
   });
 
   // It should answer 403 if user is not logged in
@@ -421,6 +458,70 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
       .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer user")
       .send({ priority_id: bug_priority_1.priority_id });
+
+    expect(response.status).toBe(200);
+    expect(response.body.tags[0]).toEqual({
+      tag_id: tag_3.tag_id,
+      tag_name: tag_3.display_name
+    })
+  });
+
+  it("It should return an error 403 if the status does not exists", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user")
+      .send({ status_id: 99 });
+
+    expect(response.status).toBe(403);
+  });
+
+  // Should return an error 400 if the status is not a number
+  it("It should return an error 400 if the status is not a number", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user")
+      .send({ status_id: "not a number" });
+
+    expect(response.status).toBe(400);
+  });
+
+  // It should return the updated status
+  it("It should return the updated status", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user")
+      .send({ status_id: bug_status_1.status_id });
+
+    expect(response.status).toBe(200);
+    expect(response.body.status).toEqual(expect.objectContaining(status_1));
+  });
+
+  // It should not return the status if not sent
+  it("It should not return the status if not sent", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user")
+      .send({
+        priority_id: priority_3.id,
+        tags: [
+          { tag_id: tag_3.tag_id },
+          { tag_name: "Tag to be add" },
+          { tag_id: tag_3.tag_id },
+        ],
+      });
+
+    expect(response.status).toBe(200);
+    expect(response.body.status).toBeUndefined();
+  });
+
+  // It should keep existing entries if no update field in body while patching status
+  it("It should keep existing entries if no update field in body while patching status", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user")
+      .send({
+        status_id: bug_status_1.status_id
+      });
 
     expect(response.status).toBe(200);
     expect(response.body.tags[0]).toEqual({

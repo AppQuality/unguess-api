@@ -35,7 +35,8 @@ import {
 import priorities from "./priority";
 import bugsPriorities from "./bug_priority";
 
-import statuses from "./status";
+import customStatuses from "./customStatus";
+import bugCustomStatus from "./custom_bug_status";
 
 import campaignOutputs from "./cp_outputs_view";
 import { table as expressTable, data as expressData } from "./express";
@@ -139,7 +140,8 @@ export const adapter = {
     await campaignReadStatuses.mock();
     await priorities.mock();
     await bugsPriorities.mock();
-    await statuses.mock();
+    await customStatuses.mock();
+    await bugCustomStatus.mock()
   },
   drop: async () => {
     await profileTable.drop();
@@ -193,7 +195,8 @@ export const adapter = {
     await campaignReadStatuses.dropMock();
     await priorities.dropMock();
     await bugsPriorities.dropMock();
-    await statuses.dropMock();
+    await customStatuses.dropMock();
+    await bugCustomStatus.dropMock();
   },
 
   clear: async () => {
@@ -224,7 +227,8 @@ export const adapter = {
     await userTaskMedia.clear();
     await priorities.clear();
     await bugsPriorities.clear();
-    await statuses.clear();
+    await customStatuses.clear();
+    await bugCustomStatus.clear();
   },
   addCampaignWithProject: async ({
     campaign_id,
