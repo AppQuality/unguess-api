@@ -856,12 +856,16 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/BugStatus'
+                  $ref: '#/components/schemas/CustomBugStatus'
               examples:
                 Example 1:
                   value:
                     - id: 1
                       name: string
+            application/xml:
+              schema:
+                type: object
+                properties: {}
         '400':
           $ref: '#/components/responses/Error'
         '403':
@@ -1738,6 +1742,19 @@ components:
         - name
     BugStatus:
       title: BugStatus
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
+    CustomBugStatus:
+      title: CustomBugStatus
+      x-stoplight:
+        id: yw915y8a4ktlw
       type: object
       properties:
         id:
@@ -2650,6 +2667,20 @@ components:
       required:
         - data
         - kind
+    BugStatus - copy:
+      type: object
+      properties:
+        id:
+          type: integer
+          x-stoplight:
+            id: z061vja8ynghw
+        name:
+          type: string
+          x-stoplight:
+            id: rvd6o0s5h81od
+      required:
+        - id
+        - name
   securitySchemes:
     JWT:
       type: http
