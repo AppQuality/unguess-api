@@ -2667,20 +2667,6 @@ components:
       required:
         - data
         - kind
-    BugStatus - copy:
-      type: object
-      properties:
-        id:
-          type: integer
-          x-stoplight:
-            id: 7vanplqoe9ooe
-        name:
-          type: string
-          x-stoplight:
-            id: esseyxk52y8uq
-      required:
-        - id
-        - name
   securitySchemes:
     JWT:
       type: http
