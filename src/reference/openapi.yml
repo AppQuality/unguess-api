@@ -856,7 +856,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CustomBugStatus'
+                  $ref: '#/components/schemas/BugCustomStatus'
               examples:
                 Example 1:
                   value:
