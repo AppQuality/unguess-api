@@ -10,8 +10,8 @@ const defaultItem: StatusParams = {
   name: "status",
 };
 
-class CustomStatuses extends Table<StatusParams> {
-  protected name = "unguess_custom_status";
+class BugCustomStatuses extends Table<StatusParams> {
+  protected name = "unguess_bug_custom_status";
   protected columns = ["id INTEGER PRIMARY KEY NOT NULL", "name VARCHAR(45)"];
   constructor() {
     super(defaultItem);
@@ -91,6 +91,6 @@ class CustomStatuses extends Table<StatusParams> {
     return this.getDefaultItems().sort((t1, t2) => how === 'ASC' ? t1.id - t2.id : t2.id - t1.id)
   };
 }
-const customStatuses = new CustomStatuses();
-export default customStatuses;
+const bug_custom_status = new BugCustomStatuses();
+export default bug_custom_status;
 export type { StatusParams };

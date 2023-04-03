@@ -369,8 +369,8 @@ export interface components {
       id: number;
       name: string;
     };
-    /** CustomBugStatus */
-    CustomBugStatus: {
+    /** BugCustomStatus */
+    BugCustomStatus: {
       id: number;
       name: string;
     };
@@ -1061,7 +1061,7 @@ export interface operations {
               tag_name: string;
             }[];
             priority?: components["schemas"]["BugPriority"];
-            customStatus?: components["schemas"]["CustomBugStatus"];
+            customStatus?: components["schemas"]["BugCustomStatus"];
           };
         };
       };
@@ -1078,7 +1078,7 @@ export interface operations {
               }
           )[];
           priority_id?: number;
-          status_id?: number;
+          custom_status_id?: number;
         };
       };
     };

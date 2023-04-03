@@ -2,7 +2,7 @@ import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
-import customStatuses from "@src/__mocks__/database/customStatus";
+import bug_custom_status from "@src/__mocks__/database/bug_custom_status";
 
 const campaign_type_1 = {
   id: 1,
@@ -84,7 +84,7 @@ describe("GET /campaigns/{cid}/statuses", () => {
       userToCustomers: [user_to_customer_1, user_to_customer_2],
     });
 
-    await customStatuses.addDefaultItems();
+    await bug_custom_status.addDefaultItems();
   });
 
   // It should answer 403 if user is not logged in
@@ -129,7 +129,7 @@ describe("GET /campaigns/{cid}/statuses", () => {
     expect(response.status).toBe(200);
 
     const { body } = response;
-    expect(body).toEqual(customStatuses.sortedDefaultItems('DESC'));
+    expect(body).toEqual(bug_custom_status.sortedDefaultItems('DESC'));
   });
 
   it("Should not return the list of statuses for a campaign where the user is not an owner", async () => {
