@@ -1061,6 +1061,7 @@ export interface operations {
               tag_name: string;
             }[];
             priority?: components["schemas"]["BugPriority"];
+            custom_status?: components["schemas"]["BugCustomStatus"];
           };
         };
       };
@@ -1077,6 +1078,7 @@ export interface operations {
               }
           )[];
           priority_id?: number;
+          custom_status_id?: number;
         };
       };
     };
