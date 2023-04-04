@@ -538,5 +538,16 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     );
   });
 
+  // It should return an empty response if no field is sent
+  it("It should return an empty response if no field is sent", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user")
+      .send({});
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({});
+  });
+
   // --- End of file
 });
