@@ -829,6 +829,42 @@ paths:
       security:
         - JWT: []
       parameters: []
+  '/campaigns/{cid}/custom_statuses':
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Campaign id
+    get:
+      summary: Get Campaigns Priorities
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BugCustomStatus'
+              examples:
+                Example 1:
+                  value:
+                    - id: 1
+                      name: string
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-custom-statuses
+      description: ''
+      security:
+        - JWT: []
+      parameters: []
   '/campaigns/{cid}/usecases':
     parameters:
       - $ref: '#/components/parameters/cid'
