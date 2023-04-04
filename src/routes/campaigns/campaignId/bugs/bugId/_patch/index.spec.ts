@@ -511,12 +511,13 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     const response = await request(app)
       .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer user")
-      .send({ custom_status_id: bug_status_1.custom_status_id });
+      .send({ custom_status_id: status_1.id });
 
     expect(response.status).toBe(200);
     expect(response.body.custom_status).toEqual(
       expect.objectContaining({
-        custom_status_id: bug_status_1.custom_status_id,
+        id: status_1.id,
+        name: status_1.name,
       })
     );
   });
