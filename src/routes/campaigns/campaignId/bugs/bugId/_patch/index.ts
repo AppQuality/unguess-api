@@ -155,6 +155,7 @@ export default class Route extends UserRoute<{
   }
 
   private async tagsPatch() {
+    if (!this.fields.includes("tags")) return;
     if (this.tags) await this.replaceTags();
     return await this.getCurrentTags();
   }
