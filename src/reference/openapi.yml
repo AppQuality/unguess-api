@@ -359,8 +359,6 @@ paths:
                     $ref: '#/components/schemas/BugPriority'
                   custom_status:
                     $ref: '#/components/schemas/BugCustomStatus'
-                    x-stoplight:
-                      id: drgal2rhfkl4a
               examples:
                 oneTagResponse:
                   value:
@@ -395,8 +393,6 @@ paths:
                   type: number
                 custom_status_id:
                   type: number
-                  x-stoplight:
-                    id: ekow2vkl0uzu2
             examples:
               possibleTagEntries:
                 value:
@@ -1760,8 +1756,6 @@ components:
         - name
     BugCustomStatus:
       title: BugCustomStatus
-      x-stoplight:
-        id: i2xzyxsdfyg3s
       type: object
       properties:
         id:
