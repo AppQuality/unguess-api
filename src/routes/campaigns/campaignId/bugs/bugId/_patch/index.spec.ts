@@ -291,6 +291,7 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
 
     expect(response.status).toBe(403);
   });
+
   // It should fail if the campaign does not exist
   it("Should fail if the campaign does not exist", async () => {
     const response = await request(app)
@@ -299,6 +300,7 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
 
     expect(response.status).toBe(400);
   });
+
   // It should fail if the bug does not exist
   it("Should fail if the bug does not exist", async () => {
     const response = await request(app)
@@ -307,13 +309,16 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
 
     expect(response.status).toBe(400);
   });
-  // it Should fail if the user is not the owner
+
+  // It should fail if the user is not the owner
   it("Should fail if the user is not the owner", async () => {
     const response = await request(app)
       .patch(`/campaigns/${campaign_2.id}/bugs/${bug_2.id}`)
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(403);
   });
+
+  // It should remove all tags if send empty tags
   it("Should remove all tags if send empty tags", async () => {
     const response = await request(app)
       .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
@@ -324,6 +329,7 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     expect(response.status).toBe(200);
     expect(response.body.tags).toEqual([]);
   });
+
   it("Should add existing tag by tag_id", async () => {
     const response = await request(app)
       .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
@@ -341,6 +347,8 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
       ])
     );
   });
+
+  // It should add tag by tag_name if tag does not exists
   it("Should add tag by tag_name if tag does not exists", async () => {
     const response = await request(app)
       .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
@@ -370,6 +378,8 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
       ])
     );
   });
+
+  // It should ignore duplicated tag_id
   it("Should ignore duplicated tag_id", async () => {
     const response = await request(app)
       .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
@@ -444,15 +454,17 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     expect(response.body.priority).toBeUndefined();
   });
 
-  // It should keep existing tags if there are no tags sent while patching priority
-  it("It should keep existing tags if there are no tags sent while patching priority", async () => {
+  // It should return only the priority if it's the only field patched
+  it("It should return only the priority if it's the only field patched", async () => {
     const response = await request(app)
       .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer user")
       .send({ priority_id: bug_priority_1.priority_id });
 
     expect(response.status).toBe(200);
-    expect(response.body.tags).toBeDefined();
+    expect(response.body.priority).toBeDefined();
+    expect(response.body.tags).toBeUndefined();
+    expect(response.body.custom_status).toBeUndefined();
   });
 
   // It should return an error 403 if the custom_status_id does not exists
@@ -475,8 +487,8 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     expect(response.status).toBe(400);
   });
 
-  // It should keep existing entries if no update field in body while patching status
-  it("It should keep existing entries if no update field in body while patching status", async () => {
+  // It should return only the custom_status if it's the only field patched
+  it("It should return only the custom_status if it's the only field patched", async () => {
     const response = await request(app)
       .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer user")
@@ -485,7 +497,9 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
       });
 
     expect(response.status).toBe(200);
-    expect(response.body.tags).toBeDefined();
+    expect(response.body.custom_status).toBeDefined();
+    expect(response.body.tags).toBeUndefined();
+    expect(response.body.priority).toBeUndefined();
   });
 
   // It should not return the custom_status if not sent
@@ -504,6 +518,8 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
 
     expect(response.status).toBe(200);
     expect(response.body.custom_status).toBeUndefined();
+    expect(response.body.priority).toBeDefined();
+    expect(response.body.tags).toBeDefined();
   });
 
   // It should return the updated status
