@@ -1760,8 +1760,6 @@ components:
           type: integer
         name:
           type: string
-          x-stoplight:
-            id: g9kwsccjbzlwl
       required:
         - id
         - name
