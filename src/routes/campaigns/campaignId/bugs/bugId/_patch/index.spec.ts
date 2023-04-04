@@ -9,15 +9,18 @@ import replicabilities from "@src/__mocks__/database/bug_replicability";
 import statuses from "@src/__mocks__/database/bug_status";
 import devices, { DeviceParams } from "@src/__mocks__/database/device";
 import usecases, { UseCaseParams } from "@src/__mocks__/database/use_cases";
-import tags from "@src/__mocks__/database/bug_tags";
+import bug_tags from "@src/__mocks__/database/bug_tags";
 import bug_priorities from "@src/__mocks__/database/bug_priority";
 import priorities from "@src/__mocks__/database/priority";
+import bug_custom_statuses from "@src/__mocks__/database/bug_custom_status";
+import custom_status from "@src/__mocks__/database/custom_status";
 
 const campaign_type_1 = {
   id: 1,
   name: "Functional Testing (Bug Hunting)",
   type: FUNCTIONAL_CAMPAIGN_TYPE_ID,
 };
+
 const customer_1 = {
   id: 1,
   company: "Company 1",
@@ -35,6 +38,7 @@ const project_1 = {
   display_name: "Project 999",
   customer_id: 1,
 };
+
 const customer_2 = {
   id: 2,
   company: "Company 2",
@@ -66,6 +70,7 @@ const campaign_1 = {
   campaign_type: -1,
   project_id: 1,
 };
+
 const campaign_2 = {
   id: 2,
   start_date: "2017-07-20 10:00:00",
@@ -79,6 +84,7 @@ const campaign_2 = {
   campaign_type: -1,
   project_id: 2,
 };
+
 const device_1: DeviceParams = {
   id: 12,
   manufacturer: "Apple",
@@ -172,14 +178,15 @@ const bug_3: BugsParams = {
   os_version: device_1.os_version,
 };
 
-const tag_1 = {
+const bug_tag_1 = {
   id: 69,
   tag_id: 1,
   display_name: "Tag 1",
   campaign_id: campaign_1.id,
   bug_id: bug_1.id,
 };
-const tag_2_other_cp = {
+
+const bug_tag_2_other_cp = {
   id: 1,
   tag_id: 45,
   display_name: "Tag 2",
@@ -187,7 +194,7 @@ const tag_2_other_cp = {
   bug_id: 1000,
 };
 
-const tag_3 = {
+const bug_tag_3 = {
   id: 3,
   tag_id: 2,
   display_name: "Tag 3",
@@ -225,6 +232,26 @@ const bug_priority_3 = {
   priority_id: priority_3.id,
 };
 
+const defaultCustomStatuses = custom_status.getDefaultItems();
+const status_1 = defaultCustomStatuses[0]; // to do
+const status_2 = defaultCustomStatuses[1]; // to be imported
+const status_3 = defaultCustomStatuses[2]; // open
+
+const bug_status_1 = {
+  bug_id: bug_1.id,
+  custom_status_id: status_1.id,
+};
+
+const bug_status_2 = {
+  bug_id: bug_2.id,
+  custom_status_id: status_2.id,
+};
+
+const bug_status_3 = {
+  bug_id: bug_3.id,
+  custom_status_id: status_3.id,
+};
+
 describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
   beforeAll(async () => {
     await dbAdapter.add({
@@ -243,13 +270,17 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     await statuses.addDefaultItems();
     await devices.insert(device_1);
     await usecases.insert(usecase_1);
-    await tags.insert(tag_1);
-    await tags.insert(tag_2_other_cp);
-    await tags.insert(tag_3);
+    await bug_tags.insert(bug_tag_1);
+    await bug_tags.insert(bug_tag_2_other_cp);
+    await bug_tags.insert(bug_tag_3);
     await bug_priorities.insert(bug_priority_1);
     await bug_priorities.insert(bug_priority_2);
     await bug_priorities.insert(bug_priority_3);
     await priorities.addDefaultItems();
+    await bug_custom_statuses.insert(bug_status_1);
+    await bug_custom_statuses.insert(bug_status_2);
+    await bug_custom_statuses.insert(bug_status_3);
+    await custom_status.addDefaultItems();
   });
 
   // It should answer 403 if user is not logged in
@@ -298,14 +329,14 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
       .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer user")
       .send({
-        tags: [{ tag_id: tag_3.tag_id }],
+        tags: [{ tag_id: bug_tag_3.tag_id }],
       });
     expect(response.status).toBe(200);
     expect(response.body.tags).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          tag_id: tag_3.tag_id,
-          tag_name: tag_3.display_name,
+          tag_id: bug_tag_3.tag_id,
+          tag_name: bug_tag_3.display_name,
         }),
       ])
     );
@@ -316,7 +347,7 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
       .set("Authorization", "Bearer user")
       .send({
         tags: [
-          { tag_id: tag_3.tag_id },
+          { tag_id: bug_tag_3.tag_id },
           { tag_name: "Tag to be add" },
           { tag_name: "Tag to be add 2" },
         ],
@@ -329,9 +360,8 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
           tag_name: "Tag to be add 2",
         }),
         expect.objectContaining({
-          //existing tag
-          tag_id: tag_3.tag_id,
-          tag_name: tag_3.display_name,
+          tag_id: bug_tag_3.tag_id,
+          tag_name: bug_tag_3.display_name,
         }),
         expect.objectContaining({
           tag_id: 46,
@@ -346,9 +376,9 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
       .set("Authorization", "Bearer user")
       .send({
         tags: [
-          { tag_id: tag_3.tag_id },
+          { tag_id: bug_tag_3.tag_id },
           { tag_name: "Tag to be add" },
-          { tag_id: tag_3.tag_id },
+          { tag_id: bug_tag_3.tag_id },
         ],
       });
     expect(response.status).toBe(200);
@@ -356,9 +386,8 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     expect(response.body.tags).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          //existing tag
-          tag_id: tag_3.tag_id,
-          tag_name: tag_3.display_name,
+          tag_id: bug_tag_3.tag_id,
+          tag_name: bug_tag_3.display_name,
         }),
       ])
     );
@@ -405,9 +434,9 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
       .set("Authorization", "Bearer user")
       .send({
         tags: [
-          { tag_id: tag_3.tag_id },
+          { tag_id: bug_tag_3.tag_id },
           { tag_name: "Tag to be add" },
-          { tag_id: tag_3.tag_id },
+          { tag_id: bug_tag_3.tag_id },
         ],
       });
 
@@ -415,18 +444,81 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     expect(response.body.priority).toBeUndefined();
   });
 
-  // It should keep existing tags if no tags field in body while patching priority
-  it("It should keep existing tags if no tags field in body while patching priority", async () => {
+  // It should keep existing tags if there are no tags sent while patching priority
+  it("It should keep existing tags if there are no tags sent while patching priority", async () => {
     const response = await request(app)
       .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer user")
       .send({ priority_id: bug_priority_1.priority_id });
 
     expect(response.status).toBe(200);
-    expect(response.body.tags[0]).toEqual({
-      tag_id: tag_3.tag_id,
-      tag_name: tag_3.display_name
-    })
+    expect(response.body.tags).toBeDefined();
+  });
+
+  // It should return an error 403 if the custom_status_id does not exists
+  it("It should return an error 403 if the custom_status_id does not exists", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user")
+      .send({ custom_status_id: 99 });
+
+    expect(response.status).toBe(403);
+  });
+
+  // Should return an error 400 if the custom_status_id sent is not a number
+  it("It should return an error 400 if the custom_status_id sent is not a number", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user")
+      .send({ custom_status_id: "not a number" });
+
+    expect(response.status).toBe(400);
+  });
+
+  // It should keep existing entries if no update field in body while patching status
+  it("It should keep existing entries if no update field in body while patching status", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user")
+      .send({
+        custom_status_id: bug_status_1.custom_status_id,
+      });
+
+    expect(response.status).toBe(200);
+    expect(response.body.tags).toBeDefined();
+  });
+
+  // It should not return the custom_status if not sent
+  it("It should not return the custom_status if not sent", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user")
+      .send({
+        priority_id: priority_3.id,
+        tags: [
+          { tag_id: bug_tag_3.tag_id },
+          { tag_name: "Tag to be add" },
+          { tag_id: bug_tag_3.tag_id },
+        ],
+      });
+
+    expect(response.status).toBe(200);
+    expect(response.body.custom_status).toBeUndefined();
+  });
+
+  // It should return the updated status
+  it("It should return the updated status", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user")
+      .send({ custom_status_id: bug_status_1.custom_status_id });
+
+    expect(response.status).toBe(200);
+    expect(response.body.custom_status).toEqual(
+      expect.objectContaining({
+        custom_status_id: bug_status_1.custom_status_id,
+      })
+    );
   });
 
   // --- End of file
