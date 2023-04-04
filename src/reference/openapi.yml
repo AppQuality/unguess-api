@@ -1714,6 +1714,21 @@ components:
       required:
         - id
         - name
+    BugCustomStatus:
+      title: BugCustomStatus
+      x-stoplight:
+        id: i2xzyxsdfyg3s
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          x-stoplight:
+            id: g9kwsccjbzlwl
+      required:
+        - id
+        - name
     BugTag:
       title: BugTag
       type: object
