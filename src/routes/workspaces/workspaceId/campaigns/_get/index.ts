@@ -47,7 +47,6 @@ export default class Route extends UserRoute<{
 
     const parameters = this.getParameters();
     this.workspaceId = Number.parseInt(parameters.wid);
-    console.log("sto cazzo", this.workspaceId);
   }
 
   private getOrder() {
