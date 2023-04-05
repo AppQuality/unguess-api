@@ -11,7 +11,6 @@ import {
 } from "@src/utils/constants";
 import { paginateItems, formatCount } from "@src/utils/paginations";
 import WorkspaceRoute from "@src/features/routes/WorkspaceRoute";
-import { response } from "express";
 
 interface DbUser {
   tryber_wp_id: number;
@@ -19,6 +18,7 @@ interface DbUser {
   name: string;
   surname: string;
   email: string;
+  invitation_status: string;
 }
 
 export default class Route extends WorkspaceRoute<{
@@ -69,9 +69,11 @@ export default class Route extends WorkspaceRoute<{
         p.wp_user_id as tryber_wp_id, 
         p.name, 
         p.surname, 
-        p.email
+        p.email,
+        i.status     as invitation_status
           from wp_appq_user_to_customer utc
         JOIN wp_appq_evd_profile p ON (utc.wp_user_id = p.wp_user_id)
+        LEFT JOIN wp_appq_customer_account_invitations i ON (i.tester_id = p.id)
         WHERE utc.customer_id = ${this.getWorkspaceId()}
         GROUP BY p.id
       `
@@ -90,6 +92,9 @@ export default class Route extends WorkspaceRoute<{
       profile_id: user.profile_id,
       name: `${user.name} ${user.surname}`,
       email: user.email,
+      invitationPending: !!(
+        user.invitation_status && Number.parseInt(user.invitation_status) !== 1
+      ),
     }));
   }
 

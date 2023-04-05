@@ -1656,6 +1656,7 @@ export interface operations {
               profile_id: number;
               name: string;
               email: string;
+              invitationPending: boolean;
             }[];
             start?: number;
             limit?: number;
