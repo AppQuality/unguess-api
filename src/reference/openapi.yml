@@ -1409,6 +1409,8 @@ paths:
                     type: integer
                   total:
                     type: integer
+                required:
+                  - items
               examples:
                 Example 1:
                   value:
