@@ -1634,6 +1634,8 @@ components:
         - severity
         - type
         - replicability
+        - priority
+        - custom_status
         - created
         - occurred_date
         - device
