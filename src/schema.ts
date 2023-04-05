@@ -301,6 +301,7 @@ export interface components {
       type: components["schemas"]["BugType"];
       replicability: components["schemas"]["BugReplicability"];
       priority?: components["schemas"]["BugPriority"];
+      custom_status?: components["schemas"]["BugCustomStatus"];
       created: string;
       occurred_date: string;
       updated?: string;
@@ -311,9 +312,9 @@ export interface components {
         | components["schemas"]["Desktop"];
       application_section: {
         id?: number;
-        simple_title?: string;
         prefix_title?: string;
         title?: string;
+        simple_title?: string;
       };
       duplicated_of_id?: number;
       is_favorite?: number;
