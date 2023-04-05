@@ -300,8 +300,8 @@ export interface components {
       severity: components["schemas"]["BugSeverity"];
       type: components["schemas"]["BugType"];
       replicability: components["schemas"]["BugReplicability"];
-      priority?: components["schemas"]["BugPriority"];
-      custom_status?: components["schemas"]["BugCustomStatus"];
+      priority: components["schemas"]["BugPriority"];
+      custom_status: components["schemas"]["BugCustomStatus"];
       created: string;
       occurred_date: string;
       updated?: string;
