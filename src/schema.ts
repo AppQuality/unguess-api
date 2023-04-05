@@ -231,6 +231,16 @@ export interface paths {
       };
     };
   };
+  "/workspaces/{wid}/users": {
+    /** Return a list of users from a specific workspace */
+    get: operations["get-workspaces-users"];
+    parameters: {
+      path: {
+        /** Workspace (company, customer) id */
+        wid: number;
+      };
+    };
+  };
   "/workspaces/{wid}/projects": {
     get: operations["get-workspace-projects"];
     parameters: {
@@ -610,6 +620,7 @@ export interface components {
     };
     /** User */
     User: {
+      /** @description This is the main id of the user. Currently is equal to tryber_wp_user_id */
       id: number;
       /** Format: email */
       email: string;
@@ -1603,6 +1614,42 @@ export interface operations {
         content: {
           "application/json": {
             items?: components["schemas"]["Coin"][];
+            start?: number;
+            limit?: number;
+            size?: number;
+            total?: number;
+          };
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  /** Return a list of users from a specific workspace */
+  "get-workspaces-users": {
+    parameters: {
+      path: {
+        /** Workspace (company, customer) id */
+        wid: number;
+      };
+      query: {
+        /** Limit pagination parameter */
+        limit?: components["parameters"]["limit"];
+        /** Start pagination parameter */
+        start?: components["parameters"]["start"];
+        /** Order value (ASC, DESC) */
+        order?: components["parameters"]["order"];
+        /** Order by accepted field */
+        orderBy?: components["parameters"]["orderBy"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            items?: components["schemas"]["User"][];
             start?: number;
             limit?: number;
             size?: number;
