@@ -1401,6 +1401,10 @@ paths:
                           type: string
                           x-stoplight:
                             id: 1ld7e0nn6doxd
+                        invitationPending:
+                          type: boolean
+                          x-stoplight:
+                            id: g3gel7er7pn34
                       required:
                         - id
                         - profile_id
