@@ -1450,12 +1450,7 @@ paths:
         - Workspaces
       description: Return a list of users from a specific workspace
     parameters:
-      - name: wid
-        in: path
-        required: true
-        schema:
-          type: number
-        description: 'Workspace (company, customer) id'
+      - $ref: '#/components/parameters/wid'
   '/workspaces/{wid}/projects':
     parameters:
       - $ref: '#/components/parameters/wid'
@@ -2713,7 +2708,7 @@ components:
       in: path
       required: true
       schema:
-        type: number
+        type: string
       description: 'Workspace (company, customer) id'
     pid:
       name: pid
