@@ -1410,6 +1410,7 @@ paths:
                         - profile_id
                         - name
                         - email
+                        - invitationPending
                   start:
                     type: integer
                   limit:
