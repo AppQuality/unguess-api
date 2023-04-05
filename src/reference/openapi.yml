@@ -1425,17 +1425,11 @@ paths:
                     items:
                       - id: 1234
                         email: user@example.com
-                        role: string
                         name: string
                         profile_id: 999
-                        tryber_wp_user_id: 1234
-                        unguess_wp_user_id: 22
-                        picture: 'https://www.gravatar.com/avatar/617f61a54df8f1805ba1a3481e960eb7'
-                        features:
-                          - slug: string
-                            name: string
+                        invitationPending: true
                     start: 0
-                    limit: 100
+                    limit: 0
                     size: 1
                     total: 1
         '400':
