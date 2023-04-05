@@ -1,7 +1,4 @@
 /** OPENAPI-CLASS: get-workspace */
-import { getWorkspace } from "@src/utils/workspaces";
-import { ERROR_MESSAGE } from "@src/utils/constants";
-import UserRoute from "@src/features/routes/UserRoute";
 import WorkspaceRoute from "@src/features/routes/WorkspaceRoute";
 
 export default class Route extends WorkspaceRoute<{
