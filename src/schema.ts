@@ -1649,7 +1649,7 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            items?: {
+            items: {
               /** @description tryber wp_user_id */
               id: number;
               /** @description tester_id */
