@@ -1590,6 +1590,10 @@ components:
           $ref: '#/components/schemas/BugReplicability'
         priority:
           $ref: '#/components/schemas/BugPriority'
+        custom_status:
+          $ref: '#/components/schemas/BugCustomStatus'
+          x-stoplight:
+            id: t42wxhzb6rl46
         created:
           type: string
         occurred_date:
@@ -1608,11 +1612,11 @@ components:
           properties:
             id:
               type: integer
-            simple_title:
-              type: string
             prefix_title:
               type: string
             title:
+              type: string
+            simple_title:
               type: string
         duplicated_of_id:
           type: integer
