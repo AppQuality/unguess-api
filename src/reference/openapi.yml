@@ -1592,8 +1592,6 @@ components:
           $ref: '#/components/schemas/BugPriority'
         custom_status:
           $ref: '#/components/schemas/BugCustomStatus'
-          x-stoplight:
-            id: t42wxhzb6rl46
         created:
           type: string
         occurred_date:
