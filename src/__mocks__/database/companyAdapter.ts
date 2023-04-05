@@ -66,6 +66,7 @@ import userTask from "@src/__mocks__/database/user_task";
 import customerUniqueBugsRead from "@src/__mocks__/database/customer_unique_bug_read";
 import bugsReadStatus from "@src/__mocks__/database/bug_read_status";
 import campaignReadStatuses from "@src/__mocks__/database/campaign_read_status";
+import customerInvitations from "@src/__mocks__/database/customer_invitations";
 
 interface dataObject {
   profiles?: Array<any>;
@@ -137,6 +138,7 @@ export const adapter = {
     await campaignReadStatuses.mock();
     await priorities.mock();
     await bugsPriorities.mock();
+    await customerInvitations.mock();
   },
   drop: async () => {
     await profileTable.drop();
@@ -190,6 +192,7 @@ export const adapter = {
     await campaignReadStatuses.dropMock();
     await priorities.dropMock();
     await bugsPriorities.dropMock();
+    await customerInvitations.dropMock();
   },
 
   clear: async () => {

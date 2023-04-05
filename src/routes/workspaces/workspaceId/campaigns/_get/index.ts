@@ -37,14 +37,16 @@ export default class Route extends UserRoute<{
   constructor(configuration: RouteClassConfiguration) {
     super(configuration);
     const query = this.getQuery();
-    if (query.limit) this.limit = parseInt(query.limit as unknown as string);
-    if (query.start) this.start = parseInt(query.start as unknown as string);
+    if (query.limit)
+      this.limit = Number.parseInt(query.limit as unknown as string);
+    if (query.start)
+      this.start = Number.parseInt(query.start as unknown as string);
 
     this.order = this.getOrder();
     this.orderBy = this.getOrderBy();
 
     const parameters = this.getParameters();
-    this.workspaceId = parseInt(parameters.wid as unknown as string);
+    this.workspaceId = Number.parseInt(parameters.wid);
   }
 
   private getOrder() {
@@ -79,7 +81,22 @@ export default class Route extends UserRoute<{
     return undefined;
   }
 
+  protected async init(): Promise<void> {
+    await super.init();
+
+    if (isNaN(this.workspaceId)) {
+      this.setError(400, {
+        code: 400,
+        message: "Invalid workspace",
+      } as OpenapiError);
+
+      throw new Error("Invalid workspace");
+    }
+  }
+
   protected async filter(): Promise<boolean> {
+    if (!(await super.filter())) return false;
+
     try {
       await getWorkspace({
         workspaceId: this.workspaceId,

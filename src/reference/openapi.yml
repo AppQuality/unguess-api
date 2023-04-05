@@ -1367,6 +1367,82 @@ paths:
         - Workspaces
     parameters:
       - $ref: '#/components/parameters/wid'
+  '/workspaces/{wid}/users':
+    get:
+      summary: Retrieve users of a specific workspace
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                          description: tryber wp_user_id
+                        profile_id:
+                          type: number
+                          description: tester_id
+                        name:
+                          type: string
+                        email:
+                          type: string
+                        invitationPending:
+                          type: boolean
+                      required:
+                        - id
+                        - profile_id
+                        - name
+                        - email
+                        - invitationPending
+                  start:
+                    type: integer
+                  limit:
+                    type: integer
+                  size:
+                    type: integer
+                  total:
+                    type: integer
+                required:
+                  - items
+              examples:
+                Example 1:
+                  value:
+                    items:
+                      - id: 1234
+                        email: user@example.com
+                        name: string
+                        profile_id: 999
+                        invitationPending: true
+                    start: 0
+                    limit: 0
+                    size: 1
+                    total: 1
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-workspaces-users
+      security:
+        - JWT: []
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/order'
+        - $ref: '#/components/parameters/orderBy'
+      tags:
+        - Workspaces
+      description: Return a list of users from a specific workspace
+    parameters:
+      - $ref: '#/components/parameters/wid'
   '/workspaces/{wid}/projects':
     parameters:
       - $ref: '#/components/parameters/wid'
@@ -2194,7 +2270,6 @@ components:
     User:
       title: User
       type: object
-      description: ''
       x-examples:
         example-1:
           value:
@@ -2217,6 +2292,7 @@ components:
       properties:
         id:
           type: integer
+          description: This is the main id of the user. Currently is equal to tryber_wp_user_id
         email:
           type: string
           format: email
@@ -2624,7 +2700,7 @@ components:
       in: path
       required: true
       schema:
-        type: number
+        type: string
       description: 'Workspace (company, customer) id'
     pid:
       name: pid
