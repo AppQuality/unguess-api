@@ -3,7 +3,7 @@ import { getWorkspace } from "@src/utils/workspaces";
 
 export default class WorkspaceRoute<
   T extends RouteClassTypes & {
-    parameters: T["parameters"] & { wid: string | number };
+    parameters: T["parameters"] & { wid: string };
   }
 > extends UserRoute<T> {
   protected workspace_id: number;
@@ -16,9 +16,7 @@ export default class WorkspaceRoute<
 
     if (!params.wid) throw new Error("Missing workspace id");
 
-    this.workspace_id = Number.isInteger(params.wid)
-      ? params.wid
-      : Number.parseInt(params.wid);
+    this.workspace_id = Number.parseInt(params.wid);
   }
 
   protected async init(): Promise<void> {

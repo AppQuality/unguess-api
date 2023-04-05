@@ -237,7 +237,7 @@ export interface paths {
     parameters: {
       path: {
         /** Workspace (company, customer) id */
-        wid: number;
+        wid: components["parameters"]["wid"];
       };
     };
   };
@@ -764,7 +764,7 @@ export interface components {
   };
   parameters: {
     /** @description Workspace (company, customer) id */
-    wid: number;
+    wid: string;
     /** @description Project id */
     pid: number;
     /** @description Limit pagination parameter */
@@ -1631,7 +1631,7 @@ export interface operations {
     parameters: {
       path: {
         /** Workspace (company, customer) id */
-        wid: number;
+        wid: components["parameters"]["wid"];
       };
       query: {
         /** Limit pagination parameter */

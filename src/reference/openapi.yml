@@ -1385,26 +1385,16 @@ paths:
                       properties:
                         id:
                           type: number
-                          x-stoplight:
-                            id: brvds9h4rku8d
                           description: tryber wp_user_id
                         profile_id:
                           type: number
-                          x-stoplight:
-                            id: w8ezk92hjsh18
                           description: tester_id
                         name:
                           type: string
-                          x-stoplight:
-                            id: 25ltdeyhusow7
                         email:
                           type: string
-                          x-stoplight:
-                            id: 1ld7e0nn6doxd
                         invitationPending:
                           type: boolean
-                          x-stoplight:
-                            id: g3gel7er7pn34
                       required:
                         - id
                         - profile_id

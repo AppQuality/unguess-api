@@ -1,15 +1,11 @@
 /** OPENAPI-CLASS: get-workspaces-users */
-import { Context } from "openapi-backend";
+
 import * as db from "@src/features/db";
-import { getWorkspace, getWorkspaceCoins } from "@src/utils/workspaces";
 import {
-  DEFAULT_ORDER_BY_PARAMETER,
-  DEFAULT_ORDER_PARAMETER,
   ERROR_MESSAGE,
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
 } from "@src/utils/constants";
-import { paginateItems, formatCount } from "@src/utils/paginations";
 import WorkspaceRoute from "@src/features/routes/WorkspaceRoute";
 
 interface DbUser {

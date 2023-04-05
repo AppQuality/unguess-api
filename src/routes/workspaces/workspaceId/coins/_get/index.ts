@@ -62,7 +62,7 @@ export default async (
       : "DESC";
 
   try {
-    let wid = parseInt(c.request.params.wid as string);
+    let wid = Number.parseInt(c.request.params.wid as string);
 
     await getWorkspace({
       workspaceId: wid,

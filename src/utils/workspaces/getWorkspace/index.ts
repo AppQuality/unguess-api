@@ -28,7 +28,8 @@ export const getWorkspace = async ({
   } as StoplightComponents["schemas"]["Error"];
 
   // Check parameters
-  if (workspaceId == null || workspaceId <= 0) throw { ...error, code: 400 };
+  if (workspaceId == null || Number.isNaN(workspaceId) || workspaceId < 1)
+    throw { ...error, code: 400 };
 
   if (user.role !== "administrator")
     if (user.id == null || user.id <= 0) throw { ...error, code: 400 };
