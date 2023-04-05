@@ -13,13 +13,17 @@ export const DEFAULT_BUG_PRIORITY = {
   id: 3,
   name: "medium",
 };
+export const DEFAULT_BUG_CUSTOM_STATUS = {
+  id: 1,
+  name: "to do",
+};
 
 /******* Related to Ordering *******/
 export const DEFAULT_ORDER_BY_PARAMETER = "id";
 export const SEVERITY__ID = "severity_id";
 export const PRIORITY__ID = "priority_id";
-export const DESC = 'DESC';
-export const ASC = 'ASC';
+export const DESC = "DESC";
+export const ASC = "ASC";
 export const DEFAULT_ORDER_PARAMETER = "DESC";
 /* *********************************** */
 

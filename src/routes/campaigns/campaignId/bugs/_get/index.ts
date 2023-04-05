@@ -1,5 +1,6 @@
 /** OPENAPI-CLASS: get-campaigns-cid-bugs */
 import {
+  DEFAULT_BUG_CUSTOM_STATUS,
   DEFAULT_BUG_PRIORITY,
   DEFAULT_ORDER_BY_PARAMETER,
   DEFAULT_ORDER_PARAMETER,
@@ -27,6 +28,11 @@ interface Priority {
   name: string;
 }
 
+interface CustomStatus {
+  id: number;
+  name: string;
+}
+
 export default class BugsRoute extends CampaignRoute<{
   response: StoplightOperations["get-campaigns-cid-bugs"]["responses"]["200"]["content"]["application/json"];
   parameters: StoplightOperations["get-campaigns-cid-bugs"]["parameters"]["path"];
@@ -37,10 +43,12 @@ export default class BugsRoute extends CampaignRoute<{
   private order: string = DEFAULT_ORDER_PARAMETER;
   private orderBy: string = DEFAULT_ORDER_BY_PARAMETER;
   private defaultPriority: Priority = DEFAULT_BUG_PRIORITY;
+  private defaultCustomStatus: CustomStatus = DEFAULT_BUG_CUSTOM_STATUS;
 
   private isTitleRuleActive: boolean = false;
   private tags: (Tag & { bug_id: number })[] = [];
   private priorities: (Priority & { bug_id: number })[] = [];
+  private customStatuses: (CustomStatus & { bug_id: number })[] = [];
   private filterBy: { [key: string]: string | string[] } | undefined;
   private filterByTags: number[] | undefined;
   private filterByNoTags: boolean = false;
@@ -121,6 +129,7 @@ export default class BugsRoute extends CampaignRoute<{
     if (!bugs || !bugs.length) return this.emptyResponse();
 
     this.priorities = await this.getPriorities(bugs);
+    this.customStatuses = await this.getCustomStatuses(bugs);
     const enhancedBugs = this.enhanceBugs(bugs);
     const filtered = this.filterBugs(enhancedBugs);
     const ordered = this.handleApplicationOrderBy(filtered);
@@ -276,6 +285,29 @@ export default class BugsRoute extends CampaignRoute<{
     return priorities;
   }
 
+  private async getCustomStatuses(
+    bugs: Awaited<ReturnType<typeof this.getBugs>>
+  ) {
+    if (!bugs || !bugs.length) return [];
+
+    const customStatuses: (CustomStatus & { bug_id: number })[] =
+      await db.query(
+        `SELECT 
+        cs.id,
+        csb.bug_id,
+        cs.name
+      FROM wp_ug_bug_custom_status_to_bug csb
+      JOIN wp_ug_bug_custom_status cs ON (csb.custom_status_id = cs.id)
+      where csb.bug_id IN (${bugs.map((bug) => bug.id).join(",")})
+      `,
+        "unguess"
+      );
+
+    if (!customStatuses) return [];
+
+    return customStatuses;
+  }
+
   private enhanceBugs(bugs: Awaited<ReturnType<typeof this.getBugs>>) {
     if (!bugs || !bugs.length) return [];
 
@@ -322,6 +354,7 @@ export default class BugsRoute extends CampaignRoute<{
         device: getBugDevice(bug),
         siblings: this.getSiblingsOfBug(bug, bugs),
         priority: this.getBugPriority(bug.id),
+        custom_status: this.getBugCustomStatus(bug.id),
         ...(tags && { tags }),
       };
     });
@@ -363,6 +396,18 @@ export default class BugsRoute extends CampaignRoute<{
       : this.defaultPriority;
   }
 
+  private getBugCustomStatus(bug_id: number): CustomStatus {
+    if (!this.customStatuses.length) return this.defaultCustomStatus;
+
+    const customStatus = this.customStatuses.find(
+      (status) => status.bug_id === bug_id
+    );
+
+    return customStatus
+      ? { id: customStatus.id, name: customStatus.name }
+      : this.defaultCustomStatus;
+  }
+
   private formatBugs(bugs: ReturnType<typeof this.paginateBugs>) {
     return bugs.map((bug) => {
       return {
@@ -390,6 +435,7 @@ export default class BugsRoute extends CampaignRoute<{
         tags: bug.tags,
         siblings: bug.siblings,
         priority: bug.priority,
+        custom_status: bug.custom_status,
       };
     });
   }
