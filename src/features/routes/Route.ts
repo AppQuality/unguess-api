@@ -15,6 +15,7 @@ export default class Route<T extends RouteClassTypes> {
   private body: T["body"] | undefined;
   private parameters: T["parameters"] | undefined;
   protected query: T["query"] | undefined;
+  protected response: T["response"] | undefined;
   private id: number | undefined;
 
   constructor(
@@ -65,6 +66,12 @@ export default class Route<T extends RouteClassTypes> {
   protected getQuery() {
     if (typeof this.query === "undefined") throw new Error("Invalid query");
     return this.query;
+  }
+
+  protected getResponse() {
+    if (typeof this.response === "undefined")
+      throw new Error("Invalid response");
+    return this.response;
   }
 
   protected getId() {
