@@ -455,7 +455,8 @@ export default class BugsRoute extends CampaignRoute<{
       if (this.filterBugsByDevice(bug) === false) return false;
       if (this.filterBugsByOs(bug) === false) return false;
       if (this.filterBugsBySearch(bug) === false) return false;
-
+      if (this.filterBugsByCustomStatus(bug) === false) return false;
+      
       return true;
     });
   }
@@ -564,6 +565,23 @@ export default class BugsRoute extends CampaignRoute<{
       .filter((priorityId) => priorityId > 0);
 
     return prioritiesToFilter.includes(bug.priority.id);
+  }
+
+  private filterBugsByCustomStatus(
+    bug: Parameters<typeof this.filterBugs>[0][number]
+  ) {
+    if (!this.filterBy) return true;
+    if (!this.filterBy["customStatus"]) return true;
+    if (typeof this.filterBy["customStatus"] !== "string") return true;
+
+    const customStatusToFilter = this.filterBy["customStatus"]
+      .split(",")
+      .map((customStatusId) =>
+        parseInt(customStatusId) > 0 ? parseInt(customStatusId) : 0
+      )
+      .filter((customStatusId) => customStatusId > 0);
+
+    return customStatusToFilter.includes(bug.priority.id);
   }
 
   private filterBugsByType(bug: Parameters<typeof this.filterBugs>[0][number]) {
