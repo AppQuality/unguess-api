@@ -581,7 +581,7 @@ export default class BugsRoute extends CampaignRoute<{
       )
       .filter((customStatusId) => customStatusId > 0);
 
-    return customStatusToFilter.includes(bug.priority.id);
+    return customStatusToFilter.includes(bug.custom_status.id);
   }
 
   private filterBugsByType(bug: Parameters<typeof this.filterBugs>[0][number]) {
