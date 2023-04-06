@@ -64,7 +64,11 @@ export default class Route extends UserRoute<{
       return false;
     }
     try {
-      await getBugById({ bugId: this.bid, campaignId: this.cid });
+      await getBugById({
+        bugId: this.bid,
+        campaignId: this.cid,
+        showNeedReview: campaign.showNeedReview,
+      });
     } catch (e) {
       this.setError(400, {
         status_code: 400,
@@ -213,8 +217,9 @@ export default class Route extends UserRoute<{
       }
       if (tagToAdd) {
         values.push(
-          db.format(`(?,?,?,?,?,?,?,1)`, [
+          db.format(`(?,?,?,?,?,?,?,?,1)`, [
             tagToAdd.id,
+            tagToAdd.name,
             tagToAdd.name,
             tagToAdd.name,
             this.bid,
@@ -229,7 +234,7 @@ export default class Route extends UserRoute<{
 
     await db.query(`
     INSERT INTO wp_appq_bug_taxonomy 
-      (tag_id, display_name, slug, bug_id, campaign_id, author_wp_id, author_tid, is_public) 
+      (tag_id, display_name, slug, description, bug_id, campaign_id, author_wp_id, author_tid, is_public) 
     VALUES ${values.join(",")}
   `);
   }
