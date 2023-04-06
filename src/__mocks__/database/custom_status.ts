@@ -17,22 +17,26 @@ const defaultCustomStatuses = [
   },
   {
     id: 2,
-    name: "to be imported",
-  },
-  {
-    id: 3,
-    name: "open",
-  },
-  {
-    id: 4,
     name: "pending",
   },
   {
+    id: 3,
+    name: "to be imported",
+  },
+  {
+    id: 4,
+    name: "open",
+  },
+  {
     id: 5,
-    name: "solved",
+    name: "to be retested",
   },
   {
     id: 6,
+    name: "solved",
+  },
+  {
+    id: 7,
     name: "not a bug",
   },
 ];

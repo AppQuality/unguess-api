@@ -255,7 +255,7 @@ const bug_1_highest_priority: BugPriorityParams = {
 
 const bug_status_1: BugCustomStatusParams = {
   bug_id: bug_1.id,
-  custom_status_id: 6,
+  custom_status_id: 7,
 };
 
 describe("GET /campaigns/{cid}/bugs/{bid}", () => {

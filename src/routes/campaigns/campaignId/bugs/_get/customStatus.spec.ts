@@ -182,7 +182,7 @@ const bug_custom_status_2: BugCustomStatusParams = {
 
 const bug_custom_status_3: BugCustomStatusParams = {
   bug_id: bug_3.id,
-  custom_status_id: 6,
+  custom_status_id: 7,
 };
 
 describe("GET /campaigns/{cid}/bugs", () => {
@@ -252,12 +252,12 @@ describe("GET /campaigns/{cid}/bugs", () => {
         expect.objectContaining({
           custom_status: {
             id: 2,
-            name: "to be imported",
+            name: "pending",
           },
         }),
         expect.objectContaining({
           custom_status: {
-            id: 6,
+            id: 7,
             name: "not a bug",
           },
         }),
