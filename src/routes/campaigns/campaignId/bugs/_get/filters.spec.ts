@@ -18,7 +18,9 @@ import bugPriorities, {
 } from "@src/__mocks__/database/bug_priority";
 import priorities from "@src/__mocks__/database/priority";
 import customStatuses from "@src/__mocks__/database/custom_status";
-import bugCustomStatuses, { BugCustomStatusParams } from "@src/__mocks__/database/bug_custom_status";
+import bugCustomStatuses, {
+  BugCustomStatusParams,
+} from "@src/__mocks__/database/bug_custom_status";
 
 const customer_1 = {
   id: 999,
@@ -307,12 +309,12 @@ const tag_4 = {
 
 const bug_customStatus_1: BugCustomStatusParams = {
   bug_id: bug_1.id,
-  custom_status_id: 3
+  custom_status_id: 3,
 };
 
 const bug_customStatus_2: BugCustomStatusParams = {
   bug_id: bug_2.id,
-  custom_status_id: 5
+  custom_status_id: 5,
 };
 
 describe("GET /campaigns/{cid}/bugs", () => {
@@ -507,9 +509,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
       .set("Authorization", "Bearer user");
     expect(response.body.items.length).toBe(1);
     expect(response.body.items).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ id: bug_1.id }),
-      ])
+      expect.arrayContaining([expect.objectContaining({ id: bug_1.id })])
     );
   });
 
@@ -519,9 +519,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
       .set("Authorization", "Bearer user");
     expect(response.body.items.length).toBe(1);
     expect(response.body.items).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ id: bug_1.id }),
-      ])
+      expect.arrayContaining([expect.objectContaining({ id: bug_1.id })])
     );
   });
 
@@ -789,31 +787,27 @@ describe("GET /campaigns/{cid}/bugs", () => {
 
   it("Should return bugs filtered by custom status ids", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[customStatus]=5`)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[customStatuses]=5`)
       .set("Authorization", "Bearer user");
     expect(response.body.items.length).toBe(1);
     expect(response.body.items).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ id: bug_2.id }),
-      ])
+      expect.arrayContaining([expect.objectContaining({ id: bug_2.id })])
     );
   });
 
   it("Should return bugs filtered by custom status ids even if a custom status id does not exist", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[customStatus]=5,99`)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[customStatuses]=5,99`)
       .set("Authorization", "Bearer user");
     expect(response.body.items.length).toBe(1);
     expect(response.body.items).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ id: bug_2.id }),
-      ])
+      expect.arrayContaining([expect.objectContaining({ id: bug_2.id })])
     );
   });
 
   it("Should return an empty array filtered by non existing custom status id", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[customStatus]=99`)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[customStatuses]=99`)
       .set("Authorization", "Bearer user");
     expect(response.statusCode).toBe(200);
     expect(response.body.items.length).toBe(0);
@@ -821,7 +815,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
 
   it("Should return all bugs in an array if custom status field is empty", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[customStatus]=`)
+      .get(`/campaigns/${campaign_1.id}/bugs?filterBy[customStatuses]=`)
       .set("Authorization", "Bearer user");
     expect(response.statusCode).toBe(200);
     expect(response.body.items.length).toBe(4);
