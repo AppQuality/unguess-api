@@ -152,6 +152,15 @@ export interface paths {
       };
     };
   };
+  "/campaigns/{cid}/custom_statuses": {
+    get: operations["get-campaigns-cid-custom-statuses"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+  };
   "/campaigns/{cid}/usecases": {
     get: operations["get-campaigns-cid-usecases"];
     parameters: {
@@ -301,7 +310,8 @@ export interface components {
       severity: components["schemas"]["BugSeverity"];
       type: components["schemas"]["BugType"];
       replicability: components["schemas"]["BugReplicability"];
-      priority?: components["schemas"]["BugPriority"];
+      priority: components["schemas"]["BugPriority"];
+      custom_status: components["schemas"]["BugCustomStatus"];
       created: string;
       occurred_date: string;
       updated?: string;
@@ -312,9 +322,9 @@ export interface components {
         | components["schemas"]["Desktop"];
       application_section: {
         id?: number;
-        simple_title?: string;
         prefix_title?: string;
         title?: string;
+        simple_title?: string;
       };
       duplicated_of_id?: number;
       is_favorite?: number;
@@ -372,6 +382,11 @@ export interface components {
     };
     /** BugPriority */
     BugPriority: {
+      id: number;
+      name: string;
+    };
+    /** BugCustomStatus */
+    BugCustomStatus: {
       id: number;
       name: string;
     };
@@ -1058,6 +1073,7 @@ export interface operations {
               tag_name: string;
             }[];
             priority?: components["schemas"]["BugPriority"];
+            custom_status?: components["schemas"]["BugCustomStatus"];
           };
         };
       };
@@ -1074,6 +1090,7 @@ export interface operations {
               }
           )[];
           priority_id?: number;
+          custom_status_id?: number;
         };
       };
     };
@@ -1289,6 +1306,25 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["BugPriority"][];
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  "get-campaigns-cid-custom-statuses": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["BugCustomStatus"][];
         };
       };
       400: components["responses"]["Error"];

@@ -21,6 +21,10 @@ import bugPriorities, {
   BugPriorityParams,
 } from "@src/__mocks__/database/bug_priority";
 import priorities from "@src/__mocks__/database/priority";
+import bugCustomStatuses, {
+  BugCustomStatusParams,
+} from "@src/__mocks__/database/bug_custom_status";
+import customStatuses from "@src/__mocks__/database/custom_status";
 
 const customer_1 = {
   id: 999,
@@ -249,6 +253,11 @@ const bug_1_highest_priority: BugPriorityParams = {
   priority_id: 5,
 };
 
+const bug_status_1: BugCustomStatusParams = {
+  bug_id: bug_1.id,
+  custom_status_id: 7,
+};
+
 describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   beforeEach(async () => {
     await dbAdapter.add({
@@ -292,6 +301,9 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
       meta_key: "bug_title_rule",
       meta_value: "1",
     });
+
+    await customStatuses.addDefaultItems();
+    await bugCustomStatuses.insert(bug_status_1);
   });
 
   afterEach(async () => {
@@ -650,6 +662,38 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
         priority: {
           id: 3,
           name: "medium",
+        },
+      })
+    );
+  });
+
+  // It should return the custom_status property
+  it("Should return the custom_status property", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user");
+
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        custom_status: {
+          id: bug_status_1.custom_status_id,
+          name: "not a bug",
+        },
+      })
+    );
+  });
+
+  // It should return the fallback "to do" custom_status if there isn't any
+  it("Should return the fallback 'to do' custom_status if there isn't any", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_2.id}`)
+      .set("Authorization", "Bearer user");
+
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        custom_status: {
+          id: 1,
+          name: "to do",
         },
       })
     );

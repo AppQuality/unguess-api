@@ -357,6 +357,8 @@ paths:
                         - tag_name
                   priority:
                     $ref: '#/components/schemas/BugPriority'
+                  custom_status:
+                    $ref: '#/components/schemas/BugCustomStatus'
               examples:
                 oneTagResponse:
                   value:
@@ -388,6 +390,8 @@ paths:
                           - tag_name
                     type: object
                 priority_id:
+                  type: number
+                custom_status_id:
                   type: number
             examples:
               possibleTagEntries:
@@ -825,6 +829,42 @@ paths:
         '500':
           $ref: '#/components/responses/Error'
       operationId: get-campaigns-cid-priorities
+      description: ''
+      security:
+        - JWT: []
+      parameters: []
+  '/campaigns/{cid}/custom_statuses':
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Campaign id
+    get:
+      summary: Get Campaigns Priorities
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BugCustomStatus'
+              examples:
+                Example 1:
+                  value:
+                    - id: 1
+                      name: string
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-custom-statuses
       description: ''
       security:
         - JWT: []
@@ -1626,6 +1666,8 @@ components:
           $ref: '#/components/schemas/BugReplicability'
         priority:
           $ref: '#/components/schemas/BugPriority'
+        custom_status:
+          $ref: '#/components/schemas/BugCustomStatus'
         created:
           type: string
         occurred_date:
@@ -1644,11 +1686,11 @@ components:
           properties:
             id:
               type: integer
-            simple_title:
-              type: string
             prefix_title:
               type: string
             title:
+              type: string
+            simple_title:
               type: string
         duplicated_of_id:
           type: integer
@@ -1668,6 +1710,8 @@ components:
         - severity
         - type
         - replicability
+        - priority
+        - custom_status
         - created
         - occurred_date
         - device
@@ -1781,6 +1825,17 @@ components:
         - name
     BugPriority:
       title: BugPriority
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
+    BugCustomStatus:
+      title: BugCustomStatus
       type: object
       properties:
         id:
