@@ -232,24 +232,24 @@ const bug_priority_3 = {
   priority_id: priority_3.id,
 };
 
-const defaultCustomStatuses = custom_status.getDefaultItems();
-const status_1 = defaultCustomStatuses[0]; // to do
-const status_2 = defaultCustomStatuses[1]; // to be imported
-const status_3 = defaultCustomStatuses[2]; // open
+const status_to_be_imported = {
+  id: 3,
+  name: "to be imported",
+};
 
-const bug_status_1 = {
-  bug_id: bug_1.id,
-  custom_status_id: status_1.id,
+const status_open = {
+  id: 4,
+  name: "open",
 };
 
 const bug_status_2 = {
   bug_id: bug_2.id,
-  custom_status_id: status_2.id,
+  custom_status_id: status_to_be_imported.id,
 };
 
 const bug_status_3 = {
   bug_id: bug_3.id,
-  custom_status_id: status_3.id,
+  custom_status_id: status_open.id,
 };
 
 describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
@@ -277,7 +277,6 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     await bug_priorities.insert(bug_priority_2);
     await bug_priorities.insert(bug_priority_3);
     await priorities.addDefaultItems();
-    await bug_custom_statuses.insert(bug_status_1);
     await bug_custom_statuses.insert(bug_status_2);
     await bug_custom_statuses.insert(bug_status_3);
     await custom_status.addDefaultItems();
@@ -493,7 +492,7 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
       .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer user")
       .send({
-        custom_status_id: bug_status_1.custom_status_id,
+        custom_status_id: status_open.id,
       });
 
     expect(response.status).toBe(200);
@@ -527,13 +526,13 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     const response = await request(app)
       .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer user")
-      .send({ custom_status_id: status_1.id });
+      .send({ custom_status_id: status_open.id });
 
     expect(response.status).toBe(200);
     expect(response.body.custom_status).toEqual(
       expect.objectContaining({
-        id: status_1.id,
-        name: status_1.name,
+        id: status_open.id,
+        name: status_open.name,
       })
     );
   });
