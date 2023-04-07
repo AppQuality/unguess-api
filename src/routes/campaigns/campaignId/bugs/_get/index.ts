@@ -456,7 +456,7 @@ export default class BugsRoute extends CampaignRoute<{
       if (this.filterBugsByOs(bug) === false) return false;
       if (this.filterBugsBySearch(bug) === false) return false;
       if (this.filterBugsByCustomStatus(bug) === false) return false;
-      
+
       return true;
     });
   }
@@ -571,10 +571,10 @@ export default class BugsRoute extends CampaignRoute<{
     bug: Parameters<typeof this.filterBugs>[0][number]
   ) {
     if (!this.filterBy) return true;
-    if (!this.filterBy["customStatus"]) return true;
-    if (typeof this.filterBy["customStatus"] !== "string") return true;
+    if (!this.filterBy["customStatuses"]) return true;
+    if (typeof this.filterBy["customStatuses"] !== "string") return true;
 
-    const customStatusToFilter = this.filterBy["customStatus"]
+    const customStatusToFilter = this.filterBy["customStatuses"]
       .split(",")
       .map((customStatusId) =>
         parseInt(customStatusId) > 0 ? parseInt(customStatusId) : 0
