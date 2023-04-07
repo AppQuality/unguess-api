@@ -1443,6 +1443,49 @@ paths:
       description: Return a list of users from a specific workspace
     parameters:
       - $ref: '#/components/parameters/wid'
+    post:
+      summary: Add user to workspace
+      operationId: post-workspaces-wid-users
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  profile_id:
+                    type: number
+                  tryber_wp_user_id:
+                    type: number
+                  email:
+                    type: string
+                required:
+                  - profile_id
+                  - tryber_wp_user_id
+                  - email
+      description: Use this to add a new or existent user into a specific workspace.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                name:
+                  type: string
+                surname:
+                  type: string
+                locale:
+                  type: string
+                  description: preferred language
+                  enum:
+                    - it
+                    - en
+                  default: en
+              required:
+                - email
   '/workspaces/{wid}/projects':
     parameters:
       - $ref: '#/components/parameters/wid'
