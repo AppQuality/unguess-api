@@ -1,6 +1,6 @@
 import sgMail from "@sendgrid/mail";
 
-import config from "src/config";
+import config from "@src/config";
 
 sgMail.setApiKey(config.sendgrid.key);
 

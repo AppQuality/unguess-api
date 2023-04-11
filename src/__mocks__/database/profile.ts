@@ -12,6 +12,8 @@ export const table = {
       "wp_user_id INTEGER ",
       "is_verified INTEGER DEFAULT 0",
       "blacklisted INTEGER DEFAULT 1",
+      "employment_id INTEGER NOT NULL",
+      "education_id INTEGER NOT NULL",
     ]);
   },
   drop: async () => {

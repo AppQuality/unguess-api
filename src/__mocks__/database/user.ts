@@ -10,6 +10,9 @@ export const table = {
       "user_login VARCHAR(60)",
       "user_pass VARCHAR(255)",
       "user_email VARCHAR(100)",
+      "user_nicename VARCHAR(50) DEFAULT ''",
+      "display_name VARCHAR(250) DEFAULT ''",
+      "user_registered DATETIME DEFAULT '0000-00-00 00:00:00'",
       "user_url VARCHAR(100)",
     ]);
   },

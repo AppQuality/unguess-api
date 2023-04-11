@@ -48,7 +48,8 @@ const createTryberWPUser = async (
         ]
       )
     );
-    return results.insertId;
+
+    return results?.insertId || results.lastInsertRowid;
   } catch (e) {
     throw e;
   }

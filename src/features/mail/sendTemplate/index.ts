@@ -31,7 +31,7 @@ export const sendTemplate = async ({
     for (const key in optionalFields) {
       if (templateHtml.includes(key)) {
         templateHtml = templateHtml.replace(
-          key,
+          new RegExp(key, "g"),
           optionalFields[key as keyof typeof optionalFields]
         );
       }

@@ -1,6 +1,5 @@
 /** OPENAPI-CLASS: post-workspaces-wid-users */
 import WorkspaceRoute from "@src/features/routes/WorkspaceRoute";
-import { getCampaign } from "@src/utils/campaigns";
 import * as db from "@src/features/db";
 import createTryberWPUser from "@src/features/wp/createTryberWPUser";
 import { randomString } from "@src/utils/users/getRandomString";
@@ -32,14 +31,13 @@ export default class Route extends WorkspaceRoute<{
 
   constructor(configuration: RouteClassConfiguration) {
     super(configuration);
-
     this.invitedUser = this.getBody();
   }
 
   protected async filter(): Promise<boolean> {
     if (!super.filter()) return false;
 
-    if (this.isValidUser()) {
+    if (!this.isValidUser()) {
       this.setError(400, {} as OpenapiError);
       return false;
     }
@@ -49,6 +47,7 @@ export default class Route extends WorkspaceRoute<{
   protected async prepare() {
     const users = await this.getUsers();
     const user = users.find((u) => u.email === this.invitedUser.email);
+
     if (user) {
       // user already exists in the workspace
       this.setError(400, { message: "User already exists" } as OpenapiError);
@@ -56,14 +55,24 @@ export default class Route extends WorkspaceRoute<{
     }
 
     const userExists = await this.getUserByEmail(this.invitedUser.email);
+    let userToAdd: DbUser = userExists;
 
     try {
-      if (!userExists) {
-        const newUser = await this.createUser(this.invitedUser);
-        // await this.addInvitation(newUser);
-      } else {
-        // await this.addInvitation(userExists);
+      if (!userToAdd) {
+        userToAdd = await this.createUser(this.invitedUser);
+        await this.sendInvitation({
+          email: userToAdd.email,
+          profile_id: userToAdd.profile_id,
+          locale: this.invitedUser.locale || "en",
+        });
       }
+
+      await this.addUserToWorkspace(userToAdd);
+      return this.setSuccess(200, {
+        profile_id: userToAdd.profile_id,
+        tryber_wp_user_id: userToAdd.tryber_wp_id,
+        email: userToAdd.email,
+      });
     } catch (e) {
       if (!userExists) this.removeCreatedUser(this.invitedUser.email);
 
@@ -74,8 +83,20 @@ export default class Route extends WorkspaceRoute<{
     }
   }
 
-  private async addUserToWorkspace(user: DbUser): Promise<void> {}
-  private async removeCreatedUser(email: string): Promise<void> {}
+  private async addUserToWorkspace(user: DbUser): Promise<void> {
+    const { tryber_wp_id } = user;
+
+    await db.query(
+      db.format(
+        `INSERT INTO wp_appq_user_to_customer (wp_user_id, customer_id) VALUES (?, ?)`,
+        [tryber_wp_id, this.getWorkspaceId()]
+      )
+    );
+  }
+
+  private async removeCreatedUser(email: string): Promise<void> {
+    throw new Error("Not implemented user removal");
+  }
 
   private async getUserByEmail(email: string): Promise<DbUser> {
     const alreadyRegisteredEmail = await db.query(
@@ -102,21 +123,23 @@ export default class Route extends WorkspaceRoute<{
   }
 
   private async createUser(invitedUser: InvitedUser): Promise<DbUser> {
-    const { email, name = "", surname = "", locale = "en" } = invitedUser;
+    const { email, name = "", surname = "" } = invitedUser;
     const psw = randomString(12);
     const username =
       name && surname ? `${name}-${surname}` : email.split("@")[0];
 
     const tryber_wp_id = await createTryberWPUser(username, email, psw);
-
     const profile = await db.query(
       db.format(
-        `INSERT INTO wp_appq_evd_profile (wp_user_id, name, surname, email, blacklisted) VALUES (?, ?, ?, ?, ?)`,
-        [tryber_wp_id, name, surname, email, 1]
+        `INSERT INTO 
+          wp_appq_evd_profile 
+          (wp_user_id, name, surname, email, blacklisted, employment_id, education_id) 
+          VALUES (?, ?, ?, ?, 1, -1, -1)`,
+        [tryber_wp_id, name, surname, email]
       )
     );
 
-    const profile_id = profile.insertId;
+    const profile_id = this.getInsertedId(profile);
 
     return {
       tryber_wp_id,
@@ -184,6 +207,8 @@ export default class Route extends WorkspaceRoute<{
       subject: subj,
       optionalFields: {
         "{Inviter.name}": sender.email,
+        "{Inviter.email}": sender.email,
+        "{Inviter.url}": `${process.env.APP_URL}/invites/${profile_id}/${token}`,
       },
     });
   }
@@ -195,5 +220,9 @@ export default class Route extends WorkspaceRoute<{
     if (!email) return false;
 
     return true;
+  }
+
+  private getInsertedId(insert_result: any): number {
+    return insert_result.insertId ?? insert_result.lastInsertRowid;
   }
 }
