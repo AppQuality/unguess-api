@@ -1486,6 +1486,8 @@ paths:
                   default: en
               required:
                 - email
+      security:
+        - JWT: []
   '/workspaces/{wid}/projects':
     parameters:
       - $ref: '#/components/parameters/wid'
