@@ -128,8 +128,6 @@ describe("GET /campaigns/{cid}/custom_statuses", () => {
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
 
-    console.log(response.body);
-
     const { body } = response;
 
     expect(body).toEqual(
