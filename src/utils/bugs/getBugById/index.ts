@@ -5,6 +5,8 @@ import { getBugAdditional } from "../getBugAdditional";
 import { getBugDevice } from "../getBugDevice";
 import { getBugMedia } from "../getBugMedia";
 import { getBugTags } from "../getBugTags";
+import { getBugPriority } from "../getBugPriority";
+import { getBugCustomStatus } from "../getBugCustomStatus";
 
 type BugWithMedia =
   StoplightOperations["get-campaigns-single-bug"]["responses"]["200"]["content"]["application/json"];
@@ -72,11 +74,10 @@ export const getBugById = async ({
         WHERE b.id = ? 
         and b.campaign_id = ?
         AND b.publish = 1
-        AND ${
-          showNeedReview
-            ? `(status.name = 'Approved' OR status.name = 'Need Review')`
-            : `status.name = 'Approved'`
-        };`,
+        AND ${showNeedReview
+        ? `(status.name = 'Approved' OR status.name = 'Need Review')`
+        : `status.name = 'Approved'`
+      };`,
       [bugId, campaignId]
     )
   );
@@ -110,6 +111,9 @@ export const getBugById = async ({
     hasTitleRule,
   });
 
+  const bugPriority = await getBugPriority(bug.id);
+  const bugCustomStatus = await getBugCustomStatus(bug.id);
+
   return {
     id: bug.id,
     internal_id: bug.internal_id,
@@ -126,6 +130,8 @@ export const getBugById = async ({
       id: bug.severity_id,
       name: bug.severity,
     },
+    priority: bugPriority,
+    custom_status: bugCustomStatus,
     type: {
       id: bug.bug_type_id,
       name: bug.type,

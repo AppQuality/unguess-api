@@ -35,6 +35,9 @@ import {
 import priorities from "./priority";
 import bugsPriorities from "./bug_priority";
 
+import customStatuses from "./custom_status";
+import bugCustomStatuses from "./bug_custom_status";
+
 import campaignOutputs from "./cp_outputs_view";
 import { table as expressTable, data as expressData } from "./express";
 import defaultUsers from "@src/__mocks__/database/seed/users.json";
@@ -66,6 +69,7 @@ import userTask from "@src/__mocks__/database/user_task";
 import customerUniqueBugsRead from "@src/__mocks__/database/customer_unique_bug_read";
 import bugsReadStatus from "@src/__mocks__/database/bug_read_status";
 import campaignReadStatuses from "@src/__mocks__/database/campaign_read_status";
+import customerInvitations from "@src/__mocks__/database/customer_invitations";
 
 interface dataObject {
   profiles?: Array<any>;
@@ -137,6 +141,9 @@ export const adapter = {
     await campaignReadStatuses.mock();
     await priorities.mock();
     await bugsPriorities.mock();
+    await customStatuses.mock();
+    await bugCustomStatuses.mock();
+    await customerInvitations.mock();
   },
   drop: async () => {
     await profileTable.drop();
@@ -190,6 +197,9 @@ export const adapter = {
     await campaignReadStatuses.dropMock();
     await priorities.dropMock();
     await bugsPriorities.dropMock();
+    await customStatuses.dropMock();
+    await bugCustomStatuses.dropMock();
+    await customerInvitations.dropMock();
   },
 
   clear: async () => {
@@ -220,6 +230,8 @@ export const adapter = {
     await userTaskMedia.clear();
     await priorities.clear();
     await bugsPriorities.clear();
+    await customStatuses.clear();
+    await bugCustomStatuses.clear();
   },
   addCampaignWithProject: async ({
     campaign_id,

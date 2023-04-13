@@ -152,6 +152,15 @@ export interface paths {
       };
     };
   };
+  "/campaigns/{cid}/custom_statuses": {
+    get: operations["get-campaigns-cid-custom-statuses"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+  };
   "/campaigns/{cid}/usecases": {
     get: operations["get-campaigns-cid-usecases"];
     parameters: {
@@ -231,6 +240,16 @@ export interface paths {
       };
     };
   };
+  "/workspaces/{wid}/users": {
+    /** Return a list of users from a specific workspace */
+    get: operations["get-workspaces-users"];
+    parameters: {
+      path: {
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
+      };
+    };
+  };
   "/workspaces/{wid}/projects": {
     get: operations["get-workspace-projects"];
     parameters: {
@@ -291,7 +310,8 @@ export interface components {
       severity: components["schemas"]["BugSeverity"];
       type: components["schemas"]["BugType"];
       replicability: components["schemas"]["BugReplicability"];
-      priority?: components["schemas"]["BugPriority"];
+      priority: components["schemas"]["BugPriority"];
+      custom_status: components["schemas"]["BugCustomStatus"];
       created: string;
       occurred_date: string;
       updated?: string;
@@ -302,9 +322,9 @@ export interface components {
         | components["schemas"]["Desktop"];
       application_section: {
         id?: number;
-        simple_title?: string;
         prefix_title?: string;
         title?: string;
+        simple_title?: string;
       };
       duplicated_of_id?: number;
       is_favorite?: number;
@@ -362,6 +382,11 @@ export interface components {
     };
     /** BugPriority */
     BugPriority: {
+      id: number;
+      name: string;
+    };
+    /** BugCustomStatus */
+    BugCustomStatus: {
       id: number;
       name: string;
     };
@@ -610,6 +635,7 @@ export interface components {
     };
     /** User */
     User: {
+      /** @description This is the main id of the user. Currently is equal to tryber_wp_user_id */
       id: number;
       /** Format: email */
       email: string;
@@ -753,7 +779,7 @@ export interface components {
   };
   parameters: {
     /** @description Workspace (company, customer) id */
-    wid: number;
+    wid: string;
     /** @description Project id */
     pid: number;
     /** @description Limit pagination parameter */
@@ -1047,6 +1073,7 @@ export interface operations {
               tag_name: string;
             }[];
             priority?: components["schemas"]["BugPriority"];
+            custom_status?: components["schemas"]["BugCustomStatus"];
           };
         };
       };
@@ -1063,6 +1090,7 @@ export interface operations {
               }
           )[];
           priority_id?: number;
+          custom_status_id?: number;
         };
       };
     };
@@ -1278,6 +1306,25 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["BugPriority"][];
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  "get-campaigns-cid-custom-statuses": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["BugCustomStatus"][];
         };
       };
       400: components["responses"]["Error"];
@@ -1603,6 +1650,50 @@ export interface operations {
         content: {
           "application/json": {
             items?: components["schemas"]["Coin"][];
+            start?: number;
+            limit?: number;
+            size?: number;
+            total?: number;
+          };
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  /** Return a list of users from a specific workspace */
+  "get-workspaces-users": {
+    parameters: {
+      path: {
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
+      };
+      query: {
+        /** Limit pagination parameter */
+        limit?: components["parameters"]["limit"];
+        /** Start pagination parameter */
+        start?: components["parameters"]["start"];
+        /** Order value (ASC, DESC) */
+        order?: components["parameters"]["order"];
+        /** Order by accepted field */
+        orderBy?: components["parameters"]["orderBy"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            items: {
+              /** @description tryber wp_user_id */
+              id: number;
+              /** @description tester_id */
+              profile_id: number;
+              name: string;
+              email: string;
+              invitationPending: boolean;
+            }[];
             start?: number;
             limit?: number;
             size?: number;

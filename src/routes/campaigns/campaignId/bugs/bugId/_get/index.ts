@@ -2,7 +2,10 @@
 import * as db from "@src/features/db";
 import { getBugById } from "@src/utils/bugs";
 import BugsRoute from "@src/features/routes/BugRoute";
-import { DEFAULT_BUG_PRIORITY } from "@src/utils/constants";
+import {
+  DEFAULT_BUG_PRIORITY,
+  DEFAULT_BUG_CUSTOM_STATUS,
+} from "@src/utils/constants";
 
 type Bug =
   StoplightOperations["get-campaigns-single-bug"]["responses"]["200"]["content"]["application/json"];
@@ -83,12 +86,26 @@ export default class Route extends BugsRoute<{
     return result[0] as { id: number; name: string };
   }
 
+  private async getCustomStatus() {
+    const result = await db.query(
+      db.format(
+        "SELECT cs.id, cs.name FROM wp_ug_bug_custom_status cs JOIN wp_ug_bug_custom_status_to_bug csb ON (csb.custom_status_id = cs.id) WHERE csb.bug_id=?",
+        [this.bug_id]
+      ),
+      "unguess"
+    );
+    if (!result.length) return DEFAULT_BUG_CUSTOM_STATUS;
+    return result[0] as { id: number; name: string };
+  }
+
   private async enhanceBug(bug: Bug) {
     const priority = await this.getPriority();
+    const customStatus = await this.getCustomStatus();
 
     return {
       ...bug,
       priority,
+      custom_status: customStatus,
     };
   }
 }

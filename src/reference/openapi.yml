@@ -357,6 +357,8 @@ paths:
                         - tag_name
                   priority:
                     $ref: '#/components/schemas/BugPriority'
+                  custom_status:
+                    $ref: '#/components/schemas/BugCustomStatus'
               examples:
                 oneTagResponse:
                   value:
@@ -388,6 +390,8 @@ paths:
                           - tag_name
                     type: object
                 priority_id:
+                  type: number
+                custom_status_id:
                   type: number
             examples:
               possibleTagEntries:
@@ -825,6 +829,42 @@ paths:
         '500':
           $ref: '#/components/responses/Error'
       operationId: get-campaigns-cid-priorities
+      description: ''
+      security:
+        - JWT: []
+      parameters: []
+  '/campaigns/{cid}/custom_statuses':
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Campaign id
+    get:
+      summary: Get Campaigns Priorities
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BugCustomStatus'
+              examples:
+                Example 1:
+                  value:
+                    - id: 1
+                      name: string
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-custom-statuses
       description: ''
       security:
         - JWT: []
@@ -1367,6 +1407,82 @@ paths:
         - Workspaces
     parameters:
       - $ref: '#/components/parameters/wid'
+  '/workspaces/{wid}/users':
+    get:
+      summary: Retrieve users of a specific workspace
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                          description: tryber wp_user_id
+                        profile_id:
+                          type: number
+                          description: tester_id
+                        name:
+                          type: string
+                        email:
+                          type: string
+                        invitationPending:
+                          type: boolean
+                      required:
+                        - id
+                        - profile_id
+                        - name
+                        - email
+                        - invitationPending
+                  start:
+                    type: integer
+                  limit:
+                    type: integer
+                  size:
+                    type: integer
+                  total:
+                    type: integer
+                required:
+                  - items
+              examples:
+                Example 1:
+                  value:
+                    items:
+                      - id: 1234
+                        email: user@example.com
+                        name: string
+                        profile_id: 999
+                        invitationPending: true
+                    start: 0
+                    limit: 0
+                    size: 1
+                    total: 1
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-workspaces-users
+      security:
+        - JWT: []
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/order'
+        - $ref: '#/components/parameters/orderBy'
+      tags:
+        - Workspaces
+      description: Return a list of users from a specific workspace
+    parameters:
+      - $ref: '#/components/parameters/wid'
   '/workspaces/{wid}/projects':
     parameters:
       - $ref: '#/components/parameters/wid'
@@ -1550,6 +1666,8 @@ components:
           $ref: '#/components/schemas/BugReplicability'
         priority:
           $ref: '#/components/schemas/BugPriority'
+        custom_status:
+          $ref: '#/components/schemas/BugCustomStatus'
         created:
           type: string
         occurred_date:
@@ -1568,11 +1686,11 @@ components:
           properties:
             id:
               type: integer
-            simple_title:
-              type: string
             prefix_title:
               type: string
             title:
+              type: string
+            simple_title:
               type: string
         duplicated_of_id:
           type: integer
@@ -1592,6 +1710,8 @@ components:
         - severity
         - type
         - replicability
+        - priority
+        - custom_status
         - created
         - occurred_date
         - device
@@ -1705,6 +1825,17 @@ components:
         - name
     BugPriority:
       title: BugPriority
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
+    BugCustomStatus:
+      title: BugCustomStatus
       type: object
       properties:
         id:
@@ -2194,7 +2325,6 @@ components:
     User:
       title: User
       type: object
-      description: ''
       x-examples:
         example-1:
           value:
@@ -2217,6 +2347,7 @@ components:
       properties:
         id:
           type: integer
+          description: This is the main id of the user. Currently is equal to tryber_wp_user_id
         email:
           type: string
           format: email
@@ -2624,7 +2755,7 @@ components:
       in: path
       required: true
       schema:
-        type: number
+        type: string
       description: 'Workspace (company, customer) id'
     pid:
       name: pid
