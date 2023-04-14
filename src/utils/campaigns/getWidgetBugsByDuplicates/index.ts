@@ -2,6 +2,10 @@ import * as db from "@src/features/db";
 import { getBugDevice } from "@src/utils/bugs/getBugDevice";
 import { BugsParams } from "@src/__mocks__/database/bugs";
 import { getBugTitle, getTitleRule } from "../getTitleRule";
+import {
+  DEFAULT_BUG_CUSTOM_STATUS,
+  DEFAULT_BUG_PRIORITY,
+} from "@src/utils/constants";
 
 interface Bug extends BugsParams {
   last_seen: string;
@@ -35,6 +39,10 @@ const formatBugs = async (bugs: any, campaignId: number) => {
       bugTitle: bug.title,
       hasTitleRule: titleRuleIsActive,
     });
+
+    const bugPriority = await getPriority(bug.id);
+
+    const bugCustomStatus = await getCustomStatus(bug.id);
 
     results.push({
       id: bug.id,
@@ -73,10 +81,36 @@ const formatBugs = async (bugs: any, campaignId: number) => {
       device,
       is_favorite: bug.is_favorite,
       duplicates: bug.duplicates,
+      priority: bugPriority,
+      custom_status: bugCustomStatus,
     });
   }
 
   return results.slice(0, MAX_WIDGET_RESULTS_LENGTH);
+};
+
+const getPriority = async (bug_id: number) => {
+  const result = await db.query(
+    db.format(
+      "SELECT p.id, p.name FROM wp_ug_priority p JOIN wp_ug_priority_to_bug pb ON (pb.priority_id = p.id) WHERE pb.bug_id=?",
+      [bug_id]
+    ),
+    "unguess"
+  );
+  if (!result.length) return DEFAULT_BUG_PRIORITY;
+  return result[0] as { id: number; name: string };
+};
+
+const getCustomStatus = async (bug_id: number) => {
+  const result = await db.query(
+    db.format(
+      "SELECT cs.id, cs.name FROM wp_ug_bug_custom_status cs JOIN wp_ug_bug_custom_status_to_bug csb ON (csb.custom_status_id = cs.id) WHERE csb.bug_id=?",
+      [bug_id]
+    ),
+    "unguess"
+  );
+  if (!result.length) return DEFAULT_BUG_CUSTOM_STATUS;
+  return result[0] as { id: number; name: string };
 };
 
 export const getWidgetBugsByDuplicates = async (
