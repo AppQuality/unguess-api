@@ -1,19 +1,29 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import UnlayerTemplate from "@src/__mocks__/database/unlayer_mail_template";
-import MailEvents from "@src/__mocks__/database/event_transactional_mail";
+
+const customer_2 = {
+  id: 123,
+  company: "Mela Inc.",
+  company_logo: "logo999.png",
+  tokens: 100,
+};
 
 const customer_1 = {
-  id: 999,
-  company: "Company 999",
+  id: 456,
+  company: "PiccoloProgramma Corporation",
   company_logo: "logo999.png",
   tokens: 100,
 };
 
 const user_to_customer_1 = {
   wp_user_id: 1,
-  customer_id: 999,
+  customer_id: customer_1.id,
+};
+
+const user_to_customer_2 = {
+  wp_user_id: 2,
+  customer_id: customer_2.id,
 };
 
 describe("POST /workspaces/wid/users", () => {
@@ -59,10 +69,52 @@ describe("POST /workspaces/wid/users", () => {
       .post(`/workspaces/${customer_1.id}/users`)
       .set("Authorization", "Bearer user")
       .send({
-        email: "cannarozzo.luca+test2@gmail.com",
+        email: "stefano.lavori@mela.com",
       });
     expect(response.status).toBe(200);
 
-    console.log(response.body);
+    const users = await request(app)
+      .get(`/workspaces/${customer_1.id}/users`)
+      .set("Authorization", "Bearer user")
+      .send();
+
+    expect(users.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          email: "stefano.lavori@mela.com",
+        }),
+      ])
+    );
   });
+
+  it("should answer 400 if the user is already in the workspace", async () => {
+    await request(app)
+      .post(`/workspaces/${customer_1.id}/users`)
+      .set("Authorization", "Bearer user")
+      .send({
+        email: "vincenzo.cancelli@finestre.com",
+      });
+
+    const response = await request(app)
+      .post(`/workspaces/${customer_1.id}/users`)
+      .set("Authorization", "Bearer user")
+      .send({
+        email: "vincenzo.cancelli@finestre.com",
+      });
+
+    expect(response.status).toBe(400);
+  });
+
+  it("should answer 403 if the user is not allowed to apply changes in the workspace", async () => {
+    const response = await request(app)
+      .post(`/workspaces/${customer_2.id}/users`)
+      .set("Authorization", "Bearer user")
+      .send({
+        email: "goffredo.baci@amazzonia.com",
+      });
+
+    expect(response.status).toBe(403);
+  });
+
+  // --- end of tests
 });
