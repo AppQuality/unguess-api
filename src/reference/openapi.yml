@@ -1603,12 +1603,13 @@ paths:
             schema:
               type: object
               properties:
-                email:
-                  type: string
+                user_id:
+                  type: number
                   x-stoplight:
                     id: e58obm46133e2
+                  description: Tryber WP USER ID
               required:
-                - email
+                - user_id
   '/workspaces/{wid}/projects':
     parameters:
       - $ref: '#/components/parameters/wid'
