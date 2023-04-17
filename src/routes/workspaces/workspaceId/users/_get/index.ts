@@ -1,5 +1,4 @@
 /** OPENAPI-CLASS: get-workspaces-users */
-
 import * as db from "@src/features/db";
 import {
   ERROR_MESSAGE,
