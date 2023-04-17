@@ -21,8 +21,13 @@ const user_to_customer_1 = {
   customer_id: customer_1.id,
 };
 
-const user_to_customer_2 = {
+const user_to_customer_3 = {
   wp_user_id: 2,
+  customer_id: customer_1.id,
+};
+
+const user_to_customer_2 = {
+  wp_user_id: 323,
   customer_id: customer_2.id,
 };
 
@@ -32,7 +37,20 @@ describe("POST /workspaces/wid/users", () => {
       try {
         await dbAdapter.add({
           companies: [customer_1, customer_2],
-          userToCustomers: [user_to_customer_1, user_to_customer_2],
+          userToCustomers: [
+            user_to_customer_1,
+            user_to_customer_3,
+            user_to_customer_2,
+          ],
+          profiles: [
+            {
+              id: 2,
+              name: "Giovanni",
+              surname: "Bianchi",
+              email: "giovanni.bianchi@example.com",
+              wp_user_id: 2,
+            },
+          ],
         });
       } catch (error) {
         console.error(error);
@@ -87,7 +105,7 @@ describe("POST /workspaces/wid/users", () => {
     );
   });
 
-  it("should answer 400 if the user is already in the workspace", async () => {
+  it("should answer 200 and resend invitation if the user is already in the workspace but with a pending/expired invite", async () => {
     await request(app)
       .post(`/workspaces/${customer_1.id}/users`)
       .set("Authorization", "Bearer user")
@@ -100,6 +118,17 @@ describe("POST /workspaces/wid/users", () => {
       .set("Authorization", "Bearer user")
       .send({
         email: "vincenzo.cancelli@finestre.com",
+      });
+
+    expect(response.status).toBe(200);
+  });
+
+  it("should answer 400 if the user is active and already in the workspace", async () => {
+    const response = await request(app)
+      .post(`/workspaces/${customer_1.id}/users`)
+      .set("Authorization", "Bearer user")
+      .send({
+        email: "giovanni.bianchi@example.com",
       });
 
     expect(response.status).toBe(400);

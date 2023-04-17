@@ -53,7 +53,7 @@ const invited_profile = {
   wp_user_id: 15,
   name: "Customer Invited",
   surname: "Customer Invited",
-  email: "Invited@unguess.io",
+  email: "invited@unguess.io",
 };
 
 const expired_profile = {
@@ -61,7 +61,7 @@ const expired_profile = {
   wp_user_id: 16,
   name: "Customer Expired",
   surname: "Customer Expired",
-  email: "Expired@unguess.io",
+  email: "expired@unguess.io",
 };
 
 const user1_to_customer_1 = {
