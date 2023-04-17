@@ -1504,6 +1504,12 @@ paths:
                   - profile_id
                   - tryber_wp_user_id
                   - email
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       description: Use this to add a new or existent user into a specific workspace.
       requestBody:
         content:
@@ -1528,6 +1534,27 @@ paths:
                 - email
       security:
         - JWT: []
+    delete:
+      summary: ''
+      operationId: delete-workspaces-wid-users
+      responses:
+        '200':
+          description: OK
+      description: Remove an user from workspace
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  x-stoplight:
+                    id: qgzz3328k5dxx
+              required:
+                - email
   '/workspaces/{wid}/projects':
     parameters:
       - $ref: '#/components/parameters/wid'
