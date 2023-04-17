@@ -245,6 +245,8 @@ export interface paths {
     get: operations["get-workspaces-users"];
     /** Use this to add a new or existent user into a specific workspace. */
     post: operations["post-workspaces-wid-users"];
+    /** Remove an user from workspace */
+    delete: operations["delete-workspaces-wid-users"];
     parameters: {
       path: {
         /** Workspace (company, customer) id */
@@ -1727,6 +1729,9 @@ export interface operations {
           };
         };
       };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
     };
     requestBody: {
       content: {
@@ -1740,6 +1745,26 @@ export interface operations {
            * @enum {string}
            */
           locale?: "it" | "en";
+        };
+      };
+    };
+  };
+  /** Remove an user from workspace */
+  "delete-workspaces-wid-users": {
+    parameters: {
+      path: {
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          email: string;
         };
       };
     };
