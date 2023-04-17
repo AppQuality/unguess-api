@@ -1557,10 +1557,12 @@ paths:
                     size: 1
                     total: 1
                 properties:
-                  items:
+                  users:
                     type: array
                     items:
                       type: object
+                      x-stoplight:
+                        id: zq4odgob84t1y
                       properties:
                         id:
                           type: integer
@@ -1578,16 +1580,8 @@ paths:
                         - name
                         - profile_id
                         - invitationPending
-                  start:
-                    type: integer
-                  limit:
-                    type: integer
-                  size:
-                    type: integer
-                  total:
-                    type: integer
                 required:
-                  - items
+                  - users
         '400':
           $ref: '#/components/responses/Error'
         '403':
