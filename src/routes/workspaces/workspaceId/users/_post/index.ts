@@ -50,9 +50,27 @@ export default class Route extends WorkspaceRoute<{
     const user = users.find((u) => u.email === this.invitedUser.email);
 
     if (user) {
-      // user already exists in the workspace
-      this.setError(400, { message: "User already exists" } as OpenapiError);
-      return;
+      if (
+        user.invitation_status &&
+        Number.parseInt(user.invitation_status) !== 1
+      ) {
+        await this.sendInvitation({
+          email: user.email,
+          profile_id: user.profile_id,
+          locale: this.invitedUser.locale || "en",
+        });
+
+        return this.setSuccess(200, {
+          profile_id: user.profile_id,
+          tryber_wp_user_id: user.tryber_wp_id,
+          email: user.email,
+        });
+      } else {
+        // user already exists in the workspace
+        return this.setError(400, {
+          message: "User already exists",
+        } as OpenapiError);
+      }
     }
 
     const userExists = await this.getUserByEmail(this.invitedUser.email);
@@ -61,6 +79,7 @@ export default class Route extends WorkspaceRoute<{
     try {
       if (!userToAdd) {
         userToAdd = await this.createUser(this.invitedUser);
+
         await this.sendInvitation({
           email: userToAdd.email,
           profile_id: userToAdd.profile_id,
@@ -224,7 +243,24 @@ export default class Route extends WorkspaceRoute<{
       .update(`${profile_id}_AppQ`)
       .digest("hex");
 
-    // Add invitation info to db
+    // Remove previous invitation (todo: replace with onDuplicateKeyUpdate when next will be available)
+    const inviteExists = await db.query(
+      db.format(
+        `SELECT * FROM wp_appq_customer_account_invitations WHERE tester_id = ?`,
+        [Number(profile_id), this.getWorkspaceId()]
+      )
+    );
+
+    if (inviteExists.length) {
+      await db.query(
+        db.format(
+          `DELETE FROM wp_appq_customer_account_invitations WHERE tester_id = ?`,
+          [profile_id, this.getWorkspaceId()]
+        )
+      );
+    }
+
+    // Add new invitation
     await db.query(
       db.format(
         "INSERT INTO wp_appq_customer_account_invitations (tester_id, status, token) VALUES (?, 0, ?)",

@@ -89,7 +89,8 @@ export default class Route extends WorkspaceRoute<{
       name: `${user.name} ${user.surname}`.trim(),
       email: user.email,
       invitationPending: !!(
-        user.invitation_status && Number.parseInt(user.invitation_status) !== 1
+        user.invitation_status !== null &&
+        Number.parseInt(user.invitation_status) !== 1
       ),
     }));
   }
