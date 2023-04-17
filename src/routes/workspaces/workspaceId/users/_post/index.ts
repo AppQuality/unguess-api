@@ -2,6 +2,7 @@
 import WorkspaceRoute from "@src/features/routes/WorkspaceRoute";
 import * as db from "@src/features/db";
 import createTryberWPUser from "@src/features/wp/createTryberWPUser";
+import createUserProfile from "@src/features/wp/createUserProfile";
 import { randomString } from "@src/utils/users/getRandomString";
 import crypto from "crypto";
 import { sendTemplate } from "@src/features/mail/sendTemplate";
@@ -76,10 +77,9 @@ export default class Route extends WorkspaceRoute<{
     } catch (e) {
       if (!userExists) this.removeCreatedUser(this.invitedUser.email);
 
-      this.setError(500, {
+      return this.setError(500, {
         message: "Error adding user to workspace",
       } as OpenapiError);
-      return;
     }
   }
 
@@ -95,7 +95,46 @@ export default class Route extends WorkspaceRoute<{
   }
 
   private async removeCreatedUser(email: string): Promise<void> {
-    throw new Error("Not implemented user removal");
+    const user = await this.getUserByEmail(this.invitedUser.email);
+
+    if (user) {
+      await db.query(
+        db.format(
+          `DELETE  
+            FROM wp_appq_user_to_customer
+            WHERE wp_user_id = ?`,
+          [user.tryber_wp_id]
+        )
+      );
+    }
+
+    // Remove user profiles (if any)
+    await db.query(
+      db.format(
+        `DELETE  
+            FROM wp_users
+            WHERE user_email = ?`,
+        [email]
+      )
+    );
+
+    await db.query(
+      db.format(
+        `DELETE  
+          FROM wp_appq_evd_profile
+          WHERE email = ?`,
+        [email]
+      )
+    );
+
+    await db.query(
+      db.format(
+        `DELETE  
+          FROM wp_users
+          WHERE user_email = ?`,
+        [email]
+      )
+    );
   }
 
   private async getUserByEmail(email: string): Promise<DbUser> {
@@ -129,21 +168,19 @@ export default class Route extends WorkspaceRoute<{
       name && surname ? `${name}-${surname}` : email.split("@")[0];
 
     const tryber_wp_id = await createTryberWPUser(username, email, psw);
-    const profile = await db.query(
-      db.format(
-        `INSERT INTO 
-          wp_appq_evd_profile 
-          (wp_user_id, name, surname, email, blacklisted, employment_id, education_id) 
-          VALUES (?, ?, ?, ?, 1, -1, -1)`,
-        [tryber_wp_id, name, surname, email]
-      )
-    );
 
-    const profile_id = this.getInsertedId(profile);
+    const profile = await createUserProfile({
+      tryber_wp_id,
+      name,
+      surname,
+      email,
+    });
+
+    if (!profile) throw new Error("Error creating user profile");
 
     return {
       tryber_wp_id,
-      profile_id,
+      profile_id: profile.profile_id,
       name,
       surname,
       email,

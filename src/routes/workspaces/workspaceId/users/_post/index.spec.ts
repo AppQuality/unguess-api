@@ -31,8 +31,8 @@ describe("POST /workspaces/wid/users", () => {
     return new Promise(async (resolve, reject) => {
       try {
         await dbAdapter.add({
-          companies: [customer_1],
-          userToCustomers: [user_to_customer_1],
+          companies: [customer_1, customer_2],
+          userToCustomers: [user_to_customer_1, user_to_customer_2],
         });
       } catch (error) {
         console.error(error);
@@ -48,7 +48,7 @@ describe("POST /workspaces/wid/users", () => {
     const response = await request(app)
       .post(`/workspaces/${customer_1.id}/users`)
       .send({
-        email: "bill.gates@unguess.io",
+        email: "vincenzo.cancelli@finestre.com",
       });
 
     expect(response.status).toBe(403);
@@ -111,6 +111,17 @@ describe("POST /workspaces/wid/users", () => {
       .set("Authorization", "Bearer user")
       .send({
         email: "goffredo.baci@amazzonia.com",
+      });
+
+    expect(response.status).toBe(403);
+  });
+
+  it("Should return 500 but keep the user if there is an error on existing user addition", async () => {
+    const response = await request(app)
+      .post(`/workspaces/${customer_2.id}/users`)
+      .set("Authorization", "Bearer user")
+      .send({
+        email: "giovanni.bianchi@example.com",
       });
 
     expect(response.status).toBe(403);

@@ -26,6 +26,7 @@ export const table = {
 
 type WpUsersParams = {
   ID?: number;
+  user_email?: string;
 };
 const data: {
   [key: string]: (params?: WpUsersParams) => Promise<{ [key: string]: any }>;

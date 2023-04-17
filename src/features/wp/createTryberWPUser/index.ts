@@ -1,11 +1,10 @@
 import { HashPassword } from "wordpress-hash-node";
-
 import * as db from "@src/features/db";
 
 const createTryberWPUser = async (
   username: string,
   email: string,
-  password: string
+  psw: string
 ): Promise<number> => {
   let sql = `SELECT * FROM wp_users WHERE user_login = ?`;
   let alreadyRegisteredUser;
@@ -16,7 +15,7 @@ const createTryberWPUser = async (
   }
   if (alreadyRegisteredUser.length) {
     const random = Math.random().toString(36).substring(7);
-    return await createTryberWPUser(`${username}-${random}`, email, password);
+    return await createTryberWPUser(`${username}-${random}`, email, psw);
   }
 
   sql = `SELECT * FROM wp_users WHERE user_email = ?`;
@@ -30,7 +29,7 @@ const createTryberWPUser = async (
     throw e;
   }
 
-  const hash = HashPassword(password);
+  const hash = HashPassword(psw);
 
   try {
     const results = await db.query(
