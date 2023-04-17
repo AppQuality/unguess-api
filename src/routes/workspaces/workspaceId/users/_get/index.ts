@@ -71,6 +71,7 @@ export default class Route extends WorkspaceRoute<{
         LEFT JOIN wp_appq_customer_account_invitations i ON (i.tester_id = p.id)
         WHERE utc.customer_id = ${this.getWorkspaceId()}
         GROUP BY p.id
+        ORDER BY p.id DESC
       `
     );
 
@@ -85,7 +86,7 @@ export default class Route extends WorkspaceRoute<{
     return users.map((user) => ({
       id: user.tryber_wp_id,
       profile_id: user.profile_id,
-      name: `${user.name} ${user.surname}`,
+      name: `${user.name} ${user.surname}`.trim(),
       email: user.email,
       invitationPending: !!(
         user.invitation_status && Number.parseInt(user.invitation_status) !== 1
