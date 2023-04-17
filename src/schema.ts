@@ -1759,12 +1759,28 @@ export interface operations {
     };
     responses: {
       /** OK */
-      200: unknown;
+      200: {
+        content: {
+          "application/json": {
+            items: {
+              id: number;
+              email: string;
+              name: string;
+              profile_id: number;
+              invitationPending: boolean;
+            }[];
+          };
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
     };
     requestBody: {
       content: {
         "application/json": {
-          email: string;
+          /** @description Tryber WP USER ID */
+          user_id: number;
         };
       };
     };
