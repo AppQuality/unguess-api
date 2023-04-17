@@ -70,6 +70,8 @@ import customerUniqueBugsRead from "@src/__mocks__/database/customer_unique_bug_
 import bugsReadStatus from "@src/__mocks__/database/bug_read_status";
 import campaignReadStatuses from "@src/__mocks__/database/campaign_read_status";
 import customerInvitations from "@src/__mocks__/database/customer_invitations";
+import unlayerTemplate from "@src/__mocks__/database/unlayer_mail_template";
+import mailEvents from "@src/__mocks__/database/event_transactional_mail";
 
 interface dataObject {
   profiles?: Array<any>;
@@ -144,6 +146,9 @@ export const adapter = {
     await customStatuses.mock();
     await bugCustomStatuses.mock();
     await customerInvitations.mock();
+
+    await unlayerTemplate.mock();
+    await mailEvents.mock();
   },
   drop: async () => {
     await profileTable.drop();
@@ -200,6 +205,9 @@ export const adapter = {
     await customStatuses.dropMock();
     await bugCustomStatuses.dropMock();
     await customerInvitations.dropMock();
+
+    await unlayerTemplate.dropMock();
+    await mailEvents.dropMock();
   },
 
   clear: async () => {
@@ -230,6 +238,8 @@ export const adapter = {
     await userTaskMedia.clear();
     await priorities.clear();
     await bugsPriorities.clear();
+    await unlayerTemplate.clear();
+    await mailEvents.clear();
     await customStatuses.clear();
     await bugCustomStatuses.clear();
   },

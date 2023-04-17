@@ -243,6 +243,8 @@ export interface paths {
   "/workspaces/{wid}/users": {
     /** Return a list of users from a specific workspace */
     get: operations["get-workspaces-users"];
+    /** Use this to add a new or existent user into a specific workspace. */
+    post: operations["post-workspaces-wid-users"];
     parameters: {
       path: {
         /** Workspace (company, customer) id */
@@ -1704,6 +1706,42 @@ export interface operations {
       400: components["responses"]["Error"];
       403: components["responses"]["Error"];
       500: components["responses"]["Error"];
+    };
+  };
+  /** Use this to add a new or existent user into a specific workspace. */
+  "post-workspaces-wid-users": {
+    parameters: {
+      path: {
+        /** Workspace (company, customer) id */
+        wid: components["parameters"]["wid"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            profile_id: number;
+            tryber_wp_user_id: number;
+            email: string;
+          };
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          email: string;
+          name?: string;
+          surname?: string;
+          /**
+           * @description preferred language
+           * @default en
+           * @enum {string}
+           */
+          locale?: "it" | "en";
+        };
+      };
     };
   };
   "get-workspace-projects": {
