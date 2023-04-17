@@ -1540,7 +1540,54 @@ paths:
       responses:
         '200':
           description: OK
-          content: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                x-examples:
+                  Example 1:
+                    items:
+                      - id: 1234
+                        email: user@example.com
+                        name: string
+                        profile_id: 999
+                        invitationPending: true
+                    start: 0
+                    limit: 0
+                    size: 1
+                    total: 1
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        email:
+                          type: string
+                        name:
+                          type: string
+                        profile_id:
+                          type: integer
+                        invitationPending:
+                          type: boolean
+                      required:
+                        - id
+                        - email
+                        - name
+                        - profile_id
+                        - invitationPending
+                  start:
+                    type: integer
+                  limit:
+                    type: integer
+                  size:
+                    type: integer
+                  total:
+                    type: integer
+                required:
+                  - items
         '400':
           $ref: '#/components/responses/Error'
         '403':
