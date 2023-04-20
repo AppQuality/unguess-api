@@ -12,6 +12,8 @@ export const table = {
       "wp_user_id INTEGER ",
       "is_verified INTEGER DEFAULT 0",
       "blacklisted INTEGER DEFAULT 1",
+      "employment_id INTEGER NOT NULL",
+      "education_id INTEGER NOT NULL",
     ]);
   },
   drop: async () => {
@@ -33,6 +35,8 @@ data.basicCustomer = async (params) => {
     email: "mario.rossi@example.com",
     wp_user_id: 1,
     is_verified: 1,
+    employment_id: -1,
+    education_id: -1,
     ...params,
   };
   await db.insert("wp_appq_evd_profile", item);
