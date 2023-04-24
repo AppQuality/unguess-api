@@ -1,55 +1,25 @@
 /** OPENAPI-CLASS: post-analytics-views-campaigns-cid */
 import CampaignRoute from "@src/features/routes/CampaignRoute";
-import * as db from "@src/features/db";
+import { unguess } from "@src/features/database";
 
 export default class Route extends CampaignRoute<{
   response: StoplightOperations["post-analytics-views-campaigns-cid"]["responses"]["200"]["content"]["application/json"];
   parameters: StoplightOperations["post-analytics-views-campaigns-cid"]["parameters"]["path"];
 }> {
   protected async prepare(): Promise<void> {
-    if (await this.campaignReadStatusAlreadyExists()) {
-      await this.updateCampaignReadStatus();
-    } else {
-      await this.newCampaignReadStatus();
-    }
+    await unguess.tables.WpUgCampaignReadStatus.do()
+      .insert({
+        is_read: 1,
+        last_read_on: unguess.fn.now(),
+        read_on: unguess.fn.now(),
+        campaign_id: this.cp_id,
+        unguess_wp_user_id: this.getWordpressId("unguess"),
+      })
+      .onConflict(["campaign_id", "unguess_wp_user_id"])
+      .merge(["last_read_on", "is_read"]);
+
     return this.setSuccess(200, {
       success: true,
     });
-  }
-
-  private async campaignReadStatusAlreadyExists() {
-    const results = await db.query(
-      db.format(
-        `SELECT * FROM wp_ug_campaign_read_status 
-          WHERE campaign_id = ? AND unguess_wp_user_id = ?`,
-        [this.cp_id, this.getWordpressId("unguess")]
-      ),
-      "unguess"
-    );
-    return results.length > 0;
-  }
-
-  private async updateCampaignReadStatus() {
-    await db.query(
-      db.format(
-        `UPDATE wp_ug_campaign_read_status 
-        SET is_read=1, last_read_on = NOW()
-        WHERE campaign_id = ? AND unguess_wp_user_id = ?`,
-        [this.cp_id, this.getWordpressId("unguess")]
-      ),
-      "unguess"
-    );
-  }
-
-  private async newCampaignReadStatus() {
-    await db.query(
-      db.format(
-        `INSERT INTO wp_ug_campaign_read_status
-          (campaign_id,unguess_wp_user_id,is_read,read_on,last_read_on) 
-          VALUES (?,?, 1, NOW(), NOW() )`,
-        [this.cp_id, this.getWordpressId("unguess")]
-      ),
-      "unguess"
-    );
   }
 }

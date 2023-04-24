@@ -1,24 +1,22 @@
 import app from "@src/app";
 import request from "supertest";
-
-import Templates from "@src/__mocks__/database/templates";
-import Category from "@src/__mocks__/database/template_categories";
+import { unguess } from "@src/features/database";
 
 describe("GET /templates", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        Category.insert({
+        await unguess.tables.WpUgTemplateCategories.do().insert({
           id: 1,
           name: "Category 1",
         });
 
-        Category.insert({
+        await unguess.tables.WpUgTemplateCategories.do().insert({
           id: 2,
           name: "Category 2",
         });
 
-        Templates.insert({
+        await unguess.tables.WpUgTemplates.do().insert({
           title: "Template 1",
           description: "Template 1 description",
           content: "<h1>Template 1</h1><p>content</p>",
@@ -28,7 +26,7 @@ describe("GET /templates", () => {
           image: "https://placehold.it/300x300",
         });
 
-        Templates.insert({
+        await unguess.tables.WpUgTemplates.do().insert({
           title: "Template 2",
           description: "Template 2 description",
           content: "<h1>Template 2</h1><p>content</p>",
@@ -36,7 +34,7 @@ describe("GET /templates", () => {
           device_type: "webapp",
         });
 
-        Templates.insert({
+        await unguess.tables.WpUgTemplates.do().insert({
           title: "Template 3",
           description: "Template 3 description",
           content: "<h1>Template 3</h1><p>content</p>",

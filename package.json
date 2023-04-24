@@ -14,13 +14,13 @@
     "build": "npm-run-all clean transpile copy-reference",
     "start": "tsnd --respawn -r tsconfig-paths/register  --transpile-only  ./src/index.ts",
     "postinstall": "husky install",
-    "rename-schema": "node -e \"require('fs').rename('postman/schemas/openapi.yml','postman/schemas/schema.yaml', (err) => { (err ? console.log(err) : console.log('Rename complete!')); } ) \"",
-    "update-postman": "copyfiles -f src/reference/openapi.yml postman/schemas && npm run rename-schema",
-    "types": "openapi-typescript src/reference/openapi.yml --output src/schema.ts "
+    "types": "openapi-typescript src/reference/openapi.yml --output src/schema.ts"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@appquality/tryber-database": "0.7.0",
+    "@appquality/unguess-database": "0.6.1",
     "@appquality/wp-auth": "^1.0.7",
     "@babel/runtime": "^7.16.7",
     "@sendgrid/mail": "^7.7.0",
