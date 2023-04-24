@@ -19,7 +19,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@appquality/tryber-database": "0.6.3",
+    "@appquality/tryber-database": "0.7.0",
     "@appquality/unguess-database": "0.6.1",
     "@appquality/wp-auth": "^1.0.7",
     "@babel/runtime": "^7.16.7",
