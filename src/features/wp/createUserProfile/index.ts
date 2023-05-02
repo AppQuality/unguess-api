@@ -1,5 +1,5 @@
 import { ERROR_MESSAGE } from "@src/utils/constants";
-import * as db from "@src/features/db";
+import { tryber } from "@src/features/database";
 
 export interface ICreateUserProfileArgs {
   tryber_wp_id: number;
@@ -27,18 +27,20 @@ export default async ({
     message: ERROR_MESSAGE,
   } as StoplightComponents["schemas"]["Error"];
 
-  const profile = await db.query(
-    db.format(
-      `INSERT INTO 
-        wp_appq_evd_profile 
-        (wp_user_id, name, surname, email, blacklisted, employment_id, education_id) 
-        VALUES (?, ?, ?, ?, 1, -1, -1)`,
-      [tryber_wp_id, name, surname, email]
-    )
-  );
+  const profile = await tryber.tables.WpAppqEvdProfile.do()
+    .insert({
+      wp_user_id: tryber_wp_id,
+      name,
+      surname,
+      email,
+      blacklisted: 1,
+      employment_id: -1,
+      education_id: -1,
+    })
+    .returning("id");
 
   if (profile) {
-    const profile_id = profile.insertId ?? profile.lastInsertRowid;
+    const profile_id = profile[0].id;
     return {
       tryber_wp_id,
       profile_id,
