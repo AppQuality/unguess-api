@@ -58,11 +58,6 @@ describe("POST /workspaces/wid/users", () => {
         email: "vincenzo.cancelli@finestre.com",
       });
 
-    const invites =
-      await tryber.tables.WpAppqCustomerAccountInvitations.do().select();
-
-    console.log("inviti", invites);
-
     const response = await request(app)
       .post(`/workspaces/${workspaces.customer_1.id}/users`)
       .set("Authorization", "Bearer user")
