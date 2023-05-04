@@ -1288,6 +1288,18 @@ paths:
       security:
         - JWT: []
       x-internal: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                company:
+                  type: string
+                  x-stoplight:
+                    id: bayc9ghvya8u8
+              required:
+                - company
   '/workspaces/{wid}':
     parameters:
       - $ref: '#/components/parameters/wid'
