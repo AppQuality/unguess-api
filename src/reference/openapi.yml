@@ -1263,21 +1263,24 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Workspace'
+                type: object
+                properties:
+                  id:
+                    type: number
+                    x-stoplight:
+                      id: 81s4r2ocn6lxr
+                  company:
+                    type: string
+                    x-stoplight:
+                      id: rp658rxklmjnh
+                required:
+                  - id
+                  - company
               examples:
                 Example 1:
                   value:
-                    id: 666
-                    company: Tesla Inc
-                    tokens: 146
-                    logo: string
-                    csm:
-                      id: 32
-                      email: vincenzo.cancelli@unguess.io
-                      name: Vincenzo Cancelli
-                      profile_id: 32
-                      tryber_wp_user_id: 1
-                    coins: 12
+                    id: 123
+                    company: Tesla Inc.
         '400':
           $ref: '#/components/responses/Error'
         '403':
