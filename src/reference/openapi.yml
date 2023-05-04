@@ -1278,6 +1278,12 @@ paths:
                       profile_id: 32
                       tryber_wp_user_id: 1
                     coins: 12
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       description: This endpoint is useful to add a new workspace. Only admin can use this.
       security:
         - JWT: []
