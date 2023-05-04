@@ -212,6 +212,8 @@ export interface paths {
   };
   "/workspaces": {
     get: operations["get-workspaces"];
+    /** This endpoint is useful to add a new workspace. Only admin can use this. */
+    post: operations["post-workspaces"];
   };
   "/workspaces/{wid}": {
     get: operations["get-workspace"];
@@ -1570,6 +1572,20 @@ export interface operations {
       400: components["responses"]["Error"];
       403: components["responses"]["Error"];
       404: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  /** This endpoint is useful to add a new workspace. Only admin can use this. */
+  "post-workspaces": {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Workspace"];
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
       500: components["responses"]["Error"];
     };
   };
