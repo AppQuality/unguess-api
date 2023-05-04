@@ -1581,12 +1581,23 @@ export interface operations {
       /** OK */
       200: {
         content: {
-          "application/json": components["schemas"]["Workspace"];
+          "application/json": {
+            id: number;
+            company: string;
+          };
         };
       };
       400: components["responses"]["Error"];
       403: components["responses"]["Error"];
       500: components["responses"]["Error"];
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          company: string;
+          pm_id?: number;
+        };
+      };
     };
   };
   "get-workspace": {
