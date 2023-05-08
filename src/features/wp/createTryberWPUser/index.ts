@@ -42,7 +42,7 @@ const createTryberWPUser = async (
       })
       .returning("ID");
 
-    return wp_user[0].ID;
+    return wp_user[0].ID ?? wp_user[0];
   } catch (e) {
     throw e;
   }

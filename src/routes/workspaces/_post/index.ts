@@ -42,10 +42,12 @@ export default class Route extends UserRoute<{
         .returning(["id", "company"]);
 
       this.setSuccess(200, {
-        id: customer[0].id,
-        company: customer[0].company,
+        id: customer[0].id ?? customer[0],
+        company: customer[0].company ?? this.companyName,
       });
     } catch (error) {
+      console.log(error);
+
       this.setError(500, {
         message: ERROR_MESSAGE,
       } as OpenapiError);

@@ -40,7 +40,7 @@ export default async ({
     .returning("id");
 
   if (profile) {
-    const profile_id = profile[0].id;
+    const profile_id = profile[0].id ?? profile[0];
     return {
       tryber_wp_id,
       profile_id,
