@@ -16,25 +16,11 @@ interface DbUser {
   invitation_status: string;
 }
 
-interface InvitedUser {
-  email: string;
-  name?: string;
-  surname?: string;
-  locale?: string;
-}
-
 export default class Route extends WorkspaceRoute<{
   response: StoplightOperations["post-workspaces-wid-users"]["responses"]["200"]["content"]["application/json"];
   parameters: StoplightOperations["post-workspaces-wid-users"]["parameters"]["path"];
   body: StoplightOperations["post-workspaces-wid-users"]["requestBody"]["content"]["application/json"];
 }> {
-  private invitedUser: InvitedUser;
-
-  constructor(configuration: RouteClassConfiguration) {
-    super(configuration);
-    this.invitedUser = this.getBody();
-  }
-
   protected async filter(): Promise<boolean> {
     if (!super.filter()) return false;
 
@@ -47,9 +33,7 @@ export default class Route extends WorkspaceRoute<{
 
   protected async prepare() {
     const users = await this.getUsers();
-    const userInWorkspace = users.find(
-      (u) => u.email === this.invitedUser.email
-    );
+    const userInWorkspace = users.find((u) => u.email === this.getBody().email);
 
     if (userInWorkspace) {
       const pendingInvite =
@@ -60,7 +44,7 @@ export default class Route extends WorkspaceRoute<{
         await this.sendInvitation({
           email: userInWorkspace.email,
           profile_id: userInWorkspace.profile_id,
-          locale: this.invitedUser.locale || "en",
+          locale: this.getBody().locale || "en",
         });
 
         return this.setSuccess(200, {
@@ -76,17 +60,17 @@ export default class Route extends WorkspaceRoute<{
       }
     }
 
-    const userExists = await this.getUserByEmail(this.invitedUser.email);
+    const userExists = await this.getUserByEmail(this.getBody().email);
     let userToAdd: DbUser = userExists;
 
     try {
       if (!userToAdd) {
-        userToAdd = await this.createUser(this.invitedUser);
+        userToAdd = await this.createUser(this.getBody());
 
         await this.sendInvitation({
           email: userToAdd.email,
           profile_id: userToAdd.profile_id,
-          locale: this.invitedUser.locale || "en",
+          locale: this.getBody().locale || "en",
         });
       }
 
@@ -97,7 +81,7 @@ export default class Route extends WorkspaceRoute<{
         email: userToAdd.email,
       });
     } catch (e) {
-      if (!userExists) this.removeCreatedUser(this.invitedUser.email);
+      if (!userExists) this.removeCreatedUser(this.getBody().email);
 
       return this.setError(500, {
         message: "Error adding user to workspace",
@@ -115,7 +99,7 @@ export default class Route extends WorkspaceRoute<{
   }
 
   private async removeCreatedUser(email: string): Promise<void> {
-    const user = await this.getUserByEmail(this.invitedUser.email);
+    const user = await this.getUserByEmail(this.getBody().email);
 
     if (user) {
       await tryber.tables.WpAppqUserToCustomer.do().delete().where({
@@ -159,7 +143,9 @@ export default class Route extends WorkspaceRoute<{
       : null;
   }
 
-  private async createUser(invitedUser: InvitedUser): Promise<DbUser> {
+  private async createUser(
+    invitedUser: StoplightOperations["post-workspaces-wid-users"]["requestBody"]["content"]["application/json"]
+  ): Promise<DbUser> {
     const { email, name = "", surname = "" } = invitedUser;
     const psw = randomString(12);
     const username =
@@ -250,21 +236,31 @@ export default class Route extends WorkspaceRoute<{
     const sender = this.getUser();
 
     await sendTemplate({
-      template: `customer_invitation_${locale}`,
+      template: this.getEmailEvent(),
       email: email,
       subject: subj,
       optionalFields: {
         "{Inviter.name}": sender.email,
         "{Inviter.email}": sender.email,
         "{Inviter.url}": `${process.env.APP_URL}/invites/${profile_id}/${token}`,
+        "{Inviter.redirectUrl}": this.getEmailRedirectUrl(),
       },
     });
   }
 
-  protected isValidUser(): boolean {
-    if (!this.invitedUser) return false;
+  private getEmailEvent() {
+    const body = this.getBody();
+    return body.event_name ?? `customer_invitation_${body.locale ?? "en"}`;
+  }
 
-    const { email } = this.invitedUser;
+  private getEmailRedirectUrl() {
+    return this.getBody().redirect_url ?? process.env.APP_URL;
+  }
+
+  protected isValidUser(): boolean {
+    if (!this.getBody()) return false;
+
+    const { email } = this.getBody();
     if (!email) return false;
 
     return true;

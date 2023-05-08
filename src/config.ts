@@ -46,10 +46,10 @@ const config: {
   sendgrid: {
     key: process.env.SENDGRID_KEY || "",
     default_sender: {
-      email: process.env.DEFAULT_SENDER_MAIL || "it@tryber.me",
-      name: process.env.DEFAULT_SENDER_NAME || "Tryber",
+      email: process.env.DEFAULT_SENDER_MAIL || "info@unguess.io",
+      name: process.env.DEFAULT_SENDER_NAME || "UNGUESS",
     },
-    default_category: process.env.DEFAULT_CATEGORY || "Test",
+    default_category: process.env.DEFAULT_CATEGORY || "UNGUESSAPP_STAGING",
   },
   jwt: {
     secret: process.env.JWT_SECRET || "secret",
