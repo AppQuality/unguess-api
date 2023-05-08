@@ -132,14 +132,14 @@ export default class WorkspaceRoute<
 
   protected async getCoins() {
     const coins = await unguess.tables.WpUgCoins.do()
-      .sum("amount")
+      .sum({ total: "amount" })
       .where({
         customer_id: this.getWorkspaceId(),
       })
       .groupBy("customer_id")
       .first();
 
-    return coins || 0;
+    return coins?.total || 0;
   }
 
   protected getWorkspaceId() {

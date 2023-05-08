@@ -46,8 +46,6 @@ export default class Route extends UserRoute<{
         company: customer[0].company ?? this.companyName,
       });
     } catch (error) {
-      console.log(error);
-
       this.setError(500, {
         message: ERROR_MESSAGE,
       } as OpenapiError);
