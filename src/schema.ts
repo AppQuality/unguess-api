@@ -1772,6 +1772,8 @@ export interface operations {
            * @enum {string}
            */
           locale?: "it" | "en";
+          event_name?: string;
+          redirect_url?: string;
         };
       };
     };

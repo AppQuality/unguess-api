@@ -1582,6 +1582,10 @@ paths:
                     - it
                     - en
                   default: en
+                event_name:
+                  type: string
+                redirect_url:
+                  type: string
               required:
                 - email
       security:
