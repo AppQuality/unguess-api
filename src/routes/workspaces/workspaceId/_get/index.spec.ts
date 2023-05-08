@@ -2,9 +2,17 @@ import app from "@src/app";
 import request from "supertest";
 import { fallBackCsmProfile } from "@src/utils/constants";
 import { useBasicWorkspaces } from "@src/features/db/hooks/basicWorkspaces";
+import { unguess } from "@src/features/database";
 
 describe("GET /workspaces/{wid}", () => {
   const context = useBasicWorkspaces();
+
+  beforeAll(async () => {
+    await unguess.tables.WpUgCoins.do().insert({
+      customer_id: context.customer_1.id,
+      amount: 123,
+    });
+  });
 
   it("Should answer 403 if not logged in", async () => {
     const response = await request(app).get(
@@ -36,6 +44,22 @@ describe("GET /workspaces/{wid}", () => {
 
   it("Should answer with a workspace object", async () => {
     const response = await request(app)
+      .get(`/workspaces/${context.customer_2.id}`)
+      .set("authorization", "Bearer admin");
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        id: context.customer_2.id,
+        company: context.customer_2.company,
+        tokens: context.customer_2.tokens,
+        logo: context.customer_2.company_logo,
+        csm: fallBackCsmProfile,
+      })
+    );
+  });
+
+  it("Should answer with a coins info if there are some", async () => {
+    const response = await request(app)
       .get(`/workspaces/${context.customer_1.id}`)
       .set("authorization", "Bearer user");
     expect(response.status).toBe(200);
@@ -46,7 +70,7 @@ describe("GET /workspaces/{wid}", () => {
         tokens: context.customer_1.tokens,
         logo: context.customer_1.company_logo,
         csm: fallBackCsmProfile,
-        coins: 0,
+        coins: 123,
       })
     );
   });
