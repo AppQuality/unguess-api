@@ -1,26 +1,25 @@
 import { HashPassword } from "wordpress-hash-node";
 import * as db from "@src/features/db";
+import { tryber } from "@src/features/database";
 
 const createTryberWPUser = async (
   user_login: string,
   email: string,
   psw: string
 ): Promise<number> => {
-  let sql = `SELECT * FROM wp_users WHERE user_login = ?`;
-  let alreadyRegisteredUser;
-  try {
-    alreadyRegisteredUser = await db.query(db.format(sql, [user_login]));
-  } catch (e) {
-    throw e;
-  }
+  const alreadyRegisteredUser = await tryber.tables.WpUsers.do()
+    .select("ID")
+    .where({ user_login });
+
   if (alreadyRegisteredUser.length) {
     const random = Math.random().toString(36).substring(7);
     return await createTryberWPUser(`${user_login}-${random}`, email, psw);
   }
 
-  sql = `SELECT * FROM wp_users WHERE user_email = ?`;
   try {
-    const alreadyRegisteredEmail = await db.query(db.format(sql, [email]));
+    const alreadyRegisteredEmail = await tryber.tables.WpUsers.do()
+      .select("*")
+      .where({ user_email: email });
 
     if (alreadyRegisteredEmail.length) {
       throw Error(`Email ${email} already registered`);
@@ -32,23 +31,18 @@ const createTryberWPUser = async (
   const hash = HashPassword(psw);
 
   try {
-    const results = await db.query(
-      db.format(
-        `INSERT INTO wp_users 
-    (user_email, user_nicename, display_name, user_login, user_pass, user_registered) 
-    VALUES (?, ?, ?, ?, ?, ?)`,
-        [
-          email,
-          user_login.substring(0, 50),
-          user_login,
-          user_login,
-          hash,
-          new Date().toISOString().substring(0, 10),
-        ]
-      )
-    );
+    const wp_user = await tryber.tables.WpUsers.do()
+      .insert({
+        user_email: email,
+        user_nicename: user_login.substring(0, 50),
+        display_name: user_login,
+        user_login,
+        user_pass: hash,
+        user_registered: new Date().toISOString().substring(0, 10),
+      })
+      .returning("ID");
 
-    return results?.insertId || results.lastInsertRowid;
+    return wp_user[0].ID ?? wp_user[0];
   } catch (e) {
     throw e;
   }

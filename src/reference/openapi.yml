@@ -1,30 +1,30 @@
 openapi: 3.0.3
 info:
   title: UnguessApi
-  version: "1.0"
+  version: '1.0'
   description: An API to get all data for your bugfinding and ux research needs!
   contact:
     name: Developers
     email: it@unguess.io
-    url: "https://unguess.io/"
-  termsOfService: "https://unguess.io/terms-and-conditions/"
+    url: 'https://unguess.io/'
+  termsOfService: 'https://unguess.io/terms-and-conditions/'
 servers:
-  - url: "https://api.unguess.io"
+  - url: 'https://api.unguess.io'
 paths:
   /:
     get:
       summary: Get API description
       tags: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
                 type: object
                 properties: {}
-        "500":
-          $ref: "#/components/responses/Error"
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-root
       description: Get all routes available for this apis
     parameters: []
@@ -37,26 +37,26 @@ paths:
         - Authentication
       parameters: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Authentication"
-        "500":
-          $ref: "#/components/responses/Error"
+                $ref: '#/components/schemas/Authentication'
+        '500':
+          $ref: '#/components/responses/Error'
       requestBody:
-        $ref: "#/components/requestBodies/Credentials"
-  "/analytics/views/campaigns/{cid}":
+        $ref: '#/components/requestBodies/Credentials'
+  '/analytics/views/campaigns/{cid}':
     post:
-      description: ""
+      description: ''
       summary: View a campaign
       operationId: post-analytics-views-campaigns-cid
       tags:
         - Authentication
       parameters: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -65,53 +65,53 @@ paths:
                 properties:
                   success:
                     type: boolean
-        "500":
-          $ref: "#/components/responses/Error"
+        '500':
+          $ref: '#/components/responses/Error'
       security:
         - JWT: []
     parameters:
-      - $ref: "#/components/parameters/cid"
+      - $ref: '#/components/parameters/cid'
   /campaigns:
     post:
       summary: Create campaign
       operationId: post-campaigns
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Campaign"
-        "400":
-          $ref: "#/components/responses/Error"
-        "403":
-          $ref: "#/components/responses/Error"
-        "404":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+                $ref: '#/components/schemas/Campaign'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       parameters: []
       security:
         - JWT: []
       requestBody:
-        $ref: "#/components/requestBodies/Campaign"
+        $ref: '#/components/requestBodies/Campaign'
       tags:
         - Campaigns
     parameters: []
-  "/campaigns/{cid}":
+  '/campaigns/{cid}':
     parameters:
-      - $ref: "#/components/parameters/cid"
+      - $ref: '#/components/parameters/cid'
     patch:
       summary: Patch campaign
       operationId: patch-campaigns
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Campaign"
-      description: ""
+                $ref: '#/components/schemas/Campaign'
+      description: ''
       security:
         - JWT: []
       requestBody:
@@ -122,27 +122,27 @@ paths:
               properties:
                 customer_title:
                   type: string
-        description: ""
+        description: ''
     get:
       summary: Get campaign by ID
       operationId: get-campaign
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CampaignWithOutput"
+                $ref: '#/components/schemas/CampaignWithOutput'
       security:
         - JWT: []
-  "/campaigns/{cid}/bugs":
+  '/campaigns/{cid}/bugs':
     parameters:
-      - $ref: "#/components/parameters/cid"
+      - $ref: '#/components/parameters/cid'
     get:
       summary: Get Campaigns Bugs
       tags: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -153,7 +153,7 @@ paths:
                     type: array
                     items:
                       allOf:
-                        - $ref: "#/components/schemas/Bug"
+                        - $ref: '#/components/schemas/Bug'
                         - type: object
                           properties:
                             tags:
@@ -207,8 +207,14 @@ paths:
                         replicability:
                           id: 0
                           name: string
+                        priority:
+                          id: 12
+                          name: Highest
+                        custom_status:
+                          id: 2
+                          name: To do
                         created: string
-                        occurred_date: "2023-02-09T15:15:04+01:00"
+                        occurred_date: '2023-02-09T15:15:04+01:00'
                         updated: string
                         note: string
                         device:
@@ -233,81 +239,81 @@ paths:
                     limit: 0
                     size: 0
                     total: 0
-        "400":
-          $ref: "#/components/responses/Error"
-        "401":
-          $ref: "#/components/responses/Error"
-        "403":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-campaigns-cid-bugs
-      description: ""
+      description: ''
       security:
         - JWT: []
       parameters:
-        - $ref: "#/components/parameters/limit"
-        - $ref: "#/components/parameters/start"
-        - $ref: "#/components/parameters/order"
-        - $ref: "#/components/parameters/orderBy"
-        - $ref: "#/components/parameters/filterBy"
-        - $ref: "#/components/parameters/search"
-  "/campaigns/{cid}/bugTypes":
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/order'
+        - $ref: '#/components/parameters/orderBy'
+        - $ref: '#/components/parameters/filterBy'
+        - $ref: '#/components/parameters/search'
+  '/campaigns/{cid}/bugTypes':
     parameters:
-      - $ref: "#/components/parameters/cid"
+      - $ref: '#/components/parameters/cid'
     get:
       summary: Get Campaigns BugTypes
       tags: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/BugType"
+                  $ref: '#/components/schemas/BugType'
               examples: {}
-        "400":
-          $ref: "#/components/responses/Error"
-        "403":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-campaigns-cid-bug-types
-      description: ""
+      description: ''
       security:
         - JWT: []
       parameters: []
-  "/campaigns/{cid}/bugs/{bid}":
+  '/campaigns/{cid}/bugs/{bid}':
     parameters:
-      - $ref: "#/components/parameters/cid"
-      - $ref: "#/components/parameters/bid"
+      - $ref: '#/components/parameters/cid'
+      - $ref: '#/components/parameters/bid'
     get:
       summary: Get Campaigns Single Bug
       tags: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Bug"
+                  - $ref: '#/components/schemas/Bug'
                   - type: object
                     properties:
                       media:
                         type: array
                         items:
-                          $ref: "#/components/schemas/BugMedia"
+                          $ref: '#/components/schemas/BugMedia'
                       tags:
                         type: array
                         items:
-                          $ref: "#/components/schemas/BugTag"
+                          $ref: '#/components/schemas/BugTag'
                       additional_fields:
                         type: array
                         items:
-                          $ref: "#/components/schemas/BugAdditionalField"
+                          $ref: '#/components/schemas/BugAdditionalField'
                       reporter:
                         type: object
                         required:
@@ -321,14 +327,14 @@ paths:
                     required:
                       - reporter
               examples: {}
-        "400":
-          $ref: "#/components/responses/Error"
-        "401":
-          $ref: "#/components/responses/Error"
-        "403":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-campaigns-single-bug
       security:
         - JWT: []
@@ -336,7 +342,7 @@ paths:
       summary: Patch Campaigns Single Bug
       operationId: patch-campaigns-cid-bugs-bid
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -356,9 +362,9 @@ paths:
                         - tag_id
                         - tag_name
                   priority:
-                    $ref: "#/components/schemas/BugPriority"
+                    $ref: '#/components/schemas/BugPriority'
                   custom_status:
-                    $ref: "#/components/schemas/BugCustomStatus"
+                    $ref: '#/components/schemas/BugCustomStatus'
               examples:
                 oneTagResponse:
                   value:
@@ -404,7 +410,7 @@ paths:
                   tags: []
       security:
         - JWT: []
-  "/campaigns/{cid}/replicabilities":
+  '/campaigns/{cid}/replicabilities':
     parameters:
       - name: cid
         in: path
@@ -416,23 +422,23 @@ paths:
       summary: GET Replicabilities by Campaign
       tags: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/BugReplicability"
-        "400":
+                  $ref: '#/components/schemas/BugReplicability'
+        '400':
           description: Bad Request
-        "403":
+        '403':
           description: Forbidden
       operationId: get-campaigns-replicabilities
       description: Return all accepted replicabilities of a specific campaign
       security:
         - JWT: []
-  "/campaigns/{cid}/bugs/{bid}/siblings":
+  '/campaigns/{cid}/bugs/{bid}/siblings':
     parameters:
       - name: cid
         in: path
@@ -450,7 +456,7 @@ paths:
       summary: Get Bug siblings
       tags: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -538,32 +544,32 @@ paths:
                 required:
                   - siblings
               examples: {}
-        "400":
-          $ref: "#/components/responses/Error"
-        "401":
-          $ref: "#/components/responses/Error"
-        "403":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-campaigns-bug-siblings
       security:
         - JWT: []
-      description: ""
-  "/campaigns/{cid}/meta":
+      description: ''
+  '/campaigns/{cid}/meta':
     parameters:
-      - $ref: "#/components/parameters/cid"
+      - $ref: '#/components/parameters/cid'
     get:
       summary: Get Campaign meta info
       tags: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/Campaign"
+                  - $ref: '#/components/schemas/Campaign'
                   - type: object
                     properties:
                       selected_testers:
@@ -605,46 +611,46 @@ paths:
                     allowed_devices:
                       - smartphone
                       - tablet
-        "400":
-          $ref: "#/components/responses/Error"
-        "401":
-          $ref: "#/components/responses/Error"
-        "403":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-campaigns-cid-meta
       security:
         - JWT: []
       parameters: []
       description: Used to extra info about a selected campaign
-  "/campaigns/{cid}/reports":
+  '/campaigns/{cid}/reports':
     parameters:
-      - $ref: "#/components/parameters/cid"
+      - $ref: '#/components/parameters/cid'
     get:
       summary: GET Reports by Campaign
       tags: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Report"
+                  $ref: '#/components/schemas/Report'
       operationId: get-campaigns-reports
       description: Return all available report of a specific campaign
       security:
         - JWT: []
-  "/campaigns/{cid}/tags":
+  '/campaigns/{cid}/tags':
     parameters:
-      - $ref: "#/components/parameters/cid"
+      - $ref: '#/components/parameters/cid'
     get:
       summary: Get Campaigns Tags
       tags: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -674,18 +680,18 @@ paths:
                     - tag_id: 2
                       display_name: tag2
                       slug: tag2
-        "400":
-          $ref: "#/components/responses/Error"
-        "403":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-campaigns-cid-tags
-      description: ""
+      description: ''
       security:
         - JWT: []
       parameters: []
-  "/campaigns/{cid}/devices":
+  '/campaigns/{cid}/devices':
     parameters:
       - name: cid
         in: path
@@ -697,7 +703,7 @@ paths:
       summary: Get Campaigns Bugs Devices
       tags: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -715,18 +721,18 @@ paths:
                   value:
                     - device: Apple iPhone 11
                     - device: Desktop
-        "400":
-          $ref: "#/components/responses/Error"
-        "403":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-campaigns-cid-devices
-      description: ""
+      description: ''
       security:
         - JWT: []
       parameters: []
-  "/campaigns/{cid}/os":
+  '/campaigns/{cid}/os':
     parameters:
       - name: cid
         in: path
@@ -738,7 +744,7 @@ paths:
       summary: Get Campaigns Bugs Os
       tags: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -755,49 +761,49 @@ paths:
                 Example 1:
                   value:
                     - os: iOS 16
-        "400":
-          $ref: "#/components/responses/Error"
-        "403":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-campaigns-cid-os
-      description: ""
+      description: ''
       security:
         - JWT: []
       parameters: []
-  "/campaigns/{cid}/severities":
+  '/campaigns/{cid}/severities':
     parameters:
-      - $ref: "#/components/parameters/cid"
+      - $ref: '#/components/parameters/cid'
     get:
       summary: Get Campaigns Severities
       tags: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/BugSeverity"
+                  $ref: '#/components/schemas/BugSeverity'
               examples:
                 Example 1:
                   value:
                     - id: 1
                       name: string
-        "400":
-          $ref: "#/components/responses/Error"
-        "403":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-campaigns-cid-severities
-      description: ""
+      description: ''
       security:
         - JWT: []
       parameters: []
-  "/campaigns/{cid}/priorities":
+  '/campaigns/{cid}/priorities':
     parameters:
       - name: cid
         in: path
@@ -809,31 +815,31 @@ paths:
       summary: Get Campaigns Priorities
       tags: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/BugPriority"
+                  $ref: '#/components/schemas/BugPriority'
               examples:
                 Example 1:
                   value:
                     - id: 1
                       name: string
-        "400":
-          $ref: "#/components/responses/Error"
-        "403":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-campaigns-cid-priorities
-      description: ""
+      description: ''
       security:
         - JWT: []
       parameters: []
-  "/campaigns/{cid}/custom_statuses":
+  '/campaigns/{cid}/custom_statuses':
     parameters:
       - name: cid
         in: path
@@ -845,38 +851,38 @@ paths:
       summary: Get Campaigns Priorities
       tags: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/BugCustomStatus"
+                  $ref: '#/components/schemas/BugCustomStatus'
               examples:
                 Example 1:
                   value:
                     - id: 1
                       name: string
-        "400":
-          $ref: "#/components/responses/Error"
-        "403":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-campaigns-cid-custom-statuses
-      description: ""
+      description: ''
       security:
         - JWT: []
       parameters: []
-  "/campaigns/{cid}/usecases":
+  '/campaigns/{cid}/usecases':
     parameters:
-      - $ref: "#/components/parameters/cid"
+      - $ref: '#/components/parameters/cid'
     get:
       summary: Get Campaign usecases data
       tags: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -916,17 +922,17 @@ paths:
                       uniqueBugs: 8
                       id: 1220
                       completion: 62.5
-        "400":
-          $ref: "#/components/responses/Error"
-        "403":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-campaigns-cid-usecases
       security:
         - JWT: []
       parameters: []
-  "/campaigns/{cid}/widgets":
+  '/campaigns/{cid}/widgets':
     parameters:
       - name: cid
         in: path
@@ -938,17 +944,17 @@ paths:
       summary: Get Campaign widget data
       tags: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/WidgetBugsByUseCase"
-                  - $ref: "#/components/schemas/WidgetBugsByDevice"
-                  - $ref: "#/components/schemas/WidgetCampaignProgress"
-                  - $ref: "#/components/schemas/WidgetCampaignUniqueBugs"
-                  - $ref: "#/components/schemas/WidgetBugsByDuplicates"
+                  - $ref: '#/components/schemas/WidgetBugsByUseCase'
+                  - $ref: '#/components/schemas/WidgetBugsByDevice'
+                  - $ref: '#/components/schemas/WidgetCampaignProgress'
+                  - $ref: '#/components/schemas/WidgetCampaignUniqueBugs'
+                  - $ref: '#/components/schemas/WidgetBugsByDuplicates'
               examples:
                 Bugs by UseCase:
                   value:
@@ -960,19 +966,19 @@ paths:
                         uniqueBugs: 8
                         usecase_id: 1220
                     kind: bugsByUseCase
-        "400":
-          $ref: "#/components/responses/Error"
-        "401":
-          $ref: "#/components/responses/Error"
-        "403":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-campaigns-cid-widgets-wslug
       security:
         - JWT: []
       parameters:
-        - $ref: "#/components/parameters/wslug"
+        - $ref: '#/components/parameters/wslug'
         - schema:
             type: boolean
           in: query
@@ -983,48 +989,49 @@ paths:
       summary: Create a new project
       operationId: post-projects
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Project"
-        "400":
-          $ref: "#/components/responses/Error"
-        "403":
-          $ref: "#/components/responses/Error"
-        "404":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+                $ref: '#/components/schemas/Project'
+              examples: {}
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       security:
         - JWT: []
       requestBody:
-        $ref: "#/components/requestBodies/Project"
+        $ref: '#/components/requestBodies/Project'
       tags:
         - Projects
-  "/projects/{pid}":
+  '/projects/{pid}':
     parameters:
-      - $ref: "#/components/parameters/pid"
+      - $ref: '#/components/parameters/pid'
     get:
       summary: Get single project by ID
       tags:
         - Projects
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Project"
-        "400":
-          $ref: "#/components/responses/Error"
-        "401":
-          $ref: "#/components/responses/Error"
-        "403":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+                $ref: '#/components/schemas/Project'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-projects-projectId
       description: Retrieve projects details from an ID.
       security:
@@ -1033,12 +1040,12 @@ paths:
       summary: Update single project
       operationId: patch-projects-pid
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Project"
+                $ref: '#/components/schemas/Project'
               examples:
                 example-1:
                   value:
@@ -1046,16 +1053,16 @@ paths:
                     name: string
                     campaigns_count: 0
                     workspaceId: 0
-        "400":
-          $ref: "#/components/responses/Error"
-        "401":
-          $ref: "#/components/responses/Error"
-        "403":
-          $ref: "#/components/responses/Error"
-        "405":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '405':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       description: Update fields of a specific project. Currently only the project name is editable.
       security:
         - JWT: []
@@ -1074,7 +1081,7 @@ paths:
               example-1:
                 value:
                   display_name: string
-  "/projects/{pid}/campaigns":
+  '/projects/{pid}/campaigns':
     parameters:
       - name: pid
         in: path
@@ -1088,7 +1095,7 @@ paths:
         - Campaign
         - Projects
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -1098,7 +1105,7 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: "#/components/schemas/CampaignWithOutput"
+                      $ref: '#/components/schemas/CampaignWithOutput'
                   start:
                     type: integer
                   limit:
@@ -1108,9 +1115,9 @@ paths:
                   total:
                     type: integer
               examples: {}
-        "400":
-          $ref: "#/components/responses/Error"
-        "401":
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
           description: Unauthorized
           content:
             application/json:
@@ -1120,7 +1127,7 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: "#/components/schemas/Campaign"
+                      $ref: '#/components/schemas/Campaign'
                   start:
                     type: integer
                   limit:
@@ -1129,16 +1136,16 @@ paths:
                     type: integer
                   total:
                     type: integer
-        "403":
-          $ref: "#/components/responses/Error"
-        "404":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-project-campaigns
       parameters:
-        - $ref: "#/components/parameters/limit"
-        - $ref: "#/components/parameters/start"
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
       security:
         - JWT: []
   /templates:
@@ -1146,7 +1153,7 @@ paths:
       summary: GET /templates
       tags: []
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -1158,51 +1165,51 @@ paths:
                       properties:
                         id:
                           type: number
-                    - $ref: "#/components/schemas/Template"
+                    - $ref: '#/components/schemas/Template'
               examples:
                 example-1:
                   value:
                     - id: 0
                       title: Ricerca con form
-                      description: "Ricerca di soluzioni e prodotti tramite parametri specifici. (es. cerca biglietto, cerca offerta..)"
+                      description: 'Ricerca di soluzioni e prodotti tramite parametri specifici. (es. cerca biglietto, cerca offerta..)'
                       content: <h3>Descrizione della funzionalità</h3><p>Stai per testare la funzionalità “barra di ricerca” il cui scopo è quello di “cercare prodotti”</p>
                       category:
                         id: 12
                         name: Flusso di ricerca e acquisto
                       device_type: webapp
                       locale: en
-                      image: "http://example.com"
+                      image: 'http://example.com'
                       requiresLogin: false
-        "400":
-          $ref: "#/components/responses/Error"
-        "403":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-templates
       description: Retrieve all available use case templates
       security:
         - JWT: []
       parameters:
-        - $ref: "#/components/parameters/filterBy"
-        - $ref: "#/components/parameters/order"
-        - $ref: "#/components/parameters/orderBy"
+        - $ref: '#/components/parameters/filterBy'
+        - $ref: '#/components/parameters/order'
+        - $ref: '#/components/parameters/orderBy'
   /users/me:
     get:
       summary: Get user data
       tags:
         - User
       responses:
-        "200":
-          description: ""
+        '200':
+          description: ''
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
-        "403":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+                $ref: '#/components/schemas/User'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-users-me
       security:
         - JWT: []
@@ -1212,7 +1219,7 @@ paths:
       tags:
         - Workspaces
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -1222,7 +1229,7 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: "#/components/schemas/Workspace"
+                      $ref: '#/components/schemas/Workspace'
                   start:
                     type: integer
                   limit:
@@ -1231,58 +1238,103 @@ paths:
                     type: integer
                   total:
                     type: integer
-        "400":
-          $ref: "#/components/responses/Error"
-        "403":
-          $ref: "#/components/responses/Error"
-        "404":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-workspaces
       parameters:
-        - $ref: "#/components/parameters/limit"
-        - $ref: "#/components/parameters/start"
-        - $ref: "#/components/parameters/order"
-        - $ref: "#/components/parameters/orderBy"
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/order'
+        - $ref: '#/components/parameters/orderBy'
       security:
         - JWT: []
-  "/workspaces/{wid}":
+    post:
+      summary: Create a new workspace
+      operationId: post-workspaces
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                  company:
+                    type: string
+                required:
+                  - id
+                  - company
+              examples:
+                Example 1:
+                  value:
+                    id: 123
+                    company: Tesla Inc.
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      description: This endpoint is useful to add a new workspace. Only admin can use this.
+      security:
+        - JWT: []
+      x-internal: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                company:
+                  type: string
+                pm_id:
+                  type: number
+              required:
+                - company
+  '/workspaces/{wid}':
     parameters:
-      - $ref: "#/components/parameters/wid"
+      - $ref: '#/components/parameters/wid'
     get:
       summary: GET single Workspace
       tags:
         - Workspaces
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Workspace"
-        "400":
-          $ref: "#/components/responses/Error"
-        "403":
-          $ref: "#/components/responses/Error"
-        "404":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+                $ref: '#/components/schemas/Workspace'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-workspace
       parameters: []
       security:
         - JWT: []
-  "/workspaces/{wid}/campaigns":
+  '/workspaces/{wid}/campaigns':
     parameters:
-      - $ref: "#/components/parameters/wid"
+      - $ref: '#/components/parameters/wid'
     get:
       summary: GET Workspace campaigns
       tags:
         - Workspaces
         - Campaigns
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -1292,7 +1344,7 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: "#/components/schemas/CampaignWithOutput"
+                      $ref: '#/components/schemas/CampaignWithOutput'
                   start:
                     type: integer
                   limit:
@@ -1301,29 +1353,29 @@ paths:
                     type: integer
                   total:
                     type: integer
-        "400":
-          $ref: "#/components/responses/Error"
-        "403":
-          $ref: "#/components/responses/Error"
-        "404":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-workspace-campaigns
       security:
         - JWT: []
-      description: ""
+      description: ''
       parameters:
-        - $ref: "#/components/parameters/limit"
-        - $ref: "#/components/parameters/start"
-        - $ref: "#/components/parameters/order"
-        - $ref: "#/components/parameters/orderBy"
-        - $ref: "#/components/parameters/filterBy"
-  "/workspaces/{wid}/coins":
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/order'
+        - $ref: '#/components/parameters/orderBy'
+        - $ref: '#/components/parameters/filterBy'
+  '/workspaces/{wid}/coins':
     get:
       summary: Retrieve available customer coins
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -1333,7 +1385,7 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: "#/components/schemas/Coin"
+                      $ref: '#/components/schemas/Coin'
                   start:
                     type: integer
                   limit:
@@ -1351,8 +1403,8 @@ paths:
                         amount: 5
                         agreement_id: 14560
                         price: 900
-                        created_on: "2022-06-23T12:14:12Z"
-                        updated_on: "2022-06-23T14:45:15Z"
+                        created_on: '2022-06-23T12:14:12Z'
+                        updated_on: '2022-06-23T14:45:15Z'
                     start: 0
                     limit: 10
                     size: 1
@@ -1365,53 +1417,53 @@ paths:
                         amount: 5
                         agreement_id: 2002
                         price: 900
-                        created_on: "2022-06-23T12:14:12Z"
-                        updated_on: "2022-06-23T14:45:15Z"
+                        created_on: '2022-06-23T12:14:12Z'
+                        updated_on: '2022-06-23T14:45:15Z'
                       - id: 151
                         customer_id: 98
                         amount: 50
                         price: 15
-                        created_on: "2022-06-23T12:14:12Z"
-                        updated_on: "2022-06-23T14:45:15Z"
+                        created_on: '2022-06-23T12:14:12Z'
+                        updated_on: '2022-06-23T14:45:15Z'
                       - id: 456
                         customer_id: 98
                         amount: 2
                         price: 1
-                        created_on: "2022-06-23T12:14:12Z"
-                        updated_on: "2022-06-23T14:45:15Z"
+                        created_on: '2022-06-23T12:14:12Z'
+                        updated_on: '2022-06-23T14:45:15Z'
                       - id: 678
                         customer_id: 98
                         amount: 200
                         price: 24
-                        created_on: "2022-06-23T12:14:12Z"
-                        updated_on: "2022-06-23T14:45:15Z"
+                        created_on: '2022-06-23T12:14:12Z'
+                        updated_on: '2022-06-23T14:45:15Z'
                     start: 0
                     limit: 4
                     size: 4
                     total: 18
-        "400":
-          $ref: "#/components/responses/Error"
-        "403":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-workspaces-coins
       security:
         - JWT: []
       parameters:
-        - $ref: "#/components/parameters/limit"
-        - $ref: "#/components/parameters/start"
-        - $ref: "#/components/parameters/order"
-        - $ref: "#/components/parameters/orderBy"
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/order'
+        - $ref: '#/components/parameters/orderBy'
       tags:
         - Workspaces
     parameters:
-      - $ref: "#/components/parameters/wid"
-  "/workspaces/{wid}/users":
+      - $ref: '#/components/parameters/wid'
+  '/workspaces/{wid}/users':
     get:
       summary: Retrieve users of a specific workspace
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -1464,30 +1516,30 @@ paths:
                     limit: 0
                     size: 1
                     total: 1
-        "400":
-          $ref: "#/components/responses/Error"
-        "403":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-workspaces-users
       security:
         - JWT: []
       parameters:
-        - $ref: "#/components/parameters/limit"
-        - $ref: "#/components/parameters/start"
-        - $ref: "#/components/parameters/order"
-        - $ref: "#/components/parameters/orderBy"
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/order'
+        - $ref: '#/components/parameters/orderBy'
       tags:
         - Workspaces
       description: Return a list of users from a specific workspace
     parameters:
-      - $ref: "#/components/parameters/wid"
+      - $ref: '#/components/parameters/wid'
     post:
       summary: Add user to workspace
       operationId: post-workspaces-wid-users
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -1504,12 +1556,12 @@ paths:
                   - profile_id
                   - tryber_wp_user_id
                   - email
-        "400":
-          $ref: "#/components/responses/Error"
-        "403":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       description: Use this to add a new or existent user into a specific workspace.
       requestBody:
         content:
@@ -1530,6 +1582,10 @@ paths:
                     - it
                     - en
                   default: en
+                event_name:
+                  type: string
+                redirect_url:
+                  type: string
               required:
                 - email
       security:
@@ -1538,7 +1594,7 @@ paths:
       summary: Remove user from workspace
       operationId: delete-workspaces-wid-users
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -1576,12 +1632,12 @@ paths:
                         - invitationPending
                 required:
                   - items
-        "400":
-          $ref: "#/components/responses/Error"
-        "403":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       description: Remove an user from workspace
       security:
         - JWT: []
@@ -1598,16 +1654,16 @@ paths:
                   description: Tryber WP USER ID
               required:
                 - user_id
-  "/workspaces/{wid}/projects":
+  '/workspaces/{wid}/projects':
     parameters:
-      - $ref: "#/components/parameters/wid"
+      - $ref: '#/components/parameters/wid'
     get:
       summary: GET Workspace Projects
       tags:
         - Workspaces
         - Projects
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -1617,7 +1673,7 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: "#/components/schemas/Project"
+                      $ref: '#/components/schemas/Project'
                   start:
                     type: integer
                   limit:
@@ -1626,51 +1682,51 @@ paths:
                     type: integer
                   total:
                     type: integer
-        "400":
-          $ref: "#/components/responses/Error"
-        "403":
-          $ref: "#/components/responses/Error"
-        "404":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-workspace-projects
       security:
         - JWT: []
       parameters:
-        - $ref: "#/components/parameters/limit"
-        - $ref: "#/components/parameters/start"
-  "/workspaces/{wid}/projects/{pid}":
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
+  '/workspaces/{wid}/projects/{pid}':
     parameters:
-      - $ref: "#/components/parameters/wid"
-      - $ref: "#/components/parameters/pid"
+      - $ref: '#/components/parameters/wid'
+      - $ref: '#/components/parameters/pid'
     get:
       summary: GET Workspace single project
       tags:
         - Workspaces
         - Projects
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Project"
-        "400":
-          $ref: "#/components/responses/Error"
-        "403":
-          $ref: "#/components/responses/Error"
-        "404":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+                $ref: '#/components/schemas/Project'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-workspace-project
       security:
         - JWT: []
-  "/workspaces/{wid}/projects/{pid}/campaigns":
+  '/workspaces/{wid}/projects/{pid}/campaigns':
     parameters:
-      - $ref: "#/components/parameters/wid"
-      - $ref: "#/components/parameters/pid"
+      - $ref: '#/components/parameters/wid'
+      - $ref: '#/components/parameters/pid'
     get:
       summary: GET Workspace Project campaigns
       tags:
@@ -1678,7 +1734,7 @@ paths:
         - Workspaces
         - Campaigns
       responses:
-        "200":
+        '200':
           description: OK
           content:
             application/json:
@@ -1688,7 +1744,7 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: "#/components/schemas/CampaignWithOutput"
+                      $ref: '#/components/schemas/CampaignWithOutput'
                   start:
                     type: integer
                   limit:
@@ -1697,18 +1753,18 @@ paths:
                     type: integer
                   total:
                     type: integer
-        "400":
-          $ref: "#/components/responses/Error"
-        "403":
-          $ref: "#/components/responses/Error"
-        "404":
-          $ref: "#/components/responses/Error"
-        "500":
-          $ref: "#/components/responses/Error"
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
       operationId: get-workspace-project-campaigns
       parameters:
-        - $ref: "#/components/parameters/limit"
-        - $ref: "#/components/parameters/start"
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
       security:
         - JWT: []
 components:
@@ -1716,7 +1772,7 @@ components:
     Authentication:
       title: Authentication
       type: object
-      description: ""
+      description: ''
       x-examples:
         example-1:
           value:
@@ -1724,7 +1780,7 @@ components:
             name: string
             surname: string
             email: user@example.com
-            image: "http://example.com"
+            image: 'http://example.com'
             id: 0
             wp_user_id: 0
             role: string
@@ -1764,7 +1820,7 @@ components:
         campaign_id:
           type: integer
         title:
-          $ref: "#/components/schemas/BugTitle"
+          $ref: '#/components/schemas/BugTitle'
         step_by_step:
           type: string
         expected_result:
@@ -1772,17 +1828,17 @@ components:
         current_result:
           type: string
         status:
-          $ref: "#/components/schemas/BugStatus"
+          $ref: '#/components/schemas/BugStatus'
         severity:
-          $ref: "#/components/schemas/BugSeverity"
+          $ref: '#/components/schemas/BugSeverity'
         type:
-          $ref: "#/components/schemas/BugType"
+          $ref: '#/components/schemas/BugType'
         replicability:
-          $ref: "#/components/schemas/BugReplicability"
+          $ref: '#/components/schemas/BugReplicability'
         priority:
-          $ref: "#/components/schemas/BugPriority"
+          $ref: '#/components/schemas/BugPriority'
         custom_status:
-          $ref: "#/components/schemas/BugCustomStatus"
+          $ref: '#/components/schemas/BugCustomStatus'
         created:
           type: string
         occurred_date:
@@ -1793,9 +1849,9 @@ components:
           type: string
         device:
           oneOf:
-            - $ref: "#/components/schemas/Smartphone"
-            - $ref: "#/components/schemas/Tablet"
-            - $ref: "#/components/schemas/Desktop"
+            - $ref: '#/components/schemas/Smartphone'
+            - $ref: '#/components/schemas/Tablet'
+            - $ref: '#/components/schemas/Desktop'
         application_section:
           type: object
           properties:
@@ -1847,9 +1903,9 @@ components:
             - name
             - value
         - oneOf:
-            - $ref: "#/components/schemas/BugAdditionalFieldRegex"
-            - $ref: "#/components/schemas/BugAdditionalFieldSelect"
-      description: "Describe any additional info "
+            - $ref: '#/components/schemas/BugAdditionalFieldRegex'
+            - $ref: '#/components/schemas/BugAdditionalFieldSelect'
+      description: 'Describe any additional info '
     BugAdditionalFieldRegex:
       title: BugAdditionalFieldRegex
       type: object
@@ -2104,13 +2160,13 @@ components:
     CampaignWithOutput:
       title: CampaignWithOutput
       allOf:
-        - $ref: "#/components/schemas/Campaign"
+        - $ref: '#/components/schemas/Campaign'
         - type: object
           properties:
             outputs:
               type: array
               items:
-                $ref: "#/components/schemas/Output"
+                $ref: '#/components/schemas/Output'
     Coin:
       title: Coin
       type: object
@@ -2136,7 +2192,7 @@ components:
           type: string
         updated_on:
           type: string
-          description: "On each coin use, the related package will be updated"
+          description: 'On each coin use, the related package will be updated'
       required:
         - id
         - customer_id
@@ -2269,7 +2325,7 @@ components:
           type: object
           properties:
             extension:
-              $ref: "#/components/schemas/ReportExtensions"
+              $ref: '#/components/schemas/ReportExtensions'
             type:
               type: string
             domain_name:
@@ -2327,7 +2383,7 @@ components:
           manufacturer: Samsung
           model: Galaxy S22 Ultra
           os: Android
-          os_version: "13"
+          os_version: '13'
           type: smartphone
       x-internal: true
       type: object
@@ -2358,7 +2414,7 @@ components:
           manufacturer: Samsung
           model: Galaxy Tab
           os: Android
-          os_version: "12"
+          os_version: '12'
           type: tablet
       x-internal: true
       type: object
@@ -2379,7 +2435,7 @@ components:
           type: string
           description: HTML content used to pre-fill the use case editor
         category:
-          $ref: "#/components/schemas/TemplateCategory"
+          $ref: '#/components/schemas/TemplateCategory'
         device_type:
           type: string
           enum:
@@ -2428,7 +2484,7 @@ components:
               properties:
                 id:
                   type: number
-            - $ref: "#/components/schemas/Template"
+            - $ref: '#/components/schemas/Template'
         logged:
           type: boolean
         link:
@@ -2436,7 +2492,7 @@ components:
       required:
         - title
         - description
-      description: ""
+      description: ''
     User:
       title: User
       type: object
@@ -2481,7 +2537,7 @@ components:
         features:
           type: array
           items:
-            $ref: "#/components/schemas/Feature"
+            $ref: '#/components/schemas/Feature'
       required:
         - id
         - email
@@ -2504,7 +2560,7 @@ components:
             role: string
             name: Teomondo Scrofalo
             workspaces: []
-            picture: "https://pbs.twimg.com/media/Ccp6RXFWIAAQQ2V.jpg"
+            picture: 'https://pbs.twimg.com/media/Ccp6RXFWIAAQQ2V.jpg'
       description: A workspace is the company area with projects and campaigns
       properties:
         id:
@@ -2623,7 +2679,7 @@ components:
             - manufacturer: Samsung
               model: Galaxy S22 Ultra
               os: Android
-              os_version: "13"
+              os_version: '13'
               type: smartphone
               bugs: 12
             - desktop_type: Gaming PC
@@ -2639,9 +2695,9 @@ components:
           items:
             allOf:
               - oneOf:
-                  - $ref: "#/components/schemas/Smartphone"
-                  - $ref: "#/components/schemas/Desktop"
-                  - $ref: "#/components/schemas/Tablet"
+                  - $ref: '#/components/schemas/Smartphone'
+                  - $ref: '#/components/schemas/Desktop'
+                  - $ref: '#/components/schemas/Tablet'
               - type: object
                 properties:
                   unique_bugs:
@@ -2750,7 +2806,7 @@ components:
           type: array
           items:
             allOf:
-              - $ref: "#/components/schemas/Bug"
+              - $ref: '#/components/schemas/Bug'
               - type: object
                 properties:
                   duplicates:
@@ -2856,14 +2912,14 @@ components:
     JWT:
       type: http
       scheme: bearer
-      description: ""
+      description: ''
   responses:
     Error:
       description: Example response
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Error"
+            $ref: '#/components/schemas/Error'
   parameters:
     wid:
       name: wid
@@ -2871,7 +2927,7 @@ components:
       required: true
       schema:
         type: string
-      description: "Workspace (company, customer) id"
+      description: 'Workspace (company, customer) id'
     pid:
       name: pid
       in: path
@@ -2899,7 +2955,7 @@ components:
       required: false
       schema:
         type: string
-      description: "Order value (ASC, DESC)"
+      description: 'Order value (ASC, DESC)'
     orderBy:
       name: orderBy
       in: query
@@ -2912,7 +2968,7 @@ components:
       in: query
       required: false
       schema: {}
-      description: "filterBy[<fieldName>]=<fieldValue>"
+      description: 'filterBy[<fieldName>]=<fieldValue>'
     cid:
       name: cid
       in: path
@@ -2961,7 +3017,7 @@ components:
             required:
               - username
               - password
-      description: ""
+      description: ''
     Campaign:
       content:
         application/json:
@@ -2993,7 +3049,7 @@ components:
               platforms:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Platform"
+                  $ref: '#/components/schemas/Platform'
               page_preview_id:
                 type: integer
                 description: Da togliere
@@ -3024,7 +3080,7 @@ components:
               use_cases:
                 type: array
                 items:
-                  $ref: "#/components/schemas/UseCase"
+                  $ref: '#/components/schemas/UseCase'
             required:
               - title
               - start_date

@@ -1,20 +1,11 @@
-import { data as userData } from "@src/__mocks__/database/user";
+import { tryber } from "@src/features/database";
 import createUserProfile from ".";
 
 describe("wp/createUserProfile", () => {
   beforeAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await userData.basicUser({
-          ID: 666,
-          user_email: "vincenzo.cancelli@finestre.com",
-        });
-      } catch (error) {
-        console.log(error);
-        reject(error);
-      }
-
-      resolve(true);
+    await tryber.tables.WpUsers.do().insert({
+      ID: 666,
+      user_email: "vincenzo.cancelli@finestre.com",
     });
   });
 

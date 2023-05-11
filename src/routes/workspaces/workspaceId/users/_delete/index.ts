@@ -1,6 +1,6 @@
 /** OPENAPI-CLASS: delete-workspaces-wid-users */
 import WorkspaceRoute from "@src/features/routes/WorkspaceRoute";
-import * as db from "@src/features/db";
+import { tryber } from "@src/features/database";
 
 interface DbUser {
   tryber_wp_id: number;
@@ -53,12 +53,12 @@ export default class Route extends WorkspaceRoute<{
   }
 
   private async removeUserFromWorkspace() {
-    const response = await db.query(
-      db.format(
-        `DELETE FROM wp_appq_user_to_customer WHERE wp_user_id = ? AND customer_id = ?`,
-        [this.userToRemoveWpId, this.getWorkspaceId()]
-      )
-    );
+    const response = await tryber.tables.WpAppqUserToCustomer.do()
+      .delete()
+      .where({
+        wp_user_id: this.userToRemoveWpId,
+        customer_id: this.getWorkspaceId(),
+      });
 
     if (!response) throw new Error("Something went wrong");
   }
@@ -79,22 +79,34 @@ export default class Route extends WorkspaceRoute<{
   }
 
   protected async getUsers(): Promise<DbUser[]> {
-    const users: DbUser[] = await db.query(
-      `SELECT 
-        p.id         as profile_id, 
-        p.wp_user_id as tryber_wp_id, 
-        p.name, 
-        p.surname, 
-        p.email,
-        i.status     as invitation_status
-          from wp_appq_user_to_customer utc
-        JOIN wp_appq_evd_profile p ON (utc.wp_user_id = p.wp_user_id)
-        LEFT JOIN wp_appq_customer_account_invitations i ON (i.tester_id = p.id)
-        WHERE utc.customer_id = ${this.getWorkspaceId()}
-        GROUP BY p.id
-        ORDER BY p.id DESC
-      `
-    );
+    const users = await tryber.tables.WpAppqUserToCustomer.do()
+      .select(
+        tryber.ref("id").withSchema("wp_appq_evd_profile").as("profile_id"),
+        tryber
+          .ref("wp_user_id")
+          .withSchema("wp_appq_evd_profile")
+          .as("tryber_wp_id"),
+        tryber.ref("name").withSchema("wp_appq_evd_profile"),
+        tryber.ref("surname").withSchema("wp_appq_evd_profile"),
+        tryber.ref("email").withSchema("wp_appq_evd_profile"),
+        tryber
+          .ref("status")
+          .withSchema("wp_appq_customer_account_invitations")
+          .as("invitation_status")
+      )
+      .join(
+        "wp_appq_evd_profile",
+        "wp_appq_user_to_customer.wp_user_id",
+        "wp_appq_evd_profile.wp_user_id"
+      )
+      .leftJoin(
+        "wp_appq_customer_account_invitations",
+        "wp_appq_customer_account_invitations.tester_id",
+        "wp_appq_evd_profile.id"
+      )
+      .where("wp_appq_user_to_customer.customer_id", this.getWorkspaceId())
+      .groupBy("wp_appq_evd_profile.id")
+      .orderBy("wp_appq_evd_profile.id", "desc");
 
     if (!users) return [];
 

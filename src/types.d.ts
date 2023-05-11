@@ -45,4 +45,10 @@ declare global {
     request: OpenapiRequest;
     response: OpenapiResponse;
   };
+
+  namespace jest {
+    interface Matchers<R> {
+      toBeNow(precision: number): jest.CustomMatcherResult;
+    }
+  }
 }

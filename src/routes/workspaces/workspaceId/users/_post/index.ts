@@ -1,11 +1,11 @@
 /** OPENAPI-CLASS: post-workspaces-wid-users */
 import WorkspaceRoute from "@src/features/routes/WorkspaceRoute";
-import * as db from "@src/features/db";
 import createTryberWPUser from "@src/features/wp/createTryberWPUser";
 import createUserProfile from "@src/features/wp/createUserProfile";
 import { randomString } from "@src/utils/users/getRandomString";
 import crypto from "crypto";
 import { sendTemplate } from "@src/features/mail/sendTemplate";
+import { tryber } from "@src/features/database";
 
 interface DbUser {
   tryber_wp_id: number;
@@ -16,25 +16,11 @@ interface DbUser {
   invitation_status: string;
 }
 
-interface InvitedUser {
-  email: string;
-  name?: string;
-  surname?: string;
-  locale?: string;
-}
-
 export default class Route extends WorkspaceRoute<{
   response: StoplightOperations["post-workspaces-wid-users"]["responses"]["200"]["content"]["application/json"];
   parameters: StoplightOperations["post-workspaces-wid-users"]["parameters"]["path"];
   body: StoplightOperations["post-workspaces-wid-users"]["requestBody"]["content"]["application/json"];
 }> {
-  private invitedUser: InvitedUser;
-
-  constructor(configuration: RouteClassConfiguration) {
-    super(configuration);
-    this.invitedUser = this.getBody();
-  }
-
   protected async filter(): Promise<boolean> {
     if (!super.filter()) return false;
 
@@ -47,23 +33,24 @@ export default class Route extends WorkspaceRoute<{
 
   protected async prepare() {
     const users = await this.getUsers();
-    const user = users.find((u) => u.email === this.invitedUser.email);
+    const userInWorkspace = users.find((u) => u.email === this.getBody().email);
 
-    if (user) {
-      if (
-        user.invitation_status &&
-        Number.parseInt(user.invitation_status) !== 1
-      ) {
+    if (userInWorkspace) {
+      const pendingInvite =
+        userInWorkspace.invitation_status &&
+        Number.parseInt(userInWorkspace.invitation_status) !== 1;
+
+      if (pendingInvite) {
         await this.sendInvitation({
-          email: user.email,
-          profile_id: user.profile_id,
-          locale: this.invitedUser.locale || "en",
+          email: userInWorkspace.email,
+          profile_id: userInWorkspace.profile_id,
+          locale: this.getBody().locale || "en",
         });
 
         return this.setSuccess(200, {
-          profile_id: user.profile_id,
-          tryber_wp_user_id: user.tryber_wp_id,
-          email: user.email,
+          profile_id: userInWorkspace.profile_id,
+          tryber_wp_user_id: userInWorkspace.tryber_wp_id,
+          email: userInWorkspace.email,
         });
       } else {
         // user already exists in the workspace
@@ -73,17 +60,17 @@ export default class Route extends WorkspaceRoute<{
       }
     }
 
-    const userExists = await this.getUserByEmail(this.invitedUser.email);
+    const userExists = await this.getUserByEmail(this.getBody().email);
     let userToAdd: DbUser = userExists;
 
     try {
       if (!userToAdd) {
-        userToAdd = await this.createUser(this.invitedUser);
+        userToAdd = await this.createUser(this.getBody());
 
         await this.sendInvitation({
           email: userToAdd.email,
           profile_id: userToAdd.profile_id,
-          locale: this.invitedUser.locale || "en",
+          locale: this.getBody().locale || "en",
         });
       }
 
@@ -94,7 +81,7 @@ export default class Route extends WorkspaceRoute<{
         email: userToAdd.email,
       });
     } catch (e) {
-      if (!userExists) this.removeCreatedUser(this.invitedUser.email);
+      if (!userExists) this.removeCreatedUser(this.getBody().email);
 
       return this.setError(500, {
         message: "Error adding user to workspace",
@@ -105,72 +92,48 @@ export default class Route extends WorkspaceRoute<{
   private async addUserToWorkspace(user: DbUser): Promise<void> {
     const { tryber_wp_id } = user;
 
-    await db.query(
-      db.format(
-        `INSERT INTO wp_appq_user_to_customer (wp_user_id, customer_id) VALUES (?, ?)`,
-        [tryber_wp_id, this.getWorkspaceId()]
-      )
-    );
+    await tryber.tables.WpAppqUserToCustomer.do().insert({
+      wp_user_id: tryber_wp_id,
+      customer_id: this.getWorkspaceId(),
+    });
   }
 
   private async removeCreatedUser(email: string): Promise<void> {
-    const user = await this.getUserByEmail(this.invitedUser.email);
+    const user = await this.getUserByEmail(this.getBody().email);
 
     if (user) {
-      await db.query(
-        db.format(
-          `DELETE  
-            FROM wp_appq_user_to_customer
-            WHERE wp_user_id = ?`,
-          [user.tryber_wp_id]
-        )
-      );
+      await tryber.tables.WpAppqUserToCustomer.do().delete().where({
+        wp_user_id: user.tryber_wp_id,
+      });
     }
 
     // Remove user profiles (if any)
-    await db.query(
-      db.format(
-        `DELETE  
-            FROM wp_users
-            WHERE user_email = ?`,
-        [email]
-      )
-    );
+    await tryber.tables.WpUsers.do().delete().where({
+      user_email: email,
+    });
 
-    await db.query(
-      db.format(
-        `DELETE  
-          FROM wp_appq_evd_profile
-          WHERE email = ?`,
-        [email]
-      )
-    );
-
-    await db.query(
-      db.format(
-        `DELETE  
-          FROM wp_users
-          WHERE user_email = ?`,
-        [email]
-      )
-    );
+    await tryber.tables.WpAppqEvdProfile.do().delete().where({
+      email: email,
+    });
   }
 
-  private async getUserByEmail(email: string): Promise<DbUser> {
-    const alreadyRegisteredEmail = await db.query(
-      db.format(
-        `SELECT 
-          p.id as profile_id, 
-          p.name, 
-          p.surname, 
-          p.email, 
-          wpu.ID as tryber_wp_id 
-        FROM wp_users wpu 
-          JOIN wp_appq_evd_profile p ON (p.wp_user_id = wpu.ID) 
-          WHERE wpu.user_email = ?`,
-        [email]
+  private async getUserByEmail(email: string): Promise<any> {
+    const alreadyRegisteredEmail = await tryber.tables.WpUsers.do()
+      .select(
+        tryber.ref("ID").withSchema("wp_users").as("tryber_wp_id"),
+        tryber.ref("id").withSchema("wp_appq_evd_profile").as("profile_id"),
+        tryber.ref("name").withSchema("wp_appq_evd_profile"),
+        tryber.ref("surname").withSchema("wp_appq_evd_profile"),
+        tryber.ref("email").withSchema("wp_appq_evd_profile")
       )
-    );
+      .join(
+        "wp_appq_evd_profile",
+        "wp_users.ID",
+        "wp_appq_evd_profile.wp_user_id"
+      )
+      .where({
+        user_email: email,
+      });
 
     return alreadyRegisteredEmail.length
       ? {
@@ -180,7 +143,9 @@ export default class Route extends WorkspaceRoute<{
       : null;
   }
 
-  private async createUser(invitedUser: InvitedUser): Promise<DbUser> {
+  private async createUser(
+    invitedUser: StoplightOperations["post-workspaces-wid-users"]["requestBody"]["content"]["application/json"]
+  ): Promise<DbUser> {
     const { email, name = "", surname = "" } = invitedUser;
     const psw = randomString(12);
     const username =
@@ -208,21 +173,33 @@ export default class Route extends WorkspaceRoute<{
   }
 
   protected async getUsers(): Promise<DbUser[]> {
-    const users: DbUser[] = await db.query(
-      `SELECT 
-        p.id         as profile_id, 
-        p.wp_user_id as tryber_wp_id, 
-        p.name, 
-        p.surname, 
-        p.email,
-        i.status     as invitation_status
-          from wp_appq_user_to_customer utc
-        JOIN wp_appq_evd_profile p ON (utc.wp_user_id = p.wp_user_id)
-        LEFT JOIN wp_appq_customer_account_invitations i ON (i.tester_id = p.id)
-        WHERE utc.customer_id = ${this.getWorkspaceId()}
-        GROUP BY p.id
-      `
-    );
+    const users = await tryber.tables.WpAppqUserToCustomer.do()
+      .select(
+        tryber.ref("id").withSchema("wp_appq_evd_profile").as("profile_id"),
+        tryber
+          .ref("wp_user_id")
+          .withSchema("wp_appq_evd_profile")
+          .as("tryber_wp_id"),
+        tryber.ref("name").withSchema("wp_appq_evd_profile"),
+        tryber.ref("surname").withSchema("wp_appq_evd_profile"),
+        tryber.ref("email").withSchema("wp_appq_evd_profile"),
+        tryber
+          .ref("status")
+          .withSchema("wp_appq_customer_account_invitations")
+          .as("invitation_status")
+      )
+      .join(
+        "wp_appq_evd_profile",
+        "wp_appq_user_to_customer.wp_user_id",
+        "wp_appq_evd_profile.wp_user_id"
+      )
+      .leftJoin(
+        "wp_appq_customer_account_invitations",
+        "wp_appq_evd_profile.id",
+        "wp_appq_customer_account_invitations.tester_id"
+      )
+      .where("wp_appq_user_to_customer.customer_id", this.getWorkspaceId())
+      .groupBy("wp_appq_evd_profile.id");
 
     if (!users) return [];
 
@@ -243,30 +220,14 @@ export default class Route extends WorkspaceRoute<{
       .update(`${profile_id}_AppQ`)
       .digest("hex");
 
-    // Remove previous invitation (todo: replace with onDuplicateKeyUpdate when next will be available)
-    const inviteExists = await db.query(
-      db.format(
-        `SELECT * FROM wp_appq_customer_account_invitations WHERE tester_id = ?`,
-        [Number(profile_id), this.getWorkspaceId()]
-      )
-    );
-
-    if (inviteExists.length) {
-      await db.query(
-        db.format(
-          `DELETE FROM wp_appq_customer_account_invitations WHERE tester_id = ?`,
-          [profile_id, this.getWorkspaceId()]
-        )
-      );
-    }
-
-    // Add new invitation
-    await db.query(
-      db.format(
-        "INSERT INTO wp_appq_customer_account_invitations (tester_id, status, token) VALUES (?, 0, ?)",
-        [profile_id, token]
-      )
-    );
+    await tryber.tables.WpAppqCustomerAccountInvitations.do()
+      .insert({
+        tester_id: profile_id,
+        status: "0",
+        token: token,
+      })
+      .onConflict("tester_id")
+      .merge();
 
     const subj =
       locale === "it"
@@ -275,27 +236,33 @@ export default class Route extends WorkspaceRoute<{
     const sender = this.getUser();
 
     await sendTemplate({
-      template: `customer_invitation_${locale}`,
+      template: this.getEmailEvent(),
       email: email,
       subject: subj,
       optionalFields: {
         "{Inviter.name}": sender.email,
         "{Inviter.email}": sender.email,
         "{Inviter.url}": `${process.env.APP_URL}/invites/${profile_id}/${token}`,
+        "{Inviter.redirectUrl}": this.getEmailRedirectUrl(),
       },
     });
   }
 
-  protected isValidUser(): boolean {
-    if (!this.invitedUser) return false;
+  private getEmailEvent() {
+    const body = this.getBody();
+    return body.event_name ?? `customer_invitation_${body.locale ?? "en"}`;
+  }
 
-    const { email } = this.invitedUser;
+  private getEmailRedirectUrl() {
+    return this.getBody().redirect_url ?? process.env.APP_URL;
+  }
+
+  protected isValidUser(): boolean {
+    if (!this.getBody()) return false;
+
+    const { email } = this.getBody();
     if (!email) return false;
 
     return true;
-  }
-
-  private getInsertedId(insert_result: any): number {
-    return insert_result.insertId ?? insert_result.lastInsertRowid;
   }
 }
