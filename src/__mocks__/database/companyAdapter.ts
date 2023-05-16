@@ -19,6 +19,11 @@ import UserToCustomer, {
   data as userToCustomerData,
 } from "./user_to_customer";
 
+import UserToCampaign, {
+  UserToCampaignParams,
+  data as userToCampaignData,
+} from "./user_to_campaign";
+
 import { table as featuresTable, data as featuresData } from "./features";
 
 import {
@@ -81,6 +86,7 @@ interface dataObject {
   campaignTypes?: Array<any>;
   userToProjects?: Array<UserToProjectParams>;
   userToCustomers?: Array<UserToCustomerParams>;
+  userToCampaigns?: Array<UserToCampaignParams>;
   userToFeatures?: Array<any>;
   features?: Array<any>;
   users?: Array<any>;
@@ -99,6 +105,7 @@ export const adapter = {
     await Campaigns.mock();
     await campaignTypeTable.create();
     await UserToCustomer.mock();
+    await UserToCampaign.mock();
     await UserToProjects.mock();
     await userTable.create();
     await userTableUG.create();
@@ -157,6 +164,7 @@ export const adapter = {
     await Campaigns.dropMock();
     await campaignTypeTable.drop();
     await UserToCustomer.dropMock();
+    await UserToCampaign.dropMock();
     await UserToProjects.dropMock();
     await userTable.drop();
     await userTableUG.drop();
@@ -217,6 +225,7 @@ export const adapter = {
     await Campaigns.clear();
     await campaignTypeTable.clear();
     await UserToCustomer.clear();
+    await UserToCampaign.clear();
     await UserToProjects.clear();
     await userTable.clear();
     await userTableUG.clear();
@@ -286,6 +295,12 @@ export const adapter = {
       wp_user_id: wp_user_id,
       customer_id: customer_id,
     });
+
+    await UserToCampaign.insert({
+      wp_user_id: wp_user_id,
+      campaign_id: customer_id,
+    });
+
     await UserToProjects.insert({
       wp_user_id: wp_user_id,
       project_id: project_id,
@@ -300,6 +315,7 @@ export const adapter = {
     campaignTypes = [],
     userToProjects = [],
     userToCustomers = [],
+    userToCampaigns = [],
     userToFeatures = [],
     features = [],
     users = [],
@@ -341,6 +357,11 @@ export const adapter = {
     userToCustomers.length &&
       userToCustomers.forEach(async (userToCustomer) => {
         await userToCustomerData.basicItem(userToCustomer);
+      });
+
+    userToCampaigns.length &&
+      userToCampaigns.forEach(async (userToCampaign) => {
+        await userToCampaignData.basicItem(userToCampaign);
       });
 
     const usersList = [...defaultUsers, ...users];
