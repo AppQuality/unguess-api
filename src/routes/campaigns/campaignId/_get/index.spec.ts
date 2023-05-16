@@ -120,6 +120,37 @@ describe("GET /campaigns/{cid}", () => {
     expect(response.status).toBe(403);
   });
 
+  // It should answer 403 if the campaign exists but the user has no permissions to see the campaign details
+  it("Should answer 403 if the campaign exists but the user has no permissions to see the campaign details", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}`)
+      .set("Authorization", "Bearer unauthorized_user");
+
+    expect(response.status).toBe(403);
+  });
+
+  // It should answer 200 with the campaign if the user is an admin
+  it("Should answer 200 with the campaign if the user is an admin", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}`)
+      .set("Authorization", "Bearer admin");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        id: campaign_1.id,
+        project: expect.objectContaining({
+          id: project_1.id,
+        }),
+        status: expect.objectContaining({
+          id: campaign_1.status_id,
+        }),
+        type: expect.objectContaining({
+          id: campaign_1.campaign_type_id,
+        }),
+      })
+    );
+  });
 
   // It should answer 200 with the campaign
   it("Should answer 200 with the campaign", async () => {
@@ -176,4 +207,5 @@ describe("GET /campaigns/{cid}", () => {
       })
     );
   });
+
 });
