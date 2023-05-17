@@ -86,6 +86,12 @@ export default class CampaignRoute<
   }
 
   private async evaluateUserPermissions(): Promise<boolean> {
+    /* 
+      * This function returns the final results after reducing various Access Layers.
+      * Order of the access checks matters here: 
+      ** It should be ordered in a descending order.
+      ** AccessToProject is super w.r.t. AccessToCampaign.
+    */
     return (
       await Promise.all([
         await this.hasAccessToProject(),
