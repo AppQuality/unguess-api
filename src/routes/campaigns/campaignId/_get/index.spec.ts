@@ -110,16 +110,6 @@ describe("GET /campaigns/{cid}", () => {
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(400);
   });
-
-  // It should answer 403 if the user has no permissions to see the campaign
-  it("Should answer 403 if the campaign exists but the user has no permissions to see the campaign", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_2.id}`)
-      .set("Authorization", "Bearer user");
-
-    expect(response.status).toBe(403);
-  });
-
   // It should answer 403 if the campaign exists but the user has no permissions to see the campaign details
   it("Should answer 403 if the campaign exists but the user has no permissions to see the campaign details", async () => {
     const response = await request(app)
