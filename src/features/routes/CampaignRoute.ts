@@ -2,6 +2,7 @@ import UserRoute from "./UserRoute";
 import * as db from "@src/features/db";
 import { getProjectById } from "@src/utils/projects/getProjectById";
 import { getTitleRule } from "@src/utils/campaigns/getTitleRule";
+import { getCampaign } from "@src/utils/campaigns";
 
 type CampaignRouteParameters = { cid: string };
 
@@ -25,7 +26,7 @@ export default class CampaignRoute<
 
     const params = this.getParameters();
 
-    if (!params.cid) throw new Error("Missing campaign id");
+    if (!params?.cid) throw new Error("Missing campaign id");
 
     this.cp_id = parseInt(params.cid);
   }
@@ -77,24 +78,52 @@ export default class CampaignRoute<
   protected async filter(): Promise<boolean> {
     if (!(await super.filter())) return false;
 
-    if (!(await this.hasAccessToProject())) {
-      this.setError(403, {
-        code: 400,
-        message: "Project not found",
-      } as OpenapiError);
-      return false;
-    }
+    if (!(await this.evaluateUserPermissions())) {
+      return false
+    };
 
     return true;
   }
 
-  private async hasAccessToProject() {
+  private async evaluateUserPermissions(): Promise<boolean> {
+    /* 
+      * This function returns the final results after reducing various Access Layers.
+      * Order of the access checks matters here: 
+      ** It should be ordered in a descending order.
+      ** AccessToProject is super w.r.t. AccessToCampaign.
+    */
+    return (
+      await Promise.all([
+        await this.hasAccessToProject(),
+        await this.hasAccessToCampaign(),
+      ])
+    ).reduce((prev, curr) => prev && curr, true);
+  };
+
+  private async hasAccessToCampaign(): Promise<boolean> {
+    try {
+      await getCampaign({ campaignId: this.cp_id });
+    } catch (_error) {
+      this.setError(403, {
+        code: 400,
+        message: "Do not have Access to the Campaign",
+      } as OpenapiError);
+      return false;
+    }
+    return true;
+  }
+
+  private async hasAccessToProject(): Promise<boolean> {
     try {
       await getProjectById({
         projectId: this.getProjectId(),
         user: this.getUser(),
       });
-    } catch (error) {
+    } catch (_error) {
+      this.setError(403, {
+        code: 400,
+        message: "Project not found",
+      } as OpenapiError);
       return false;
     }
     return true;

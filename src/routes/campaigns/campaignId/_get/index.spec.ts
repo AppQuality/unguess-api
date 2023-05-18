@@ -15,6 +15,11 @@ const user_to_customer_1 = {
   customer_id: 999,
 };
 
+const user_to_campaign_1 = {
+  wp_user_id: 1,
+  campaign_id: 1,
+};
+
 const project_1 = {
   id: 999,
   display_name: "Project 999",
@@ -75,6 +80,7 @@ describe("GET /campaigns/{cid}", () => {
         await dbAdapter.add({
           companies: [customer_1],
           userToCustomers: [user_to_customer_1],
+          userToCampaigns: [user_to_campaign_1],
           projects: [project_1, project_2],
           userToProjects: [user_to_project_1],
           campaignTypes: [campaign_type_1],
@@ -104,13 +110,36 @@ describe("GET /campaigns/{cid}", () => {
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(400);
   });
-
-  // It should answer 403 if the user has no permissions to see the campaign
-  it("Should answer 403 if the user has no permissions to see the campaign", async () => {
+  // It should answer 403 if the campaign exists but the user has no permissions to see the campaign details
+  it("Should answer 403 if the campaign exists but the user has no permissions to see the campaign details", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_2.id}`)
-      .set("Authorization", "Bearer user");
+      .get(`/campaigns/${campaign_1.id}`)
+      .set("Authorization", "Bearer unauthorized_user");
+
     expect(response.status).toBe(403);
+  });
+
+  // It should answer 200 with the campaign if the user is an admin
+  it("Should answer 200 with the campaign if the user is an admin", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}`)
+      .set("Authorization", "Bearer admin");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        id: campaign_1.id,
+        project: expect.objectContaining({
+          id: project_1.id,
+        }),
+        status: expect.objectContaining({
+          id: campaign_1.status_id,
+        }),
+        type: expect.objectContaining({
+          id: campaign_1.campaign_type_id,
+        }),
+      })
+    );
   });
 
   // It should answer 200 with the campaign
@@ -168,4 +197,5 @@ describe("GET /campaigns/{cid}", () => {
       })
     );
   });
+
 });
