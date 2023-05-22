@@ -13,11 +13,11 @@ export default class WorkspaceRoute<
   constructor(configuration: RouteClassConfiguration) {
     super(configuration);
 
-    const params = this.getParameters();
+    const { wid } = this.getParameters() as T["parameters"] & { wid: string };
 
-    if (!params.wid) throw new Error("Missing workspace id");
+    if (!wid) throw new Error("Missing workspace id");
 
-    this.workspace_id = Number.parseInt(params.wid);
+    this.workspace_id = Number.parseInt(wid);
   }
 
   protected async init(): Promise<void> {
