@@ -6,7 +6,6 @@ export const getCampaign = async ({
   campaignId,
   withOutputs,
 }: {
-  user: UserType;
   campaignId: number;
   withOutputs?: boolean;
 }): Promise<
