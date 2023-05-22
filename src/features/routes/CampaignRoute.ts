@@ -2,7 +2,6 @@ import UserRoute from "./UserRoute";
 import * as db from "@src/features/db";
 import { getProjectById } from "@src/utils/projects/getProjectById";
 import { getTitleRule } from "@src/utils/campaigns/getTitleRule";
-import { getCampaign } from "@src/utils/campaigns";
 
 type CampaignRouteParameters = { cid: string };
 
