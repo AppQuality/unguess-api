@@ -934,12 +934,7 @@ paths:
       parameters: []
   '/campaigns/{cid}/widgets':
     parameters:
-      - name: cid
-        in: path
-        required: true
-        schema:
-          type: number
-        description: Campaign id
+      - $ref: '#/components/parameters/cid'
     get:
       summary: Get Campaign widget data
       tags: []
