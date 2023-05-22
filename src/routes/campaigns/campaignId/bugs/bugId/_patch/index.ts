@@ -1,7 +1,7 @@
 /** OPENAPI-CLASS: patch-campaigns-cid-bugs-bid */
 import { ERROR_MESSAGE } from "@src/utils/constants";
 import { getCampaign } from "@src/utils/campaigns";
-import UserRoute from "@src/features/routes/UserRoute";
+import BugsRoute from "@src/features/routes/BugRoute";
 import { getProjectById } from "@src/utils/projects";
 import { getBugById } from "@src/utils/bugs";
 import * as db from "@src/features/db";
@@ -12,7 +12,7 @@ type Priority =
 type CustomStatus =
   StoplightOperations["patch-campaigns-cid-bugs-bid"]["responses"]["200"]["content"]["application/json"]["custom_status"];
 
-export default class Route extends UserRoute<{
+export default class Route extends BugsRoute<{
   parameters: StoplightOperations["patch-campaigns-cid-bugs-bid"]["parameters"]["path"];
   body: StoplightOperations["patch-campaigns-cid-bugs-bid"]["requestBody"]["content"]["application/json"];
   response: StoplightOperations["patch-campaigns-cid-bugs-bid"]["responses"]["200"]["content"]["application/json"];
@@ -31,12 +31,12 @@ export default class Route extends UserRoute<{
     this.fields = Object.keys(this.getBody()) as AcceptedField[];
     this.cid = parseInt(params.cid);
     this.bid = parseInt(params.bid);
-    this.tags = this.getTags();
+    this.tags = this.getBugTags();
     this.priorityId = this.getBody().priority_id;
     this.customStatusId = this.getBody().custom_status_id;
   }
 
-  private getTags() {
+  private getBugTags() {
     const tags = this.getBody().tags;
 
     if (!tags) return undefined;
