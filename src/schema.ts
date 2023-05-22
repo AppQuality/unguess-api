@@ -175,7 +175,7 @@ export interface paths {
     parameters: {
       path: {
         /** Campaign id */
-        cid: number;
+        cid: components["parameters"]["cid"];
       };
     };
   };
@@ -787,7 +787,7 @@ export interface components {
     /** @description Workspace (company, customer) id */
     wid: string;
     /** @description Project id */
-    pid: number;
+    pid: string;
     /** @description Limit pagination parameter */
     limit: number;
     /** @description Start pagination parameter */
@@ -1370,7 +1370,7 @@ export interface operations {
     parameters: {
       path: {
         /** Campaign id */
-        cid: number;
+        cid: components["parameters"]["cid"];
       };
       query: {
         /** Campaign widget slug */
