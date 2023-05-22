@@ -79,38 +79,59 @@ export default class CampaignRoute<
     if (!(await super.filter())) return false;
 
     if (!(await this.evaluateUserPermissions())) {
-      return false
-    };
+      return false;
+    }
 
     return true;
   }
 
   private async evaluateUserPermissions(): Promise<boolean> {
-    /* 
-      * This function returns the final results after reducing various Access Layers.
-      * Order of the access checks matters here: 
-      ** It should be ordered in a descending order.
-      ** AccessToProject is super w.r.t. AccessToCampaign.
-    */
-    return (
-      await Promise.all([
-        await this.hasAccessToProject(),
-        await this.hasAccessToCampaign(),
-      ])
-    ).reduce((prev, curr) => prev && curr, true);
-  };
+    /*
+     * This function returns the final results after reducing various Access Layers.
+     * Order of the access checks matters here:
+     ** It should be ordered in a descending order.
+     ** AccessToProject is super w.r.t. AccessToCampaign.
+     */
+    if (await this.hasAccessToProject()) {
+      return true;
+    }
+    if (await this.hasAccessToCampaign()) {
+      return true;
+    }
+    return false;
+  }
 
   private async hasAccessToCampaign(): Promise<boolean> {
     try {
-      await getCampaign({ campaignId: this.cp_id });
+      const result = await db.query(
+        db.format(
+          `
+            SELECT wp_user_id
+            FROM wp_appq_user_to_campaign
+            WHERE campaign_id = ?
+            AND wp_user_id = ?
+          `,
+          [this.cp_id, this.getUserId()]
+        )
+      );
+
+      if (result.length > 0) {
+        return true;
+      }
+
+      this.setError(403, {
+        code: 400,
+        message: "Do not have access to the campaign",
+      } as OpenapiError);
+
+      return false;
     } catch (_error) {
       this.setError(403, {
         code: 400,
-        message: "Do not have Access to the Campaign",
+        message: "Do not have access to the campaign",
       } as OpenapiError);
       return false;
     }
-    return true;
   }
 
   private async hasAccessToProject(): Promise<boolean> {

@@ -6,13 +6,14 @@ export const getCampaign = async ({
   campaignId,
   withOutputs,
 }: {
+  user: UserType;
   campaignId: number;
   withOutputs?: boolean;
 }): Promise<
   | (StoplightComponents["schemas"]["Campaign"] & {
-    showNeedReview: boolean;
-    formFactors: string;
-  })
+      showNeedReview: boolean;
+      formFactors: string;
+    })
   | false
 > => {
   const result = await db.query(
@@ -52,8 +53,6 @@ export const getCampaign = async ({
   if (!campaign) {
     return false;
   }
-
-  if (! await doesUserHaveAccessToCampaign(campaign.id)) throw new Error();
 
   // Get campaign family
   const campaign_family = getCampaignFamily({
@@ -119,9 +118,10 @@ async function getCampaignOutputs(campaign: {
         FROM wp_appq_evd_bug 
         WHERE campaign_id = ?
         AND publish = 1
-        AND ${campaign.showNeedReview
-          ? "(status_id = 2 OR status_id = 4)"
-          : "status_id = 2"
+        AND ${
+          campaign.showNeedReview
+            ? "(status_id = 2 OR status_id = 4)"
+            : "status_id = 2"
         }`,
         [campaign.id]
       )
@@ -142,14 +142,3 @@ async function getCampaignOutputs(campaign: {
     return media.length && media[0].total > 0;
   }
 }
-
-async function doesUserHaveAccessToCampaign(campaignId: string) {
-  return !!(await db.query(
-    db.format(
-      `
-        SELECT wp_user_id
-        FROM wp_appq_user_to_campaign
-        WHERE campaign_id = ?
-      `, [campaignId])
-  ));
-};

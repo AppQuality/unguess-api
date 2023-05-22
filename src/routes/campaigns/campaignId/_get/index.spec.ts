@@ -12,18 +12,13 @@ const customer_1 = {
 
 const user_to_customer_1 = {
   wp_user_id: 1,
-  customer_id: 999,
-};
-
-const user_to_campaign_1 = {
-  wp_user_id: 1,
-  campaign_id: 1,
+  customer_id: customer_1.id,
 };
 
 const project_1 = {
   id: 999,
   display_name: "Project 999",
-  customer_id: 999,
+  customer_id: customer_1.id,
 };
 
 const project_2 = {
@@ -34,7 +29,13 @@ const project_2 = {
 
 const user_to_project_1 = {
   wp_user_id: 1,
-  project_id: 999,
+  project_id: project_1.id,
+};
+
+// TODO: remove this one and update tests once the refactor on the project permissions is done
+const user_to_project_2 = {
+  wp_user_id: 999,
+  project_id: project_2.id,
 };
 
 const campaign_type_1 = {
@@ -71,6 +72,25 @@ const campaign_2 = {
   project_id: project_2.id,
 };
 
+const campaign_3 = {
+  id: 3,
+  start_date: "2017-07-20 10:00:00",
+  end_date: "2017-07-20 10:00:00",
+  close_date: "2017-07-20 10:00:00",
+  title: "Campaign 997 title",
+  customer_title: "Campaign 997 customer title",
+  status_id: 1,
+  is_public: 1,
+  campaign_type_id: campaign_type_1.id,
+  campaign_type: -1,
+  project_id: project_2.id,
+};
+
+const user_to_campaign_1 = {
+  wp_user_id: 1,
+  campaign_id: campaign_3.id,
+};
+
 describe("GET /campaigns/{cid}", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
@@ -82,9 +102,9 @@ describe("GET /campaigns/{cid}", () => {
           userToCustomers: [user_to_customer_1],
           userToCampaigns: [user_to_campaign_1],
           projects: [project_1, project_2],
-          userToProjects: [user_to_project_1],
+          userToProjects: [user_to_project_1, user_to_project_2],
           campaignTypes: [campaign_type_1],
-          campaigns: [campaign_1, campaign_2],
+          campaigns: [campaign_1, campaign_2, campaign_3],
         });
 
         //Outputs
@@ -110,11 +130,12 @@ describe("GET /campaigns/{cid}", () => {
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(400);
   });
-  // It should answer 403 if the campaign exists but the user has no permissions to see the campaign details
-  it("Should answer 403 if the campaign exists but the user has no permissions to see the campaign details", async () => {
+
+  // It should answer 403 if the campaign exists but the user has no permissions to see the campaign
+  it("Should answer 403 if the campaign exists but the user has no permissions to see the campaign", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}`)
-      .set("Authorization", "Bearer unauthorized_user");
+      .get(`/campaigns/${campaign_2.id}`)
+      .set("Authorization", "Bearer user");
 
     expect(response.status).toBe(403);
   });
@@ -142,24 +163,29 @@ describe("GET /campaigns/{cid}", () => {
     );
   });
 
-  // It should answer 200 with the campaign
-  it("Should answer 200 with the campaign", async () => {
+  // Should answer 200 with the campaign if the user has specific permission to see the campaign
+  it("Should answer 200 with the campaign if the user has specific permission to see the campaign", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}`)
+      .get(`/campaigns/${campaign_3.id}`)
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
     expect(response.body).toEqual(
       expect.objectContaining({
+        id: campaign_3.id,
+      })
+    );
+  });
+
+  // Should answer 200 with the campaign if the user has no specific permission for the campaign but has the permission for the project
+  it("Should answer 200 with the campaign if the user has no specific permission for the campaign but has the permission for the project", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}`)
+      .set("Authorization", "Bearer user");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(
+      expect.objectContaining({
         id: campaign_1.id,
-        project: expect.objectContaining({
-          id: project_1.id,
-        }),
-        status: expect.objectContaining({
-          id: campaign_1.status_id,
-        }),
-        type: expect.objectContaining({
-          id: campaign_1.campaign_type_id,
-        }),
       })
     );
   });
@@ -197,5 +223,4 @@ describe("GET /campaigns/{cid}", () => {
       })
     );
   });
-
 });

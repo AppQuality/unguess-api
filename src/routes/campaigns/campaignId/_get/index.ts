@@ -8,6 +8,7 @@ export default class Route extends CampaignRoute<{
 }> {
   protected async prepare() {
     const campaign = await getCampaign({
+      user: this.getUser(),
       campaignId: this.cp_id,
       withOutputs: true,
     });
