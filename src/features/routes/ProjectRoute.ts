@@ -140,7 +140,7 @@ export default class ProjectRoute<
     return this.project_id;
   }
 
-  protected getWorkspace() {
+  protected getProject() {
     if (!this.project) throw new Error("Invalid project");
     return this.project;
   }
