@@ -787,7 +787,7 @@ export interface components {
     /** @description Workspace (company, customer) id */
     wid: string;
     /** @description Project id */
-    pid: number;
+    pid: string;
     /** @description Limit pagination parameter */
     limit: number;
     /** @description Start pagination parameter */

@@ -2928,7 +2928,7 @@ components:
       in: path
       required: true
       schema:
-        type: number
+        type: string
       description: Project id
     limit:
       name: limit
