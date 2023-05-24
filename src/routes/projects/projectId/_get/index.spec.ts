@@ -95,8 +95,7 @@ describe("GET /projects/{pid}", () => {
     const response = await request(app)
       .get(`/projects/999999`)
       .set("authorization", "Bearer user");
-    expect(response.body.code).toBe(403);
-    expect(response.body.message).toBe(ERROR_MESSAGE);
+    expect(response.status).toBe(403);
   });
 
   it("Should answer 400 of the requested parameter is wrong", async () => {

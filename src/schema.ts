@@ -199,7 +199,7 @@ export interface paths {
     parameters: {
       path: {
         /** Project id */
-        pid: number;
+        pid: components["parameters"]["pid"];
       };
     };
   };
@@ -1466,7 +1466,7 @@ export interface operations {
     parameters: {
       path: {
         /** Project id */
-        pid: number;
+        pid: components["parameters"]["pid"];
       };
       query: {
         /** Limit pagination parameter */
