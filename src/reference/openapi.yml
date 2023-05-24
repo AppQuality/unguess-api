@@ -1078,12 +1078,7 @@ paths:
                   display_name: string
   '/projects/{pid}/campaigns':
     parameters:
-      - name: pid
-        in: path
-        required: true
-        schema:
-          type: number
-        description: Project id
+      - $ref: '#/components/parameters/pid'
     get:
       summary: GET Project campaigns
       tags:
