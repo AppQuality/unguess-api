@@ -40,7 +40,7 @@ export default class ProjectRoute<
         message: "Project not found or not accessible",
       } as OpenapiError);
 
-      throw new Error("Project not found or not accessibled");
+      throw new Error("Project not found or not accessible");
     }
   }
 
@@ -99,7 +99,7 @@ export default class ProjectRoute<
       if (!project.length)
         return this.setError(403, {
           code: 403,
-          message: "project not found or not accessible",
+          message: "Project not found or not accessible",
         } as OpenapiError);
 
       project = project[0] as {
@@ -117,7 +117,7 @@ export default class ProjectRoute<
         ) {
           return this.setError(403, {
             code: 403,
-            message: "project not found or not accessible",
+            message: "Project not found or not accessible",
           } as OpenapiError);
         }
       }
