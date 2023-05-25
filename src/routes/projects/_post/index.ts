@@ -1,45 +1,59 @@
-/** OPENAPI-ROUTE: post-projects */
-import { Context } from "openapi-backend";
+/** OPENAPI-CLASS: post-projects */
+import * as db from "@src/features/db";
 import { ERROR_MESSAGE } from "@src/utils/constants";
 import { getWorkspace } from "@src/utils/workspaces";
 import { createProject } from "@src/utils/projects";
+import UserRoute from "@src/features/routes/UserRoute";
 
-export default async (
-  c: Context,
-  req: OpenapiRequest,
-  res: OpenapiResponse
-) => {
-  let user = req.user;
-  let error = {
-    code: 500,
-    message: ERROR_MESSAGE,
-    error: true,
-  } as StoplightComponents["schemas"]["Error"];
-  let request_body: StoplightComponents["requestBodies"]["Project"]["content"]["application/json"] =
-    req.body;
+export default class Route extends UserRoute<{
+  body: StoplightOperations["post-projects"]["requestBody"]["content"]["application/json"];
+  response: StoplightOperations["post-projects"]["responses"]["200"]["content"]["application/json"];
+}> {
+  private workspaceId: number;
 
-  res.status_code = 200;
+  constructor(configuration: RouteClassConfiguration) {
+    super(configuration);
 
-  try {
-    // Check if workspace exists
-    await getWorkspace({
-      workspaceId: request_body.customer_id,
-      user: user,
-    });
+    const body = this.getBody();
+    const { customer_id: workspaceId } = body;
 
-    // Create the project
-    let project = await createProject(request_body, user);
+    this.workspaceId = workspaceId;
+  }
 
-    return project as StoplightComponents["schemas"]["Project"];
-  } catch (e: any) {
-    if (e.code) {
-      error.code = e.code;
-      res.status_code = e.code;
-    } else {
-      error.code = 500;
-      res.status_code = 500;
+  protected async filter(): Promise<boolean> {
+    if (!super.filter()) return false;
+
+    if (
+      !(await this.hasPermission()) ||
+      !(await getWorkspace({
+        workspaceId: this.workspaceId,
+        user: this.getUser(),
+      }))
+    ) {
+      this.setError(403, {
+        code: 400,
+        message: ERROR_MESSAGE,
+      } as OpenapiError);
+      return false;
     }
 
-    return error;
+    return true;
   }
-};
+
+  protected async prepare() {
+    const project = await createProject(this.getBody(), this.getUser());
+    return this.setSuccess(200, project);
+  }
+
+  protected async hasPermission() {
+    const workspaceSql = db.format(
+      `SELECT * FROM wp_appq_user_to_customer
+        WHERE wp_user_id = ? AND customer_id = ?`,
+      [this.getUser().tryber_wp_user_id, this.workspaceId]
+    );
+
+    const access = await db.query(workspaceSql);
+
+    return access.length > 0;
+  }
+}
