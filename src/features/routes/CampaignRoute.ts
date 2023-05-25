@@ -75,9 +75,19 @@ export default class CampaignRoute<
   }
 
   protected async filter(): Promise<boolean> {
-    if (!(await super.filter())) return false;
+    if (!(await super.filter())) {
+      this.setError(403, {
+        code: 400,
+        message: "You don't have access to this campaign",
+      } as OpenapiError);
+      return false;
+    }
 
     if (!(await this.evaluateUserPermissions())) {
+      this.setError(403, {
+        code: 400,
+        message: "You don't have access to this campaign",
+      } as OpenapiError);
       return false;
     }
 
@@ -91,13 +101,18 @@ export default class CampaignRoute<
      ** It should be ordered in a descending order.
      ** AccessToProject is super w.r.t. AccessToCampaign.
      */
-    if (await this.hasAccessToProject()) {
-      return true;
+    if (this.getUser().role !== "administrator") {
+      if (await this.hasAccessToProject()) {
+        return true;
+      }
+      if (await this.hasAccessToCampaign()) {
+        return true;
+      }
+
+      return false;
     }
-    if (await this.hasAccessToCampaign()) {
-      return true;
-    }
-    return false;
+
+    return true;
   }
 
   private async hasAccessToCampaign(): Promise<boolean> {
@@ -118,35 +133,34 @@ export default class CampaignRoute<
         return true;
       }
 
-      this.setError(403, {
-        code: 400,
-        message: "Do not have access to the campaign",
-      } as OpenapiError);
-
       return false;
     } catch (_error) {
-      this.setError(403, {
-        code: 400,
-        message: "Do not have access to the campaign",
-      } as OpenapiError);
       return false;
     }
   }
 
   private async hasAccessToProject(): Promise<boolean> {
     try {
-      await getProjectById({
-        projectId: this.getProjectId(),
-        user: this.getUser(),
-      });
+      const result = await db.query(
+        db.format(
+          `
+            SELECT wp_user_id
+            FROM wp_appq_user_to_project
+            WHERE project_id = ?
+            AND wp_user_id = ?
+          `,
+          [this.projectId || "", this.getUserId()]
+        )
+      );
+
+      if (result.length > 0) {
+        return true;
+      }
+
+      return false;
     } catch (_error) {
-      this.setError(403, {
-        code: 400,
-        message: "Project not found",
-      } as OpenapiError);
       return false;
     }
-    return true;
   }
 
   protected getProjectId() {

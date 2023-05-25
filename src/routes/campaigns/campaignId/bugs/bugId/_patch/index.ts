@@ -54,7 +54,11 @@ export default class Route extends BugsRoute<{
   }
 
   protected async filter(): Promise<boolean> {
-    if (!super.filter()) return false;
+    if (!(await super.filter())) {
+      this.setError(403, { message: "Something went wrong!" } as OpenapiError);
+      return false;
+    }
+
     const campaign = await getCampaign({ campaignId: this.cid });
     if (!campaign) {
       this.setError(400, {

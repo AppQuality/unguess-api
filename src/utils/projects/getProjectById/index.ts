@@ -1,6 +1,5 @@
 import * as db from "@src/features/db";
 import { ERROR_MESSAGE } from "@src/utils/constants";
-import { getWorkspace } from "@src/utils/workspaces";
 
 interface getProjectByIdArgs {
   user: UserType;
@@ -9,7 +8,6 @@ interface getProjectByIdArgs {
 
 export const getProjectById = async ({
   projectId,
-  user,
 }: getProjectByIdArgs): Promise<StoplightComponents["schemas"]["Project"]> => {
   let error = {
     message: ERROR_MESSAGE + " with project",
