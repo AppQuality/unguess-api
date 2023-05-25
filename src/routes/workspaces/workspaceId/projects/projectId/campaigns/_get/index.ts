@@ -44,10 +44,15 @@ export default async (
     : (START_QUERY_PARAM_DEFAULT as StoplightComponents["parameters"]["start"]);
 
   try {
-    await getWorkspace({
+    const ws = await getWorkspace({
       workspaceId: wid,
       user: user,
     });
+
+    if (!ws) {
+      throw new Error("Workspace not found");
+    }
+
     let projectResult = (await getProject({
       workspaceId: wid,
       projectId: pid,

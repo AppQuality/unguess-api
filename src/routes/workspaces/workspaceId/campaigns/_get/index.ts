@@ -98,10 +98,15 @@ export default class Route extends UserRoute<{
     if (!(await super.filter())) return false;
 
     try {
-      await getWorkspace({
+      const ws = await getWorkspace({
         workspaceId: this.workspaceId,
         user: this.getUser(),
       });
+
+      if (!ws) {
+        throw new Error("Workspace not found");
+      }
+
       return true;
     } catch (err) {
       throw { code: 403, message: "Something went wrong" };

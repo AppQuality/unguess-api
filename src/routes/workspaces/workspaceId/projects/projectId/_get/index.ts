@@ -27,10 +27,14 @@ export default async (
 
   try {
     // Get customer
-    await getWorkspace({
+    const ws = await getWorkspace({
       workspaceId: wid,
       user: user,
     });
+
+    if (!ws) {
+      throw new Error("Workspace not found");
+    }
 
     // Get all customer's project
     let customerProjects = await getUserProjects({
