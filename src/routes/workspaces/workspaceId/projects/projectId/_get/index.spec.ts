@@ -94,7 +94,7 @@ describe("GET /workspaces/{wid}/projects/{pid}", () => {
     expect(response.body.message).toBe(ERROR_MESSAGE);
   });
 
-  it("Should answer 400 of the requested parameter is wrong", async () => {
+  it("Should answer 400 if the requested parameter is wrong", async () => {
     const response = await request(app)
       .get(`/workspaces/${customer_1.id}/projects/a`)
       .set("authorization", "Bearer user");

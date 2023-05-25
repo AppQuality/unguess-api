@@ -30,6 +30,12 @@ export default async (
   let wid = parseInt(c.request.params.wid as string);
   let pid = parseInt(c.request.params.pid as string);
 
+  if (isNaN(wid) || isNaN(pid)) {
+    error.code = 400;
+    res.status_code = 400;
+    return error;
+  }
+
   let limit = c.request.query.limit
     ? parseInt(c.request.query.limit as string)
     : (LIMIT_QUERY_PARAM_DEFAULT as StoplightComponents["parameters"]["limit"]);

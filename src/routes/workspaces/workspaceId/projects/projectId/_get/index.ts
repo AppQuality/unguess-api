@@ -19,6 +19,12 @@ export default async (
   let wid = parseInt(c.request.params.wid as string);
   let pid = parseInt(c.request.params.pid as string);
 
+  if (isNaN(wid) || isNaN(pid)) {
+    error.code = 400;
+    res.status_code = 400;
+    return error;
+  }
+
   try {
     // Get customer
     await getWorkspace({
