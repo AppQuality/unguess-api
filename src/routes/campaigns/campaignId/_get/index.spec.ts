@@ -32,12 +32,6 @@ const user_to_project_1 = {
   project_id: project_1.id,
 };
 
-// TODO: remove this one and update tests once the refactor on the project permissions is done
-const user_to_project_2 = {
-  wp_user_id: 999,
-  project_id: project_2.id,
-};
-
 const campaign_type_1 = {
   id: 999,
   name: "Functional Testing (Bug Hunting)",
@@ -102,7 +96,7 @@ describe("GET /campaigns/{cid}", () => {
           userToCustomers: [user_to_customer_1],
           userToCampaigns: [user_to_campaign_1],
           projects: [project_1, project_2],
-          userToProjects: [user_to_project_1, user_to_project_2],
+          userToProjects: [user_to_project_1],
           campaignTypes: [campaign_type_1],
           campaigns: [campaign_1, campaign_2, campaign_3],
         });
