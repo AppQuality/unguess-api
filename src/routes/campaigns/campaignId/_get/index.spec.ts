@@ -2,6 +2,7 @@ import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
+import { tryber } from "@src/features/database";
 
 const customer_1 = {
   id: 999,
@@ -50,9 +51,16 @@ const campaign_1 = {
   campaign_type_id: campaign_type_1.id,
   campaign_type: -1,
   project_id: project_1.id,
+  platform_id: 1,
+  page_preview_id: -1,
+  page_manual_id: -1,
+  customer_id: -1,
+  pm_id: -1,
+  description: "Campaign description",
 };
 
 const campaign_2 = {
+  ...campaign_1,
   id: 2,
   start_date: "2017-07-20 10:00:00",
   end_date: "2017-07-20 10:00:00",
@@ -67,6 +75,7 @@ const campaign_2 = {
 };
 
 const campaign_3 = {
+  ...campaign_1,
   id: 3,
   start_date: "2017-07-20 10:00:00",
   end_date: "2017-07-20 10:00:00",
@@ -89,7 +98,7 @@ describe("GET /campaigns/{cid}", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
       try {
-        await dbAdapter.create();
+        // await dbAdapter.create();
 
         await dbAdapter.add({
           companies: [customer_1],
@@ -98,8 +107,15 @@ describe("GET /campaigns/{cid}", () => {
           projects: [project_1, project_2],
           userToProjects: [user_to_project_1],
           campaignTypes: [campaign_type_1],
-          campaigns: [campaign_1, campaign_2, campaign_3],
+          // campaigns: [campaign_1, campaign_2, campaign_3],
         });
+
+        /**
+         * Test fluid database inserts (using raw sqlite and knex)
+         */
+        await tryber.tables.WpAppqEvdCampaign.do().insert(campaign_1);
+        await tryber.tables.WpAppqEvdCampaign.do().insert(campaign_2);
+        await tryber.tables.WpAppqEvdCampaign.do().insert(campaign_3);
 
         //Outputs
       } catch (error) {

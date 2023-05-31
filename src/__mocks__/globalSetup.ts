@@ -12,12 +12,12 @@ expect.extend({
 });
 
 beforeAll(async () => {
-  await dbAdapter.create();
+  // await dbAdapter.create();
   await tryber.create();
   await unguess.create();
 });
 afterAll(async () => {
-  await dbAdapter.drop();
+  // await dbAdapter.drop();
   await unguess.drop();
   await unguess.destroy();
   await tryber.drop();

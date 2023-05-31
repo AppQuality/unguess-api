@@ -26,6 +26,10 @@ data.basicItem = async (params) => {
     id: 1,
     name: "Banana campaign",
     type: 1,
+    description: "This is a banana campaign",
+    has_auto_apply: 0,
+    icon: "banana.png",
+    category_id: 1,
     ...params,
   };
   await db.insert("wp_appq_campaign_type", item);

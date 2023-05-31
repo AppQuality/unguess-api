@@ -6,13 +6,13 @@ class Databases {
 
   constructor(debug: boolean = false) {
     this.tryberDb = new sqlite3(
-      ":memory:",
+      "tryber.db",
       debug ? { verbose: console.log } : {}
     );
     this.addFunctions(this.tryberDb);
 
     this.unguessDb = new sqlite3(
-      ":memory:",
+      "unguess.db",
       debug ? { verbose: console.log } : {}
     );
     this.addFunctions(this.unguessDb);

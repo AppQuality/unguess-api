@@ -75,7 +75,15 @@ export type { CampaignsParams };
 // Backward compatibility
 const data = {
   basicCampaign: async (params: CampaignsParams) => {
-    return await campaigns.insert(params);
+    return await campaigns.insert({
+      platform_id: 1,
+      page_preview_id: -1,
+      page_manual_id: -1,
+      customer_id: -1,
+      pm_id: -1,
+      description: "Campaign description",
+      ...params,
+    });
   },
 };
 

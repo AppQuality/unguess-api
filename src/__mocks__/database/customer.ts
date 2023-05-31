@@ -34,7 +34,10 @@ export type { CustomerParams };
 // Backward compatibility
 const data = {
   basicItem: async (params: CustomerParams) => {
-    return await customers.insert(params);
+    return await customers.insert({
+      pm_id: 32,
+      ...params,
+    });
   },
 };
 
