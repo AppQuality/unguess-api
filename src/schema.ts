@@ -774,6 +774,14 @@ export interface components {
        */
       kind: "campaignUniqueBugs";
     };
+    /** Invitation */
+    Invitation: {
+      id?: number;
+      profile_id?: number;
+      name?: string;
+      email?: string;
+      invitationPending?: boolean;
+    };
   };
   responses: {
     /** Example response */
@@ -1716,15 +1724,7 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            items: {
-              /** @description tryber wp_user_id */
-              id: number;
-              /** @description tester_id */
-              profile_id: number;
-              name: string;
-              email: string;
-              invitationPending: boolean;
-            }[];
+            items: components["schemas"]["Invitation"][];
             start?: number;
             limit?: number;
             size?: number;
