@@ -979,6 +979,165 @@ paths:
           in: query
           name: updateTrend
           description: should update bug trend after request resolves?
+  '/campaigns/{cid}/users':
+    get:
+      summary: Retrieve users of a specific workspace
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Invitation'
+                  start:
+                    type: integer
+                  limit:
+                    type: integer
+                  size:
+                    type: integer
+                  total:
+                    type: integer
+                required:
+                  - items
+              examples:
+                Example 1:
+                  value:
+                    items:
+                      - id: 1234
+                        email: user@example.com
+                        name: string
+                        profile_id: 999
+                        invitationPending: true
+                    start: 0
+                    limit: 0
+                    size: 1
+                    total: 1
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaign-users
+      security:
+        - JWT: []
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/order'
+        - $ref: '#/components/parameters/orderBy'
+      tags:
+        - Workspaces
+      description: Return a list of users from a specific campaign
+    parameters:
+      - $ref: '#/components/parameters/cid'
+    post:
+      summary: Add user to workspace
+      operationId: post-campaign-cid-users
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  profile_id:
+                    type: number
+                  tryber_wp_user_id:
+                    type: number
+                  email:
+                    type: string
+                required:
+                  - profile_id
+                  - tryber_wp_user_id
+                  - email
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      description: Use this to add a new or existent user into a specific campaign.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                name:
+                  type: string
+                surname:
+                  type: string
+                locale:
+                  type: string
+                  description: preferred language
+                  enum:
+                    - it
+                    - en
+                  default: en
+                event_name:
+                  type: string
+                redirect_url:
+                  type: string
+              required:
+                - email
+      security:
+        - JWT: []
+    delete:
+      summary: Remove user from workspace
+      operationId: delete-campaign-cid-users
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                x-examples:
+                  Example 1:
+                    items:
+                      - id: 1234
+                        email: user@example.com
+                        name: string
+                        profile_id: 999
+                        invitationPending: true
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Invitation'
+                required:
+                  - items
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      description: Remove an user from campaign
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: number
+                  x-stoplight:
+                    id: e58obm46133e2
+                  description: Tryber WP USER ID
+              required:
+                - user_id
   /projects:
     post:
       summary: Create a new project
@@ -1583,24 +1742,7 @@ paths:
                   items:
                     type: array
                     items:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                        email:
-                          type: string
-                        name:
-                          type: string
-                        profile_id:
-                          type: integer
-                        invitationPending:
-                          type: boolean
-                      required:
-                        - id
-                        - email
-                        - name
-                        - profile_id
-                        - invitationPending
+                      $ref: '#/components/schemas/Invitation'
                 required:
                   - items
         '400':
