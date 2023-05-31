@@ -169,6 +169,11 @@ export default class CampaignRoute<
     return this.projectId;
   }
 
+  protected getCampaignId() {
+    if (typeof this.cp_id === "undefined") throw new Error("Invalid campaign");
+    return this.cp_id;
+  }
+
   protected async getTags(): Promise<
     Array<{
       tag_id: number;
