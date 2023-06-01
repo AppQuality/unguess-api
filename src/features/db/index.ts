@@ -9,7 +9,9 @@ export const query = async (
   dbName: string = ""
 ): Promise<any> => {
   const db = dbName == "unguess" ? unguess : tryber;
-  return await db.raw(query);
+  const res = await db.raw(query);
+
+  return res ? res[0] : [];
 };
 
 export const escape = (value: string) => {
