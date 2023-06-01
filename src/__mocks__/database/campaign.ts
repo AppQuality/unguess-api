@@ -37,6 +37,10 @@ const defaultItem: CampaignsParams = {
   project_id: 1,
   customer_id: 2,
   cust_bug_vis: 0,
+  platform_id: 1,
+  page_preview_id: 1,
+  page_manual_id: 1,
+  pm_id: 1,
 };
 
 class Campaigns extends Table<CampaignsParams> {
@@ -77,11 +81,6 @@ export { data };
 const data = {
   basicCampaign: async (params: CampaignsParams) => {
     return await campaigns.insert({
-      platform_id: 1,
-      page_preview_id: 1,
-      page_manual_id: 1,
-      pm_id: 1,
-      cust_bug_vis: 0,
       ...params,
     });
   },
