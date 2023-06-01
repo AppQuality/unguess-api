@@ -7,66 +7,46 @@ import {
   START_QUERY_PARAM_DEFAULT,
   fallBackCsmProfile,
 } from "@src/utils/constants";
-import {
-  WorkspaceOrderBy,
-  WorkspaceOrders,
-} from "@src/utils/workspaces/getUserWorkspaces";
 import UserRoute from "@src/features/routes/UserRoute";
-
-interface GetWorkspacesArgs {
-  limit: StoplightComponents["parameters"]["limit"];
-  start: StoplightComponents["parameters"]["start"];
-  orderBy: WorkspaceOrderBy;
-  order: WorkspaceOrders;
-}
-type PaginationParams = {
-  items: Array<any>;
-  limit?: StoplightComponents["parameters"]["limit"] | string;
-  start?: StoplightComponents["parameters"]["start"] | string;
-  total: number;
-};
 
 export default class WorkspacesRoute extends UserRoute<{
   response: StoplightOperations["get-workspaces"]["responses"]["200"]["content"]["application/json"];
   parameters: StoplightOperations["get-workspaces"]["parameters"]["query"];
 }> {
-  protected csmProfiles: {
-    [id: number]: StoplightComponents["schemas"]["Workspace"]["csm"];
-  } = {};
+  private limit: StoplightComponents["parameters"]["limit"] =
+    LIMIT_QUERY_PARAM_DEFAULT;
+  private start: StoplightComponents["parameters"]["start"] =
+    START_QUERY_PARAM_DEFAULT;
+  private orderBy: "id" | "company" | "tokens" = "id";
+  private order: "ASC" | "DESC" = "ASC";
 
-  protected async prepare() {
+  constructor(configuration: RouteClassConfiguration) {
+    super(configuration);
+
     const parameters =
       this.getQuery() as StoplightOperations["get-workspaces"]["parameters"]["query"];
+
+    console.log(parameters);
+
+    this.limit = Number(parameters.limit) || LIMIT_QUERY_PARAM_DEFAULT;
+    this.start = Number(parameters.start) || START_QUERY_PARAM_DEFAULT;
+
+    this.order =
+      parameters.order &&
+      ["ASC", "DESC"].includes(parameters.order.toUpperCase())
+        ? (parameters.order.toUpperCase() as "DESC" | "ASC")
+        : "ASC";
+
+    this.orderBy =
+      parameters.orderBy &&
+      ["id", "company", "tokens"].includes(parameters.orderBy.toLowerCase())
+        ? (parameters.orderBy.toLowerCase() as "id" | "company" | "tokens")
+        : "id";
+  }
+
+  protected async prepare() {
     try {
-      console.log("parameters", parameters);
-      const limit = parameters.limit
-        ? parseInt(parameters.limit.toString())
-        : LIMIT_QUERY_PARAM_DEFAULT;
-
-      const start = parameters.start
-        ? parseInt(parameters.start.toString())
-        : START_QUERY_PARAM_DEFAULT;
-
-      const order =
-        parameters.order &&
-        ["ASC", "DESC"].includes(parameters.order.toUpperCase())
-          ? (parameters.order.toUpperCase() as "DESC" | "ASC")
-          : "ASC";
-
-      const orderBy =
-        parameters.orderBy &&
-        ["id", "company", "tokens"].includes(parameters.orderBy.toLowerCase())
-          ? (parameters.orderBy.toLowerCase() as "id" | "company" | "tokens")
-          : "id";
-
-      let userWorkspaces = await this.getUserWorkspaces({
-        limit,
-        start,
-        order,
-        orderBy,
-      });
-
-      console.log("limit", limit);
+      let userWorkspaces = await this.getUserWorkspaces();
 
       if (!userWorkspaces.workspaces.length) {
         return this.setSuccess(200, {
@@ -79,8 +59,8 @@ export default class WorkspacesRoute extends UserRoute<{
       }
       return this.setSuccess(200, {
         items: userWorkspaces.workspaces,
-        start,
-        limit,
+        start: this.start,
+        limit: this.limit,
         size: userWorkspaces.workspaces.length,
         total: userWorkspaces.total,
       });
@@ -92,32 +72,7 @@ export default class WorkspacesRoute extends UserRoute<{
     }
   }
 
-  protected paginateItems(data: PaginationParams) {
-    let { items, limit, start, total } = data;
-
-    return items.length
-      ? {
-          items,
-          start,
-          limit,
-          size: items.length,
-          total,
-        }
-      : this.emptyPaginatedResponse();
-  }
-
-  protected emptyPaginatedResponse() {
-    return {
-      items: [],
-      start: 0,
-      limit: 0,
-      size: 0,
-      total: 0,
-    };
-  }
-
-  protected async getUserWorkspaces(args: GetWorkspacesArgs) {
-    const { limit, start, order, orderBy } = args;
+  protected async getUserWorkspaces() {
     let query = tryber.tables.WpAppqCustomer.do()
       .select(
         "wp_appq_customer.*",
@@ -148,14 +103,17 @@ export default class WorkspacesRoute extends UserRoute<{
       );
     }
 
-    if (orderBy) {
-      query = query.orderBy(`wp_appq_customer.${orderBy}`, `${order || "ASC"}`);
+    if (this.orderBy) {
+      query = query.orderBy(
+        `wp_appq_customer.${this.orderBy}`,
+        `${this.order || "ASC"}`
+      );
     }
 
-    if (limit) {
+    if (this.limit) {
       query = query
-        .limit(limit)
-        .offset(start ? start : START_QUERY_PARAM_DEFAULT);
+        .limit(this.limit)
+        .offset(this.start ? this.start : START_QUERY_PARAM_DEFAULT);
     }
 
     let countQuery = tryber.tables.WpAppqCustomer.do()
@@ -185,7 +143,9 @@ export default class WorkspacesRoute extends UserRoute<{
       )
         return { workspaces: [], total: 0 };
 
+      console.log(query.toString());
       const result = await query;
+      console.log(result);
 
       const countResult = await countQuery;
 
@@ -197,7 +157,7 @@ export default class WorkspacesRoute extends UserRoute<{
 
       return { workspaces: [], total: 0 };
     } catch (e) {
-      //console.log(e.message);
+      console.log(e.message);
       return { workspaces: [], total: 0 };
     }
   }
@@ -235,11 +195,15 @@ export default class WorkspacesRoute extends UserRoute<{
   protected async loadCsmData(
     csm: StoplightComponents["schemas"]["Workspace"]["csm"]
   ) {
-    if (csm.id in this.csmProfiles) return this.csmProfiles[csm.id];
+    const csmProfiles: {
+      [id: number]: StoplightComponents["schemas"]["Workspace"]["csm"];
+    } = {};
+
+    if (csm.id in csmProfiles) return csmProfiles[csm.id];
 
     let profilePic = await getGravatar(csm.email);
     if (profilePic) csm.picture = profilePic;
-    this.csmProfiles[csm.id] = csm;
+    csmProfiles[csm.id] = csm;
 
     return csm;
   }
