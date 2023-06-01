@@ -1,15 +1,12 @@
 /** OPENAPI-CLASS: get-project-campaigns */
-import { Context } from "openapi-backend";
 import * as db from "@src/features/db";
-import { getProjectById } from "@src/utils/projects";
-import { paginateItems, formatCount } from "@src/utils/paginations";
+import { formatCount } from "@src/utils/paginations";
 import {
   getCampaignFamily,
   getCampaignOutputs,
   getCampaignStatus,
 } from "@src/utils/campaigns";
 import {
-  ERROR_MESSAGE,
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
 } from "@src/utils/constants";

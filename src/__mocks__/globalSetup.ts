@@ -1,4 +1,5 @@
 import { tryber, unguess } from "@src/features/database";
+import campaignOutputs from "../__mocks__/database/cp_outputs_view";
 
 expect.extend({
   toBeNow(received: number, precision: number = 0) {
@@ -12,11 +13,13 @@ expect.extend({
 
 beforeAll(async () => {
   // await dbAdapter.create();
+  await campaignOutputs.mock();
   await tryber.create();
   await unguess.create();
 });
 afterAll(async () => {
   // await dbAdapter.drop();
+  await campaignOutputs.dropMock();
   await unguess.drop();
   await unguess.destroy();
   await tryber.drop();
