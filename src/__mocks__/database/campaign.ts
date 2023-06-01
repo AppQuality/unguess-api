@@ -71,12 +71,18 @@ class Campaigns extends Table<CampaignsParams> {
 const campaigns = new Campaigns();
 export default campaigns;
 export type { CampaignsParams };
+export { data };
 
 // Backward compatibility
 const data = {
   basicCampaign: async (params: CampaignsParams) => {
-    return await campaigns.insert(params);
+    return await campaigns.insert({
+      platform_id: 1,
+      page_preview_id: 1,
+      page_manual_id: 1,
+      pm_id: 1,
+      cust_bug_vis: 0,
+      ...params,
+    });
   },
 };
-
-export { data };

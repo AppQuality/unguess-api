@@ -30,12 +30,11 @@ class Customers extends Table<CustomerParams> {
 const customers = new Customers();
 export default customers;
 export type { CustomerParams };
+export { data };
 
 // Backward compatibility
 const data = {
   basicItem: async (params: CustomerParams) => {
-    return await customers.insert(params);
+    return await customers.insert({ pm_id: 1, ...params });
   },
 };
-
-export { data };

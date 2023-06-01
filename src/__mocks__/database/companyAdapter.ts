@@ -1,13 +1,13 @@
-import Customer, { CustomerParams, data as customerData } from "./customer";
-import { table as profileTable, data as profileData } from "./profile";
-import Projects, { ProjectParams, data as projectData } from "./project";
 import Campaigns, { CampaignsParams, data as campaignData } from "./campaign";
 import {
   table as campaignTypeTable,
   data as campaignTypesData,
 } from "./campaign_type";
-import { table as userTable, data as userData } from "./user";
-import { table as userTableUG, data as userDataUG } from "./user_unguess";
+import Customer, { CustomerParams, data as customerData } from "./customer";
+import { data as profileData, table as profileTable } from "./profile";
+import Projects, { ProjectParams, data as projectData } from "./project";
+import { data as userData, table as userTable } from "./user";
+import { data as userDataUG, table as userTableUG } from "./user_unguess";
 
 import UserToProjects, {
   UserToProjectParams,
@@ -24,59 +24,59 @@ import UserToCampaign, {
   data as userToCampaignData,
 } from "./user_to_campaign";
 
-import { table as featuresTable, data as featuresData } from "./features";
+import { data as featuresData, table as featuresTable } from "./features";
 
 import {
-  table as userToFeaturesTable,
   data as userToFeaturesData,
+  table as userToFeaturesTable,
 } from "./userToFeatures";
 
 import Coins from "./coins";
 import {
-  table as coinsTransactionsTable,
   data as coinsTransactionsData,
+  table as coinsTransactionsTable,
 } from "./coins_transactions";
 
-import priorities from "./priority";
 import bugsPriorities from "./bug_priority";
+import priorities from "./priority";
 
-import customStatuses from "./custom_status";
 import bugCustomStatuses from "./bug_custom_status";
+import customStatuses from "./custom_status";
 
-import campaignOutputs from "./cp_outputs_view";
-import { table as expressTable, data as expressData } from "./express";
 import defaultUsers from "@src/__mocks__/database/seed/users.json";
+import campaignOutputs from "./cp_outputs_view";
+import { data as expressData, table as expressTable } from "./express";
 
-import UseCase from "@src/__mocks__/database/use_cases";
-import useCaseGroup from "@src/__mocks__/database/use_case_group";
-import { table as platformTable } from "@src/__mocks__/database/platforms";
-import bugs from "@src/__mocks__/database/bugs";
-import userTaskMedia from "@src/__mocks__/database/user_task_media";
-import reports from "@src/__mocks__/database/report";
-import bugSeverity from "@src/__mocks__/database/bug_severity";
-import customSeverity from "@src/__mocks__/database/bug_severity_custom";
+import bugMedia from "@src/__mocks__/database/bug_media";
 import bugReplicability from "@src/__mocks__/database/bug_replicability";
 import customReplicabilities from "@src/__mocks__/database/bug_replicability_custom";
+import bugSeverity from "@src/__mocks__/database/bug_severity";
+import customSeverity from "@src/__mocks__/database/bug_severity_custom";
+import bugStatus from "@src/__mocks__/database/bug_status";
+import tags from "@src/__mocks__/database/bug_tags";
 import bugType from "@src/__mocks__/database/bug_type";
 import customBugType from "@src/__mocks__/database/bug_type_custom";
-import bugStatus from "@src/__mocks__/database/bug_status";
-import bugMedia from "@src/__mocks__/database/bug_media";
-import devices from "@src/__mocks__/database/device";
+import bugs from "@src/__mocks__/database/bugs";
 import additionalField from "@src/__mocks__/database/campaign_additional_field";
 import additionalFieldData from "@src/__mocks__/database/campaign_additional_field_data";
-import candidates from "@src/__mocks__/database/cp_has_candidate";
 import CampaignMeta from "@src/__mocks__/database/campaign_meta";
-import tags from "@src/__mocks__/database/bug_tags";
+import candidates from "@src/__mocks__/database/cp_has_candidate";
+import devices from "@src/__mocks__/database/device";
+import { table as platformTable } from "@src/__mocks__/database/platforms";
+import reports from "@src/__mocks__/database/report";
+import useCaseGroup from "@src/__mocks__/database/use_case_group";
+import UseCase from "@src/__mocks__/database/use_cases";
+import userTaskMedia from "@src/__mocks__/database/user_task_media";
 
-import Templates from "@src/__mocks__/database/templates";
-import Category from "@src/__mocks__/database/template_categories";
-import userTask from "@src/__mocks__/database/user_task";
-import customerUniqueBugsRead from "@src/__mocks__/database/customer_unique_bug_read";
 import bugsReadStatus from "@src/__mocks__/database/bug_read_status";
 import campaignReadStatuses from "@src/__mocks__/database/campaign_read_status";
 import customerInvitations from "@src/__mocks__/database/customer_invitations";
-import unlayerTemplate from "@src/__mocks__/database/unlayer_mail_template";
+import customerUniqueBugsRead from "@src/__mocks__/database/customer_unique_bug_read";
 import mailEvents from "@src/__mocks__/database/event_transactional_mail";
+import Category from "@src/__mocks__/database/template_categories";
+import Templates from "@src/__mocks__/database/templates";
+import unlayerTemplate from "@src/__mocks__/database/unlayer_mail_template";
+import userTask from "@src/__mocks__/database/user_task";
 
 interface dataObject {
   profiles?: Array<any>;
@@ -269,6 +269,7 @@ export const adapter = {
     customer?: CustomerParams;
   }) => {
     await Campaigns.insert({
+      platform_id: 0,
       ...rest.campaign,
       id: campaign_id,
       project_id,
@@ -286,6 +287,7 @@ export const adapter = {
     const customer = await Customer.all(undefined, [{ id: customer_id }]);
     if (customer.length === 0) {
       await Customer.insert({
+        pm_id: 1,
         ...rest.customer,
         id: customer_id,
       });
