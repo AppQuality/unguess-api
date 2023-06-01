@@ -54,6 +54,7 @@ describe("GET /workspaces", () => {
     const response = await request(app)
       .get("/workspaces?limit=1&start=0")
       .set("authorization", "Bearer user");
+    console.log(response.body);
     expect(response.body.start).toBe(0);
     expect(response.body.limit).toBe(1);
     expect(response.body.size).toBe(1);
