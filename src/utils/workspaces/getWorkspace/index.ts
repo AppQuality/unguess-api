@@ -69,7 +69,7 @@ export const getWorkspace = async ({
 
     //Add CSM info
 
-    let rawCsm = workspace.pm_id
+    let rawCsm = workspace.csmEmail
       ? {
           id: workspace.pm_id,
           name: workspace.csmName + " " + workspace.csmSurname,
