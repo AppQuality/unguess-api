@@ -4,10 +4,11 @@ import {
   fallBackCsmProfile,
   LIMIT_QUERY_PARAM_DEFAULT,
 } from "@src/utils/constants";
-import useCustomersData from "./useCustomersData";
+import useCustomersDataCsmDefault from "./useCustomersDataCsmDefault";
+import useCustomersDataCsmCustom from "./useCustomersDataCsmCustom";
 
 describe("GET /workspaces", () => {
-  useCustomersData();
+  useCustomersDataCsmDefault();
 
   it("Should answer 403 if not logged in", async () => {
     const response = await request(app).get("/workspaces");
@@ -102,6 +103,55 @@ describe("GET /workspaces", () => {
           logo: "logo.png",
           tokens: 100,
           csm: fallBackCsmProfile,
+        }),
+      ])
+    );
+  });
+});
+
+//DESCRIBE USE NOT FALLBACK CSM PROFILE
+
+describe("GET /workspaces with CSM", () => {
+  useCustomersDataCsmCustom();
+
+  it("Should answer 200 if logged in", async () => {
+    const response = await request(app)
+      .get("/workspaces")
+      .set("authorization", "Bearer user");
+    expect(response.status).toBe(200);
+    expect(response.body.start).toBe(0);
+    expect(response.body.limit).toBe(LIMIT_QUERY_PARAM_DEFAULT);
+    expect(response.body.size).toBe(2);
+    expect(response.body.total).toBe(2);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 1,
+          company: "Company",
+          logo: "logo.png",
+          tokens: 100,
+          csm: {
+            id: 1,
+            email: "marco.giuliani@unguess.io",
+            name: "Marco Giuliani",
+            profile_id: 1,
+            tryber_wp_user_id: 1,
+            url: "https://meetings.hubspot.com/marco.giuliani",
+          },
+        }),
+        expect.objectContaining({
+          id: 2,
+          company: "Different Company",
+          logo: "logo.png",
+          tokens: 100,
+          csm: {
+            id: 1,
+            email: "marco.giuliani@unguess.io",
+            name: "Marco Giuliani",
+            profile_id: 1,
+            tryber_wp_user_id: 1,
+            url: "https://meetings.hubspot.com/marco.giuliani",
+          },
         }),
       ])
     );

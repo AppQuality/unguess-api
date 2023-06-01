@@ -1,19 +1,19 @@
 import { tryber } from "@src/features/database";
 
-const useCustomersData = () => {
+const useCustomersDataCsmCustom = () => {
   beforeAll(async () => {
     await tryber.tables.WpAppqEvdProfile.do().insert({
-      id: 2,
+      id: 1,
       wp_user_id: 1,
-      name: "Gianluca",
-      surname: "Peretti",
-      email: "gianluca.peretti@unguess.io",
+      name: "Marco",
+      surname: "Giuliani",
+      email: "marco.giuliani@unguess.io",
       employment_id: 1,
       education_id: 1,
     });
     await tryber.tables.WpUsers.do().insert({
-      ID: 2,
-      user_url: "https://meetings.hubspot.com/gianluca-peretti",
+      ID: 1,
+      user_url: "https://meetings.hubspot.com/marco.giuliani",
     });
     await tryber.tables.WpAppqCustomer.do().insert([
       {
@@ -21,21 +21,21 @@ const useCustomersData = () => {
         company: "Company",
         company_logo: "logo.png",
         tokens: 100,
-        pm_id: 0,
+        pm_id: 1,
       },
       {
         id: 2,
         company: "Different Company",
         company_logo: "logo.png",
         tokens: 100,
-        pm_id: 0,
+        pm_id: 1,
       },
       {
         id: 3,
         company: "Zoom",
         company_logo: "logo.png",
         tokens: 100,
-        pm_id: 0,
+        pm_id: 1,
       },
     ]);
     await tryber.tables.WpAppqUserToCustomer.do().insert([
@@ -58,4 +58,4 @@ const useCustomersData = () => {
   });
 };
 
-export default useCustomersData;
+export default useCustomersDataCsmCustom;
