@@ -94,7 +94,7 @@ const prepareResponse = async (
   let workspaces: StoplightComponents["schemas"]["Workspace"][] = [];
 
   for (const customer of customers) {
-    let rawCsm = customer.pm_id
+    let rawCsm = customer.csmEmail
       ? {
           id: customer.pm_id,
           name: customer.csmName + " " + customer.csmSurname,
