@@ -64,10 +64,16 @@ export default async (
   try {
     let wid = Number.parseInt(c.request.params.wid as string);
 
-    await getWorkspace({
+    const ws = await getWorkspace({
       workspaceId: wid,
       user: user,
     });
+
+    if (!ws) {
+      error.code = 403;
+      res.status_code = 403;
+      return error;
+    }
 
     const coins = await getWorkspaceCoins({
       workspaceId: wid,

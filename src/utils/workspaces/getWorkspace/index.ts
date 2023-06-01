@@ -21,7 +21,9 @@ interface GetWorkspacesArgs {
 export const getWorkspace = async ({
   workspaceId,
   user,
-}: GetWorkspacesArgs): Promise<StoplightComponents["schemas"]["Workspace"]> => {
+}: GetWorkspacesArgs): Promise<
+  StoplightComponents["schemas"]["Workspace"] | false
+> => {
   let error = {
     message: ERROR_MESSAGE + " with workspace",
     error: true,
@@ -96,5 +98,5 @@ export const getWorkspace = async ({
     } as StoplightComponents["schemas"]["Workspace"];
   }
 
-  throw { ...error, message: "generic workspace error", code: 403 };
+  return false;
 };

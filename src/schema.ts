@@ -175,7 +175,21 @@ export interface paths {
     parameters: {
       path: {
         /** Campaign id */
-        cid: number;
+        cid: components["parameters"]["cid"];
+      };
+    };
+  };
+  "/campaigns/{cid}/users": {
+    /** Return a list of users from a specific campaign */
+    get: operations["get-campaign-users"];
+    /** Use this to add a new or existent user into a specific campaign. */
+    post: operations["post-campaign-cid-users"];
+    /** Remove an user from campaign */
+    delete: operations["delete-campaign-cid-users"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
       };
     };
   };
@@ -199,7 +213,7 @@ export interface paths {
     parameters: {
       path: {
         /** Project id */
-        pid: number;
+        pid: components["parameters"]["pid"];
       };
     };
   };
@@ -774,6 +788,14 @@ export interface components {
        */
       kind: "campaignUniqueBugs";
     };
+    /** Invitation */
+    Invitation: {
+      id?: number;
+      profile_id?: number;
+      name?: string;
+      email?: string;
+      invitationPending?: boolean;
+    };
   };
   responses: {
     /** Example response */
@@ -787,7 +809,7 @@ export interface components {
     /** @description Workspace (company, customer) id */
     wid: string;
     /** @description Project id */
-    pid: number;
+    pid: string;
     /** @description Limit pagination parameter */
     limit: number;
     /** @description Start pagination parameter */
@@ -1370,7 +1392,7 @@ export interface operations {
     parameters: {
       path: {
         /** Campaign id */
-        cid: number;
+        cid: components["parameters"]["cid"];
       };
       query: {
         /** Campaign widget slug */
@@ -1395,6 +1417,113 @@ export interface operations {
       401: components["responses"]["Error"];
       403: components["responses"]["Error"];
       500: components["responses"]["Error"];
+    };
+  };
+  /** Return a list of users from a specific campaign */
+  "get-campaign-users": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+      };
+      query: {
+        /** Limit pagination parameter */
+        limit?: components["parameters"]["limit"];
+        /** Start pagination parameter */
+        start?: components["parameters"]["start"];
+        /** Order value (ASC, DESC) */
+        order?: components["parameters"]["order"];
+        /** Order by accepted field */
+        orderBy?: components["parameters"]["orderBy"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            items: components["schemas"]["Invitation"][];
+            start?: number;
+            limit?: number;
+            size?: number;
+            total?: number;
+          };
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  /** Use this to add a new or existent user into a specific campaign. */
+  "post-campaign-cid-users": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            profile_id: number;
+            tryber_wp_user_id: number;
+            email: string;
+          };
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          email: string;
+          name?: string;
+          surname?: string;
+          /**
+           * @description preferred language
+           * @default en
+           * @enum {string}
+           */
+          locale?: "it" | "en";
+          event_name?: string;
+          redirect_url?: string;
+        };
+      };
+    };
+  };
+  /** Remove an user from campaign */
+  "delete-campaign-cid-users": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            items: components["schemas"]["Invitation"][];
+          };
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description Tryber WP USER ID */
+          user_id: number;
+        };
+      };
     };
   };
   "post-projects": {
@@ -1466,7 +1595,7 @@ export interface operations {
     parameters: {
       path: {
         /** Project id */
-        pid: number;
+        pid: components["parameters"]["pid"];
       };
       query: {
         /** Limit pagination parameter */
@@ -1716,15 +1845,7 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            items: {
-              /** @description tryber wp_user_id */
-              id: number;
-              /** @description tester_id */
-              profile_id: number;
-              name: string;
-              email: string;
-              invitationPending: boolean;
-            }[];
+            items: components["schemas"]["Invitation"][];
             start?: number;
             limit?: number;
             size?: number;
@@ -1791,13 +1912,7 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            items: {
-              id: number;
-              email: string;
-              name: string;
-              profile_id: number;
-              invitationPending: boolean;
-            }[];
+            items: components["schemas"]["Invitation"][];
           };
         };
       };

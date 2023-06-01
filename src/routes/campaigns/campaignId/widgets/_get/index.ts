@@ -1,5 +1,4 @@
-/** OPENAPI-ROUTE: get-campaigns-cid-widgets-wslug */
-import { Context } from "openapi-backend";
+/** OPENAPI-CLASS: get-campaigns-cid-widgets-wslug */
 import {
   getCampaign,
   getWidgetBugsByDevice,
@@ -7,116 +6,117 @@ import {
   getWidgetBugsByUseCase,
   getWidgetCampaignProgress,
 } from "@src/utils/campaigns";
-import { ERROR_MESSAGE } from "@src/utils/constants";
-import { getProjectById } from "@src/utils/projects";
 import getCampaignBugsTrend from "./uniqueBugsWidget/getCampaignBugsTrend";
 import updateTrend from "./uniqueBugsWidget/updateTrend";
 import getCampaignBugSituation from "./uniqueBugsWidget/getCampaignBugSituation";
 import isGracePeriodPassed from "./uniqueBugsWidget/isGracePeriodPassed";
+import CampaignRoute from "@src/features/routes/CampaignRoute";
 
-export default async (
-  c: Context,
-  req: OpenapiRequest,
-  res: OpenapiResponse
-) => {
-  const user = req.user;
+export default class Route extends CampaignRoute<{
+  response: StoplightOperations["get-campaigns-cid-widgets-wslug"]["responses"]["200"]["content"]["application/json"];
+  parameters: StoplightOperations["get-campaigns-cid-widgets-wslug"]["parameters"]["path"];
+  query: StoplightOperations["get-campaigns-cid-widgets-wslug"]["parameters"]["query"];
+}> {
+  private widget: string | undefined;
+  private updateTrend: boolean | undefined;
 
-  const error = {
-    code: 500,
-    message: ERROR_MESSAGE,
-    error: true,
-  } as StoplightComponents["schemas"]["Error"];
+  protected async init(): Promise<void> {
+    await super.init();
 
-  const cid = parseInt(c.request.params.cid as string);
-  const widget = c.request.query
-    .s as StoplightComponents["parameters"]["wslug"];
-  const shouldUpdateTrend = c.request.query.hasOwnProperty("updateTrend");
+    const { s: widget, updateTrend } = this.getQuery();
 
-  if (widget !== "unique-bugs" && shouldUpdateTrend) {
-    res.status_code = 422;
-    throw {
-      message: "Invalid query parameter",
-      code: 422,
-    };
-  }
-  res.status_code = 200;
-
-  try {
-    if (!cid || !widget) {
-      throw {
-        ...error,
+    if (widget !== "unique-bugs" && updateTrend) {
+      this.setError(422, {
         code: 400,
-        message: "Missing campaign id or widget slug",
-      };
+        message: "Invalid query parameter",
+      } as OpenapiError);
+
+      throw new Error("Invalid query parameter");
     }
 
+    if (!this.cp_id || !widget) {
+      this.setError(400, {
+        code: 400,
+        message: "Missing campaign id or widget slug",
+      } as OpenapiError);
+
+      throw new Error("Missing campaign id or widget slug");
+    }
+
+    this.widget = widget;
+    this.updateTrend = updateTrend;
+  }
+
+  protected async prepare() {
     // Check if the campaign exists
     const campaign = await getCampaign({
-      campaignId: cid,
+      campaignId: this.cp_id,
       withOutputs: true,
     });
 
     if (!campaign) {
-      throw {
-        ...error,
+      this.setError(403, {
         code: 403,
         message:
           "Campaign doesn't exist or you don't have permission to view it",
-      };
+      } as OpenapiError);
+
+      throw new Error(
+        "Campaign doesn't exist or you don't have permission to view it"
+      );
     }
-    // Check if user has permission to access the campaign
-    await getProjectById({
-      projectId: campaign.project.id,
-      user: user,
-    });
 
     // Return requested widget
-    switch (widget) {
-      case "bugs-by-usecase":
-        return await getWidgetBugsByUseCase(campaign);
-      case "bugs-by-device":
-        return await getWidgetBugsByDevice(campaign);
-      case "cp-progress":
-        return await getWidgetCampaignProgress(campaign);
-      case "bugs-by-duplicates":
-        return await getWidgetBugsByDuplicates(campaign);
-      case "unique-bugs":
-        const { unique, total } = await getCampaignBugSituation(campaign);
+    try {
+      switch (this.widget) {
+        case "bugs-by-usecase":
+          return this.setSuccess(200, await getWidgetBugsByUseCase(campaign));
+        case "bugs-by-device":
+          return this.setSuccess(200, await getWidgetBugsByDevice(campaign));
+        case "cp-progress":
+          return this.setSuccess(
+            200,
+            await getWidgetCampaignProgress(campaign)
+          );
+        case "bugs-by-duplicates":
+          return this.setSuccess(
+            200,
+            await getWidgetBugsByDuplicates(campaign)
+          );
+        case "unique-bugs":
+          const { unique, total } = await getCampaignBugSituation(campaign);
 
-        const trend = await getCampaignBugsTrend({
-          campaignId: campaign.id,
-          userId: user.unguess_wp_user_id,
-          unique,
-        });
-        if (
-          shouldUpdateTrend &&
-          (await isGracePeriodPassed({
+          const trend = await getCampaignBugsTrend({
             campaignId: campaign.id,
-            userId: user.unguess_wp_user_id,
-          }))
-        ) {
-          await updateTrend({
-            campaignId: campaign.id,
-            userId: user.unguess_wp_user_id,
+            userId: this.getUser().unguess_wp_user_id,
             unique,
           });
-        }
-        return {
-          data: { unique, total, trend },
-          kind: "campaignUniqueBugs",
-        };
+
+          if (
+            this.updateTrend &&
+            (await isGracePeriodPassed({
+              campaignId: campaign.id,
+              userId: this.getUser().unguess_wp_user_id,
+            }))
+          ) {
+            await updateTrend({
+              campaignId: campaign.id,
+              userId: this.getUser().unguess_wp_user_id,
+              unique,
+            });
+          }
+          return this.setSuccess(200, {
+            data: { unique, total, trend },
+            kind: "campaignUniqueBugs",
+          });
+      }
+    } catch (e: any) {
+      return this.setError(400, e as OpenapiError);
     }
 
-    throw {
-      ...error,
+    return this.setError(400, {
       code: 401,
       message: "The requested widget is not available or you don't have access",
-    };
-  } catch (e: any) {
-    res.status_code = e.code || 500;
-    error.code = typeof e.code === "number" ? e.code : 500;
-    error.message = e.message || ERROR_MESSAGE;
-
-    throw error;
+    } as OpenapiError);
   }
-};
+}

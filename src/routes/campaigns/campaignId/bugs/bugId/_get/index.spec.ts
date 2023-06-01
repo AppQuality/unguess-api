@@ -568,7 +568,6 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer user");
-    console.log(response.body);
     expect(response.status).toBe(200);
     expect(response.body.reporter).toEqual({
       tester_id: profile_1.id,

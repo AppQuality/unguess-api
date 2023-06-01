@@ -159,31 +159,30 @@ describe("GET /projects/{pid}/campaigns", () => {
 
   it("Should answer 200 if logged in", async () => {
     const response = await request(app)
-      .get(`/workspaces/${customer_1.id}/projects/${project_1.id}/campaigns`)
+      .get(`/projects/${project_1.id}/campaigns`)
       .set("authorization", "Bearer user");
     expect(response.status).toBe(200);
   });
 
   it("Should answer 403 if not logged in", async () => {
     const response = await request(app).get(
-      `/workspaces/${customer_1.id}/projects/${project_1.id}/campaigns`
+      `/projects/${project_1.id}/campaigns`
     );
     expect(response.status).toBe(403);
   });
 
   it("Should answer 400 if pid is a string", async () => {
     const response = await request(app)
-      .get(`/workspaces/${customer_1.id}/projects/asd/campaigns`)
+      .get(`/projects/asd/campaigns`)
       .set("authorization", "Bearer user");
     expect(response.status).toBe(400);
   });
 
   it("Should return 403 if project is not found", async () => {
     const response = await request(app)
-      .get(`/workspaces/${customer_1.id}/projects/999/campaigns`)
+      .get(`/projects/999/campaigns`)
       .set("authorization", "Bearer user");
-    expect(response.body.code).toBe(403);
-    expect(response.body.message).toBe(ERROR_MESSAGE);
+    expect(response.status).toBe(403);
   });
 
   it("Should return a list of campaigns if project is present", async () => {

@@ -1,7 +1,9 @@
 import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { ERROR_MESSAGE } from "@src/utils/constants";
+import * as db from "@src/features/db";
+
+const ERROR_MESSAGE = "Project not found or not accessible";
 
 const customer_1 = {
   id: 1,
@@ -93,8 +95,7 @@ describe("GET /projects/{pid}", () => {
     const response = await request(app)
       .get(`/projects/999999`)
       .set("authorization", "Bearer user");
-    expect(response.body.code).toBe(403);
-    expect(response.body.message).toBe(ERROR_MESSAGE);
+    expect(response.status).toBe(403);
   });
 
   it("Should answer 400 of the requested parameter is wrong", async () => {
@@ -140,11 +141,20 @@ describe("GET /projects/{pid}", () => {
   });
 
   //Should answer with an error if the project is limited to a customer
-  it("Should answer with an error if the project exist but is limited to other users of the same company", async () => {
+  it("Should answer with a project object if the user has only a project level access", async () => {
+    await db.query(
+      `INSERT INTO wp_appq_user_to_project (wp_user_id, project_id) VALUES (1, ${project_3.id})`
+    );
+
     const response = await request(app)
-      .get(`/projects/${project_2.id}`)
+      .get(`/projects/${project_3.id}`)
       .set("authorization", "Bearer user");
-    expect(response.body.code).toBe(403);
-    expect(response.body.message).toBe(ERROR_MESSAGE);
+    expect(response.status).toBe(200);
+    expect(response.body).toMatchObject({
+      id: project_3.id,
+      name: "Projettino tre",
+      campaigns_count: 0,
+      workspaceId: -1,
+    });
   });
 });

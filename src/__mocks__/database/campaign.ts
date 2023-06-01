@@ -80,8 +80,6 @@ export { data };
 // Backward compatibility
 const data = {
   basicCampaign: async (params: CampaignsParams) => {
-    return await campaigns.insert({
-      ...params,
-    });
+    return await campaigns.insert(params);
   },
 };

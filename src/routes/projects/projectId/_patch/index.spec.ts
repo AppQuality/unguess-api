@@ -28,6 +28,12 @@ const project_2 = {
   customer_id: 12,
 };
 
+const project_3 = {
+  id: 3,
+  display_name: "A not so awesome project",
+  customer_id: 20,
+};
+
 const user_to_project_1 = {
   wp_user_id: 1,
   project_id: 32,
@@ -81,6 +87,7 @@ describe("PATCH /projects/{pid}", () => {
         // Restore initial data for projects
         await projectData.basicProject(project_1);
         await projectData.basicProject(project_2);
+        await projectData.basicProject(project_3);
 
         resolve(true);
       } catch (error) {
@@ -112,16 +119,14 @@ describe("PATCH /projects/{pid}", () => {
       .set("authorization", "Bearer user")
       .send({ display_name: "New name" });
     expect(response.status).toBe(403);
-    expect(response.body.message).toBe(ERROR_MESSAGE);
   });
 
   it("Should answer 403 if user is not part of the project", async () => {
     const response = await request(app)
-      .patch(`/projects/${project_2.id}`)
+      .patch(`/projects/${project_3.id}`)
       .set("authorization", "Bearer user")
       .send({ display_name: "New name" });
     expect(response.status).toBe(403);
-    expect(response.body.message).toBe(ERROR_MESSAGE);
   });
 
   it("Should answer 400 if the body object doesn't contains required fields", async () => {
@@ -162,13 +167,12 @@ describe("PATCH /projects/{pid}", () => {
     });
   });
 
-  //Should answer with an error if the project is limited to a customer
-  it("Should answer 403 with an error if the project exist but is limited to other users of the same company", async () => {
+  //Should answer 200 if the user has no permission to the project but is related to the same workspace
+  it("Should answer 200 if the user has no permission to the project but is related to the same workspace", async () => {
     const response = await request(app)
       .patch(`/projects/${project_2.id}`)
       .set("authorization", "Bearer user")
       .send({ display_name: "New name" });
-    expect(response.body.code).toBe(403);
-    expect(response.body.message).toBe(ERROR_MESSAGE);
+    expect(response.status).toBe(200);
   });
 });

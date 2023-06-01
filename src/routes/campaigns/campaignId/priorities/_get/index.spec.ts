@@ -74,6 +74,11 @@ const campaign_2 = {
   project_id: 2,
 };
 
+const user_to_project_1 = {
+  wp_user_id: 1,
+  project_id: 1,
+};
+
 describe("GET /campaigns/{cid}/priorities", () => {
   beforeAll(async () => {
     await dbAdapter.add({
@@ -82,6 +87,7 @@ describe("GET /campaigns/{cid}/priorities", () => {
       companies: [customer_1, customer_2],
       projects: [project_1, project_2],
       userToCustomers: [user_to_customer_1, user_to_customer_2],
+      userToProjects: [user_to_project_1],
     });
 
     await priorities.addDefaultItems();
@@ -130,7 +136,9 @@ describe("GET /campaigns/{cid}/priorities", () => {
 
     const { body } = response;
 
-    expect(body).toEqual(priorities.getDefaultItems().sort((t1, t2) => t2.id - t1.id));
+    expect(body).toEqual(
+      priorities.getDefaultItems().sort((t1, t2) => t2.id - t1.id)
+    );
   });
 
   it("Should not return the list of priorities for a campaign where the user is not an owner", async () => {

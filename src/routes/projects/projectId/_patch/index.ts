@@ -1,37 +1,43 @@
-/** OPENAPI-ROUTE: patch-projects-pid */
-import { Context } from "openapi-backend";
+/** OPENAPI-CLASS: patch-projects-pid */
 import * as db from "@src/features/db";
 import { getProjectById } from "@src/utils/projects";
-import { ERROR_MESSAGE } from "@src/utils/constants";
+import ProjectRoute from "@src/features/routes/ProjectRoute";
 
 const patchableFields = ["display_name"]; // Only allow these fields to be patched (for now)
 
-export default async (
-  c: Context,
-  req: OpenapiRequest,
-  res: OpenapiResponse
-) => {
-  let user = req.user;
-  let error = {
-    message: ERROR_MESSAGE,
-    error: true,
-  } as StoplightComponents["schemas"]["Error"];
+interface iBody {
+  [key: string]: string;
+}
 
-  res.status_code = 200;
+export default class Route extends ProjectRoute<{
+  response: StoplightOperations["patch-projects-pid"]["responses"]["200"]["content"]["application/json"];
+  parameters: StoplightOperations["patch-projects-pid"]["parameters"]["path"];
+  body: StoplightOperations["patch-projects-pid"]["requestBody"]["content"]["application/json"];
+}> {
+  private requestBody: iBody = {};
 
-  let pid = parseInt(c.request.params.pid as string);
+  constructor(configuration: RouteClassConfiguration) {
+    super(configuration);
 
-  try {
-    const validData = Object.keys(req.body)
+    this.setBody();
+  }
+
+  private setBody() {
+    this.requestBody = this.getBody();
+  }
+
+  protected async prepare(): Promise<void> {
+    // Check if the body contains allowed patchableFields
+    const validData = Object.keys(this.requestBody)
       .filter((key) => patchableFields.includes(key))
-      .reduce((obj: { [key: string]: string }, key) => {
-        obj[key] = req.body[key];
+      .reduce((obj: iBody, key) => {
+        obj[key] = this.requestBody[key];
         return obj;
       }, {});
 
     const project = await getProjectById({
-      user: user,
-      projectId: pid,
+      user: this.getUser(),
+      projectId: this.getProjectId(),
     });
 
     const changes = Object.keys(validData).map((key) =>
@@ -45,19 +51,9 @@ export default async (
 
     await db.query(updateQuery);
 
-    return {
+    return this.setSuccess(200, {
       ...project,
       name: validData.display_name,
-    };
-  } catch (e: any) {
-    if (e.code) {
-      error.code = e.code;
-      res.status_code = e.code;
-    } else {
-      error.code = 500;
-      res.status_code = 500;
-    }
-
-    return error;
+    });
   }
-};
+}

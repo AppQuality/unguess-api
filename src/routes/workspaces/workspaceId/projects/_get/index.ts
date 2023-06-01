@@ -34,10 +34,16 @@ export default async (
 
   try {
     // Get workspace
-    await getWorkspace({
+    const ws = await getWorkspace({
       workspaceId: wid,
       user: user,
     });
+
+    if (!ws) {
+      error.code = 403;
+      res.status_code = 403;
+      return error;
+    }
 
     // Get workspace projects
     let projects: Array<{

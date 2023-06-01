@@ -102,6 +102,11 @@ const campaign_4 = {
   project_id: 1,
 };
 
+const user_to_project_1 = {
+  wp_user_id: 1,
+  project_id: 1,
+};
+
 describe("GET /campaigns/{cid}/severities", () => {
   beforeAll(async () => {
     await dbAdapter.add({
@@ -110,6 +115,7 @@ describe("GET /campaigns/{cid}/severities", () => {
       companies: [customer_1, customer_2],
       projects: [project_1, project_2],
       userToCustomers: [user_to_customer_1, user_to_customer_2],
+      userToProjects: [user_to_project_1],
     });
     await severities.addDefaultItems();
     await bugStatus.addDefaultItems();
