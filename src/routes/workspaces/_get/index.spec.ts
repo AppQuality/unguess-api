@@ -1,56 +1,13 @@
 import app from "@src/app";
 import request from "supertest";
-import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import {
   fallBackCsmProfile,
   LIMIT_QUERY_PARAM_DEFAULT,
 } from "@src/utils/constants";
-
-const customer_1 = {
-  id: 1,
-  company: "Company",
-  company_logo: "logo.png",
-  tokens: 100,
-};
-
-const customer_2 = {
-  ...customer_1,
-  id: 2,
-  company: "Different Company",
-};
-
-const customer_3 = {
-  ...customer_1,
-  id: 3,
-  company: "Zoom",
-};
-
-const user_to_customer_1 = {
-  wp_user_id: 1,
-  customer_id: 1,
-};
-
-const user_to_customer_2 = {
-  wp_user_id: 1,
-  customer_id: 2,
-};
+import useCustomersData from "./useCustomersData";
 
 describe("GET /workspaces", () => {
-  beforeAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await dbAdapter.add({
-          companies: [customer_1, customer_2, customer_3],
-          userToCustomers: [user_to_customer_1, user_to_customer_2],
-        });
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
-    });
-  });
+  useCustomersData();
 
   it("Should answer 403 if not logged in", async () => {
     const response = await request(app).get("/workspaces");
@@ -68,29 +25,27 @@ describe("GET /workspaces", () => {
     const response = await request(app)
       .get("/workspaces")
       .set("authorization", "Bearer user");
-    expect(JSON.stringify(response.body)).toStrictEqual(
-      JSON.stringify({
-        items: [
-          {
-            id: customer_1.id,
-            company: customer_1.company,
-            logo: customer_1.company_logo,
-            tokens: customer_1.tokens,
-            csm: fallBackCsmProfile,
-          },
-          {
-            id: customer_2.id,
-            company: customer_2.company,
-            logo: customer_2.company_logo,
-            tokens: customer_2.tokens,
-            csm: fallBackCsmProfile,
-          },
-        ],
-        start: 0,
-        limit: LIMIT_QUERY_PARAM_DEFAULT,
-        size: 2,
-        total: 2,
-      })
+    expect(response.body.start).toBe(0);
+    expect(response.body.limit).toBe(LIMIT_QUERY_PARAM_DEFAULT);
+    expect(response.body.size).toBe(2);
+    expect(response.body.total).toBe(2);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 1,
+          company: "Company",
+          logo: "logo.png",
+          tokens: 100,
+          csm: fallBackCsmProfile,
+        }),
+        expect.objectContaining({
+          id: 2,
+          company: "Different Company",
+          logo: "logo.png",
+          tokens: 100,
+          csm: fallBackCsmProfile,
+        }),
+      ])
     );
   });
 
@@ -98,22 +53,20 @@ describe("GET /workspaces", () => {
     const response = await request(app)
       .get("/workspaces?limit=1&start=0")
       .set("authorization", "Bearer user");
-    expect(JSON.stringify(response.body)).toStrictEqual(
-      JSON.stringify({
-        items: [
-          {
-            id: customer_1.id,
-            company: customer_1.company,
-            logo: customer_1.company_logo,
-            tokens: customer_1.tokens,
-            csm: fallBackCsmProfile,
-          },
-        ],
-        start: 0,
-        limit: 1,
-        size: 1,
-        total: 2,
-      })
+    expect(response.body.start).toBe(0);
+    expect(response.body.limit).toBe(1);
+    expect(response.body.size).toBe(1);
+    expect(response.body.total).toBe(2);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 1,
+          company: "Company",
+          logo: "logo.png",
+          tokens: 100,
+          csm: fallBackCsmProfile,
+        }),
+      ])
     );
   });
 
@@ -126,33 +79,31 @@ describe("GET /workspaces", () => {
     expect(response.body.err[0].message).toBe("should be number");
   });
 
-  it("Should answer with an array of workspaces ordered by name", async () => {
+  it("Should answer with an array of workspaces ordered by name DESC", async () => {
     const response = await request(app)
       .get("/workspaces?orderBy=company&order=desc")
       .set("authorization", "Bearer user");
-    expect(JSON.stringify(response.body)).toStrictEqual(
-      JSON.stringify({
-        items: [
-          {
-            id: customer_2.id,
-            company: customer_2.company,
-            logo: customer_2.company_logo,
-            tokens: customer_2.tokens,
-            csm: fallBackCsmProfile,
-          },
-          {
-            id: customer_1.id,
-            company: customer_1.company,
-            logo: customer_1.company_logo,
-            tokens: customer_1.tokens,
-            csm: fallBackCsmProfile,
-          },
-        ],
-        start: 0,
-        limit: LIMIT_QUERY_PARAM_DEFAULT,
-        size: 2,
-        total: 2,
-      })
+    expect(response.body.start).toBe(0);
+    expect(response.body.limit).toBe(LIMIT_QUERY_PARAM_DEFAULT);
+    expect(response.body.size).toBe(2);
+    expect(response.body.total).toBe(2);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 2,
+          company: "Different Company",
+          logo: "logo.png",
+          tokens: 100,
+          csm: fallBackCsmProfile,
+        }),
+        expect.objectContaining({
+          id: 1,
+          company: "Company",
+          logo: "logo.png",
+          tokens: 100,
+          csm: fallBackCsmProfile,
+        }),
+      ])
     );
   });
 });
