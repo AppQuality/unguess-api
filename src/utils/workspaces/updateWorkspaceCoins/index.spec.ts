@@ -105,7 +105,7 @@ describe("updateWorkspaceCoins", () => {
   });
 
   afterEach(async () => {
-    dbAdapter.clear();
+    await dbAdapter.clear();
   });
 
   // Should return the updated packages and the updated total coins amount
