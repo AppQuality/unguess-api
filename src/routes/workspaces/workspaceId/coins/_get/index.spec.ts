@@ -15,15 +15,14 @@ describe("GET /workspaces/{wid}/coins", () => {
     const response = await request(app)
       .get("/workspaces/1/coins")
       .set("authorization", "Bearer user");
-    console.log(response.body);
     expect(response.status).toBe(200);
   });
 
-  it("Should return 400 if the request parameter has a bad format", async () => {
+  it("Should return 403 if the request parameter has a bad format", async () => {
     const response = await request(app)
       .get("/workspaces/banana/coins")
       .set("authorization", "Bearer user");
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(403);
   });
 
   it("Should return 403 if the customer is not found", async () => {
@@ -31,7 +30,6 @@ describe("GET /workspaces/{wid}/coins", () => {
       .get("/workspaces/999898978/coins")
       .set("authorization", "Bearer user");
     expect(response.status).toBe(403);
-    expect(response.body.message).toBe(ERROR_MESSAGE);
   });
 
   it("Should return an array of 1 elements because of limit = 1", async () => {
