@@ -1,5 +1,4 @@
-import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { unguess, tryber } from "@src/features/database";
+import { tryber, unguess } from "@src/features/database";
 
 expect.extend({
   toBeNow(received: number, precision: number = 0) {

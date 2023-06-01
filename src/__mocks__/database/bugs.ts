@@ -46,12 +46,16 @@ const defaultItem: BugsParams = {
   wp_user_id: 1,
   status_reason: "???",
   application_section: "???",
+  created: "2023-02-09T15:46:34.000+01:00",
+  last_seen: "2023-02-09T15:46:34.000+01:00",
   note: "???",
   manufacturer: "???",
   model: "???",
   os: "???",
   os_version: "???",
   last_seen: "2023-02-09T15:46:34.000+01:00",
+  reviewer: 1,
+  last_editor_id: 1,
 };
 class Bugs extends Table<BugsParams> {
   protected name = "wp_appq_evd_bug";

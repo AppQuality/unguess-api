@@ -12,6 +12,7 @@ const defaultItem: CustomerParams = {
   company: "Company",
   company_logo: "logo.png",
   tokens: 100,
+  pm_id: 32
 };
 
 class Customers extends Table<CustomerParams> {
@@ -30,15 +31,11 @@ class Customers extends Table<CustomerParams> {
 const customers = new Customers();
 export default customers;
 export type { CustomerParams };
+export { data };
 
 // Backward compatibility
 const data = {
   basicItem: async (params: CustomerParams) => {
-    return await customers.insert({
-      pm_id: 32,
-      ...params,
-    });
+    return await customers.insert(params);
   },
 };
-
-export { data };
