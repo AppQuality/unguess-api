@@ -53,7 +53,6 @@ const defaultItem: BugsParams = {
   model: "???",
   os: "???",
   os_version: "???",
-  last_seen: "2023-02-09T15:46:34.000+01:00",
   reviewer: 1,
   last_editor_id: 1,
 };
