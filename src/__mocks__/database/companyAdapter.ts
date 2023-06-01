@@ -293,20 +293,35 @@ export const adapter = {
       });
     }
 
-    await UserToCustomer.insert({
-      wp_user_id: wp_user_id,
-      customer_id: customer_id,
-    });
+    const isUserInCustomer = await UserToCustomer.all(undefined, [
+      { wp_user_id, customer_id },
+    ]);
+    if (isUserInCustomer.length === 0) {
+      await UserToCustomer.insert({
+        wp_user_id: wp_user_id,
+        customer_id: customer_id,
+      });
+    }
 
-    await UserToCampaign.insert({
-      wp_user_id: wp_user_id,
-      campaign_id: customer_id,
-    });
+    const isUserInCampaign = await UserToCampaign.all(undefined, [
+      { wp_user_id, campaign_id },
+    ]);
+    if (isUserInCampaign.length === 0) {
+      await UserToCampaign.insert({
+        wp_user_id: wp_user_id,
+        campaign_id: customer_id,
+      });
+    }
 
-    await UserToProjects.insert({
-      wp_user_id: wp_user_id,
-      project_id: project_id,
-    });
+    const isUserInProject = await UserToProjects.all(undefined, [
+      { wp_user_id, project_id },
+    ]);
+    if (isUserInProject.length === 0) {
+      await UserToProjects.insert({
+        wp_user_id: wp_user_id,
+        project_id: project_id,
+      });
+    }
   },
 
   add: async ({
