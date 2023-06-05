@@ -32,6 +32,7 @@ const project_2 = {
 const project_3 = {
   id: 12,
   display_name: "Projettino tre",
+  customer_id: -1,
 };
 
 const user_to_project_1 = {

@@ -395,7 +395,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
 
     it("Should answer 200 and returns the usecase completion of 87.5", async () => {
       await userTask.insert(uT1);
-      await userTask.insert({ ...uT1, id: 2 });
+      await userTask.insert({ ...uT1, id: 2, task_id: useCase2.id });
 
       const response = await request(app)
         .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-usecase`)

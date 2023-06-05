@@ -19,15 +19,15 @@ async function updateTrend({
     ),
     "unguess"
   );
-  const now = new Date().getTime();
+
   if (trend.length > 0) {
     await db.query(
       db.format(
         `UPDATE wp_appq_unique_bug_read 
-                    SET bugs_read = ? , update_time = FROM_UNIXTIME(? * 0.001)
+                    SET bugs_read = ? , update_time = CURRENT_TIMESTAMP
                     WHERE campaign_id = ? AND wp_user_id = ?
                   `,
-        [unique, now, campaignId, userId]
+        [unique, campaignId, userId]
       ),
       "unguess"
     );
@@ -36,9 +36,9 @@ async function updateTrend({
       db.format(
         `INSERT INTO wp_appq_unique_bug_read 
                     (bugs_read, update_time, campaign_id, wp_user_id) 
-                    VALUES (?, FROM_UNIXTIME(? * 0.001), ?, ?)
+                    VALUES (?,CURRENT_TIMESTAMP, ?, ?)
                   `,
-        [unique, now, campaignId, userId]
+        [unique, campaignId, userId]
       ),
       "unguess"
     );

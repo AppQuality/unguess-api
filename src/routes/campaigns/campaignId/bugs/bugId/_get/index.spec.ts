@@ -209,6 +209,7 @@ const tag_1 = {
   bug_id: bug_1.id,
   display_name: "Tag visibile",
   is_public: 1,
+  tag_id: 1,
 };
 
 const tag_2 = {
@@ -216,6 +217,7 @@ const tag_2 = {
   bug_id: bug_1.id,
   display_name: "Tag privato",
   is_public: 0,
+  tag_id: 2,
 };
 
 const field_1 = {
