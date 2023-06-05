@@ -7,7 +7,7 @@ export default class WorkspaceRoute<
     parameters: T["parameters"] & { wid: string };
   }
 > extends UserRoute<T> {
-  protected workspace_id: number;
+  protected workspace_id: number | undefined;
   protected workspace: StoplightComponents["schemas"]["Workspace"] | undefined;
 
   constructor(configuration: RouteClassConfiguration) {
@@ -15,15 +15,16 @@ export default class WorkspaceRoute<
 
     const { wid } = this.getParameters() as T["parameters"] & { wid: string };
 
-    if (!wid) throw new Error("Missing workspace id");
-
-    this.workspace_id = Number.parseInt(wid);
+    // if (!wid) throw new Error("Missing workspace id");
+    if (wid) {
+      this.workspace_id = Number.parseInt(wid);
+    }
   }
 
   protected async init(): Promise<void> {
     await super.init();
 
-    if (isNaN(this.workspace_id)) {
+    if (!this.workspace_id || isNaN(this.workspace_id)) {
       this.setError(400, {
         code: 400,
         message: "Invalid workspace id",
@@ -93,11 +94,11 @@ export default class WorkspaceRoute<
             })
             .first();
 
-          if (!userToCustomer)
-            return this.setError(403, {
-              code: 403,
-              message: "workspace issue",
-            } as OpenapiError);
+          if (!userToCustomer) return false;
+          // return this.setError(403, {
+          //   code: 403,
+          //   message: "workspace issue",
+          // } as OpenapiError);
         }
 
         //Add CSM info

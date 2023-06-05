@@ -1,12 +1,13 @@
 // import { tryber, unguess } from "../database";
 import UserRoute from "./UserRoute";
 import * as db from "@src/features/db";
+import WorkspaceRoute from "./WorkspaceRoute";
 
 export default class ProjectRoute<
   T extends RouteClassTypes & {
     parameters: T["parameters"] & { pid: string };
   }
-> extends UserRoute<T> {
+> extends WorkspaceRoute<T> {
   protected project_id: number;
   protected project: StoplightComponents["schemas"]["Project"] | undefined;
 
@@ -21,8 +22,6 @@ export default class ProjectRoute<
   }
 
   protected async init(): Promise<void> {
-    await super.init();
-
     if (isNaN(this.project_id)) {
       this.setError(400, {
         code: 400,
@@ -42,11 +41,27 @@ export default class ProjectRoute<
 
       throw new Error("Project not found or not accessible");
     }
+
+    this.workspace_id = this.project.workspaceId;
+    await super.init();
   }
 
   protected async filter(): Promise<boolean> {
-    if (!(await super.filter())) return false;
-    return true;
+    const user = this.getUser();
+    if (user.role === "administrator") return true;
+
+    if (!(await super.filter())) {
+      console.log(
+        "filtering in project route, the user does NOT have access to the workspace"
+      );
+
+      return !!(await this.hasAccessToProject());
+    } else {
+      console.log(
+        "filtering in project route, the user has access to the workspace"
+      );
+      return true;
+    }
   }
 
   private async hasAccessToWorkspace(wid: number): Promise<boolean> {
@@ -110,17 +125,7 @@ export default class ProjectRoute<
         name: string;
       };
 
-      if (user.role !== "administrator") {
-        if (
-          !(await this.hasAccessToWorkspace(project.wid)) &&
-          !(await this.hasAccessToProject())
-        ) {
-          return this.setError(403, {
-            code: 403,
-            message: "Project not found or not accessible",
-          } as OpenapiError);
-        }
-      }
+      this.workspace_id = project.wid;
 
       this.project = {
         id: project.id,
