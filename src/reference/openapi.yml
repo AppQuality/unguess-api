@@ -1133,8 +1133,6 @@ paths:
               properties:
                 user_id:
                   type: number
-                  x-stoplight:
-                    id: e58obm46133e2
                   description: Tryber WP USER ID
               required:
                 - user_id
@@ -1762,8 +1760,6 @@ paths:
               properties:
                 user_id:
                   type: number
-                  x-stoplight:
-                    id: e58obm46133e2
                   description: Tryber WP USER ID
               required:
                 - user_id
@@ -3023,30 +3019,18 @@ components:
         - kind
     Invitation:
       title: Invitation
-      x-stoplight:
-        id: 4ehhrws24g0z3
       type: object
       properties:
         id:
           type: number
-          x-stoplight:
-            id: ll5rvikgapbyq
         profile_id:
           type: number
-          x-stoplight:
-            id: 1ezch2qqvvr7g
         name:
           type: string
-          x-stoplight:
-            id: wqov5l3a9lxtg
         email:
           type: string
-          x-stoplight:
-            id: lo59k194be9y3
         invitationPending:
           type: boolean
-          x-stoplight:
-            id: xrezofmqmglsl
   securitySchemes:
     JWT:
       type: http
