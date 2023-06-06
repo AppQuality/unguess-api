@@ -1,6 +1,5 @@
 import app from "@src/app";
 import request from "supertest";
-import { useBasicWorkspaces } from "@src/features/db/hooks/basicWorkspaces";
 import { tryber } from "@src/features/database";
 import { useBasicProjectsContext } from "@src/features/db/hooks/basicProjects";
 
@@ -126,7 +125,7 @@ describe("GET /projects/{pid}/users", () => {
     expect(response.status).toBe(403);
   });
 
-  it("Should return 403 if the customer is not allowed to view workspace users", async () => {
+  it("Should return 403 if the customer is not allowed to view project users", async () => {
     const response = await request(app)
       .get(`/projects/${context.prj2.id}/users`)
       .set("authorization", "Bearer user");
