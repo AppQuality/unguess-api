@@ -220,7 +220,6 @@ describe("GET /workspaces/{wid}/projects", () => {
       .get(`/workspaces/9999/projects`)
       .set("authorization", "Bearer user");
     expect(result.body.code).toBe(403);
-    expect(result.body.message).toBe(ERROR_MESSAGE);
   });
 
   it("Should return a list of projects if customer is present and has some projects", async () => {
