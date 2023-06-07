@@ -802,13 +802,19 @@ export interface components {
        */
       kind: "campaignUniqueBugs";
     };
-    /** Invitation */
+    /** Tenant */
     Invitation: {
-      id?: number;
-      profile_id?: number;
-      name?: string;
-      email?: string;
-      invitationPending?: boolean;
+      /** @description tryber wp_user_id */
+      id: number;
+      profile_id: number;
+      name: string;
+      email: string;
+      invitationPending: boolean;
+      permissionFrom?: {
+        /** @enum {string} */
+        type?: "workspace" | "project";
+        id?: number;
+      };
     };
   };
   responses: {
