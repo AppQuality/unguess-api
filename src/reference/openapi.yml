@@ -3175,11 +3175,12 @@ components:
         - data
         - kind
     Invitation:
-      title: Invitation
+      title: Tenant
       type: object
       properties:
         id:
           type: number
+          description: tryber wp_user_id
         profile_id:
           type: number
         name:
@@ -3188,6 +3189,28 @@ components:
           type: string
         invitationPending:
           type: boolean
+        permissionFrom:
+          type: object
+          x-stoplight:
+            id: 9sdcsulmoj4x2
+          properties:
+            type:
+              type: string
+              x-stoplight:
+                id: bs14g9tm2aq8h
+              enum:
+                - workspace
+                - project
+            id:
+              type: integer
+              x-stoplight:
+                id: 4xagwt3ei9hmw
+      required:
+        - id
+        - profile_id
+        - name
+        - email
+        - invitationPending
   securitySchemes:
     JWT:
       type: http
