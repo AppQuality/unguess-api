@@ -67,11 +67,11 @@ export default class GetWorkspaceCoinsRoute extends UserRoute<{
       const coins = await this.getWorkspaceCoins();
 
       const countQuery = await unguess.tables.WpUgCoins.do()
-        .count("* as count")
+        .count({ count: "id" })
         .where("customer_id", wid)
         .first();
 
-      const total = countQuery.count ? countQuery.count : 0;
+      const total = countQuery?.count ? countQuery.count : 0;
 
       let paginatedCoins = {};
 
