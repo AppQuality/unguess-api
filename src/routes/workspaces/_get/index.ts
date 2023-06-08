@@ -76,6 +76,8 @@ export default class WorkspacesRoute extends UserRoute<{
         tryber.ref("wp_appq_customer.id"),
         tryber.ref("wp_appq_customer.company"),
         tryber.ref("wp_appq_customer.tokens"),
+        tryber.ref("wp_appq_customer.pm_id"),
+        tryber.ref("wp_appq_customer.company_logo"),
         tryber.ref("wp_appq_evd_profile.name").as("csmName"),
         tryber.ref("wp_appq_evd_profile.surname").as("csmSurname"),
         tryber.ref("wp_appq_evd_profile.email").as("csmEmail"),
