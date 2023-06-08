@@ -26,8 +26,6 @@ export default class WorkspacesRoute extends UserRoute<{
     const parameters =
       this.getQuery() as StoplightOperations["get-workspaces"]["parameters"]["query"];
 
-    console.log(parameters);
-
     this.limit = Number(parameters.limit) || LIMIT_QUERY_PARAM_DEFAULT;
     this.start = Number(parameters.start) || START_QUERY_PARAM_DEFAULT;
 
@@ -75,7 +73,9 @@ export default class WorkspacesRoute extends UserRoute<{
   protected async getUserWorkspaces() {
     let query = tryber.tables.WpAppqCustomer.do()
       .select(
-        "wp_appq_customer.*",
+        tryber.ref("wp_appq_customer.id"),
+        tryber.ref("wp_appq_customer.company"),
+        tryber.ref("wp_appq_customer.tokens"),
         tryber.ref("wp_appq_evd_profile.name").as("csmName"),
         tryber.ref("wp_appq_evd_profile.surname").as("csmSurname"),
         tryber.ref("wp_appq_evd_profile.email").as("csmEmail"),
@@ -143,9 +143,7 @@ export default class WorkspacesRoute extends UserRoute<{
       )
         return { workspaces: [], total: 0 };
 
-      console.log(query.toString());
       const result = await query;
-      console.log(result);
 
       const countResult = await countQuery;
 
@@ -201,8 +199,6 @@ export default class WorkspacesRoute extends UserRoute<{
 
     if (csm.id in csmProfiles) return csmProfiles[csm.id];
 
-    let profilePic = await getGravatar(csm.email);
-    if (profilePic) csm.picture = profilePic;
     csmProfiles[csm.id] = csm;
 
     return csm;
