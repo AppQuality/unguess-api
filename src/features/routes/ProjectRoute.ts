@@ -50,7 +50,18 @@ export default class ProjectRoute<
   protected async filter(): Promise<boolean> {
     if (!(await super.filter())) {
       // The user does not have access to the workspace
-      return !!(await this.checkPrjAccess());
+      const access = await this.checkPrjAccess();
+
+      if (!access) {
+        this.setError(403, {
+          code: 403,
+          message: "Project not found or not accessible",
+        } as OpenapiError);
+
+        return false;
+      }
+
+      return true;
     }
 
     // The user has access to the workspace

@@ -63,7 +63,18 @@ export default class WorkspaceRoute<
   protected async filter(): Promise<boolean> {
     if (!(await super.filter())) return false;
 
-    return await this.checkWSAccess();
+    const access = await this.checkWSAccess();
+
+    if (!access) {
+      this.setError(403, {
+        code: 403,
+        message: "Workspace not found",
+      } as OpenapiError);
+
+      return false;
+    }
+
+    return true;
   }
 
   private async initWorkspace() {

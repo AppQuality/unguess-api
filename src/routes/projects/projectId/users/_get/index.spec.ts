@@ -118,14 +118,14 @@ describe("GET /projects/{pid}/users", () => {
     expect(response.status).toBe(400);
   });
 
-  it("Should return 403 if the customer is not found", async () => {
+  it("Should return 403 if the user is not found", async () => {
     const response = await request(app)
       .get("/projects/999898978/users")
       .set("authorization", "Bearer user");
     expect(response.status).toBe(403);
   });
 
-  it("Should return 403 if the customer is not allowed to view project users", async () => {
+  it("Should return 403 if the user is not allowed to view project users", async () => {
     const response = await request(app)
       .get(`/projects/${context.prj2.id}/users`)
       .set("authorization", "Bearer user");

@@ -1,6 +1,7 @@
 import * as db from "@src/features/db";
 import { getTitleRule } from "@src/utils/campaigns/getTitleRule";
 import ProjectRoute from "./ProjectRoute";
+import { tryber } from "../database";
 
 type CampaignRouteParameters = { cid: string };
 
@@ -75,7 +76,18 @@ export default class CampaignRoute<
   protected async filter(): Promise<boolean> {
     if (!(await super.filter())) {
       // The user does NOT have access to the workspace or project
-      return !!(await this.checkCpAccess());
+      const access = await this.checkCpAccess();
+
+      if (!access) {
+        this.setError(403, {
+          code: 403,
+          message: "Campaign not found or not accessible",
+        } as OpenapiError);
+
+        return false;
+      }
+
+      return true;
     }
 
     // The user HAS access to the workspace or project
@@ -83,27 +95,23 @@ export default class CampaignRoute<
   }
 
   private async checkCpAccess(): Promise<boolean> {
-    try {
-      const result = await db.query(
-        db.format(
-          `
-            SELECT wp_user_id
-            FROM wp_appq_user_to_campaign
-            WHERE campaign_id = ?
-            AND wp_user_id = ?
-          `,
-          [this.cp_id, this.getUserId()]
-        )
-      );
+    const hasAccess = await tryber.tables.WpAppqUserToCampaign.do()
+      .select()
+      .where({
+        campaign_id: this.cp_id,
+        wp_user_id: this.getUser().tryber_wp_user_id,
+      })
+      .first();
 
-      if (result.length > 0) {
-        return true;
-      }
-
-      return false;
-    } catch (_error) {
+    if (!hasAccess) {
+      this.setError(403, {
+        code: 400,
+        message: "You don't have access to this campaign",
+      } as OpenapiError);
       return false;
     }
+
+    return true;
   }
 
   protected getCampaignId() {
