@@ -21,14 +21,13 @@ export default class Route extends ProjectRoute<{
   parameters: StoplightOperations["post-projects-pid-users"]["parameters"]["path"];
   body: StoplightOperations["post-projects-pid-users"]["requestBody"]["content"]["application/json"];
 }> {
-  protected async filter(): Promise<boolean> {
-    if (!super.filter()) return false;
+  constructor(configuration: RouteClassConfiguration) {
+    super(configuration);
 
     if (!this.isValidUser()) {
       this.setError(400, {} as OpenapiError);
-      return false;
+      throw new Error("Invalid user");
     }
-    return true;
   }
 
   protected async prepare() {
