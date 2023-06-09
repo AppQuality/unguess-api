@@ -37,6 +37,9 @@ export default class Route extends UserRoute<{
         workspaceId: this._validatedBody.customer_id,
         user: this.getUser(),
       });
+
+      if (!workspace) throw new Error("Invalid workspace");
+
       this._workspaceId = workspace.id;
       this.availableCoins = workspace.coins || 0;
       this._cost = await getExpressCost({

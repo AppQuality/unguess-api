@@ -32,6 +32,7 @@ const data: {
 
 data.addItem = async (params) => {
   const item = {
+    architecture: 0,
     ...params,
   };
   await db.insert("wp_appq_evd_platform", item);

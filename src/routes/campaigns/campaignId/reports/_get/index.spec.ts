@@ -11,6 +11,13 @@ const customer_1 = {
   tokens: 100,
 };
 
+const customer_10 = {
+  id: 10,
+  company: "Company 10",
+  company_logo: "logo999.png",
+  tokens: 100,
+};
+
 const user_to_customer_1 = {
   wp_user_id: 1,
   customer_id: 999,
@@ -113,7 +120,7 @@ describe("GET /campaigns/{cid}/reports", () => {
     return new Promise(async (resolve, reject) => {
       try {
         await dbAdapter.add({
-          companies: [customer_1],
+          companies: [customer_1, customer_10],
           userToCustomers: [user_to_customer_1],
           projects: [project_1, project_2],
           userToProjects: [user_to_project_1],

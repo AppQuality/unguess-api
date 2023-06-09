@@ -21,7 +21,7 @@ export default class Route extends UserRoute<{
   }
 
   protected async filter(): Promise<boolean> {
-    if (!super.filter()) return false;
+    if (!(await super.filter())) return false;
 
     if (!this.isAdmin()) {
       this.setError(403, {

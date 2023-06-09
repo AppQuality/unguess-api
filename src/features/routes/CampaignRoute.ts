@@ -1,8 +1,7 @@
-import UserRoute from "./UserRoute";
 import * as db from "@src/features/db";
-import { getProjectById } from "@src/utils/projects/getProjectById";
 import { getTitleRule } from "@src/utils/campaigns/getTitleRule";
-import { getCampaign } from "@src/utils/campaigns";
+import ProjectRoute from "./ProjectRoute";
+import { tryber } from "../database";
 
 type CampaignRouteParameters = { cid: string };
 
@@ -12,9 +11,8 @@ export default class CampaignRoute<
   T extends RouteClassTypes & {
     parameters: T["parameters"] & CampaignRouteParameters;
   }
-> extends UserRoute<T> {
+> extends ProjectRoute<T> {
   protected cp_id: number;
-  protected projectId: number | undefined;
   protected showNeedReview: boolean = false;
   protected baseBugInternalId: string = "";
   private NEED_REVIEW_STATUS_ID = 4;
@@ -32,8 +30,6 @@ export default class CampaignRoute<
   }
 
   protected async init(): Promise<void> {
-    await super.init();
-
     if (isNaN(this.cp_id)) {
       this.setError(400, {
         code: 400,
@@ -54,9 +50,11 @@ export default class CampaignRoute<
       throw new Error("Campaign not found");
     }
 
-    this.projectId = campaign.project_id;
+    this.project_id = campaign.project_id;
     this.showNeedReview = campaign.showNeedReview;
     this.baseBugInternalId = campaign.base_bug_internal_id;
+
+    await super.init();
   }
 
   private async initCampaign() {
@@ -76,63 +74,49 @@ export default class CampaignRoute<
   }
 
   protected async filter(): Promise<boolean> {
-    if (!(await super.filter())) return false;
+    if (!(await super.filter())) {
+      // The user does NOT have access to the workspace or project
+      const access = await this.checkCpAccess();
 
-    if (!(await this.evaluateUserPermissions())) {
-      return false
-    };
+      if (!access) {
+        this.setError(403, {
+          code: 403,
+          message: "Campaign not found or not accessible",
+        } as OpenapiError);
 
+        return false;
+      }
+
+      return true;
+    }
+
+    // The user HAS access to the workspace or project
     return true;
   }
 
-  private async evaluateUserPermissions(): Promise<boolean> {
-    /* 
-      * This function returns the final results after reducing various Access Layers.
-      * Order of the access checks matters here: 
-      ** It should be ordered in a descending order.
-      ** AccessToProject is super w.r.t. AccessToCampaign.
-    */
-    return (
-      await Promise.all([
-        await this.hasAccessToProject(),
-        await this.hasAccessToCampaign(),
-      ])
-    ).reduce((prev, curr) => prev && curr, true);
-  };
+  private async checkCpAccess(): Promise<boolean> {
+    const hasAccess = await tryber.tables.WpAppqUserToCampaign.do()
+      .select()
+      .where({
+        campaign_id: this.cp_id,
+        wp_user_id: this.getUser().tryber_wp_user_id,
+      })
+      .first();
 
-  private async hasAccessToCampaign(): Promise<boolean> {
-    try {
-      await getCampaign({ campaignId: this.cp_id });
-    } catch (_error) {
+    if (!hasAccess) {
       this.setError(403, {
         code: 400,
-        message: "Do not have Access to the Campaign",
+        message: "You don't have access to this campaign",
       } as OpenapiError);
       return false;
     }
+
     return true;
   }
 
-  private async hasAccessToProject(): Promise<boolean> {
-    try {
-      await getProjectById({
-        projectId: this.getProjectId(),
-        user: this.getUser(),
-      });
-    } catch (_error) {
-      this.setError(403, {
-        code: 400,
-        message: "Project not found",
-      } as OpenapiError);
-      return false;
-    }
-    return true;
-  }
-
-  protected getProjectId() {
-    if (typeof this.projectId === "undefined")
-      throw new Error("Invalid project");
-    return this.projectId;
+  protected getCampaignId() {
+    if (typeof this.cp_id === "undefined") throw new Error("Invalid campaign");
+    return this.cp_id;
   }
 
   protected async getTags(): Promise<

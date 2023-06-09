@@ -1,11 +1,15 @@
-import * as db from "@src/features/db";
+import { unguess } from "@src/features/database";
 
 export default async (unguess_user_id: number) => {
-  const sql = `SELECT f.id, f.slug, f.display_name from wp_ug_features f
-  JOIN wp_ug_user_to_feature utf on f.id = utf.feature_id
-  WHERE utf.unguess_wp_user_id = ?`;
+  const results = await unguess.tables.WpUgFeatures.do()
+    .select("id", "slug", "display_name")
+    .join(
+      "wp_ug_user_to_feature",
+      "wp_ug_user_to_feature.feature_id",
+      "wp_ug_features.id"
+    )
+    .where("wp_ug_user_to_feature.unguess_wp_user_id", unguess_user_id);
 
-  const results = await db.query(db.format(sql, [unguess_user_id]), "unguess");
   if (results.length) {
     return results.map((feature: any) => {
       return {

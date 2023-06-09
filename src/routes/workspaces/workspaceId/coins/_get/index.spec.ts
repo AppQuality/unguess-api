@@ -1,85 +1,10 @@
 import app from "@src/app";
 import request from "supertest";
-import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { ERROR_MESSAGE } from "@src/utils/constants";
-
-const customer_1 = {
-  id: 1,
-  company: "Company",
-  company_logo: "logo.png",
-  tokens: 100,
-};
-
-const customer_2 = {
-  id: 2,
-  company: "Company",
-  company_logo: "logo.png",
-  tokens: 100,
-};
-
-const customer_3 = {
-  id: 43,
-  company: "Company",
-  company_logo: "logo.png",
-  tokens: 100,
-};
-
-const user_to_customer_1 = {
-  wp_user_id: 1,
-  customer_id: 1,
-};
-
-const user_to_customer_2 = {
-  wp_user_id: 1,
-  customer_id: 2,
-};
-
-const customer_profile_1 = {
-  id: 1,
-  wp_user_id: 1,
-  name: "Customer",
-  surname: "Customer",
-  email: "customer@unguess.io",
-};
-
-const coins_1 = {
-  id: 1,
-  customer_id: 1,
-  amount: 100,
-  price: 0,
-  created_on: "2022-06-24 12:47:30",
-  updated_on: "2022-06-24 12:51:23",
-};
-
-const coins_2 = {
-  ...coins_1,
-  id: 2,
-  amount: 50,
-};
-
-const coins_3 = {
-  ...coins_1,
-  id: 3,
-  customer_id: 2,
-};
+import useCustomersData from "./useCustomersData";
 
 describe("GET /workspaces/{wid}/coins", () => {
-  beforeAll(async () => {
-    return new Promise(async (res, rej) => {
-      try {
-        await dbAdapter.add({
-          profiles: [customer_profile_1],
-          companies: [customer_1, customer_2, customer_3],
-          userToCustomers: [user_to_customer_1, user_to_customer_2],
-          coins: [coins_1, coins_2, coins_3],
-        });
-      } catch (e) {
-        console.error(e);
-        rej(e);
-      }
-      res(true);
-    });
-  });
+  useCustomersData();
 
   it("Should return 403 status if user is not logged in", async () => {
     const response = await request(app).get("/workspaces/1/coins");
@@ -93,11 +18,11 @@ describe("GET /workspaces/{wid}/coins", () => {
     expect(response.status).toBe(200);
   });
 
-  it("Should return 400 if the request parameter has a bad format", async () => {
+  it("Should return 403 if the request parameter has a bad format", async () => {
     const response = await request(app)
       .get("/workspaces/banana/coins")
       .set("authorization", "Bearer user");
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(403);
   });
 
   it("Should return 403 if the customer is not found", async () => {
@@ -105,7 +30,6 @@ describe("GET /workspaces/{wid}/coins", () => {
       .get("/workspaces/999898978/coins")
       .set("authorization", "Bearer user");
     expect(response.status).toBe(403);
-    expect(response.body.message).toBe(ERROR_MESSAGE);
   });
 
   it("Should return an array of 1 elements because of limit = 1", async () => {
@@ -139,8 +63,22 @@ describe("GET /workspaces/{wid}/coins", () => {
 
     expect(response.body.items).toEqual(
       expect.arrayContaining([
-        expect.objectContaining(coins_1),
-        expect.objectContaining(coins_2),
+        expect.objectContaining({
+          id: 1,
+          customer_id: 1,
+          amount: 100,
+          price: 0,
+          created_on: "2022-06-24 12:47:30",
+          updated_on: "2022-06-24 12:51:23",
+        }),
+        expect.objectContaining({
+          id: 2,
+          customer_id: 1,
+          amount: 50,
+          price: 0,
+          created_on: "2022-06-24 12:47:30",
+          updated_on: "2022-06-24 12:51:23",
+        }),
       ])
     );
   });
@@ -153,7 +91,16 @@ describe("GET /workspaces/{wid}/coins", () => {
     expect(response.body.size).toBe(1);
 
     expect(response.body.items).toEqual(
-      expect.arrayContaining([expect.objectContaining(coins_2)])
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 2,
+          customer_id: 1,
+          amount: 50,
+          price: 0,
+          created_on: "2022-06-24 12:47:30",
+          updated_on: "2022-06-24 12:51:23",
+        }),
+      ])
     );
   });
 
@@ -165,7 +112,16 @@ describe("GET /workspaces/{wid}/coins", () => {
     expect(response.body.size).toBe(1);
 
     expect(response.body.items).toEqual(
-      expect.arrayContaining([expect.objectContaining(coins_1)])
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 1,
+          customer_id: 1,
+          amount: 100,
+          price: 0,
+          created_on: "2022-06-24 12:47:30",
+          updated_on: "2022-06-24 12:51:23",
+        }),
+      ])
     );
   });
 
@@ -176,8 +132,22 @@ describe("GET /workspaces/{wid}/coins", () => {
     expect(response.status).toBe(200);
     expect(response.body.items).toEqual(
       expect.arrayContaining([
-        expect.objectContaining(coins_1),
-        expect.objectContaining(coins_2),
+        expect.objectContaining({
+          id: 1,
+          customer_id: 1,
+          amount: 100,
+          price: 0,
+          created_on: "2022-06-24 12:47:30",
+          updated_on: "2022-06-24 12:51:23",
+        }),
+        expect.objectContaining({
+          id: 2,
+          customer_id: 1,
+          amount: 50,
+          price: 0,
+          created_on: "2022-06-24 12:47:30",
+          updated_on: "2022-06-24 12:51:23",
+        }),
       ])
     );
   });

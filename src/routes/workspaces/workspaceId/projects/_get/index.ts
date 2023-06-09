@@ -1,130 +1,116 @@
-/** OPENAPI-ROUTE: get-workspace-projects */
-import { Context } from "openapi-backend";
+/** OPENAPI-CLASS: get-workspace-projects */
 import * as db from "@src/features/db";
-import { getWorkspace } from "@src/utils/workspaces";
-import { paginateItems, formatCount } from "@src/utils/paginations";
+import { formatCount } from "@src/utils/paginations";
 import {
-  ERROR_MESSAGE,
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
 } from "@src/utils/constants";
+import WorkspaceRoute from "@src/features/routes/WorkspaceRoute";
 
-export default async (
-  c: Context,
-  req: OpenapiRequest,
-  res: OpenapiResponse
-) => {
-  let user = req.user;
-  let error = {
-    message: ERROR_MESSAGE,
-    error: true,
-  } as StoplightComponents["schemas"]["Error"];
+export default class Route extends WorkspaceRoute<{
+  response: StoplightOperations["get-workspace-projects"]["responses"]["200"]["content"]["application/json"];
+  parameters: StoplightOperations["get-workspace-projects"]["parameters"]["path"];
+  query: StoplightOperations["get-workspace-projects"]["parameters"]["query"];
+}> {
+  private limit: number = LIMIT_QUERY_PARAM_DEFAULT;
+  private start: number = START_QUERY_PARAM_DEFAULT;
 
-  res.status_code = 200;
+  constructor(configuration: RouteClassConfiguration) {
+    super(configuration);
 
-  let wid = parseInt(c.request.params.wid as string);
+    const query = this.getQuery();
+    if (query.limit) this.limit = parseInt(query.limit as unknown as string);
+    if (query.start) this.start = parseInt(query.start as unknown as string);
+  }
 
-  let limit = c.request.query.limit
-    ? parseInt(c.request.query.limit as string)
-    : (LIMIT_QUERY_PARAM_DEFAULT as StoplightComponents["parameters"]["limit"]);
-  let start = c.request.query.start
-    ? parseInt(c.request.query.start as string)
-    : (START_QUERY_PARAM_DEFAULT as StoplightComponents["parameters"]["start"]);
-  let total;
+  protected async prepare(): Promise<void> {
+    const projects = await this.getProjects();
 
-  try {
-    // Get workspace
-    await getWorkspace({
-      workspaceId: wid,
-      user: user,
+    const total = await this.getProjectsCount();
+
+    const enhancedProjects = await this.formatProjects(projects);
+
+    return this.setSuccess(200, {
+      items: enhancedProjects,
+      start: this.start,
+      limit: this.limit,
+      size: enhancedProjects.length,
+      total,
     });
+  }
 
-    // Get workspace projects
-    let projects: Array<{
+  protected async getProjects(): Promise<
+    {
       id: number;
       display_name: string;
       customer_id: number;
-    }> = [];
-
-    // Get customer's projects
+    }[]
+  > {
     let projectSql = `SELECT id, display_name, customer_id FROM wp_appq_project WHERE customer_id = ? ORDER BY id`;
 
-    if (limit) {
-      projectSql += ` LIMIT ${limit} OFFSET ${start}`;
+    if (this.limit) {
+      projectSql += ` LIMIT ${this.limit} OFFSET ${this.start}`;
     }
 
-    projects = await db.query(db.format(projectSql, [wid]));
+    return await db.query(db.format(projectSql, [this.getWorkspaceId()]));
+  }
 
-    // Count projects
+  protected async getProjectsCount(): Promise<number> {
     const countQuery = `SELECT COUNT(*) as count FROM wp_appq_project WHERE customer_id = ?`;
-    total = await db.query(db.format(countQuery, [wid]));
+    let total = await db.query(db.format(countQuery, [this.getWorkspaceId()]));
     total = formatCount(total);
 
-    let returnProjects: Array<StoplightComponents["schemas"]["Project"]> = [];
-    if (projects) {
-      for (const project of projects) {
-        if (user.role !== "administrator") {
-          // Check if user can see this project
-          let hasPermission = false;
-          const userToProjectSql =
-            "SELECT * FROM wp_appq_user_to_project WHERE project_id = ?";
-          let userToProjectRows: Array<{
-            wp_user_id: number;
-            project_id: number;
-          }> = await db.query(db.format(userToProjectSql, [project.id]));
-
-          if (userToProjectRows.length) {
-            // Check if the wp_user_id is in the userToProjectRows array
-            for (const userToProjectRow of userToProjectRows) {
-              if (userToProjectRow.wp_user_id == user.id) {
-                // The user has permission to see this project
-                hasPermission = true;
-                break;
-              }
-            }
-          } else {
-            // The project has no permission limits
-            hasPermission = true;
-          }
-
-          if (!hasPermission) {
-            continue;
-          }
-        }
-
-        // Get campaigns count
-        let campaigns;
-        try {
-          const campaignSql =
-            "SELECT COUNT(*) AS count FROM wp_appq_evd_campaign WHERE project_id = ?";
-          campaigns = await db.query(db.format(campaignSql, [project.id]));
-        } catch (e) {
-          res.status_code = 500;
-          error.code = 500;
-          return error;
-        }
-
-        let item: StoplightComponents["schemas"]["Project"] = {
-          id: project.id,
-          name: project.display_name,
-          campaigns_count: campaigns[0].count,
-          workspaceId: Number(project.customer_id),
-        };
-
-        returnProjects.push(item);
-      }
-    }
-
-    return paginateItems({ items: returnProjects, start, limit, total });
-  } catch (e: any) {
-    if (e.code) {
-      error.code = e.code;
-      res.status_code = e.code;
-    } else {
-      error.code = 500;
-      res.status_code = 500;
-    }
-
-    return error;
+    return total;
   }
-};
+
+  protected async formatProjects(
+    projects: {
+      id: number;
+      display_name: string;
+      customer_id: number;
+    }[]
+  ): Promise<StoplightComponents["schemas"]["Project"][]> {
+    let returnProjects: StoplightComponents["schemas"]["Project"][] = [];
+    for (const project of projects) {
+      if (this.getUser().role !== "administrator") {
+        // Check if user can see this project
+        let hasPermission = false;
+        const userToProjectSql =
+          "SELECT * FROM wp_appq_user_to_project WHERE project_id = ? AND wp_user_id = ?";
+        let userToProjectRows: Array<{
+          wp_user_id: number;
+          project_id: number;
+        }> = await db.query(
+          db.format(userToProjectSql, [project.id, this.getUserId()])
+        );
+
+        if (userToProjectRows.length) {
+          hasPermission = true;
+        }
+
+        if (!hasPermission) {
+          continue;
+        }
+      }
+
+      let item: StoplightComponents["schemas"]["Project"] = {
+        id: project.id,
+        name: project.display_name,
+        campaigns_count: await this.getCampaignsCount(project.id),
+        workspaceId: Number(project.customer_id),
+      };
+
+      returnProjects.push(item);
+    }
+
+    return returnProjects;
+  }
+
+  protected async getCampaignsCount(projectId: number): Promise<number> {
+    const campaignSql =
+      "SELECT COUNT(*) AS count FROM wp_appq_evd_campaign WHERE project_id = ?";
+    const result = await db.query(db.format(campaignSql, [projectId]));
+
+    return result[0].count;
+  }
+}

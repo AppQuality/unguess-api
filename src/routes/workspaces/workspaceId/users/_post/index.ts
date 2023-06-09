@@ -22,7 +22,7 @@ export default class Route extends WorkspaceRoute<{
   body: StoplightOperations["post-workspaces-wid-users"]["requestBody"]["content"]["application/json"];
 }> {
   protected async filter(): Promise<boolean> {
-    if (!super.filter()) return false;
+    if (!(await super.filter())) return false;
 
     if (!this.isValidUser()) {
       this.setError(400, {} as OpenapiError);
