@@ -1,7 +1,6 @@
-// import { tryber, unguess } from "../database";
-import UserRoute from "./UserRoute";
 import * as db from "@src/features/db";
 import WorkspaceRoute from "./WorkspaceRoute";
+import { tryber } from "../database";
 
 export default class ProjectRoute<
   T extends RouteClassTypes & {
@@ -16,7 +15,9 @@ export default class ProjectRoute<
 
     const { pid } = this.getParameters() as T["parameters"] & { pid: string };
 
-    if (!pid) throw new Error("Missing project id");
+    if (pid) {
+      this.project_id = Number.parseInt(pid);
+    }
 
     this.project_id = Number.parseInt(pid);
   }
@@ -47,45 +48,25 @@ export default class ProjectRoute<
   }
 
   protected async filter(): Promise<boolean> {
-    const user = this.getUser();
-    if (user.role === "administrator") return true;
-
     if (!(await super.filter())) {
-      console.log(
-        "filtering in project route, the user does NOT have access to the workspace"
-      );
-
-      return !!(await this.hasAccessToProject());
-    } else {
-      console.log(
-        "filtering in project route, the user has access to the workspace"
-      );
-      return true;
+      // The user does not have access to the workspace
+      return !!(await this.checkPrjAccess());
     }
+
+    // The user has access to the workspace
+    return true;
   }
 
-  private async hasAccessToWorkspace(wid: number): Promise<boolean> {
-    const workspaceSql = db.format(
-      `SELECT * FROM wp_appq_user_to_customer u2c
-        WHERE u2c.wp_user_id = ? AND u2c.customer_id = ?`,
-      [this.getUser().tryber_wp_user_id, wid]
-    );
+  protected async checkPrjAccess(): Promise<boolean> {
+    const hasAccess = await tryber.tables.WpAppqUserToProject.do()
+      .select()
+      .where({
+        wp_user_id: this.getUser().tryber_wp_user_id || 0,
+        project_id: this.getProjectId(),
+      })
+      .first();
 
-    const access = await db.query(workspaceSql);
-
-    return access.length > 0;
-  }
-
-  private async hasAccessToProject(): Promise<boolean> {
-    const projectSql = db.format(
-      `SELECT * FROM wp_appq_user_to_project u2p
-        WHERE u2p.wp_user_id = ? AND u2p.project_id = ?`,
-      [this.getUser().tryber_wp_user_id, this.project_id]
-    );
-
-    const access = await db.query(projectSql);
-
-    return access.length > 0;
+    return !!hasAccess;
   }
 
   private async countProjectCampaigns(): Promise<number> {
@@ -101,8 +82,6 @@ export default class ProjectRoute<
   private async initProject() {
     try {
       // Check if project exists
-      const user = this.getUser();
-
       const projectSql = db.format(
         `SELECT p.customer_id as wid, p.* FROM wp_appq_project p
           WHERE p.id = ?`,

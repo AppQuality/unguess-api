@@ -11,6 +11,13 @@ const customer_1 = {
   tokens: 100,
 };
 
+const customer_10 = {
+  id: 10,
+  company: "Company 10",
+  company_logo: "logo10.png",
+  tokens: 100,
+};
+
 const user_to_customer_1 = {
   wp_user_id: 1,
   customer_id: customer_1.id,
@@ -25,6 +32,12 @@ const project_1 = {
 const project_2 = {
   id: 998,
   display_name: "Project 998",
+  customer_id: 10,
+};
+
+const project_4 = {
+  id: 997,
+  display_name: "Project 4",
   customer_id: 10,
 };
 
@@ -89,6 +102,21 @@ const campaign_3 = {
   project_id: project_2.id,
 };
 
+const campaign_4 = {
+  ...campaign_1,
+  id: 4,
+  start_date: "2017-07-20 10:00:00",
+  end_date: "2017-07-20 10:00:00",
+  close_date: "2017-07-20 10:00:00",
+  title: "Campaign 997 title",
+  customer_title: "Campaign 997 customer title",
+  status_id: 1,
+  is_public: 1,
+  campaign_type_id: campaign_type_1.id,
+  campaign_type: -1,
+  project_id: project_4.id,
+};
+
 const user_to_campaign_1 = {
   wp_user_id: 1,
   campaign_id: campaign_3.id,
@@ -96,35 +124,25 @@ const user_to_campaign_1 = {
 
 describe("GET /campaigns/{cid}", () => {
   beforeAll(async () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        // await dbAdapter.create();
+    // await dbAdapter.create();
 
-        await dbAdapter.add({
-          companies: [customer_1],
-          userToCustomers: [user_to_customer_1],
-          userToCampaigns: [user_to_campaign_1],
-          projects: [project_1, project_2],
-          userToProjects: [user_to_project_1],
-          campaignTypes: [campaign_type_1],
-          // campaigns: [campaign_1, campaign_2, campaign_3],
-        });
-
-        /**
-         * Test fluid database inserts (using raw sqlite and knex)
-         */
-        await tryber.tables.WpAppqEvdCampaign.do().insert(campaign_1);
-        await tryber.tables.WpAppqEvdCampaign.do().insert(campaign_2);
-        await tryber.tables.WpAppqEvdCampaign.do().insert(campaign_3);
-
-        //Outputs
-      } catch (error) {
-        console.error(error);
-        reject(error);
-      }
-
-      resolve(true);
+    await dbAdapter.add({
+      companies: [customer_1, customer_10],
+      userToCustomers: [user_to_customer_1],
+      userToCampaigns: [user_to_campaign_1],
+      projects: [project_1, project_2, project_4],
+      userToProjects: [user_to_project_1],
+      campaignTypes: [campaign_type_1],
+      // campaigns: [campaign_1, campaign_2, campaign_3],
     });
+
+    /**
+     * Test fluid database inserts (using raw sqlite and knex)
+     */
+    await tryber.tables.WpAppqEvdCampaign.do().insert(campaign_1);
+    await tryber.tables.WpAppqEvdCampaign.do().insert(campaign_2);
+    await tryber.tables.WpAppqEvdCampaign.do().insert(campaign_3);
+    await tryber.tables.WpAppqEvdCampaign.do().insert(campaign_4);
   });
 
   // It should answer 403 if user is not logged in
@@ -188,14 +206,19 @@ describe("GET /campaigns/{cid}", () => {
 
   // Should answer 200 with the campaign if the user has no specific permission for the campaign but has the permission for the project
   it("Should answer 200 with the campaign if the user has no specific permission for the campaign but has the permission for the project", async () => {
+    await tryber.tables.WpAppqUserToProject.do().insert({
+      wp_user_id: 1,
+      project_id: project_4.id,
+    });
+
     const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}`)
+      .get(`/campaigns/${campaign_4.id}`)
       .set("Authorization", "Bearer user");
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual(
       expect.objectContaining({
-        id: campaign_1.id,
+        id: campaign_4.id,
       })
     );
   });
