@@ -253,7 +253,7 @@ export default class Route extends CampaignRoute<{
 
   private getEmailEvent() {
     const body = this.getBody();
-    return body.event_name ?? `customer_invitation_${body.locale ?? "en"}`;
+    return body.event_name ?? `campaign_invitation_${body.locale ?? "en"}`;
   }
 
   private getEmailRedirectUrl() {

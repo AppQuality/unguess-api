@@ -1,7 +1,7 @@
-import UserRoute from "./UserRoute";
 import * as db from "@src/features/db";
-import { getProjectById } from "@src/utils/projects/getProjectById";
 import { getTitleRule } from "@src/utils/campaigns/getTitleRule";
+import ProjectRoute from "./ProjectRoute";
+import { tryber } from "../database";
 
 type CampaignRouteParameters = { cid: string };
 
@@ -11,9 +11,8 @@ export default class CampaignRoute<
   T extends RouteClassTypes & {
     parameters: T["parameters"] & CampaignRouteParameters;
   }
-> extends UserRoute<T> {
+> extends ProjectRoute<T> {
   protected cp_id: number;
-  protected projectId: number | undefined;
   protected showNeedReview: boolean = false;
   protected baseBugInternalId: string = "";
   private NEED_REVIEW_STATUS_ID = 4;
@@ -31,8 +30,6 @@ export default class CampaignRoute<
   }
 
   protected async init(): Promise<void> {
-    await super.init();
-
     if (isNaN(this.cp_id)) {
       this.setError(400, {
         code: 400,
@@ -53,9 +50,11 @@ export default class CampaignRoute<
       throw new Error("Campaign not found");
     }
 
-    this.projectId = campaign.project_id;
+    this.project_id = campaign.project_id;
     this.showNeedReview = campaign.showNeedReview;
     this.baseBugInternalId = campaign.base_bug_internal_id;
+
+    await super.init();
   }
 
   private async initCampaign() {
@@ -76,14 +75,35 @@ export default class CampaignRoute<
 
   protected async filter(): Promise<boolean> {
     if (!(await super.filter())) {
-      this.setError(403, {
-        code: 400,
-        message: "You don't have access to this campaign",
-      } as OpenapiError);
-      return false;
+      // The user does NOT have access to the workspace or project
+      const access = await this.checkCpAccess();
+
+      if (!access) {
+        this.setError(403, {
+          code: 403,
+          message: "Campaign not found or not accessible",
+        } as OpenapiError);
+
+        return false;
+      }
+
+      return true;
     }
 
-    if (!(await this.evaluateUserPermissions())) {
+    // The user HAS access to the workspace or project
+    return true;
+  }
+
+  private async checkCpAccess(): Promise<boolean> {
+    const hasAccess = await tryber.tables.WpAppqUserToCampaign.do()
+      .select()
+      .where({
+        campaign_id: this.cp_id,
+        wp_user_id: this.getUser().tryber_wp_user_id,
+      })
+      .first();
+
+    if (!hasAccess) {
       this.setError(403, {
         code: 400,
         message: "You don't have access to this campaign",
@@ -92,81 +112,6 @@ export default class CampaignRoute<
     }
 
     return true;
-  }
-
-  private async evaluateUserPermissions(): Promise<boolean> {
-    /*
-     * This function returns the final results after reducing various Access Layers.
-     * Order of the access checks matters here:
-     ** It should be ordered in a descending order.
-     ** AccessToProject is super w.r.t. AccessToCampaign.
-     */
-    if (this.getUser().role !== "administrator") {
-      if (await this.hasAccessToProject()) {
-        return true;
-      }
-      if (await this.hasAccessToCampaign()) {
-        return true;
-      }
-
-      return false;
-    }
-
-    return true;
-  }
-
-  private async hasAccessToCampaign(): Promise<boolean> {
-    try {
-      const result = await db.query(
-        db.format(
-          `
-            SELECT wp_user_id
-            FROM wp_appq_user_to_campaign
-            WHERE campaign_id = ?
-            AND wp_user_id = ?
-          `,
-          [this.cp_id, this.getUserId()]
-        )
-      );
-
-      if (result.length > 0) {
-        return true;
-      }
-
-      return false;
-    } catch (_error) {
-      return false;
-    }
-  }
-
-  private async hasAccessToProject(): Promise<boolean> {
-    try {
-      const result = await db.query(
-        db.format(
-          `
-            SELECT wp_user_id
-            FROM wp_appq_user_to_project
-            WHERE project_id = ?
-            AND wp_user_id = ?
-          `,
-          [this.projectId || "", this.getUserId()]
-        )
-      );
-
-      if (result.length > 0) {
-        return true;
-      }
-
-      return false;
-    } catch (_error) {
-      return false;
-    }
-  }
-
-  protected getProjectId() {
-    if (typeof this.projectId === "undefined")
-      throw new Error("Invalid project");
-    return this.projectId;
   }
 
   protected getCampaignId() {

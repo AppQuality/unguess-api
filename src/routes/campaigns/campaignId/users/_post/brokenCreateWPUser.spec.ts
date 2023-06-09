@@ -50,11 +50,13 @@ const user_to_campaign_1 = {
 };
 
 describe("POST /campaigns/{cid}/users with broken createTryberWPUser", () => {
-  const workspaces = useBasicWorkspaces();
+  useBasicWorkspaces();
 
   beforeAll(async () => {
     await tryber.tables.WpAppqEvdCampaign.do().insert(campaign_1);
     await tryber.tables.WpAppqUserToCampaign.do().insert(user_to_campaign_1);
+
+    await tryber.tables.WpAppqProject.do().insert(project_1);
   });
 
   afterAll(async () => {

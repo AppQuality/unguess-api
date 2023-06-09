@@ -17,6 +17,13 @@ const project_1 = {
   edited_by: 1,
 };
 
+const project_2 = {
+  id: 1000,
+  display_name: "Project 1000",
+  customer_id: 123,
+  edited_by: 1,
+};
+
 const campaign_1 = {
   id: 1,
   start_date: "2017-07-20 10:00:00",
@@ -54,7 +61,7 @@ const campaign_2 = {
   is_public: 1,
   campaign_type_id: campaign_type_1.id,
   campaign_type: -1,
-  project_id: project_1.id,
+  project_id: project_2.id,
   platform_id: 1,
   page_preview_id: 1,
   page_manual_id: 1,
@@ -65,12 +72,15 @@ const campaign_2 = {
 };
 
 describe("POST /campaigns/{cid}/users", () => {
-  const workspaces = useBasicWorkspaces();
+  useBasicWorkspaces();
 
   beforeAll(async () => {
     await tryber.tables.WpAppqEvdCampaign.do().insert(campaign_1);
     await tryber.tables.WpAppqEvdCampaign.do().insert(campaign_2);
     await tryber.tables.WpAppqUserToCampaign.do().insert(user_to_campaign_1);
+
+    await tryber.tables.WpAppqProject.do().insert(project_1);
+    await tryber.tables.WpAppqProject.do().insert(project_2);
   });
 
   afterAll(async () => {
@@ -151,7 +161,7 @@ describe("POST /campaigns/{cid}/users", () => {
     expect(response.status).toBe(400);
   });
 
-  it("should answer 403 if the user is not allowed to apply changes in the workspace", async () => {
+  it("should answer 403 if the user is not allowed to apply changes", async () => {
     const response = await request(app)
       .post(`/campaigns/${campaign_2.id}/users`)
       .set("Authorization", "Bearer user")

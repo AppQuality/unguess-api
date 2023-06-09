@@ -30,6 +30,13 @@ const customer_1 = {
   tokens: 100,
 };
 
+const customer_10 = {
+  id: 10,
+  company: "Company 10",
+  company_logo: "logo999.png",
+  tokens: 100,
+};
+
 const user_to_customer_1 = {
   wp_user_id: 1,
   customer_id: 999,
@@ -264,7 +271,7 @@ const bug_status_1: BugCustomStatusParams = {
 describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   beforeEach(async () => {
     await dbAdapter.add({
-      companies: [customer_1],
+      companies: [customer_1, customer_10],
       profiles: [profile_1, profile_2],
       userToCustomers: [user_to_customer_1],
       projects: [project_1, project_2],
@@ -347,11 +354,11 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   });
 
   // It should answer 403 if the user has no permissions to see the campaign
-  it("Should answer 400 if the user has no permissions to see the campaign", async () => {
+  it("Should answer 403 if the user has no permissions to see the campaign", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_2.id}/bugs/${bug_1.id}`)
+      .get(`/campaigns/${campaign_2.id}/bugs/${bug_5_from_unknown.id}`)
       .set("Authorization", "Bearer user");
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(403);
   });
 
   // It should answer 200 with the campaign

@@ -8,6 +8,14 @@ import isGracePeriodPassed from "./uniqueBugsWidget/isGracePeriodPassed";
 jest.mock("./uniqueBugsWidget/isGracePeriodPassed", () =>
   jest.fn().mockImplementation(() => true)
 );
+
+const customer_10 = {
+  id: 10,
+  company: "Company 10",
+  company_logo: "logo999.png",
+  tokens: 100,
+};
+
 describe("GET /campaigns/{cid}/widgets - unique bugs", () => {
   beforeAll(async () => {
     await dbAdapter.add({
@@ -17,7 +25,7 @@ describe("GET /campaigns/{cid}/widgets - unique bugs", () => {
         { id: 3, project_id: 1, cust_bug_vis: 1 },
         { id: 4, project_id: 1 },
       ],
-      companies: [{ id: 100, company: "company 1" }],
+      companies: [{ id: 100, company: "company 1" }, customer_10],
       campaignTypes: [{ id: 1, name: "Test" }],
       userToCustomers: [{ wp_user_id: 1, customer_id: 100 }],
       projects: [

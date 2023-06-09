@@ -53,12 +53,13 @@ const user_to_campaign_1 = {
 // Get Mocked Function
 const mockedSendgrid = jest.mocked(sgMail, true);
 
-describe("POST /campaigns/{cid}/users", () => {
-  const workspaces = useBasicWorkspaces();
+describe("POST /campaigns/{cid}/users mail checks", () => {
+  useBasicWorkspaces();
 
   beforeAll(async () => {
     await tryber.tables.WpAppqEvdCampaign.do().insert(campaign_1);
     await tryber.tables.WpAppqUserToCampaign.do().insert(user_to_campaign_1);
+    await tryber.tables.WpAppqProject.do().insert(project_1);
   });
 
   afterAll(async () => {
@@ -80,7 +81,7 @@ describe("POST /campaigns/{cid}/users", () => {
 
     await tryber.tables.WpAppqEventTransactionalMail.do().insert({
       id: 1,
-      event_name: "customer_invitation_en",
+      event_name: "campaign_invitation_en",
       template_id: 1,
       last_editor_tester_id: 1,
     });
@@ -97,7 +98,7 @@ describe("POST /campaigns/{cid}/users", () => {
 
     await tryber.tables.WpAppqEventTransactionalMail.do().insert({
       id: 2,
-      event_name: "customer_invitation_it",
+      event_name: "campaign_invitation_it",
       template_id: 2,
       last_editor_tester_id: 1,
     });

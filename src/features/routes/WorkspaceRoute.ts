@@ -7,7 +7,7 @@ export default class WorkspaceRoute<
     parameters: T["parameters"] & { wid: string };
   }
 > extends UserRoute<T> {
-  protected workspace_id: number;
+  protected workspace_id: number | undefined;
   protected workspace: StoplightComponents["schemas"]["Workspace"] | undefined;
 
   constructor(configuration: RouteClassConfiguration) {
@@ -15,15 +15,15 @@ export default class WorkspaceRoute<
 
     const { wid } = this.getParameters() as T["parameters"] & { wid: string };
 
-    if (!wid) throw new Error("Missing workspace id");
-
-    this.workspace_id = Number.parseInt(wid);
+    if (wid) {
+      this.workspace_id = Number.parseInt(wid);
+    }
   }
 
   protected async init(): Promise<void> {
     await super.init();
 
-    if (isNaN(this.workspace_id)) {
+    if (!this.workspace_id || isNaN(this.workspace_id)) {
       this.setError(400, {
         code: 400,
         message: "Invalid workspace id",
@@ -44,16 +44,42 @@ export default class WorkspaceRoute<
     }
   }
 
+  protected async checkWSAccess(): Promise<boolean> {
+    const user = this.getUser();
+    if (user.role === "administrator") return true;
+
+    // Check if user has permission to get the customer
+    const hasAccess = await tryber.tables.WpAppqUserToCustomer.do()
+      .select()
+      .where({
+        wp_user_id: user.tryber_wp_user_id || 0,
+        customer_id: this.getWorkspaceId(),
+      })
+      .first();
+
+    return !!hasAccess;
+  }
+
   protected async filter(): Promise<boolean> {
     if (!(await super.filter())) return false;
+
+    const access = await this.checkWSAccess();
+
+    if (!access) {
+      this.setError(403, {
+        code: 403,
+        message: "Workspace not found",
+      } as OpenapiError);
+
+      return false;
+    }
+
     return true;
   }
 
   private async initWorkspace() {
     try {
       // Check if workspace exists
-      const user = this.getUser();
-
       const workspace = await tryber.tables.WpAppqCustomer.do()
         .select(
           tryber.ref("id").withSchema("wp_appq_customer"),
@@ -83,23 +109,6 @@ export default class WorkspaceRoute<
         .first();
 
       if (workspace) {
-        if (user.role !== "administrator") {
-          // Check if user has permission to get the customer
-          const userToCustomer = await tryber.tables.WpAppqUserToCustomer.do()
-            .select()
-            .where({
-              wp_user_id: user.tryber_wp_user_id || 0,
-              customer_id: this.getWorkspaceId(),
-            })
-            .first();
-
-          if (!userToCustomer)
-            return this.setError(403, {
-              code: 403,
-              message: "workspace issue",
-            } as OpenapiError);
-        }
-
         //Add CSM info
         const csm = workspace.csmEmail
           ? {
