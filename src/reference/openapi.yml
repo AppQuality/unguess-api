@@ -2863,6 +2863,12 @@ components:
         coins:
           type: number
           description: express coins
+        isShared:
+          type: boolean
+          description: Do this workspace have shared items?
+        sharedItems:
+          type: number
+          description: Number of shared items
       required:
         - id
         - company
