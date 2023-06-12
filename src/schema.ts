@@ -701,6 +701,10 @@ export interface components {
       };
       /** @description express coins */
       coins?: number;
+      /** @description Do this workspace have shared items? */
+      isShared?: boolean;
+      /** @description Number of shared items */
+      sharedItems?: number;
     };
     /**
      * WidgetBugsByUseCase

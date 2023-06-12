@@ -43,24 +43,33 @@ export default class WorkspacesRoute extends UserRoute<{
   }
 
   protected async prepare() {
-    try {
-      let userWorkspaces = await this.getUserWorkspaces();
+    const emptyResponse = {
+      items: [],
+      start: 0,
+      limit: 0,
+      size: 0,
+      total: 0,
+    };
 
-      if (!userWorkspaces.workspaces.length) {
-        return this.setSuccess(200, {
-          items: [],
-          start: 0,
-          limit: 0,
-          size: 0,
-          total: 0,
-        });
+    try {
+      if (
+        this.getUser().role !== "administrator" &&
+        (!this.getProfileId() || !this.getWordpressId("tryber"))
+      )
+        return this.setSuccess(200, emptyResponse);
+
+      const userWorkspaces = await this.getUserWorkspaces();
+      const preparedWorkspaces = await this.prepareResponse(userWorkspaces);
+
+      if (!preparedWorkspaces.workspaces.length) {
+        return this.setSuccess(200, emptyResponse);
       }
       return this.setSuccess(200, {
-        items: userWorkspaces.workspaces,
+        items: preparedWorkspaces.workspaces,
         start: this.start,
         limit: this.limit,
-        size: userWorkspaces.workspaces.length,
-        total: userWorkspaces.total,
+        size: preparedWorkspaces.workspaces.length,
+        total: preparedWorkspaces.total,
       });
     } catch (e) {
       return this.setError(500, {
@@ -73,17 +82,26 @@ export default class WorkspacesRoute extends UserRoute<{
   protected async getUserWorkspaces() {
     let query = tryber.tables.WpAppqCustomer.do()
       .select(
-        tryber.ref("wp_appq_customer.id"),
-        tryber.ref("wp_appq_customer.company"),
-        tryber.ref("wp_appq_customer.tokens"),
-        tryber.ref("wp_appq_customer.pm_id"),
-        tryber.ref("wp_appq_customer.company_logo"),
-        tryber.ref("wp_appq_evd_profile.name").as("csmName"),
-        tryber.ref("wp_appq_evd_profile.surname").as("csmSurname"),
-        tryber.ref("wp_appq_evd_profile.email").as("csmEmail"),
-        tryber.ref("wp_appq_evd_profile.id").as("csmProfileId"),
-        tryber.ref("wp_appq_evd_profile.wp_user_id").as("csmTryberWpUserId"),
-        tryber.ref("wp_users.user_url").as("csmUserUrl")
+        tryber.ref("id").withSchema("wp_appq_customer").as("workspaceId"),
+        tryber.ref("company").withSchema("wp_appq_customer").as("companyName"),
+        tryber.ref("tokens").withSchema("wp_appq_customer").as("tokens"),
+        tryber.ref("pm_id").withSchema("wp_appq_customer").as("pmId"),
+        tryber
+          .ref("company_logo")
+          .withSchema("wp_appq_customer")
+          .as("companyLogo"),
+        tryber.ref("name").withSchema("wp_appq_evd_profile").as("csmName"),
+        tryber
+          .ref("surname")
+          .withSchema("wp_appq_evd_profile")
+          .as("csmSurname"),
+        tryber.ref("email").withSchema("wp_appq_evd_profile").as("csmEmail"),
+        tryber.ref("id").withSchema("wp_appq_evd_profile").as("csmProfileId"),
+        tryber
+          .ref("wp_user_id")
+          .withSchema("wp_appq_evd_profile")
+          .as("csmTryberWpUserId"),
+        tryber.ref("user_url").withSchema("wp_users").as("csmUserUrl")
       )
       .join(
         "wp_appq_user_to_customer",
@@ -118,6 +136,153 @@ export default class WorkspacesRoute extends UserRoute<{
         .offset(this.start ? this.start : START_QUERY_PARAM_DEFAULT);
     }
 
+    return await query;
+  }
+
+  protected async getWorkspacesFromSharedItems(
+    workspaces: Awaited<ReturnType<typeof this.getUserWorkspaces>>
+  ) {
+    //If user is administrator, we don't need to search for shared projects
+    if (this.getUser().role === "administrator") return [];
+
+    //Search for shared projects
+    const wsFromProjects = await this.getWorkspacesFromProjects();
+    const wsFromCampaigns = await this.getWorkspacesFromCampaigns();
+
+    let shared = [...wsFromProjects, ...wsFromCampaigns];
+    if (wsFromProjects.length && wsFromCampaigns.length) {
+      const uniqueWorkspaces = Array.from(
+        new Set(shared.map((ws) => ws.workspaceId))
+      ).map((workspaceId) => {
+        const objectsWithWorkspaceId = shared.filter(
+          (ws) => ws.workspaceId === workspaceId
+        );
+        const sumOfSharedItems = objectsWithWorkspaceId.reduce(
+          (sum, obj) => sum + obj.total,
+          0
+        );
+        return { ...objectsWithWorkspaceId[0], total: sumOfSharedItems };
+      });
+
+      shared = uniqueWorkspaces;
+    }
+
+    //Merge shared workspaces from projects and campaigns with user workspaces
+    const wp_ids: Array<number> = workspaces.map((w) => w.workspaceId);
+
+    // Remove duplicated workspaces from sharedWorkspaces
+    const filteredSharedWorkspaces = shared.filter(
+      (w) => !wp_ids.includes(w.workspaceId)
+    );
+
+    return filteredSharedWorkspaces;
+  }
+
+  private async getWorkspacesFromProjects() {
+    const workspaces = await tryber.tables.WpAppqUserToProject.do()
+      .select(
+        tryber.ref("wp_appq_customer.id").as("workspaceId"),
+        tryber.ref("wp_appq_customer.company").as("companyName"),
+        tryber.ref("wp_appq_customer.tokens").as("tokens"),
+        tryber.ref("wp_appq_customer.pm_id").as("pmId"),
+        tryber.ref("wp_appq_customer.company_logo").as("companyLogo"),
+        tryber.ref("wp_appq_evd_profile.name").as("csmName"),
+        tryber.ref("wp_appq_evd_profile.surname").as("csmSurname"),
+        tryber.ref("wp_appq_evd_profile.email").as("csmEmail"),
+        tryber.ref("wp_appq_evd_profile.id").as("csmProfileId"),
+        tryber.ref("wp_appq_evd_profile.wp_user_id").as("csmTryberWpUserId"),
+        tryber.ref("wp_users.user_url").as("csmUserUrl")
+      )
+      .countDistinct({ total: "wp_appq_project.id" })
+      .join(
+        "wp_appq_project",
+        "wp_appq_project.id",
+        "wp_appq_user_to_project.project_id"
+      )
+      .join(
+        "wp_appq_customer",
+        "wp_appq_customer.id",
+        "wp_appq_project.customer_id"
+      )
+      .leftJoin(
+        "wp_appq_evd_profile",
+        "wp_appq_customer.pm_id",
+        "wp_appq_evd_profile.id"
+      )
+      .leftJoin("wp_users", "wp_appq_evd_profile.wp_user_id", "wp_users.ID")
+      .where(
+        "wp_appq_user_to_project.wp_user_id",
+        this.getUser().tryber_wp_user_id
+      )
+      .groupBy("wp_appq_customer.id");
+
+    return workspaces.length
+      ? workspaces.map((ws) => ({
+          ...ws,
+          total: this.countToInt(ws.total),
+        }))
+      : [];
+  }
+
+  private async getWorkspacesFromCampaigns() {
+    const workspaces = await tryber.tables.WpAppqUserToCampaign.do()
+      .select(
+        tryber.ref("wp_appq_customer.id").as("workspaceId"),
+        tryber.ref("wp_appq_customer.company").as("companyName"),
+        tryber.ref("wp_appq_customer.tokens").as("tokens"),
+        tryber.ref("wp_appq_customer.pm_id").as("pmId"),
+        tryber.ref("wp_appq_customer.company_logo").as("companyLogo"),
+        tryber.ref("wp_appq_evd_profile.name").as("csmName"),
+        tryber.ref("wp_appq_evd_profile.surname").as("csmSurname"),
+        tryber.ref("wp_appq_evd_profile.email").as("csmEmail"),
+        tryber.ref("wp_appq_evd_profile.id").as("csmProfileId"),
+        tryber.ref("wp_appq_evd_profile.wp_user_id").as("csmTryberWpUserId"),
+        tryber.ref("wp_users.user_url").as("csmUserUrl")
+      )
+      .countDistinct({ total: "wp_appq_evd_campaign.id" })
+      .join(
+        "wp_appq_evd_campaign",
+        "wp_appq_evd_campaign.id",
+        "wp_appq_user_to_campaign.campaign_id"
+      )
+      .join(
+        "wp_appq_project",
+        "wp_appq_project.id",
+        "wp_appq_evd_campaign.project_id"
+      )
+      .join(
+        "wp_appq_customer",
+        "wp_appq_customer.id",
+        "wp_appq_project.customer_id"
+      )
+      .leftJoin(
+        "wp_appq_evd_profile",
+        "wp_appq_customer.pm_id",
+        "wp_appq_evd_profile.id"
+      )
+      .leftJoin("wp_users", "wp_appq_evd_profile.wp_user_id", "wp_users.ID")
+      .where(
+        "wp_appq_user_to_campaign.wp_user_id",
+        this.getUser().tryber_wp_user_id
+      )
+      .groupBy("wp_appq_customer.id");
+
+    return workspaces.length
+      ? workspaces.map((ws) => ({
+          ...ws,
+          total: this.countToInt(ws.total),
+        }))
+      : [];
+  }
+
+  private countToInt(count?: string | number) {
+    if (typeof count === "undefined") return 0;
+    if (typeof count === "string") return Number.parseInt(count);
+
+    return count;
+  }
+
+  private async getTotalWorkspaces() {
     let countQuery = tryber.tables.WpAppqCustomer.do()
       .countDistinct("wp_appq_customer.id as count")
       .join(
@@ -138,71 +303,60 @@ export default class WorkspacesRoute extends UserRoute<{
       );
     }
 
+    const total = await countQuery;
+
+    return formatCount(total);
+  }
+
+  protected async prepareResponse(
+    rawWorkspaces: Awaited<ReturnType<typeof this.getUserWorkspaces>>
+  ) {
     try {
-      if (
-        this.getUser().role !== "administrator" &&
-        (!this.getProfileId() || !this.getWordpressId("tryber"))
-      )
-        return { workspaces: [], total: 0 };
+      const sharedWorkspaces = await this.getWorkspacesFromSharedItems(
+        rawWorkspaces
+      );
 
-      const result = await query;
+      const results = [...rawWorkspaces, ...sharedWorkspaces];
 
-      const countResult = await countQuery;
+      const countResult = await this.getTotalWorkspaces();
 
-      if (result.length)
+      if (results.length) {
+        let workspaces: StoplightComponents["schemas"]["Workspace"][] = [];
+
+        // Prepare csm object to be returned
+        for (const workspace of results) {
+          const csm = workspace.pmId
+            ? {
+                id: workspace.pmId,
+                name: workspace.csmName + " " + workspace.csmSurname,
+                email: workspace.csmEmail,
+                profile_id: workspace.csmProfileId,
+                tryber_wp_user_id: workspace.csmTryberWpUserId,
+                ...(workspace.csmUserUrl && { url: workspace.csmUserUrl }),
+              }
+            : fallBackCsmProfile;
+
+          workspaces.push({
+            id: workspace.workspaceId,
+            company: workspace.companyName,
+            logo: workspace.companyLogo || "",
+            tokens: workspace.tokens,
+            csm,
+            isShared: "total" in workspace || false,
+            sharedItems: "total" in workspace ? workspace.total : 0,
+          } as StoplightComponents["schemas"]["Workspace"]);
+        }
+
         return {
-          workspaces: await this.prepareResponse(result),
-          total: formatCount(countResult),
+          workspaces,
+          total: countResult + sharedWorkspaces.length,
         };
+      }
 
       return { workspaces: [], total: 0 };
     } catch (e) {
       //console.log(e.message);
       return { workspaces: [], total: 0 };
     }
-  }
-
-  protected async prepareResponse(customers: Array<any>) {
-    let workspaces: StoplightComponents["schemas"]["Workspace"][] = [];
-
-    for (const customer of customers) {
-      let rawCsm = customer.pm_id
-        ? {
-            id: customer.pm_id,
-            name: customer.csmName + " " + customer.csmSurname,
-            email: customer.csmEmail,
-            //???? role: "admin",
-            profile_id: customer.csmProfileId,
-            tryber_wp_user_id: customer.csmTryberWpUserId,
-            ...(customer.csmUserUrl && { url: customer.csmUserUrl }),
-          }
-        : fallBackCsmProfile;
-
-      let csm = await this.loadCsmData(rawCsm);
-
-      workspaces.push({
-        id: customer.id,
-        company: customer.company,
-        logo: customer.company_logo || "",
-        tokens: customer.tokens,
-        csm,
-      });
-    }
-
-    return workspaces;
-  }
-
-  protected async loadCsmData(
-    csm: StoplightComponents["schemas"]["Workspace"]["csm"]
-  ) {
-    const csmProfiles: {
-      [id: number]: StoplightComponents["schemas"]["Workspace"]["csm"];
-    } = {};
-
-    if (csm.id in csmProfiles) return csmProfiles[csm.id];
-
-    csmProfiles[csm.id] = csm;
-
-    return csm;
   }
 }
