@@ -295,6 +295,40 @@ describe("GET /workspaces", () => {
       );
     });
 
+    it("Should return falsy isShared and sharedItems 0 if the user is a workspace member and has also shared item", async () => {
+      await tryber.tables.WpAppqProject.do().insert({
+        ...baseProject,
+        id: 204,
+        customer_id: 1,
+      });
+
+      await tryber.tables.WpAppqUserToProject.do().insert({
+        wp_user_id: 1,
+        project_id: 204,
+      });
+
+      const response = await request(app)
+        .get("/workspaces")
+        .set("authorization", "Bearer user");
+
+      expect(response.status).toBe(200);
+      expect(response.body.items).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 1,
+            company: "Company",
+            isShared: false,
+            sharedItems: 0,
+          }),
+        ])
+      );
+
+      await tryber.tables.WpAppqUserToProject.do().delete().where({
+        wp_user_id: 1,
+        project_id: 204,
+      });
+    });
+
     it("Should return workspaces with shared items even if the users isn't a member of any workspaces", async () => {
       await tryber.tables.WpAppqUserToCustomer.do().delete().where({
         wp_user_id: 1,
