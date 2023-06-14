@@ -107,6 +107,9 @@ describe("GET /workspaces/{wid}", () => {
         csm: fallBackCsmProfile,
       })
     );
+
+    expect(response.body.isShared).toBe(true);
+    expect(response.body.sharedItems).toBe(1);
   });
 
   // End of describe block
