@@ -10,10 +10,9 @@ export default async (userName: string) => {
   const sql = `SELECT u.ID, u.user_login, u.user_pass, u.user_email
     FROM wp_users u
     WHERE u.user_email = ?`;
-  console.log("🚀 ~ file: index.ts:13 ~ sql:", sql);
 
   const results = await db.query(db.format(sql, [userName]), "unguess");
-  console.log("🚀 ~ file: index.ts:16 ~ results:", results);
+
   if (results.length) {
     return results[0];
   }
