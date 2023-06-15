@@ -13,61 +13,12 @@ export default class Route extends WorkspaceRoute<{
 
     return count;
   }
-  private async getSharedProjects() {
-    const projects = await tryber.tables.WpAppqUserToProject.do()
-      .countDistinct({ total: "wp_appq_project.id" })
-      .join(
-        "wp_appq_project",
-        "wp_appq_project.id",
-        "wp_appq_user_to_project.project_id"
-      )
-      .join(
-        "wp_appq_customer",
-        "wp_appq_customer.id",
-        "wp_appq_project.customer_id"
-      )
-      .where(
-        "wp_appq_user_to_project.wp_user_id",
-        this.getUser().tryber_wp_user_id
-      )
-      .andWhere("wp_appq_customer.id", this.getWorkspaceId())
-      .first();
 
-    return projects?.total ? this.countToInt(projects.total) : 0;
-  }
-
-  private async getSharedCampaigns() {
-    const campaigns = await tryber.tables.WpAppqUserToCampaign.do()
-      .countDistinct({ total: "wp_appq_evd_campaign.id" })
-      .join(
-        "wp_appq_evd_campaign",
-        "wp_appq_evd_campaign.id",
-        "wp_appq_user_to_campaign.campaign_id"
-      )
-      .join(
-        "wp_appq_project",
-        "wp_appq_project.id",
-        "wp_appq_evd_campaign.project_id"
-      )
-      .join(
-        "wp_appq_customer",
-        "wp_appq_customer.id",
-        "wp_appq_project.customer_id"
-      )
-      .where(
-        "wp_appq_user_to_campaign.wp_user_id",
-        this.getUser().tryber_wp_user_id
-      )
-      .andWhere("wp_appq_customer.id", this.getWorkspaceId())
-      .first();
-
-    return campaigns?.total ? this.countToInt(campaigns.total) : 0;
-  }
   protected async hasSharedItems(): Promise<number> {
     const sharedProjects = await this.getSharedProjects();
     const sharedCampaigns = await this.getSharedCampaigns();
 
-    return sharedProjects + sharedCampaigns;
+    return sharedProjects.length + sharedCampaigns.length;
   }
 
   protected async filter(): Promise<boolean> {

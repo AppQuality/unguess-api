@@ -161,4 +161,59 @@ export default class WorkspaceRoute<
     if (!this.workspace) throw new Error("Invalid workspace");
     return this.workspace;
   }
+
+  protected async getSharedProjects() {
+    const projects = await tryber.tables.WpAppqUserToProject.do()
+      .select("project_id")
+      .join(
+        "wp_appq_project",
+        "wp_appq_project.id",
+        "wp_appq_user_to_project.project_id"
+      )
+      .join(
+        "wp_appq_customer",
+        "wp_appq_customer.id",
+        "wp_appq_project.customer_id"
+      )
+      .where(
+        "wp_appq_user_to_project.wp_user_id",
+        this.getUser().tryber_wp_user_id
+      )
+      .andWhere("wp_appq_customer.id", this.getWorkspaceId())
+      .groupBy("project_id");
+
+    console.log("prj_id list", projects);
+
+    return projects.map((p) => p.project_id);
+  }
+
+  protected async getSharedCampaigns() {
+    const campaigns = await tryber.tables.WpAppqUserToCampaign.do()
+      .select("campaign_id")
+      .join(
+        "wp_appq_evd_campaign",
+        "wp_appq_evd_campaign.id",
+        "wp_appq_user_to_campaign.campaign_id"
+      )
+      .join(
+        "wp_appq_project",
+        "wp_appq_project.id",
+        "wp_appq_evd_campaign.project_id"
+      )
+      .join(
+        "wp_appq_customer",
+        "wp_appq_customer.id",
+        "wp_appq_project.customer_id"
+      )
+      .where(
+        "wp_appq_user_to_campaign.wp_user_id",
+        this.getUser().tryber_wp_user_id
+      )
+      .andWhere("wp_appq_customer.id", this.getWorkspaceId())
+      .groupBy("campaign_id");
+
+    console.log("cp_ids list", campaigns);
+
+    return campaigns.map((c) => c.campaign_id);
+  }
 }
