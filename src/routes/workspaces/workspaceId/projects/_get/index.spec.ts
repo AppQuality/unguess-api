@@ -2,6 +2,7 @@ import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { ERROR_MESSAGE, LIMIT_QUERY_PARAM_DEFAULT } from "@src/utils/constants";
+import { tryber } from "@src/features/database";
 
 const customer_profile_1 = {
   id: 1,
@@ -293,4 +294,46 @@ describe("GET /workspaces/{wid}/projects", () => {
       })
     );
   });
+
+  it("Should return 200 and a Workspace if the user is not a workspace member BUT has access to somes sub projects", async () => {
+    await tryber.tables.WpAppqCustomer.do().insert({
+      ...customer_1,
+      id: 1234,
+      pm_id: 32,
+    });
+
+    await tryber.tables.WpAppqProject.do().insert({
+      id: 567,
+      display_name: "Progettino uno",
+      customer_id: 1234,
+      edited_by: 32,
+    });
+
+    await tryber.tables.WpAppqUserToProject.do().insert({
+      wp_user_id: 1,
+      project_id: 567,
+    });
+
+    const response = await request(app)
+      .get(`/workspaces/1234/projects`)
+      .set("authorization", "Bearer user");
+
+    expect(response.status).toBe(200);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 567,
+          name: "Progettino uno",
+          campaigns_count: 0,
+          workspaceId: 1234,
+        }),
+      ])
+    );
+
+    expect(response.body.start).toEqual(0);
+    expect(response.body.size).toEqual(1);
+    expect(response.body.total).toEqual(1);
+  });
+
+  // End of describe
 });
