@@ -1543,6 +1543,7 @@ export interface operations {
         "application/json": {
           /** @description Tryber WP USER ID */
           user_id: number;
+          include_shared?: boolean;
         };
       };
     };
@@ -1743,6 +1744,7 @@ export interface operations {
         "application/json": {
           /** @description Tryber WP USER ID */
           user_id: number;
+          include_shared?: boolean;
         };
       };
     };
@@ -2021,6 +2023,7 @@ export interface operations {
         "application/json": {
           /** @description Tryber WP USER ID */
           user_id: number;
+          include_shared?: boolean;
         };
       };
     };
