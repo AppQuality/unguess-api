@@ -1087,6 +1087,10 @@ paths:
                   type: string
                 redirect_url:
                   type: string
+                message:
+                  type: string
+                  x-stoplight:
+                    id: 1dp7l9p818al2
               required:
                 - email
       security:
@@ -1714,6 +1718,10 @@ paths:
                   type: string
                 redirect_url:
                   type: string
+                message:
+                  type: string
+                  x-stoplight:
+                    id: pik86vvj1cvwc
               required:
                 - email
       security:
@@ -1871,6 +1879,10 @@ paths:
                   type: string
                 redirect_url:
                   type: string
+                message:
+                  type: string
+                  x-stoplight:
+                    id: wmewguaityavx
               required:
                 - email
       security:
@@ -3180,8 +3192,10 @@ components:
       required:
         - data
         - kind
-    Invitation:
+    Tenant:
       title: Tenant
+      x-stoplight:
+        id: af647bca56ce8
       type: object
       properties:
         id:
