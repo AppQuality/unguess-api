@@ -1111,6 +1111,10 @@ paths:
                 user_id:
                   type: number
                   description: Tryber WP USER ID
+                include_shared:
+                  type: boolean
+                  x-stoplight:
+                    id: o8h7lc76gzlw8
               required:
                 - user_id
   /projects:
@@ -1404,6 +1408,10 @@ paths:
                 user_id:
                   type: number
                   description: Tryber WP USER ID
+                include_shared:
+                  type: boolean
+                  x-stoplight:
+                    id: qbqgxykqow21r
               required:
                 - user_id
   /templates:
@@ -1849,6 +1857,10 @@ paths:
                 user_id:
                   type: number
                   description: Tryber WP USER ID
+                include_shared:
+                  type: boolean
+                  x-stoplight:
+                    id: w9ulhmmyfq5wv
               required:
                 - user_id
   '/workspaces/{wid}/projects':
