@@ -3407,6 +3407,8 @@ components:
                 type: string
                 x-stoplight:
                   id: bhts8uetaz9nr
+            required:
+              - email
 tags:
   - name: Authentication
   - name: Campaign
