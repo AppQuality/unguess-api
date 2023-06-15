@@ -182,8 +182,6 @@ export default class WorkspaceRoute<
       .andWhere("wp_appq_customer.id", this.getWorkspaceId())
       .groupBy("project_id");
 
-    console.log("prj_id list", projects);
-
     return projects.map((p) => p.project_id);
   }
 
@@ -211,8 +209,6 @@ export default class WorkspaceRoute<
       )
       .andWhere("wp_appq_customer.id", this.getWorkspaceId())
       .groupBy("campaign_id");
-
-    console.log("cp_ids list", campaigns);
 
     return campaigns.map((c) => c.campaign_id);
   }

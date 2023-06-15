@@ -295,7 +295,7 @@ describe("GET /workspaces/{wid}/projects", () => {
     );
   });
 
-  it("Should return 200 and a Workspace if the user is not a workspace member BUT has access to somes sub projects", async () => {
+  it("Should return 200 and a Project if the user is not a workspace member BUT has access to some sub-projects", async () => {
     await tryber.tables.WpAppqCustomer.do().insert({
       ...customer_1,
       id: 1234,
