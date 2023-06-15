@@ -1,14 +1,10 @@
 /** OPENAPI-CLASS: get-workspace-campaigns */
 import * as db from "@src/features/db";
-import { getWorkspace } from "@src/utils/workspaces";
-import { getUserProjects } from "@src/utils/projects";
 import {
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
 } from "@src/utils/constants";
 import { getCampaignFamily, getCampaignStatus } from "@src/utils/campaigns";
-
-import UserRoute from "@src/features/routes/UserRoute";
 import WorkspaceRoute from "@src/features/routes/WorkspaceRoute";
 import { tryber } from "@src/features/database";
 
@@ -110,15 +106,6 @@ export default class Route extends WorkspaceRoute<{
   protected async prepare(): Promise<void> {
     const userProjects = await this.getUserProjects();
     const campaigns = await this.getCampaigns(userProjects);
-
-    // if (!userProjects.length) return this.returnEmptyList();
-
-    // let campaigns;
-    // try {
-    //   campaigns = await this.getCampaigns(userProjects);
-    // } catch (err) {
-    //   throw { code: 400, message: "Something went wrong" };
-    // }
 
     if (!campaigns.length) return this.returnEmptyList();
 
