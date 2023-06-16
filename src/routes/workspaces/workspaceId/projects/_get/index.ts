@@ -6,6 +6,7 @@ import {
   START_QUERY_PARAM_DEFAULT,
 } from "@src/utils/constants";
 import WorkspaceRoute from "@src/features/routes/WorkspaceRoute";
+import { tryber } from "@src/features/database";
 
 export default class Route extends WorkspaceRoute<{
   response: StoplightOperations["get-workspace-projects"]["responses"]["200"]["content"]["application/json"];
@@ -14,6 +15,31 @@ export default class Route extends WorkspaceRoute<{
 }> {
   private limit: number = LIMIT_QUERY_PARAM_DEFAULT;
   private start: number = START_QUERY_PARAM_DEFAULT;
+
+  private sharedProjects: Array<number> = [];
+
+  protected async filter(): Promise<boolean> {
+    /**
+     * We need to override the filter method to check if the user has access to the workspace
+     * if the user hasn't a workspace access, we need to check if the user has access to a shared project
+     */
+
+    const access = await this.checkWSAccess();
+
+    if (!access) {
+      this.sharedProjects = await this.getSharedProjects();
+      if (this.sharedProjects.length > 0) return true;
+
+      this.setError(403, {
+        code: 403,
+        message: "Workspace doesn't exist or not accessible",
+      } as OpenapiError);
+
+      return false;
+    }
+
+    return true;
+  }
 
   constructor(configuration: RouteClassConfiguration) {
     super(configuration);
@@ -25,7 +51,6 @@ export default class Route extends WorkspaceRoute<{
 
   protected async prepare(): Promise<void> {
     const projects = await this.getProjects();
-
     const total = await this.getProjectsCount();
 
     const enhancedProjects = await this.formatProjects(projects);
@@ -46,13 +71,21 @@ export default class Route extends WorkspaceRoute<{
       customer_id: number;
     }[]
   > {
-    let projectSql = `SELECT id, display_name, customer_id FROM wp_appq_project WHERE customer_id = ? ORDER BY id`;
+    const projectsQuery = tryber.tables.WpAppqProject.do()
+      .select("id", "display_name", "customer_id")
+      .where("customer_id", this.getWorkspaceId())
+      .orderBy("id");
 
     if (this.limit) {
-      projectSql += ` LIMIT ${this.limit} OFFSET ${this.start}`;
+      projectsQuery.limit(this.limit);
+      projectsQuery.offset(this.start);
     }
 
-    return await db.query(db.format(projectSql, [this.getWorkspaceId()]));
+    if (this.sharedProjects.length > 0) {
+      projectsQuery.andWhere("id", "in", this.sharedProjects);
+    }
+
+    return await projectsQuery;
   }
 
   protected async getProjectsCount(): Promise<number> {

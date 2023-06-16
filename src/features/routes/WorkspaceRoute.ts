@@ -37,10 +37,10 @@ export default class WorkspaceRoute<
     if (!this.workspace) {
       this.setError(403, {
         code: 403,
-        message: "Workspace not found",
+        message: "Workspace doesn't exist or not accessible",
       } as OpenapiError);
 
-      throw new Error("Workspace not found");
+      throw new Error("Workspace doesn't exist or not accessible");
     }
   }
 
@@ -68,7 +68,7 @@ export default class WorkspaceRoute<
     if (!access) {
       this.setError(403, {
         code: 403,
-        message: "Workspace not found",
+        message: "Workspace doesn't exist or not accessible",
       } as OpenapiError);
 
       return false;
@@ -160,5 +160,56 @@ export default class WorkspaceRoute<
   protected getWorkspace() {
     if (!this.workspace) throw new Error("Invalid workspace");
     return this.workspace;
+  }
+
+  protected async getSharedProjects() {
+    const projects = await tryber.tables.WpAppqUserToProject.do()
+      .select("project_id")
+      .join(
+        "wp_appq_project",
+        "wp_appq_project.id",
+        "wp_appq_user_to_project.project_id"
+      )
+      .join(
+        "wp_appq_customer",
+        "wp_appq_customer.id",
+        "wp_appq_project.customer_id"
+      )
+      .where(
+        "wp_appq_user_to_project.wp_user_id",
+        this.getUser().tryber_wp_user_id
+      )
+      .andWhere("wp_appq_customer.id", this.getWorkspaceId())
+      .groupBy("project_id");
+
+    return projects.map((p) => p.project_id);
+  }
+
+  protected async getSharedCampaigns() {
+    const campaigns = await tryber.tables.WpAppqUserToCampaign.do()
+      .select("campaign_id")
+      .join(
+        "wp_appq_evd_campaign",
+        "wp_appq_evd_campaign.id",
+        "wp_appq_user_to_campaign.campaign_id"
+      )
+      .join(
+        "wp_appq_project",
+        "wp_appq_project.id",
+        "wp_appq_evd_campaign.project_id"
+      )
+      .join(
+        "wp_appq_customer",
+        "wp_appq_customer.id",
+        "wp_appq_project.customer_id"
+      )
+      .where(
+        "wp_appq_user_to_campaign.wp_user_id",
+        this.getUser().tryber_wp_user_id
+      )
+      .andWhere("wp_appq_customer.id", this.getWorkspaceId())
+      .groupBy("campaign_id");
+
+    return campaigns.map((c) => c.campaign_id);
   }
 }

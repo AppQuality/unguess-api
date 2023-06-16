@@ -9,6 +9,6 @@ export default () => {
       .readFileSync(".git/" + rev.substring(5))
       .toString()
       .trim()
-      .substr(0, 6);
+      .substring(0, 6);
   }
 };
