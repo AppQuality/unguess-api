@@ -75,6 +75,34 @@ describe("GET /workspaces/{wid}", () => {
     );
   });
 
+  it("Should return 403 aif the user has no access and no shared items", async () => {
+    await tryber.tables.WpAppqCustomer.do().insert({
+      ...context.customer_1,
+      id: 9999,
+    });
+
+    await tryber.tables.WpAppqProject.do().insert({
+      id: 123,
+      display_name: "Progettino uno",
+      customer_id: 9999,
+      edited_by: 32,
+    });
+
+    await tryber.tables.WpAppqUserToProject.do().insert({
+      wp_user_id: 12,
+      project_id: 123,
+    });
+
+    const response = await request(app)
+      .get(`/workspaces/9999`)
+      .set("authorization", "Bearer user");
+
+    expect(response.status).toBe(403);
+    expect(response.body.message).toBe(
+      "Workspace doesn't exist or not accessible"
+    );
+  });
+
   it("Should return 200 and a Workspace if the user is not a member BUT has access to some child item of the workspace", async () => {
     await tryber.tables.WpAppqCustomer.do().insert({
       ...context.customer_1,

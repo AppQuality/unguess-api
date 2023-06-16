@@ -335,5 +335,34 @@ describe("GET /workspaces/{wid}/projects", () => {
     expect(response.body.total).toEqual(1);
   });
 
+  it("Should return 403 if the users has shared items but nothing related to the workspace", async () => {
+    await tryber.tables.WpAppqCustomer.do().insert({
+      ...customer_1,
+      id: 2222,
+      pm_id: 32,
+    });
+
+    await tryber.tables.WpAppqProject.do().insert({
+      id: 3333,
+      display_name: "Progettino uno",
+      customer_id: 2222,
+      edited_by: 32,
+    });
+
+    await tryber.tables.WpAppqUserToProject.do().insert({
+      wp_user_id: 123, // another user
+      project_id: 567,
+    });
+
+    const response = await request(app)
+      .get(`/workspaces/2222/projects`)
+      .set("authorization", "Bearer user");
+
+    expect(response.status).toBe(403);
+    expect(response.body.message).toBe(
+      "Workspace doesn't exist or not accessible"
+    );
+  });
+
   // End of describe
 });

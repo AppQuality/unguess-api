@@ -1,5 +1,4 @@
 /** OPENAPI-CLASS: get-workspace */
-import { tryber } from "@src/features/database";
 import WorkspaceRoute from "@src/features/routes/WorkspaceRoute";
 import { getGravatar } from "@src/utils/users";
 
@@ -7,13 +6,6 @@ export default class Route extends WorkspaceRoute<{
   response: StoplightOperations["get-workspace"]["responses"]["200"]["content"]["application/json"];
   parameters: StoplightOperations["get-workspace"]["parameters"]["path"];
 }> {
-  private countToInt(count?: string | number) {
-    if (typeof count === "undefined") return 0;
-    if (typeof count === "string") return Number.parseInt(count);
-
-    return count;
-  }
-
   protected async hasSharedItems(): Promise<number> {
     const sharedProjects = await this.getSharedProjects();
     const sharedCampaigns = await this.getSharedCampaigns();
