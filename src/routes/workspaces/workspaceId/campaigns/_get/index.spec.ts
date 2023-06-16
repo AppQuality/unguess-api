@@ -175,7 +175,9 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       .get("/workspaces/999898978/campaigns")
       .set("authorization", "Bearer user");
     expect(response.body.code).toBe(403);
-    expect(response.body.message).toBe("Workspace not found");
+    expect(response.body.message).toBe(
+      "Workspace doesn't exist or not accessible"
+    );
   });
 
   it("Should return an array of 1 elements because of limit = 1", async () => {
@@ -538,6 +540,36 @@ describe("GET /workspaces/{wid}/campaigns", () => {
     expect(response.body.start).toEqual(0);
     expect(response.body.size).toEqual(2);
     expect(response.body.total).toEqual(2);
+  });
+
+  it("Should return 403 if the users has shared items but nothing related to the workspace", async () => {
+    await tryber.tables.WpAppqCustomer.do().insert({
+      ...customer_1,
+      id: 2222,
+      pm_id: 32,
+    });
+
+    await tryber.tables.WpAppqProject.do().insert({
+      id: 3333,
+      display_name: "Progettino uno",
+      customer_id: 2222,
+      edited_by: 32,
+    });
+
+    await tryber.tables.WpAppqEvdCampaign.do().insert({
+      ...campaign_1,
+      id: 4444,
+      project_id: 3333, // Project not accessible by the user
+    });
+
+    const response = await request(app)
+      .get(`/workspaces/2222/campaigns`)
+      .set("authorization", "Bearer user");
+
+    expect(response.status).toBe(403);
+    expect(response.body.message).toBe(
+      "Workspace doesn't exist or not accessible"
+    );
   });
 
   it("Should return 200 and a Campaign if the user is not a workspace member BUT has access only to it", async () => {

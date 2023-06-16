@@ -37,10 +37,10 @@ export default class WorkspaceRoute<
     if (!this.workspace) {
       this.setError(403, {
         code: 403,
-        message: "Workspace not found",
+        message: "Workspace doesn't exist or not accessible",
       } as OpenapiError);
 
-      throw new Error("Workspace not found");
+      throw new Error("Workspace doesn't exist or not accessible");
     }
   }
 
@@ -68,7 +68,7 @@ export default class WorkspaceRoute<
     if (!access) {
       this.setError(403, {
         code: 403,
-        message: "Workspace not found",
+        message: "Workspace doesn't exist or not accessible",
       } as OpenapiError);
 
       return false;

@@ -32,7 +32,7 @@ export default class Route extends WorkspaceRoute<{
 
       this.setError(403, {
         code: 403,
-        message: "Workspace not found",
+        message: "Workspace doesn't exist or not accessible",
       } as OpenapiError);
 
       return false;
