@@ -1,3 +1,3 @@
 # UNGUESS API
 
-[![Coverage Status](https://coveralls.io/repos/github/AppQuality/unguess_api/badge.svg?branch=develop)](https://coveralls.io/github/AppQuality/unguess_api?branch=develop)
+[![Coverage Status](https://coveralls.io/repos/github/AppQuality/unguess-api/badge.svg?branch=develop)](https://coveralls.io/github/AppQuality/unguess-api?branch=develop)
