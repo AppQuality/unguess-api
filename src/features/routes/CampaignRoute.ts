@@ -13,6 +13,7 @@ export default class CampaignRoute<
   }
 > extends ProjectRoute<T> {
   protected cp_id: number;
+  protected campaignName: string = "";
   protected showNeedReview: boolean = false;
   protected baseBugInternalId: string = "";
   private NEED_REVIEW_STATUS_ID = 4;
@@ -51,26 +52,28 @@ export default class CampaignRoute<
     }
 
     this.project_id = campaign.project_id;
-    this.showNeedReview = campaign.showNeedReview;
+    this.showNeedReview = campaign.showNeedReview === 1;
     this.baseBugInternalId = campaign.base_bug_internal_id;
+    this.campaignName = campaign.customerTitle || campaign.internalTitle;
 
     await super.init();
   }
 
   private async initCampaign() {
-    const campaigns: {
-      showNeedReview: boolean;
-      project_id: number;
-      base_bug_internal_id: string;
-    }[] = await db.query(`
-      SELECT 
-        cust_bug_vis as showNeedReview,
-        project_id,
-        base_bug_internal_id
-      FROM wp_appq_evd_campaign 
-      WHERE id = ${this.cp_id}`);
-    if (!campaigns.length) return false;
-    return campaigns[0];
+    const campaign = await tryber.tables.WpAppqEvdCampaign.do()
+      .select(
+        tryber.ref("title").as("internalTitle"),
+        tryber.ref("customer_title").as("customerTitle"),
+        tryber.ref("cust_bug_vis").as("showNeedReview"),
+        tryber.ref("project_id"),
+        tryber.ref("base_bug_internal_id")
+      )
+      .where({ id: this.cp_id })
+      .first();
+
+    if (!campaign) return false;
+
+    return campaign;
   }
 
   protected async filter(): Promise<boolean> {

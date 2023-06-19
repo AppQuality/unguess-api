@@ -243,6 +243,7 @@ export default class Route extends ProjectRoute<{
         "{Inviter.email}": sender.email,
         "{Inviter.url}": `${process.env.APP_URL}/invites/${profile_id}/${token}`,
         "{Inviter.redirectUrl}": this.getEmailRedirectUrl(),
+        "{Inviter.subject}": this.project?.name ?? "project",
       },
     });
   }

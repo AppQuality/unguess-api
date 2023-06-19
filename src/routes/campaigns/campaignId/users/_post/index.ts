@@ -247,6 +247,7 @@ export default class Route extends CampaignRoute<{
         "{Inviter.email}": sender.email,
         "{Inviter.url}": `${process.env.APP_URL}/invites/${profile_id}/${token}`,
         "{Inviter.redirectUrl}": this.getEmailRedirectUrl(),
+        "{Inviter.subject}": this.campaignName,
       },
     });
   }
