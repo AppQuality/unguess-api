@@ -1,5 +1,4 @@
 /** OPENAPI-CLASS: delete-projects-pid-users */
-import WorkspaceRoute from "@src/features/routes/WorkspaceRoute";
 import { tryber } from "@src/features/database";
 import ProjectRoute from "@src/features/routes/ProjectRoute";
 
@@ -62,6 +61,30 @@ export default class Route extends ProjectRoute<{
       });
 
     if (!response) throw new Error("Something went wrong");
+
+    if (this.getBody().include_shared) {
+      /**
+       * We have to remove eventual shared campaigns in the project
+       */
+
+      const cp_ids = await tryber.tables.WpAppqEvdCampaign.do()
+        .select(tryber.ref("id").withSchema("wp_appq_evd_campaign"))
+        .where("wp_appq_evd_campaign.project_id", this.getProjectId())
+        .groupBy("wp_appq_evd_campaign.id");
+
+      if (cp_ids.length > 0) {
+        await tryber.tables.WpAppqUserToCampaign.do()
+          .delete()
+          .where({
+            wp_user_id: this.userToRemoveWpId,
+          })
+          .andWhere(
+            "wp_appq_user_to_campaign.campaign_id",
+            "IN",
+            cp_ids.map((p) => p.id)
+          );
+      }
+    }
   }
 
   private enhanceUsers(users: Awaited<ReturnType<typeof this.getUsers>>) {

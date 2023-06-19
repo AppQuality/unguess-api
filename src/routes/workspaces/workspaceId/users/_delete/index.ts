@@ -1,6 +1,7 @@
 /** OPENAPI-CLASS: delete-workspaces-wid-users */
 import WorkspaceRoute from "@src/features/routes/WorkspaceRoute";
 import { tryber } from "@src/features/database";
+import { ca } from "date-fns/locale";
 
 interface DbUser {
   tryber_wp_id: number;
@@ -61,6 +62,60 @@ export default class Route extends WorkspaceRoute<{
       });
 
     if (!response) throw new Error("Something went wrong");
+
+    if (this.getBody().include_shared) {
+      const prj_ids = await tryber.tables.WpAppqProject.do()
+        .select("id")
+        .where("customer_id", this.getWorkspaceId());
+
+      const cp_ids = await tryber.tables.WpAppqEvdCampaign.do()
+        .select(tryber.ref("id").withSchema("wp_appq_evd_campaign"))
+        .join(
+          "wp_appq_project",
+          "wp_appq_project.id",
+          "wp_appq_evd_campaign.project_id"
+        )
+        .join(
+          "wp_appq_customer",
+          "wp_appq_customer.id",
+          "wp_appq_project.customer_id"
+        )
+        .where("wp_appq_customer.id", this.getWorkspaceId())
+        .groupBy("wp_appq_evd_campaign.id");
+
+      if (cp_ids.length > 0) {
+        /**
+         * We have to remove eventual shared campaigns in all workspace projects
+         */
+        await tryber.tables.WpAppqUserToCampaign.do()
+          .delete()
+          .where({
+            wp_user_id: this.userToRemoveWpId,
+          })
+          .andWhere(
+            "wp_appq_user_to_campaign.campaign_id",
+            "IN",
+            cp_ids.map((p) => p.id)
+          );
+      }
+
+      if (prj_ids.length > 0) {
+        /**
+         * We have to remove eventual shared projects in the workspace
+         */
+        await tryber.tables.WpAppqUserToProject.do()
+          .delete()
+
+          .where({
+            wp_user_id: this.userToRemoveWpId,
+          })
+          .andWhere(
+            "wp_appq_user_to_project.project_id",
+            "IN",
+            prj_ids.map((p) => p.id)
+          );
+      }
+    }
   }
 
   private enhanceUsers(users: Awaited<ReturnType<typeof this.getUsers>>) {
