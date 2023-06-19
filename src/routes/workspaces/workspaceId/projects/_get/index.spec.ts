@@ -54,26 +54,6 @@ const project_3 = {
   customer_id: 1,
 };
 
-const user_to_project_1 = {
-  wp_user_id: 1,
-  project_id: 1,
-};
-
-const user_to_project_2 = {
-  wp_user_id: 2,
-  project_id: 2,
-};
-
-const user_to_project_3 = {
-  wp_user_id: 1,
-  project_id: 3,
-};
-
-const user_to_project_4 = {
-  wp_user_id: 2,
-  project_id: 1,
-};
-
 const campaign_1 = {
   id: 1,
   start_date: "2017-07-20 00:00:00",
@@ -129,12 +109,6 @@ describe("GET /workspaces/{wid}/projects", () => {
           companies: [customer_1, customer_2],
           projects: [project_1, project_2, project_3],
           userToCustomers: [user_to_customer_1, user_to_customer_2],
-          userToProjects: [
-            user_to_project_1,
-            user_to_project_2,
-            user_to_project_3,
-            user_to_project_4,
-          ],
         });
       } catch (error) {
         console.error(error);
@@ -163,28 +137,26 @@ describe("GET /workspaces/{wid}/projects", () => {
     const response = await request(app)
       .get(`/workspaces/${customer_1.id}/projects`)
       .set("authorization", "Bearer user");
-    expect(JSON.stringify(response.body)).toStrictEqual(
-      JSON.stringify({
-        items: [
-          {
-            id: project_1.id,
-            name: project_1.display_name,
-            campaigns_count: 2,
-            workspaceId: project_1.customer_id,
-          },
-          {
-            id: project_3.id,
-            name: project_3.display_name,
-            campaigns_count: 1,
-            workspaceId: project_3.customer_id,
-          },
-        ],
-        start: 0,
-        limit: LIMIT_QUERY_PARAM_DEFAULT,
-        size: 2,
-        total: 2,
-      })
-    );
+    expect(response.body).toEqual({
+      items: [
+        {
+          id: project_1.id,
+          name: project_1.display_name,
+          campaigns_count: 2,
+          workspaceId: project_1.customer_id,
+        },
+        {
+          id: project_3.id,
+          name: project_3.display_name,
+          campaigns_count: 1,
+          workspaceId: project_3.customer_id,
+        },
+      ],
+      start: 0,
+      limit: LIMIT_QUERY_PARAM_DEFAULT,
+      size: 2,
+      total: 2,
+    });
   });
 
   it("Should answer with only one visible project because of limit 1", async () => {

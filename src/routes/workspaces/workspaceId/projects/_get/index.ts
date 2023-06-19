@@ -89,6 +89,13 @@ export default class Route extends WorkspaceRoute<{
   }
 
   protected async getProjectsCount(): Promise<number> {
+    /**
+     * If the user has access to a shared project,
+     * means that the user has access to at least one project BUT not access to workspace as a member.
+     * So we can safely return the sharedProjects.length
+     */
+    if (this.sharedProjects.length > 0) return this.sharedProjects.length;
+
     const countQuery = `SELECT COUNT(*) as count FROM wp_appq_project WHERE customer_id = ?`;
     let total = await db.query(db.format(countQuery, [this.getWorkspaceId()]));
     total = formatCount(total);
@@ -105,28 +112,7 @@ export default class Route extends WorkspaceRoute<{
   ): Promise<StoplightComponents["schemas"]["Project"][]> {
     let returnProjects: StoplightComponents["schemas"]["Project"][] = [];
     for (const project of projects) {
-      if (this.getUser().role !== "administrator") {
-        // Check if user can see this project
-        let hasPermission = false;
-        const userToProjectSql =
-          "SELECT * FROM wp_appq_user_to_project WHERE project_id = ? AND wp_user_id = ?";
-        let userToProjectRows: Array<{
-          wp_user_id: number;
-          project_id: number;
-        }> = await db.query(
-          db.format(userToProjectSql, [project.id, this.getUserId()])
-        );
-
-        if (userToProjectRows.length) {
-          hasPermission = true;
-        }
-
-        if (!hasPermission) {
-          continue;
-        }
-      }
-
-      let item: StoplightComponents["schemas"]["Project"] = {
+      const item: StoplightComponents["schemas"]["Project"] = {
         id: project.id,
         name: project.display_name,
         campaigns_count: await this.getCampaignsCount(project.id),
