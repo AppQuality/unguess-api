@@ -258,9 +258,7 @@ export default class Route extends CampaignRoute<{
         "{Inviter.email}": sender.email,
         "{Inviter.subject}": this.workspace?.company ?? "workspace",
         "{Inviter.redirectUrl}": this.getEmailRedirectUrl(),
-        ...(this.getBody().message && {
-          "{Inviter.inviteText}": this.getBody().message,
-        }),
+        "{Inviter.inviteText}": this.getBody()?.message ?? "",
         ...params, // additional fields
       },
     });

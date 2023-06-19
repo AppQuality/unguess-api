@@ -192,7 +192,7 @@ describe("POST /campaigns/{cid}/users mail checks", () => {
         email: "info@unguess.io",
         name: "UNGUESS",
       },
-      html: "A special mail for a special user",
+      html: "A special mail for a special user: ",
       subject: "Entra in Unguess",
       categories: ["UNGUESSAPP_STAGING"],
     });
