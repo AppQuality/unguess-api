@@ -217,6 +217,20 @@ export interface paths {
       };
     };
   };
+  "/projects/{pid}/users": {
+    /** Return a list of users from a specific project */
+    get: operations["get-projects-users"];
+    /** Use this to add a new or existent user into a specific project. */
+    post: operations["post-projects-pid-users"];
+    /** Remove an user from project */
+    delete: operations["delete-projects-pid-users"];
+    parameters: {
+      path: {
+        /** Project id */
+        pid: components["parameters"]["pid"];
+      };
+    };
+  };
   "/templates": {
     /** Retrieve all available use case templates */
     get: operations["get-templates"];
@@ -267,20 +281,6 @@ export interface paths {
       path: {
         /** Workspace (company, customer) id */
         wid: components["parameters"]["wid"];
-      };
-    };
-  };
-  "/projects/{pid}/users": {
-    /** Return a list of users from a specific project */
-    get: operations["get-projects-users"];
-    /** Use this to add a new or existent user into a specific project. */
-    post: operations["post-projects-pid-users"];
-    /** Remove an user from project */
-    delete: operations["delete-projects-pid-users"];
-    parameters: {
-      path: {
-        /** Project id */
-        pid: components["parameters"]["pid"];
       };
     };
   };
@@ -807,7 +807,7 @@ export interface components {
       kind: "campaignUniqueBugs";
     };
     /** Tenant */
-    Invitation: {
+    Tenant: {
       /** @description tryber wp_user_id */
       id: number;
       profile_id: number;
@@ -903,6 +903,19 @@ export interface components {
         "application/json": {
           name: string;
           customer_id: number;
+        };
+      };
+    };
+    Invitation: {
+      content: {
+        "application/json": {
+          email: string;
+          name?: string;
+          surname?: string;
+          locale?: string;
+          event_name?: string;
+          redirect_url?: string;
+          message?: string;
         };
       };
     };
@@ -1466,7 +1479,7 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            items: components["schemas"]["Invitation"][];
+            items: components["schemas"]["Tenant"][];
             start?: number;
             limit?: number;
             size?: number;
@@ -1502,23 +1515,7 @@ export interface operations {
       403: components["responses"]["Error"];
       500: components["responses"]["Error"];
     };
-    requestBody: {
-      content: {
-        "application/json": {
-          email: string;
-          name?: string;
-          surname?: string;
-          /**
-           * @description preferred language
-           * @default en
-           * @enum {string}
-           */
-          locale?: "it" | "en";
-          event_name?: string;
-          redirect_url?: string;
-        };
-      };
-    };
+    requestBody: components["requestBodies"]["Invitation"];
   };
   /** Remove an user from campaign */
   "delete-campaign-cid-users": {
@@ -1533,7 +1530,7 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            items: components["schemas"]["Invitation"][];
+            items: components["schemas"]["Tenant"][];
           };
         };
       };
@@ -1657,6 +1654,98 @@ export interface operations {
       403: components["responses"]["Error"];
       404: components["responses"]["Error"];
       500: components["responses"]["Error"];
+    };
+  };
+  /** Return a list of users from a specific project */
+  "get-projects-users": {
+    parameters: {
+      path: {
+        /** Project id */
+        pid: components["parameters"]["pid"];
+      };
+      query: {
+        /** Limit pagination parameter */
+        limit?: components["parameters"]["limit"];
+        /** Start pagination parameter */
+        start?: components["parameters"]["start"];
+        /** Order value (ASC, DESC) */
+        order?: components["parameters"]["order"];
+        /** Order by accepted field */
+        orderBy?: components["parameters"]["orderBy"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            items: components["schemas"]["Tenant"][];
+            start?: number;
+            limit?: number;
+            size?: number;
+            total?: number;
+          };
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  /** Use this to add a new or existent user into a specific project. */
+  "post-projects-pid-users": {
+    parameters: {
+      path: {
+        /** Project id */
+        pid: components["parameters"]["pid"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            profile_id: number;
+            tryber_wp_user_id: number;
+            email: string;
+          };
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+    requestBody: components["requestBodies"]["Invitation"];
+  };
+  /** Remove an user from project */
+  "delete-projects-pid-users": {
+    parameters: {
+      path: {
+        /** Project id */
+        pid: components["parameters"]["pid"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            items: components["schemas"]["Tenant"][];
+          };
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description Tryber WP USER ID */
+          user_id: number;
+          include_shared?: boolean;
+        };
+      };
     };
   };
   /** Retrieve all available use case templates */
@@ -1869,7 +1958,7 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            items: components["schemas"]["Invitation"][];
+            items: components["schemas"]["Tenant"][];
             start?: number;
             limit?: number;
             size?: number;
@@ -1905,23 +1994,7 @@ export interface operations {
       403: components["responses"]["Error"];
       500: components["responses"]["Error"];
     };
-    requestBody: {
-      content: {
-        "application/json": {
-          email: string;
-          name?: string;
-          surname?: string;
-          /**
-           * @description preferred language
-           * @default en
-           * @enum {string}
-           */
-          locale?: "it" | "en";
-          event_name?: string;
-          redirect_url?: string;
-        };
-      };
-    };
+    requestBody: components["requestBodies"]["Invitation"];
   };
   /** Remove an user from workspace */
   "delete-workspaces-wid-users": {
@@ -1936,7 +2009,7 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            items: components["schemas"]["Invitation"][];
+            items: components["schemas"]["Tenant"][];
           };
         };
       };
@@ -1949,113 +2022,7 @@ export interface operations {
         "application/json": {
           /** @description Tryber WP USER ID */
           user_id: number;
-        };
-      };
-    };
-  };
-  /** Return a list of users from a specific project */
-  "get-projects-users": {
-    parameters: {
-      path: {
-        /** Project id */
-        pid: components["parameters"]["pid"];
-      };
-      query: {
-        /** Limit pagination parameter */
-        limit?: components["parameters"]["limit"];
-        /** Start pagination parameter */
-        start?: components["parameters"]["start"];
-        /** Order value (ASC, DESC) */
-        order?: components["parameters"]["order"];
-        /** Order by accepted field */
-        orderBy?: components["parameters"]["orderBy"];
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/json": {
-            items: components["schemas"]["Invitation"][];
-            start?: number;
-            limit?: number;
-            size?: number;
-            total?: number;
-          };
-        };
-      };
-      400: components["responses"]["Error"];
-      403: components["responses"]["Error"];
-      500: components["responses"]["Error"];
-    };
-  };
-  /** Use this to add a new or existent user into a specific project. */
-  "post-projects-pid-users": {
-    parameters: {
-      path: {
-        /** Project id */
-        pid: components["parameters"]["pid"];
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/json": {
-            profile_id: number;
-            tryber_wp_user_id: number;
-            email: string;
-          };
-        };
-      };
-      400: components["responses"]["Error"];
-      403: components["responses"]["Error"];
-      500: components["responses"]["Error"];
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          email: string;
-          name?: string;
-          surname?: string;
-          /**
-           * @description preferred language
-           * @default en
-           * @enum {string}
-           */
-          locale?: "it" | "en";
-          event_name?: string;
-          redirect_url?: string;
-        };
-      };
-    };
-  };
-  /** Remove an user from project */
-  "delete-projects-pid-users": {
-    parameters: {
-      path: {
-        /** Project id */
-        pid: components["parameters"]["pid"];
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/json": {
-            items: components["schemas"]["Invitation"][];
-          };
-        };
-      };
-      400: components["responses"]["Error"];
-      403: components["responses"]["Error"];
-      500: components["responses"]["Error"];
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description Tryber WP USER ID */
-          user_id: number;
+          include_shared?: boolean;
         };
       };
     };

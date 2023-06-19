@@ -993,7 +993,7 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Invitation'
+                      $ref: '#/components/schemas/Tenant'
                   start:
                     type: integer
                   limit:
@@ -1065,30 +1065,7 @@ paths:
           $ref: '#/components/responses/Error'
       description: Use this to add a new or existent user into a specific campaign.
       requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                name:
-                  type: string
-                surname:
-                  type: string
-                locale:
-                  type: string
-                  description: preferred language
-                  enum:
-                    - it
-                    - en
-                  default: en
-                event_name:
-                  type: string
-                redirect_url:
-                  type: string
-              required:
-                - email
+        $ref: '#/components/requestBodies/Invitation'
       security:
         - JWT: []
     delete:
@@ -1113,7 +1090,7 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Invitation'
+                      $ref: '#/components/schemas/Tenant'
                 required:
                   - items
         '400':
@@ -1295,6 +1272,144 @@ paths:
         - $ref: '#/components/parameters/start'
       security:
         - JWT: []
+  '/projects/{pid}/users':
+    get:
+      summary: Retrieve users of a specific project
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Tenant'
+                  start:
+                    type: integer
+                  limit:
+                    type: integer
+                  size:
+                    type: integer
+                  total:
+                    type: integer
+                required:
+                  - items
+              examples:
+                Example 1:
+                  value:
+                    items:
+                      - id: 1234
+                        email: user@example.com
+                        name: string
+                        profile_id: 999
+                        invitationPending: true
+                    start: 0
+                    limit: 0
+                    size: 1
+                    total: 1
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-projects-users
+      security:
+        - JWT: []
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/order'
+        - $ref: '#/components/parameters/orderBy'
+      tags:
+        - Workspaces
+      description: Return a list of users from a specific project
+    parameters:
+      - $ref: '#/components/parameters/pid'
+    post:
+      summary: Add user to project
+      operationId: post-projects-pid-users
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  profile_id:
+                    type: number
+                  tryber_wp_user_id:
+                    type: number
+                  email:
+                    type: string
+                required:
+                  - profile_id
+                  - tryber_wp_user_id
+                  - email
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      description: Use this to add a new or existent user into a specific project.
+      requestBody:
+        $ref: '#/components/requestBodies/Invitation'
+      security:
+        - JWT: []
+    delete:
+      summary: Remove user from project
+      operationId: delete-projects-pid-users
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                x-examples:
+                  Example 1:
+                    items:
+                      - id: 1234
+                        email: user@example.com
+                        name: string
+                        profile_id: 999
+                        invitationPending: true
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Tenant'
+                required:
+                  - items
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      description: Remove an user from project
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: number
+                  description: Tryber WP USER ID
+                include_shared:
+                  type: boolean
+                  x-stoplight:
+                    id: qbqgxykqow21r
+              required:
+                - user_id
   /templates:
     get:
       summary: GET /templates
@@ -1620,7 +1735,7 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Invitation'
+                      $ref: '#/components/schemas/Tenant'
                   start:
                     type: integer
                   limit:
@@ -1692,30 +1807,7 @@ paths:
           $ref: '#/components/responses/Error'
       description: Use this to add a new or existent user into a specific workspace.
       requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                name:
-                  type: string
-                surname:
-                  type: string
-                locale:
-                  type: string
-                  description: preferred language
-                  enum:
-                    - it
-                    - en
-                  default: en
-                event_name:
-                  type: string
-                redirect_url:
-                  type: string
-              required:
-                - email
+        $ref: '#/components/requestBodies/Invitation'
       security:
         - JWT: []
     delete:
@@ -1740,7 +1832,7 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Invitation'
+                      $ref: '#/components/schemas/Tenant'
                 required:
                   - items
         '400':
@@ -1761,163 +1853,10 @@ paths:
                 user_id:
                   type: number
                   description: Tryber WP USER ID
-              required:
-                - user_id
-  '/projects/{pid}/users':
-    get:
-      summary: Retrieve users of a specific project
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Invitation'
-                  start:
-                    type: integer
-                  limit:
-                    type: integer
-                  size:
-                    type: integer
-                  total:
-                    type: integer
-                required:
-                  - items
-              examples:
-                Example 1:
-                  value:
-                    items:
-                      - id: 1234
-                        email: user@example.com
-                        name: string
-                        profile_id: 999
-                        invitationPending: true
-                    start: 0
-                    limit: 0
-                    size: 1
-                    total: 1
-        '400':
-          $ref: '#/components/responses/Error'
-        '403':
-          $ref: '#/components/responses/Error'
-        '500':
-          $ref: '#/components/responses/Error'
-      operationId: get-projects-users
-      security:
-        - JWT: []
-      parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/start'
-        - $ref: '#/components/parameters/order'
-        - $ref: '#/components/parameters/orderBy'
-      tags:
-        - Workspaces
-      description: Return a list of users from a specific project
-    parameters:
-      - $ref: '#/components/parameters/pid'
-    post:
-      summary: Add user to project
-      operationId: post-projects-pid-users
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  profile_id:
-                    type: number
-                  tryber_wp_user_id:
-                    type: number
-                  email:
-                    type: string
-                required:
-                  - profile_id
-                  - tryber_wp_user_id
-                  - email
-        '400':
-          $ref: '#/components/responses/Error'
-        '403':
-          $ref: '#/components/responses/Error'
-        '500':
-          $ref: '#/components/responses/Error'
-      description: Use this to add a new or existent user into a specific project.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                name:
-                  type: string
-                surname:
-                  type: string
-                locale:
-                  type: string
-                  description: preferred language
-                  enum:
-                    - it
-                    - en
-                  default: en
-                event_name:
-                  type: string
-                redirect_url:
-                  type: string
-              required:
-                - email
-      security:
-        - JWT: []
-    delete:
-      summary: Remove user from project
-      operationId: delete-projects-pid-users
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                x-examples:
-                  Example 1:
-                    items:
-                      - id: 1234
-                        email: user@example.com
-                        name: string
-                        profile_id: 999
-                        invitationPending: true
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Invitation'
-                required:
-                  - items
-        '400':
-          $ref: '#/components/responses/Error'
-        '403':
-          $ref: '#/components/responses/Error'
-        '500':
-          $ref: '#/components/responses/Error'
-      description: Remove an user from project
-      security:
-        - JWT: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                user_id:
-                  type: number
-                  description: Tryber WP USER ID
+                include_shared:
+                  type: boolean
+                  x-stoplight:
+                    id: w9ulhmmyfq5wv
               required:
                 - user_id
   '/workspaces/{wid}/projects':
@@ -3180,8 +3119,10 @@ components:
       required:
         - data
         - kind
-    Invitation:
+    Tenant:
       title: Tenant
+      x-stoplight:
+        id: af647bca56ce8
       type: object
       properties:
         id:
@@ -3440,6 +3381,42 @@ components:
             required:
               - name
               - customer_id
+    Invitation:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                x-stoplight:
+                  id: uoyibt5phyn07
+              name:
+                type: string
+                x-stoplight:
+                  id: tzpvrdja27gky
+              surname:
+                type: string
+                x-stoplight:
+                  id: arze0g8upzgga
+              locale:
+                type: string
+                x-stoplight:
+                  id: f5vtt7pfdyjiu
+              event_name:
+                type: string
+                x-stoplight:
+                  id: uxbdxisinmqx6
+              redirect_url:
+                type: string
+                x-stoplight:
+                  id: upd3eglz1hndb
+              message:
+                type: string
+                x-stoplight:
+                  id: bhts8uetaz9nr
+            required:
+              - email
 tags:
   - name: Authentication
   - name: Campaign
