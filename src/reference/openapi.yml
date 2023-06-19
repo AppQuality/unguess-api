@@ -1090,7 +1090,7 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Invitation'
+                      $ref: '#/components/schemas/Tenant'
                 required:
                   - items
         '400':
@@ -1383,7 +1383,7 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Invitation'
+                      $ref: '#/components/schemas/Tenant'
                 required:
                   - items
         '400':
@@ -1832,7 +1832,7 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Invitation'
+                      $ref: '#/components/schemas/Tenant'
                 required:
                   - items
         '400':
