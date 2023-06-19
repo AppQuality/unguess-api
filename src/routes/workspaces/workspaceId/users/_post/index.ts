@@ -233,18 +233,32 @@ export default class Route extends WorkspaceRoute<{
       locale === "it"
         ? `Entra in Unguess`
         : `You've been invited to join UNGUESS`;
+
+    await this.notifyUser(email, subj, {
+      "{Inviter.url}": `${process.env.APP_URL}/invites/${profile_id}/${token}`,
+    });
+  }
+
+  private async notifyUser(
+    email: string,
+    subject: string,
+    params?: { [key: string]: string }
+  ) {
     const sender = this.getUser();
 
     await sendTemplate({
       template: this.getEmailEvent(),
       email: email,
-      subject: subj,
+      subject: subject,
       optionalFields: {
         "{Inviter.name}": sender.email,
         "{Inviter.email}": sender.email,
-        "{Inviter.url}": `${process.env.APP_URL}/invites/${profile_id}/${token}`,
-        "{Inviter.redirectUrl}": this.getEmailRedirectUrl(),
         "{Inviter.subject}": this.workspace?.company ?? "workspace",
+        "{Inviter.redirectUrl}": this.getEmailRedirectUrl(),
+        ...(this.getBody().message && {
+          "{Inviter.inviteText}": this.getBody().message,
+        }),
+        ...params, // additional fields
       },
     });
   }

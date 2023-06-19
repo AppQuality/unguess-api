@@ -2,7 +2,6 @@ import sgMail from "@sendgrid/mail";
 import app from "@src/app";
 import { tryber } from "@src/features/database";
 import { useBasicProjectsContext } from "@src/features/db/hooks/basicProjects";
-import { useBasicWorkspaces } from "@src/features/db/hooks/basicWorkspaces";
 import request from "supertest";
 
 // Mocking sendgrid
@@ -55,7 +54,7 @@ describe("POST /projects/pid/users", () => {
 
     await tryber.tables.WpAppqUnlayerMailTemplate.do().insert({
       id: 3,
-      html_body: "A special mail for a special user",
+      html_body: "A special mail for a special user: {Inviter.inviteText}",
       name: "Custom mail",
       json_body: "",
       last_editor_tester_id: 1,
@@ -147,4 +146,26 @@ describe("POST /projects/pid/users", () => {
       categories: ["UNGUESSAPP_STAGING"],
     });
   });
+
+  it("Should use a custom message if provided", async () => {
+    await request(app)
+      .post(`/projects/${context.prj1.id}/users`)
+      .set("Authorization", "Bearer user")
+      .send({
+        email: "goofy.baud@saintoar.com",
+        locale: "it",
+        event_name: "customer_special_mail",
+        message:
+          "A bug is never late, Frodo. Nor is he early; he arrives precisely when he means to.",
+      });
+
+    expect(mockedSendgrid.send).toHaveBeenCalledTimes(1);
+    expect(mockedSendgrid.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        html: "A special mail for a special user: A bug is never late, Frodo. Nor is he early; he arrives precisely when he means to.",
+      })
+    );
+  });
+
+  // end of describe
 });
