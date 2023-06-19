@@ -1479,7 +1479,7 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            items: components["schemas"]["Invitation"][];
+            items: components["schemas"]["Tenant"][];
             start?: number;
             limit?: number;
             size?: number;
@@ -1530,7 +1530,7 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            items: components["schemas"]["Invitation"][];
+            items: components["schemas"]["Tenant"][];
           };
         };
       };
@@ -1679,7 +1679,7 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            items: components["schemas"]["Invitation"][];
+            items: components["schemas"]["Tenant"][];
             start?: number;
             limit?: number;
             size?: number;
@@ -1730,7 +1730,7 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            items: components["schemas"]["Invitation"][];
+            items: components["schemas"]["Tenant"][];
           };
         };
       };
@@ -1958,7 +1958,7 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            items: components["schemas"]["Invitation"][];
+            items: components["schemas"]["Tenant"][];
             start?: number;
             limit?: number;
             size?: number;
@@ -2009,7 +2009,7 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            items: components["schemas"]["Invitation"][];
+            items: components["schemas"]["Tenant"][];
           };
         };
       };
