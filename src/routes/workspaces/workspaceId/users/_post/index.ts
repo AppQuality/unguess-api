@@ -21,6 +21,9 @@ export default class Route extends WorkspaceRoute<{
   parameters: StoplightOperations["post-workspaces-wid-users"]["parameters"]["path"];
   body: StoplightOperations["post-workspaces-wid-users"]["requestBody"]["content"]["application/json"];
 }> {
+  protected newUser: DbUser | undefined;
+  protected isPending: boolean = false;
+
   protected async filter(): Promise<boolean> {
     if (!(await super.filter())) return false;
 
@@ -36,15 +39,15 @@ export default class Route extends WorkspaceRoute<{
     const userInWorkspace = users.find((u) => u.email === this.getBody().email);
 
     if (userInWorkspace) {
-      const pendingInvite =
+      this.isPending = !!(
         userInWorkspace.invitation_status &&
-        Number.parseInt(userInWorkspace.invitation_status) !== 1;
+        Number.parseInt(userInWorkspace.invitation_status) !== 1
+      );
 
-      if (pendingInvite) {
+      if (this.isPending) {
         await this.sendInvitation({
           email: userInWorkspace.email,
           profile_id: userInWorkspace.profile_id,
-          locale: this.getBody().locale || "en",
         });
 
         return this.setSuccess(200, {
@@ -64,14 +67,16 @@ export default class Route extends WorkspaceRoute<{
     let userToAdd: DbUser = userExists;
 
     try {
-      if (!userToAdd) {
+      if (!userExists) {
         userToAdd = await this.createUser(this.getBody());
+        this.newUser = userToAdd;
 
         await this.sendInvitation({
           email: userToAdd.email,
           profile_id: userToAdd.profile_id,
-          locale: this.getBody().locale || "en",
         });
+      } else {
+        this.notifyUser(userExists.email);
       }
 
       await this.addUserToWorkspace(userToAdd);
@@ -209,11 +214,9 @@ export default class Route extends WorkspaceRoute<{
   protected async sendInvitation({
     email,
     profile_id,
-    locale,
   }: {
     email: string;
     profile_id: number;
-    locale: string;
   }): Promise<void> {
     const token = crypto
       .createHash("sha256")
@@ -229,27 +232,18 @@ export default class Route extends WorkspaceRoute<{
       .onConflict("tester_id")
       .merge();
 
-    const subj =
-      locale === "it"
-        ? `Entra in Unguess`
-        : `You've been invited to join UNGUESS`;
-
-    await this.notifyUser(email, subj, {
+    await this.notifyUser(email, {
       "{Inviter.url}": `${process.env.APP_URL}/invites/${profile_id}/${token}`,
     });
   }
 
-  private async notifyUser(
-    email: string,
-    subject: string,
-    params?: { [key: string]: string }
-  ) {
+  private async notifyUser(email: string, params?: { [key: string]: string }) {
     const sender = this.getUser();
 
     await sendTemplate({
-      template: this.getEmailEvent(),
       email: email,
-      subject: subject,
+      template: this.getEmailEvent(),
+      subject: this.getEmailSubject(),
       optionalFields: {
         "{Inviter.name}": sender.email,
         "{Inviter.email}": sender.email,
@@ -261,9 +255,28 @@ export default class Route extends WorkspaceRoute<{
     });
   }
 
+  private getEmailSubject() {
+    const locale = this.getBody()?.locale ?? "en";
+
+    if (this.newUser || this.isPending) {
+      return locale === "it"
+        ? `Entra in Unguess`
+        : `You've been invited to join UNGUESS`;
+    }
+
+    return locale === "it"
+      ? `Entra in ${this.workspace?.company ?? "workspace"}`
+      : `You've been invited to join ${this.workspace?.company ?? "workspace"}`;
+  }
+
   private getEmailEvent() {
     const body = this.getBody();
-    return body.event_name ?? `customer_invitation_${body.locale ?? "en"}`;
+    const defaultEvent =
+      this.newUser || this.isPending
+        ? "customer_invitation"
+        : "customer_existent_invitation";
+
+    return body.event_name ?? `${defaultEvent}_${body.locale ?? "en"}`;
   }
 
   private getEmailRedirectUrl() {

@@ -54,21 +54,17 @@ const user_to_campaign_1 = {
 const mockedSendgrid = jest.mocked(sgMail, true);
 
 describe("POST /campaigns/{cid}/users mail checks", () => {
-  useBasicWorkspaces();
+  const context = useBasicWorkspaces();
 
   beforeAll(async () => {
     await tryber.tables.WpAppqEvdCampaign.do().insert(campaign_1);
     await tryber.tables.WpAppqUserToCampaign.do().insert(user_to_campaign_1);
+    await tryber.tables.WpAppqUserToCampaign.do().insert({
+      wp_user_id: context.profile3.wp_user_id,
+      campaign_id: context.customer_2.id,
+    });
     await tryber.tables.WpAppqProject.do().insert(project_1);
-  });
 
-  afterAll(async () => {
-    await tryber.tables.WpAppqEvdCampaign.do().delete();
-    await tryber.tables.WpAppqUserToCampaign.do().delete();
-  });
-
-  // Insert templates
-  beforeAll(async () => {
     await tryber.tables.WpAppqUnlayerMailTemplate.do().insert({
       id: 1,
       html_body: "Test mail en",
@@ -119,10 +115,28 @@ describe("POST /campaigns/{cid}/users mail checks", () => {
       template_id: 3,
       last_editor_tester_id: 1,
     });
+
+    await tryber.tables.WpAppqUnlayerMailTemplate.do().insert({
+      id: 4,
+      html_body: "Test mail it",
+      name: "Test mail",
+      json_body: "",
+      last_editor_tester_id: 1,
+      lang: "it",
+      category_id: 1,
+    });
+
+    await tryber.tables.WpAppqEventTransactionalMail.do().insert({
+      id: 4,
+      event_name: "campaign_existent_invitation_it",
+      template_id: 4,
+      last_editor_tester_id: 1,
+    });
   });
 
-  // Clear templates
   afterAll(async () => {
+    await tryber.tables.WpAppqEvdCampaign.do().delete();
+    await tryber.tables.WpAppqUserToCampaign.do().delete();
     await tryber.tables.WpAppqUnlayerMailTemplate.do().delete();
     await tryber.tables.WpAppqEventTransactionalMail.do().delete();
   });
@@ -216,6 +230,28 @@ describe("POST /campaigns/{cid}/users mail checks", () => {
         html: "A special mail for a special user: A bug is never late, Frodo. Nor is he early; he arrives precisely when he means to.",
       })
     );
+  });
+
+  it("Should send mail also if the user already has an account", async () => {
+    await request(app)
+      .post(`/campaigns/${campaign_1.id}/users`)
+      .set("Authorization", "Bearer user")
+      .send({
+        email: "paolo.verdi@example.com",
+        locale: "it",
+      });
+
+    expect(mockedSendgrid.send).toHaveBeenCalledTimes(1);
+    expect(mockedSendgrid.send).toHaveBeenCalledWith({
+      to: "paolo.verdi@example.com",
+      from: {
+        email: "info@unguess.io",
+        name: "UNGUESS",
+      },
+      html: "Test mail it",
+      subject: `Entra in ${campaign_1.customer_title}`,
+      categories: ["UNGUESSAPP_STAGING"],
+    });
   });
 
   // end of describe

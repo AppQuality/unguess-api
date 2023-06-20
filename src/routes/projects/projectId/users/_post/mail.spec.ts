@@ -68,6 +68,23 @@ describe("POST /projects/pid/users", () => {
       template_id: 3,
       last_editor_tester_id: 1,
     });
+
+    await tryber.tables.WpAppqUnlayerMailTemplate.do().insert({
+      id: 4,
+      html_body: "Test mail it",
+      name: "Test mail",
+      json_body: "",
+      last_editor_tester_id: 1,
+      lang: "it",
+      category_id: 1,
+    });
+
+    await tryber.tables.WpAppqEventTransactionalMail.do().insert({
+      id: 4,
+      event_name: "project_existent_invitation_it",
+      template_id: 4,
+      last_editor_tester_id: 1,
+    });
   });
 
   // Clear templates
@@ -165,6 +182,28 @@ describe("POST /projects/pid/users", () => {
         html: "A special mail for a special user: A bug is never late, Frodo. Nor is he early; he arrives precisely when he means to.",
       })
     );
+  });
+
+  it("Should send mail also if the user already has an account", async () => {
+    await request(app)
+      .post(`/projects/${context.prj1.id}/users`)
+      .set("Authorization", "Bearer user")
+      .send({
+        email: "paolo.verdi@example.com",
+        locale: "it",
+      });
+
+    expect(mockedSendgrid.send).toHaveBeenCalledTimes(1);
+    expect(mockedSendgrid.send).toHaveBeenCalledWith({
+      to: "paolo.verdi@example.com",
+      from: {
+        email: "info@unguess.io",
+        name: "UNGUESS",
+      },
+      html: "Test mail it",
+      subject: `Entra in ${context.prj1.display_name}`,
+      categories: ["UNGUESSAPP_STAGING"],
+    });
   });
 
   // end of describe
