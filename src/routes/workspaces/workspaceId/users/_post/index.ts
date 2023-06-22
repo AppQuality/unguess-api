@@ -233,8 +233,17 @@ export default class Route extends WorkspaceRoute<{
       .merge();
 
     await this.notifyUser(email, {
-      "{Inviter.url}": `${process.env.APP_URL}/invites/${profile_id}/${token}`,
+      "{Inviter.url}": `${this.getBaseURL()}/invites/${profile_id}/${token}`,
     });
+  }
+
+  private getBaseURL() {
+    const locale =
+      this.getBody().locale && this.getBody().locale !== "en"
+        ? `/${this.getBody().locale}`
+        : "";
+
+    return `${process.env.APP_URL}${locale}`;
   }
 
   private async notifyUser(email: string, params?: { [key: string]: string }) {
