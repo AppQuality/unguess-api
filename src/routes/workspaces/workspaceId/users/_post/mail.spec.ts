@@ -20,7 +20,7 @@ describe("POST /workspaces/wid/users", () => {
   beforeAll(async () => {
     await tryber.tables.WpAppqUnlayerMailTemplate.do().insert({
       id: 1,
-      html_body: "Test mail en",
+      html_body: "Test mail en {Inviter.url}",
       name: "Test mail",
       json_body: "",
       last_editor_tester_id: 1,
@@ -37,7 +37,7 @@ describe("POST /workspaces/wid/users", () => {
 
     await tryber.tables.WpAppqUnlayerMailTemplate.do().insert({
       id: 2,
-      html_body: "Test mail it",
+      html_body: "Test mail it {Inviter.url}",
       name: "Test mail",
       json_body: "",
       last_editor_tester_id: 1,
@@ -71,7 +71,7 @@ describe("POST /workspaces/wid/users", () => {
 
     await tryber.tables.WpAppqUnlayerMailTemplate.do().insert({
       id: 4,
-      html_body: "Test mail it",
+      html_body: "Test mail it {Inviter.url}",
       name: "Test mail",
       json_body: "",
       last_editor_tester_id: 1,
@@ -107,16 +107,17 @@ describe("POST /workspaces/wid/users", () => {
       });
 
     expect(mockedSendgrid.send).toHaveBeenCalledTimes(1);
-    expect(mockedSendgrid.send).toHaveBeenCalledWith({
-      to: "vincenzo.cancelli@finestre.com",
-      from: {
-        email: "info@unguess.io",
-        name: "UNGUESS",
-      },
-      html: "Test mail en",
-      subject: "You've been invited to join UNGUESS",
-      categories: ["UNGUESSAPP_STAGING"],
-    });
+    expect(mockedSendgrid.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: "vincenzo.cancelli@finestre.com",
+        from: {
+          email: "info@unguess.io",
+          name: "UNGUESS",
+        },
+        subject: "You've been invited to join UNGUESS",
+        categories: ["UNGUESSAPP_STAGING"],
+      })
+    );
   });
 
   it("Should send mail with locale", async () => {
@@ -129,16 +130,32 @@ describe("POST /workspaces/wid/users", () => {
       });
 
     expect(mockedSendgrid.send).toHaveBeenCalledTimes(1);
-    expect(mockedSendgrid.send).toHaveBeenCalledWith({
-      to: "vincenzo.cancelli@finestre.com",
-      from: {
-        email: "info@unguess.io",
-        name: "UNGUESS",
-      },
-      html: "Test mail it",
-      subject: "Entra in Unguess",
-      categories: ["UNGUESSAPP_STAGING"],
-    });
+    expect(mockedSendgrid.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: "vincenzo.cancelli@finestre.com",
+        from: {
+          email: "info@unguess.io",
+          name: "UNGUESS",
+        },
+        subject: "Entra in Unguess",
+        categories: ["UNGUESSAPP_STAGING"],
+      })
+    );
+  });
+
+  it("Should send localized signup link", async () => {
+    await request(app)
+      .post(`/workspaces/${workspaces.customer_1.id}/users`)
+      .set("Authorization", "Bearer user")
+      .send({
+        email: "vincenzo.cancelli+2@finestre.com",
+        locale: "it",
+      });
+
+    expect(mockedSendgrid.send).toHaveBeenCalledTimes(1);
+    const args: any = mockedSendgrid.send.mock.calls[0][0];
+
+    expect(args.html).toContain("it/invites/");
   });
 
   it("Should use a different template if the provided one exists", async () => {
@@ -194,16 +211,17 @@ describe("POST /workspaces/wid/users", () => {
       });
 
     expect(mockedSendgrid.send).toHaveBeenCalledTimes(1);
-    expect(mockedSendgrid.send).toHaveBeenCalledWith({
-      to: "paolo.verdi@example.com",
-      from: {
-        email: "info@unguess.io",
-        name: "UNGUESS",
-      },
-      html: "Test mail it",
-      subject: `Entra in ${workspaces.customer_1.company}`,
-      categories: ["UNGUESSAPP_STAGING"],
-    });
+    expect(mockedSendgrid.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: "paolo.verdi@example.com",
+        from: {
+          email: "info@unguess.io",
+          name: "UNGUESS",
+        },
+        subject: `Entra in ${workspaces.customer_1.company}`,
+        categories: ["UNGUESSAPP_STAGING"],
+      })
+    );
   });
 
   // end of describe
