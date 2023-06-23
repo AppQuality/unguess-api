@@ -139,6 +139,7 @@ const bug_1: BugsParams = {
   id: 12999,
   internal_id: "UG12999",
   wp_user_id: 1,
+  profile_id: profile_1.id,
   message: "[CON-TEXT][2ndContext] - Bug 12-999 message",
   description: "Bug 12999 description",
   expected_result: "Bug 12999 expected result",
@@ -187,6 +188,7 @@ const bug_4 = {
   ...bug_1,
   id: 13002,
   wp_user_id: profile_2.wp_user_id,
+  profile_id: profile_2.id,
 };
 
 const bug_5_from_unknown = {
@@ -194,6 +196,7 @@ const bug_5_from_unknown = {
   id: 13003,
   campaign_id: campaign_2.id,
   wp_user_id: 999,
+  profile_id: 999,
 };
 
 const bug_media_1 = {
