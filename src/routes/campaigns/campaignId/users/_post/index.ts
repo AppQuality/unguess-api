@@ -34,12 +34,21 @@ export default class Route extends CampaignRoute<{
 
     try {
       const userToAdd = await this.getUserToAdd();
-      if (userToAdd.newUser)
+      if (userToAdd.newUser) {
         await this.sendInvitation({
           email: userToAdd.email,
           profile_id: userToAdd.profile_id,
           type: "new_user",
         });
+      } else {
+        const userHasPendingInvitation =
+          userToAdd.invitation_status &&
+          Number(userToAdd.invitation_status) === 0;
+        this.notifyUser({
+          email: userToAdd.email,
+          type: userHasPendingInvitation ? "new_user" : "existing_user",
+        });
+      }
       await this.addUserToCampaign(userToAdd);
 
       return this.setSuccess(200, {
@@ -78,7 +87,6 @@ export default class Route extends CampaignRoute<{
   private async getUserToAdd() {
     const userExists = await this.getUserByEmail();
     if (userExists) {
-      this.notifyUser({ email: userExists.email, type: "existing_user" });
       return { ...userExists, newUser: false };
     }
 
@@ -189,23 +197,28 @@ export default class Route extends CampaignRoute<{
         tryber.ref("id").withSchema("wp_appq_evd_profile").as("profile_id"),
         tryber.ref("name").withSchema("wp_appq_evd_profile"),
         tryber.ref("surname").withSchema("wp_appq_evd_profile"),
-        tryber.ref("email").withSchema("wp_appq_evd_profile")
+        tryber.ref("email").withSchema("wp_appq_evd_profile"),
+        tryber
+          .ref("status")
+          .withSchema("wp_appq_customer_account_invitations")
+          .as("invitation_status")
       )
       .join(
         "wp_appq_evd_profile",
         "wp_users.ID",
         "wp_appq_evd_profile.wp_user_id"
       )
+      .leftJoin(
+        "wp_appq_customer_account_invitations",
+        "wp_appq_evd_profile.id",
+        "wp_appq_customer_account_invitations.tester_id"
+      )
       .where({
         user_email: this.getBody().email,
-      });
+      })
+      .first();
 
-    return alreadyRegisteredEmail.length
-      ? {
-          ...alreadyRegisteredEmail[0],
-          invitation_status: "1",
-        }
-      : null;
+    return alreadyRegisteredEmail;
   }
 
   private async createUser(invitedUser: {
