@@ -1,99 +1,132 @@
 /** OPENAPI-CLASS: post-projects-pid-users */
-import createTryberWPUser from "@src/features/wp/createTryberWPUser";
-import createUserProfile from "@src/features/wp/createUserProfile";
-import { randomString } from "@src/utils/users/getRandomString";
-import crypto from "crypto";
-import { sendTemplate } from "@src/features/mail/sendTemplate";
+import { Invitation } from "@src/features/class/Invitation";
 import { tryber } from "@src/features/database";
 import ProjectRoute from "@src/features/routes/ProjectRoute";
-
-interface DbUser {
-  tryber_wp_id: number;
-  profile_id: number;
-  name: string;
-  surname: string;
-  email: string;
-  invitation_status: string;
-}
 
 export default class Route extends ProjectRoute<{
   response: StoplightOperations["post-projects-pid-users"]["responses"]["200"]["content"]["application/json"];
   parameters: StoplightOperations["post-projects-pid-users"]["parameters"]["path"];
   body: StoplightOperations["post-projects-pid-users"]["requestBody"]["content"]["application/json"];
 }> {
-  protected newUser: DbUser | undefined;
-  protected isPending: boolean = false;
+  private _invitation: Invitation | undefined;
+  private locale: Language = "en";
+  private projectName: string = "project";
 
-  constructor(configuration: RouteClassConfiguration) {
-    super(configuration);
+  constructor(config: RouteClassConfiguration) {
+    super(config);
+
+    const { locale } = this.getBody();
+    if (this.isLocaleValid(locale)) this.locale = locale;
+  }
+
+  private isLocaleValid(locale?: string): locale is Language {
+    return !!locale && ["it", "en"].includes(locale);
+  }
+
+  get invitation() {
+    if (!this._invitation) throw new Error("Invitation not initialized");
+    return this._invitation;
+  }
+
+  protected async filter(): Promise<boolean> {
+    if (!(await super.filter())) return false;
 
     if (!this.isValidUser()) {
       this.setError(400, {} as OpenapiError);
-      throw new Error("Invalid user");
+      return false;
     }
+
+    return true;
+  }
+
+  private isValidUser(): boolean {
+    return this.getBody().email ? true : false;
+  }
+
+  protected async init() {
+    await super.init();
+    this.projectName = this.project?.name ?? "project";
+
+    this._invitation = new Invitation({
+      userToInvite: {
+        email: this.getBody().email,
+        name: this.getBody().name,
+        surname: this.getBody().surname,
+      },
+      object: { name: this.projectName },
+      email: {
+        sender: this.getUser(),
+        templates: this.getTemplates(),
+        subjects: this.getSubjects(),
+        message: this.getBody().message,
+      },
+      locale: this.locale,
+      redirect: this.getBody().redirect_url,
+    });
+  }
+
+  private getTemplates() {
+    return {
+      existing_user:
+        this.getBody().event_name ??
+        `project_existent_invitation_${this.locale}`,
+      new_user:
+        this.getBody().event_name ?? `project_invitation_${this.locale}`,
+    };
+  }
+
+  private getSubjects() {
+    return {
+      existing_user:
+        this.locale === "it"
+          ? `Entra in ${this.projectName}`
+          : `You've been invited to join ${this.projectName}`,
+      new_user:
+        this.locale === "it"
+          ? `Entra in Unguess`
+          : `You've been invited to join UNGUESS`,
+    };
   }
 
   protected async prepare() {
-    const users = await this.getUsers();
-    const userInProject = users.find((u) => u.email === this.getBody().email);
+    const alreadyInvitedUser = await this.retrieveUserAlreadyInvited();
 
-    if (userInProject) {
-      this.isPending = !!(
-        userInProject.invitation_status &&
-        Number.parseInt(userInProject.invitation_status) !== 1
-      );
-
-      if (this.isPending) {
-        await this.sendInvitation({
-          email: userInProject.email,
-          profile_id: userInProject.profile_id,
-        });
-
-        return this.setSuccess(200, {
-          profile_id: userInProject.profile_id,
-          tryber_wp_user_id: userInProject.tryber_wp_id,
-          email: userInProject.email,
-        });
-      } else {
-        // user already exists in the workspace
+    if (alreadyInvitedUser) {
+      if (alreadyInvitedUser.type === "existing_user") {
         return this.setError(400, {
           message: "User already exists",
         } as OpenapiError);
       }
+
+      await this.invitation.sendNewUserInvitation({
+        profile_id: alreadyInvitedUser.profile_id,
+      });
+      return this.setSuccess(200, {
+        profile_id: alreadyInvitedUser.profile_id,
+        tryber_wp_user_id: alreadyInvitedUser.tryber_wp_id,
+        email: alreadyInvitedUser.email,
+      });
     }
 
-    const userExists = await this.getUserByEmail(this.getBody().email);
-    let userToAdd: DbUser = userExists;
-
     try {
-      if (!userToAdd) {
-        userToAdd = await this.createUser(this.getBody());
-        this.newUser = userToAdd;
-
-        await this.sendInvitation({
-          email: userToAdd.email,
-          profile_id: userToAdd.profile_id,
-        });
-      } else {
-        this.notifyUser(userExists.email);
-      }
-
+      const userToAdd = await this.invitation.createAndInviteUser();
       await this.addUserToProject(userToAdd);
+
       return this.setSuccess(200, {
         profile_id: userToAdd.profile_id,
         tryber_wp_user_id: userToAdd.tryber_wp_id,
         email: userToAdd.email,
       });
     } catch (e) {
-      if (!userExists) this.removeCreatedUser(this.getBody().email);
-
       return this.setError(500, {
         message: "Error adding user to project",
       } as OpenapiError);
     }
   }
 
-  private async addUserToProject(user: DbUser): Promise<void> {
+  private async addUserToProject(user: {
+    tryber_wp_id: number;
+  }): Promise<void> {
     const { tryber_wp_id } = user;
 
     await tryber.tables.WpAppqUserToProject.do().insert({
@@ -102,82 +135,8 @@ export default class Route extends ProjectRoute<{
     });
   }
 
-  private async removeCreatedUser(email: string): Promise<void> {
-    const user = await this.getUserByEmail(this.getBody().email);
-
-    if (user) {
-      await tryber.tables.WpAppqUserToProject.do().delete().where({
-        wp_user_id: user.tryber_wp_id,
-      });
-    }
-
-    // Remove user profiles (if any)
-    await tryber.tables.WpUsers.do().delete().where({
-      user_email: email,
-    });
-
-    await tryber.tables.WpAppqEvdProfile.do().delete().where({
-      email: email,
-    });
-  }
-
-  private async getUserByEmail(email: string): Promise<any> {
-    const alreadyRegisteredEmail = await tryber.tables.WpUsers.do()
-      .select(
-        tryber.ref("ID").withSchema("wp_users").as("tryber_wp_id"),
-        tryber.ref("id").withSchema("wp_appq_evd_profile").as("profile_id"),
-        tryber.ref("name").withSchema("wp_appq_evd_profile"),
-        tryber.ref("surname").withSchema("wp_appq_evd_profile"),
-        tryber.ref("email").withSchema("wp_appq_evd_profile")
-      )
-      .join(
-        "wp_appq_evd_profile",
-        "wp_users.ID",
-        "wp_appq_evd_profile.wp_user_id"
-      )
-      .where({
-        user_email: email,
-      });
-
-    return alreadyRegisteredEmail.length
-      ? {
-          ...alreadyRegisteredEmail[0],
-          invitation_status: "1",
-        }
-      : null;
-  }
-
-  private async createUser(
-    invitedUser: StoplightOperations["post-projects-pid-users"]["requestBody"]["content"]["application/json"]
-  ): Promise<DbUser> {
-    const { email, name = "", surname = "" } = invitedUser;
-    const psw = randomString(12);
-    const username =
-      name && surname ? `${name}-${surname}` : email.split("@")[0];
-
-    const tryber_wp_id = await createTryberWPUser(username, email, psw);
-
-    const profile = await createUserProfile({
-      tryber_wp_id,
-      name,
-      surname,
-      email,
-    });
-
-    if (!profile) throw new Error("Error creating user profile");
-
-    return {
-      tryber_wp_id,
-      profile_id: profile.profile_id,
-      name,
-      surname,
-      email,
-      invitation_status: "0",
-    };
-  }
-
-  protected async getUsers(): Promise<DbUser[]> {
-    const users = await tryber.tables.WpAppqUserToProject.do()
+  private async retrieveUserAlreadyInvited() {
+    const user = await tryber.tables.WpAppqUserToProject.do()
       .select(
         tryber.ref("id").withSchema("wp_appq_evd_profile").as("profile_id"),
         tryber
@@ -203,99 +162,19 @@ export default class Route extends ProjectRoute<{
         "wp_appq_customer_account_invitations.tester_id"
       )
       .where("wp_appq_user_to_project.project_id", this.getProjectId())
-      .groupBy("wp_appq_evd_profile.id");
+      .where("wp_appq_evd_profile.email", this.getBody().email)
+      .groupBy("wp_appq_evd_profile.id")
+      .first();
 
-    if (!users) return [];
+    if (!user) return null;
 
-    return users;
-  }
-
-  protected async sendInvitation({
-    email,
-    profile_id,
-  }: {
-    email: string;
-    profile_id: number;
-  }): Promise<void> {
-    const token = crypto
-      .createHash("sha256")
-      .update(`${profile_id}_AppQ`)
-      .digest("hex");
-
-    await tryber.tables.WpAppqCustomerAccountInvitations.do()
-      .insert({
-        tester_id: profile_id,
-        status: "0",
-        token: token,
-      })
-      .onConflict("tester_id")
-      .merge();
-
-    await this.notifyUser(email, {
-      "{Inviter.url}": `${this.getBaseURL()}/invites/${profile_id}/${token}`,
-    });
-  }
-
-  private getBaseURL() {
-    const locale =
-      this.getBody().locale && this.getBody().locale !== "en"
-        ? `/${this.getBody().locale}`
-        : "";
-
-    return `${process.env.APP_URL}${locale}`;
-  }
-
-  private async notifyUser(email: string, params?: { [key: string]: string }) {
-    const sender = this.getUser();
-
-    await sendTemplate({
-      email: email,
-      template: this.getEmailEvent(),
-      subject: this.getEmailSubject(),
-      optionalFields: {
-        "{Inviter.name}": sender.email,
-        "{Inviter.email}": sender.email,
-        "{Inviter.subject}": this.project?.name ?? "project",
-        "{Inviter.redirectUrl}": this.getEmailRedirectUrl(),
-        "{Inviter.inviteText}": this.getBody()?.message ?? "",
-        ...params, // additional fields
-      },
-    });
-  }
-
-  private getEmailSubject() {
-    const locale = this.getBody()?.locale ?? "en";
-
-    if (this.newUser || this.isPending) {
-      return locale === "it"
-        ? `Entra in Unguess`
-        : `You've been invited to join UNGUESS`;
-    }
-
-    return locale === "it"
-      ? `Entra in ${this.project?.name ?? "progetto"}`
-      : `You've been invited to join ${this.project?.name ?? "project"}`;
-  }
-
-  private getEmailEvent() {
-    const body = this.getBody();
-    const defaultEvent =
-      this.newUser || this.isPending
-        ? "project_invitation"
-        : "project_existent_invitation";
-    return body.event_name ?? `${defaultEvent}_${body.locale ?? "en"}`;
-  }
-
-  private getEmailRedirectUrl() {
-    return this.getBody().redirect_url ?? process.env.APP_URL;
-  }
-
-  protected isValidUser(): boolean {
-    if (!this.getBody()) return false;
-
-    const { email } = this.getBody();
-    if (!email) return false;
-
-    return true;
+    return {
+      ...user,
+      type: !!(
+        user.invitation_status && Number.parseInt(user.invitation_status) !== 1
+      )
+        ? ("new_user" as const)
+        : ("existing_user" as const),
+    };
   }
 }

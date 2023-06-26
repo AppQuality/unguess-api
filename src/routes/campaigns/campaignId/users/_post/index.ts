@@ -3,7 +3,6 @@ import { Invitation } from "@src/features/class/Invitation";
 import { tryber } from "@src/features/database";
 import CampaignRoute from "@src/features/routes/CampaignRoute";
 
-type Language = "it" | "en";
 export default class Route extends CampaignRoute<{
   response: StoplightOperations["post-campaign-cid-users"]["responses"]["200"]["content"]["application/json"];
   parameters: StoplightOperations["post-campaign-cid-users"]["parameters"]["path"];

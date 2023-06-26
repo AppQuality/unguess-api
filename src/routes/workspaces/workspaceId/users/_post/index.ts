@@ -4,7 +4,6 @@ import { Invitation } from "@src/features/class/Invitation";
 import { tryber } from "@src/features/database";
 import WorkspaceRoute from "@src/features/routes/WorkspaceRoute";
 
-type Language = "it" | "en";
 export default class Route extends WorkspaceRoute<{
   response: StoplightOperations["post-workspaces-wid-users"]["responses"]["200"]["content"]["application/json"];
   parameters: StoplightOperations["post-workspaces-wid-users"]["parameters"]["path"];

@@ -6,7 +6,6 @@ import { randomString } from "@src/utils/users/getRandomString";
 import crypto from "crypto";
 
 type InvitationType = "new_user" | "existing_user";
-type Language = "it" | "en";
 
 const SUBJECTS: Record<InvitationType, Record<Language, string>> = {
   new_user: {

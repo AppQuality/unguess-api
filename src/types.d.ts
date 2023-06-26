@@ -46,6 +46,8 @@ declare global {
     response: OpenapiResponse;
   };
 
+  type Language = "it" | "en";
+
   namespace jest {
     interface Matchers<R> {
       toBeNow(precision: number): jest.CustomMatcherResult;
