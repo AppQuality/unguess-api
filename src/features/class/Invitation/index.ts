@@ -123,7 +123,10 @@ class Invitation {
       if (userToAdd.pendingToken) {
         await this.notifyUser({
           params: {
-            "{Inviter.url}": this.getInvitationUrl(userToAdd.pendingToken),
+            "{Inviter.url}": this.getInvitationUrl({
+              profile_id: userToAdd.profile_id,
+              token: userToAdd.pendingToken,
+            }),
           },
         });
       } else {
@@ -189,11 +192,17 @@ class Invitation {
       .onConflict("tester_id")
       .merge();
 
-    return this.getInvitationUrl(token);
+    return this.getInvitationUrl({ profile_id, token });
   }
 
-  private getInvitationUrl(token: string) {
-    return `${this.baseUrl}/invites/${token}`;
+  private getInvitationUrl({
+    profile_id,
+    token,
+  }: {
+    profile_id: number;
+    token: string;
+  }) {
+    return `${this.baseUrl}/invites/${profile_id}/${token}`;
   }
 
   private async getUserToAdd() {

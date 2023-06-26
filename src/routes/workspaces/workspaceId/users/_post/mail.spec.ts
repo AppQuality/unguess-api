@@ -155,7 +155,22 @@ describe("POST /workspaces/wid/users", () => {
     expect(mockedSendgrid.send).toHaveBeenCalledTimes(1);
     const args: any = mockedSendgrid.send.mock.calls[0][0];
 
-    expect(args.html).toContain("it/invites/");
+    const invitation = await tryber.tables.WpAppqCustomerAccountInvitations.do()
+      .select("token", "tester_id")
+      .join(
+        "wp_appq_evd_profile",
+        "wp_appq_evd_profile.id",
+        "wp_appq_customer_account_invitations.tester_id"
+      )
+      .where("email", "vincenzo.cancelli+2@finestre.com")
+      .first();
+
+    expect(invitation).toBeDefined();
+
+    if (!invitation) throw new Error("Invitation not found");
+    expect(args.html).toContain(
+      `it/invites/${invitation.tester_id}/${invitation.token}`
+    );
   });
 
   it("Should use a different template if the provided one exists", async () => {
