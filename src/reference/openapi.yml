@@ -3121,8 +3121,6 @@ components:
         - kind
     Tenant:
       title: Tenant
-      x-stoplight:
-        id: af647bca56ce8
       type: object
       properties:
         id:
@@ -3389,32 +3387,18 @@ components:
             properties:
               email:
                 type: string
-                x-stoplight:
-                  id: uoyibt5phyn07
               name:
                 type: string
-                x-stoplight:
-                  id: tzpvrdja27gky
               surname:
                 type: string
-                x-stoplight:
-                  id: arze0g8upzgga
               locale:
                 type: string
-                x-stoplight:
-                  id: f5vtt7pfdyjiu
               event_name:
                 type: string
-                x-stoplight:
-                  id: uxbdxisinmqx6
               redirect_url:
                 type: string
-                x-stoplight:
-                  id: upd3eglz1hndb
               message:
                 type: string
-                x-stoplight:
-                  id: bhts8uetaz9nr
             required:
               - email
 tags:
