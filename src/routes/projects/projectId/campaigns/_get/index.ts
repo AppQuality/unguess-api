@@ -1,47 +1,49 @@
-/** OPENAPI-ROUTE: get-project-campaigns */
-import { Context } from "openapi-backend";
+/** OPENAPI-CLASS: get-project-campaigns */
 import * as db from "@src/features/db";
-import { getProjectById } from "@src/utils/projects";
-import { paginateItems, formatCount } from "@src/utils/paginations";
+import { formatCount } from "@src/utils/paginations";
 import {
   getCampaignFamily,
   getCampaignOutputs,
   getCampaignStatus,
 } from "@src/utils/campaigns";
 import {
-  ERROR_MESSAGE,
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
 } from "@src/utils/constants";
+import ProjectRoute from "@src/features/routes/ProjectRoute";
 
-export default async (
-  c: Context,
-  req: OpenapiRequest,
-  res: OpenapiResponse
-) => {
-  let user = req.user;
-  let error = {
-    message: ERROR_MESSAGE,
-    error: true,
-  } as StoplightComponents["schemas"]["Error"];
-  res.status_code = 200;
+export default class Route extends ProjectRoute<{
+  response: StoplightOperations["get-project-campaigns"]["responses"]["200"]["content"]["application/json"];
+  parameters: StoplightOperations["get-project-campaigns"]["parameters"]["path"];
+  query: StoplightOperations["get-project-campaigns"]["parameters"]["query"];
+}> {
+  private limit: number = LIMIT_QUERY_PARAM_DEFAULT;
+  private start: number = START_QUERY_PARAM_DEFAULT;
+  private total: number = 0;
+  private campaigns: StoplightComponents["schemas"]["CampaignWithOutput"][] =
+    [];
 
-  let pid = parseInt(c.request.params.pid as string);
+  constructor(configuration: RouteClassConfiguration) {
+    super(configuration);
 
-  let limit = c.request.query.limit
-    ? parseInt(c.request.query.limit as string)
-    : (LIMIT_QUERY_PARAM_DEFAULT as StoplightComponents["parameters"]["limit"]);
-  let start = c.request.query.start
-    ? parseInt(c.request.query.start as string)
-    : (START_QUERY_PARAM_DEFAULT as StoplightComponents["parameters"]["start"]);
+    const query = this.getQuery();
+    if (query.limit) this.limit = parseInt(query.limit as unknown as string);
+    if (query.start) this.start = parseInt(query.start as unknown as string);
+  }
 
-  try {
-    let prj = (await getProjectById({
-      projectId: pid,
-      user: user,
-    })) as StoplightComponents["schemas"]["Project"];
+  protected async prepare(): Promise<void> {
+    await this.getProjectCampaigns();
+    await this.getProjectCampaignsCount();
+    return this.setSuccess(200, {
+      items: this.campaigns,
+      total: this.total,
+      start: this.start,
+      limit: this.limit,
+      size: this.campaigns.length,
+    });
+  }
 
-    // Get project campaigns
+  private async getProjectCampaigns(): Promise<void> {
     let campaignsSql = `SELECT 
         c.id,  
         c.start_date,  
@@ -65,32 +67,19 @@ export default async (
       LEFT JOIN campaigns_outputs o ON (o.campaign_id = c.id)
       WHERE c.project_id = ? group by c.id`;
 
-    if (limit) {
-      campaignsSql += ` LIMIT ${limit} OFFSET ${start}`;
+    if (this.limit) {
+      campaignsSql += ` LIMIT ${this.limit} OFFSET ${this.start}`;
     }
 
-    const countQuery = `SELECT COUNT(*) as count
-      FROM wp_appq_evd_campaign c 
-      JOIN wp_appq_project p ON c.project_id = p.id 
-      JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id 
-      WHERE c.project_id = ?`;
+    let campaigns = await db.query(
+      db.format(campaignsSql, [this.getProjectId()])
+    );
 
-    let campaigns = await db.query(db.format(campaignsSql, [prj.id]));
-
-    let total = await db.query(db.format(countQuery, [prj.id]));
-    total = formatCount(total);
-
-    let returnCampaigns: Array<
+    const returnCampaigns: Array<
       StoplightComponents["schemas"]["CampaignWithOutput"]
     > = [];
+
     for (let campaign of campaigns) {
-      // Get campaign family
-      const campaign_family = getCampaignFamily({
-        familyId: campaign.campaign_family_id,
-      });
-
-      const outputs = getCampaignOutputs(campaign);
-
       returnCampaigns.push({
         id: campaign.id,
         start_date: new Date(campaign.start_date).toISOString(),
@@ -112,27 +101,44 @@ export default async (
           name: campaign.campaign_type_name,
         },
         project: {
-          id: campaign.project_id,
-          name: prj.name,
+          id: this.getProjectId(),
+          name: this.getProject().name,
         },
         family: {
           id: campaign.campaign_family_id,
-          name: campaign_family,
+          name: this.getProjectCampaignFamilyName(campaign.campaign_family_id),
         },
-        outputs,
+        outputs: this.getProjectCampaignOutputs(campaign),
       });
     }
 
-    return paginateItems({ items: returnCampaigns, limit, start, total });
-  } catch (e: any) {
-    if (e.code) {
-      error.code = e.code;
-      res.status_code = e.code;
-    } else {
-      error.code = 500;
-      res.status_code = 500;
-    }
-
-    return error;
+    this.campaigns = returnCampaigns;
   }
-};
+
+  private async getProjectCampaignsCount(): Promise<void> {
+    const countQuery = `SELECT COUNT(*) as count
+      FROM wp_appq_evd_campaign c 
+      JOIN wp_appq_project p ON c.project_id = p.id 
+      JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id 
+      WHERE c.project_id = ?`;
+
+    let total = await db.query(db.format(countQuery, [this.getProjectId()]));
+    this.total = formatCount(total) as number;
+  }
+
+  private getProjectCampaignFamilyName(familyId: number): string {
+    return getCampaignFamily({
+      familyId,
+    });
+  }
+
+  private getProjectCampaignOutputs(
+    campaign: StoplightComponents["schemas"]["Campaign"] & {
+      media: number;
+    } & {
+      bugs: number;
+    }
+  ): StoplightComponents["schemas"]["Output"][] {
+    return getCampaignOutputs(campaign);
+  }
+}

@@ -1,21 +1,21 @@
 /** OPENAPI-CLASS: get-workspace-campaigns */
 import * as db from "@src/features/db";
-import { getWorkspace } from "@src/utils/workspaces";
-import { getUserProjects } from "@src/utils/projects";
 import {
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
 } from "@src/utils/constants";
 import { getCampaignFamily, getCampaignStatus } from "@src/utils/campaigns";
+import WorkspaceRoute from "@src/features/routes/WorkspaceRoute";
+import { tryber } from "@src/features/database";
 
-import UserRoute from "@src/features/routes/UserRoute";
-
-export default class Route extends UserRoute<{
+export default class Route extends WorkspaceRoute<{
   response: StoplightOperations["get-workspace-campaigns"]["responses"]["200"]["content"]["application/json"];
   query: StoplightOperations["get-workspace-campaigns"]["parameters"]["query"];
   parameters: StoplightOperations["get-workspace-campaigns"]["parameters"]["path"];
 }> {
-  private workspaceId: number;
+  private sharedProjects: Array<number> = [];
+  private sharedCampaigns: Array<number> = [];
+  private hasWorkspaceAccess: boolean = false;
   private limit: number = LIMIT_QUERY_PARAM_DEFAULT;
   private start: number = START_QUERY_PARAM_DEFAULT;
   private order: "ASC" | "DESC" | undefined;
@@ -44,9 +44,6 @@ export default class Route extends UserRoute<{
 
     this.order = this.getOrder();
     this.orderBy = this.getOrderBy();
-
-    const parameters = this.getParameters();
-    this.workspaceId = Number.parseInt(parameters.wid);
   }
 
   private getOrder() {
@@ -81,47 +78,34 @@ export default class Route extends UserRoute<{
     return undefined;
   }
 
-  protected async init(): Promise<void> {
-    await super.init();
+  protected async filter(): Promise<boolean> {
+    /**
+     * We need to override the filter method to check if the user has access to the workspace
+     * if the user hasn't a workspace access, we need to check if the user has access to a shared project or campaign
+     */
 
-    if (isNaN(this.workspaceId)) {
-      this.setError(400, {
-        code: 400,
-        message: "Invalid workspace",
+    this.hasWorkspaceAccess = await this.checkWSAccess();
+
+    if (!this.hasWorkspaceAccess) {
+      this.sharedProjects = await this.getSharedProjects();
+      this.sharedCampaigns = await this.getSharedCampaigns();
+      if (this.sharedProjects.length || this.sharedCampaigns.length)
+        return true;
+
+      this.setError(403, {
+        code: 403,
+        message: "Workspace doesn't exist or not accessible",
       } as OpenapiError);
 
-      throw new Error("Invalid workspace");
+      return false;
     }
-  }
 
-  protected async filter(): Promise<boolean> {
-    if (!(await super.filter())) return false;
-
-    try {
-      await getWorkspace({
-        workspaceId: this.workspaceId,
-        user: this.getUser(),
-      });
-      return true;
-    } catch (err) {
-      throw { code: 403, message: "Something went wrong" };
-    }
+    return true;
   }
 
   protected async prepare(): Promise<void> {
-    const userProjects = await getUserProjects({
-      workspaceId: this.workspaceId,
-      user: this.getUser(),
-    });
-
-    if (!userProjects.length) return this.returnEmptyList();
-
-    let campaigns;
-    try {
-      campaigns = await this.getCampaigns(userProjects);
-    } catch (err) {
-      throw { code: 400, message: "Something went wrong" };
-    }
+    const userProjects = await this.getUserProjects();
+    const campaigns = await this.getCampaigns(userProjects);
 
     if (!campaigns.length) return this.returnEmptyList();
 
@@ -185,10 +169,8 @@ export default class Route extends UserRoute<{
     });
   }
 
-  private async getCampaigns(userProjects: Project[]) {
-    let userProjectsID = userProjects.map((p) => p.id).join(",");
-    //TODO: check why the cp type is in a LEFT JOIN relation
-    const query = `SELECT 
+  private async getCampaigns(userProjects: Array<number>) {
+    let query = `SELECT 
         c.id,  
         c.start_date,  
         c.end_date,
@@ -206,17 +188,33 @@ export default class Route extends UserRoute<{
         p.display_name
       FROM wp_appq_evd_campaign c 
       JOIN wp_appq_project p ON c.project_id = p.id 
-      LEFT JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id 
-      WHERE p.id IN (${userProjectsID})
-      ${this.getAndFromFilterBy()}
-      GROUP BY c.id
-      ${
-        this.order && this.orderBy
-          ? ` ORDER BY ${this.orderBy} ${this.order}`
-          : ``
-      }
-      ${this.limit ? ` LIMIT ${this.limit} OFFSET ${this.start}` : ``}
-    `;
+      JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id`;
+
+    let where = [];
+
+    if (userProjects.length) {
+      where.push(`p.id IN (${userProjects.join(",")})`);
+    }
+
+    if (this.sharedCampaigns.length) {
+      where.push(`c.id IN (${this.sharedCampaigns.join(",")})`);
+    }
+
+    if (!where.length) return [];
+
+    query += ` WHERE ${where.join(" OR ")} `;
+
+    const filters = this.getAndFromFilterBy();
+    if (filters) query += filters;
+
+    query += ` GROUP BY c.id `;
+    if (this.order && this.orderBy) {
+      query += ` ORDER BY ${this.orderBy} ${this.order}`;
+    }
+
+    if (this.limit) {
+      query += ` LIMIT ${this.limit} OFFSET ${this.start}`;
+    }
 
     return await db.query(query);
   }
@@ -255,12 +253,25 @@ export default class Route extends UserRoute<{
     return AND;
   }
 
-  private async getTotal(userProjects: Project[]) {
-    const userProjectsIDs = userProjects.map((p) => p.id).join(",");
-    const countQuery = `SELECT COUNT(*) as count 
-    FROM wp_appq_evd_campaign c 
-    JOIN wp_appq_project p ON c.project_id = p.id 
-    WHERE p.id IN (${userProjectsIDs})`;
+  private async getTotal(userProjects: Array<number>) {
+    let countQuery = `SELECT COUNT(DISTINCT c.id) as count 
+        FROM wp_appq_evd_campaign c 
+        JOIN wp_appq_project p ON c.project_id = p.id
+        `;
+    const where = [];
+
+    if (userProjects.length) {
+      where.push(`p.id IN (${userProjects.join(",")})`);
+    }
+
+    if (this.sharedCampaigns.length) {
+      where.push(`c.id IN (${this.sharedCampaigns.join(",")})`);
+    }
+
+    if (!where.length) return 0;
+
+    countQuery += ` Where ${where.join(" OR ")}`;
+
     const total = await db.query(countQuery);
     if (!total.length) return 0;
     return total[0].count;
@@ -319,5 +330,17 @@ GROUP BY campaign_id;
       }
     }
     return results;
+  }
+
+  private async getUserProjects() {
+    if (!this.hasWorkspaceAccess) {
+      return this.sharedProjects;
+    }
+
+    const projects = await tryber.tables.WpAppqProject.do().select("id").where({
+      customer_id: this.getWorkspaceId(),
+    });
+
+    return projects.map((p) => p.id);
   }
 }

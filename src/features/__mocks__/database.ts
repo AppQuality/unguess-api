@@ -1,4 +1,3 @@
-import knex from "knex";
 import unguessDb from "@appquality/unguess-database";
 import tryberDb from "@appquality/tryber-database";
 

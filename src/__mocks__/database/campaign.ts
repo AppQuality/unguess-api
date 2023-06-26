@@ -37,6 +37,10 @@ const defaultItem: CampaignsParams = {
   project_id: 1,
   customer_id: 2,
   cust_bug_vis: 0,
+  platform_id: 1,
+  page_preview_id: 1,
+  page_manual_id: 1,
+  pm_id: 1,
 };
 
 class Campaigns extends Table<CampaignsParams> {
@@ -71,6 +75,7 @@ class Campaigns extends Table<CampaignsParams> {
 const campaigns = new Campaigns();
 export default campaigns;
 export type { CampaignsParams };
+export { data };
 
 // Backward compatibility
 const data = {
@@ -78,5 +83,3 @@ const data = {
     return await campaigns.insert(params);
   },
 };
-
-export { data };

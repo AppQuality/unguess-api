@@ -21,6 +21,13 @@ const customer_1 = {
   tokens: 100,
 };
 
+const customer_10 = {
+  id: 10,
+  company: "Company 10",
+  company_logo: "logo999.png",
+  tokens: 100,
+};
+
 const user_to_customer_1 = {
   wp_user_id: 1,
   customer_id: 999,
@@ -193,7 +200,7 @@ const bug_media_1 = {
 describe("GET /campaigns/{cid}/widgets", () => {
   beforeAll(async () => {
     await dbAdapter.add({
-      companies: [customer_1],
+      companies: [customer_1, customer_10],
       userToCustomers: [user_to_customer_1],
       projects: [project_1, project_2],
       userToProjects: [user_to_project_1],
@@ -395,7 +402,7 @@ describe("GET /campaigns/{cid}/widgets", () => {
 
     it("Should answer 200 and returns the usecase completion of 87.5", async () => {
       await userTask.insert(uT1);
-      await userTask.insert({ ...uT1, id: 2 });
+      await userTask.insert({ ...uT1, id: 2, task_id: useCase2.id });
 
       const response = await request(app)
         .get(`/campaigns/${campaign_1.id}/widgets?s=bugs-by-usecase`)

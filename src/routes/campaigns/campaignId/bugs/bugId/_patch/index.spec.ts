@@ -252,10 +252,16 @@ const bug_status_3 = {
   custom_status_id: status_open.id,
 };
 
+const user_to_project = {
+  wp_user_id: 1,
+  project_id: project_1.id,
+};
+
 describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
   beforeAll(async () => {
     await dbAdapter.add({
       campaignTypes: [campaign_type_1],
+      userToProjects: [user_to_project],
       campaigns: [campaign_1, campaign_2],
       companies: [customer_1, customer_2],
       projects: [project_1, project_2],

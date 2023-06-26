@@ -2,6 +2,7 @@ import app from "@src/app";
 import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { ERROR_MESSAGE, LIMIT_QUERY_PARAM_DEFAULT } from "@src/utils/constants";
+import { tryber } from "@src/features/database";
 
 const customer_profile_1 = {
   id: 1,
@@ -51,26 +52,6 @@ const project_3 = {
   id: 3,
   display_name: "Projettino treh",
   customer_id: 1,
-};
-
-const user_to_project_1 = {
-  wp_user_id: 1,
-  project_id: 1,
-};
-
-const user_to_project_2 = {
-  wp_user_id: 2,
-  project_id: 2,
-};
-
-const user_to_project_3 = {
-  wp_user_id: 1,
-  project_id: 3,
-};
-
-const user_to_project_4 = {
-  wp_user_id: 2,
-  project_id: 1,
 };
 
 const campaign_1 = {
@@ -128,12 +109,6 @@ describe("GET /workspaces/{wid}/projects", () => {
           companies: [customer_1, customer_2],
           projects: [project_1, project_2, project_3],
           userToCustomers: [user_to_customer_1, user_to_customer_2],
-          userToProjects: [
-            user_to_project_1,
-            user_to_project_2,
-            user_to_project_3,
-            user_to_project_4,
-          ],
         });
       } catch (error) {
         console.error(error);
@@ -162,28 +137,26 @@ describe("GET /workspaces/{wid}/projects", () => {
     const response = await request(app)
       .get(`/workspaces/${customer_1.id}/projects`)
       .set("authorization", "Bearer user");
-    expect(JSON.stringify(response.body)).toStrictEqual(
-      JSON.stringify({
-        items: [
-          {
-            id: project_1.id,
-            name: project_1.display_name,
-            campaigns_count: 2,
-            workspaceId: project_1.customer_id,
-          },
-          {
-            id: project_3.id,
-            name: project_3.display_name,
-            campaigns_count: 1,
-            workspaceId: project_3.customer_id,
-          },
-        ],
-        start: 0,
-        limit: LIMIT_QUERY_PARAM_DEFAULT,
-        size: 2,
-        total: 2,
-      })
-    );
+    expect(response.body).toEqual({
+      items: [
+        {
+          id: project_1.id,
+          name: project_1.display_name,
+          campaigns_count: 2,
+          workspaceId: project_1.customer_id,
+        },
+        {
+          id: project_3.id,
+          name: project_3.display_name,
+          campaigns_count: 1,
+          workspaceId: project_3.customer_id,
+        },
+      ],
+      start: 0,
+      limit: LIMIT_QUERY_PARAM_DEFAULT,
+      size: 2,
+      total: 2,
+    });
   });
 
   it("Should answer with only one visible project because of limit 1", async () => {
@@ -220,7 +193,6 @@ describe("GET /workspaces/{wid}/projects", () => {
       .get(`/workspaces/9999/projects`)
       .set("authorization", "Bearer user");
     expect(result.body.code).toBe(403);
-    expect(result.body.message).toBe(ERROR_MESSAGE);
   });
 
   it("Should return a list of projects if customer is present and has some projects", async () => {
@@ -294,4 +266,75 @@ describe("GET /workspaces/{wid}/projects", () => {
       })
     );
   });
+
+  it("Should return 200 and a Project if the user is not a workspace member BUT has access to some sub-projects", async () => {
+    await tryber.tables.WpAppqCustomer.do().insert({
+      ...customer_1,
+      id: 1234,
+      pm_id: 32,
+    });
+
+    await tryber.tables.WpAppqProject.do().insert({
+      id: 567,
+      display_name: "Progettino uno",
+      customer_id: 1234,
+      edited_by: 32,
+    });
+
+    await tryber.tables.WpAppqUserToProject.do().insert({
+      wp_user_id: 1,
+      project_id: 567,
+    });
+
+    const response = await request(app)
+      .get(`/workspaces/1234/projects`)
+      .set("authorization", "Bearer user");
+
+    expect(response.status).toBe(200);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 567,
+          name: "Progettino uno",
+          campaigns_count: 0,
+          workspaceId: 1234,
+        }),
+      ])
+    );
+
+    expect(response.body.start).toEqual(0);
+    expect(response.body.size).toEqual(1);
+    expect(response.body.total).toEqual(1);
+  });
+
+  it("Should return 403 if the users has shared items but nothing related to the workspace", async () => {
+    await tryber.tables.WpAppqCustomer.do().insert({
+      ...customer_1,
+      id: 2222,
+      pm_id: 32,
+    });
+
+    await tryber.tables.WpAppqProject.do().insert({
+      id: 3333,
+      display_name: "Progettino uno",
+      customer_id: 2222,
+      edited_by: 32,
+    });
+
+    await tryber.tables.WpAppqUserToProject.do().insert({
+      wp_user_id: 123, // another user
+      project_id: 567,
+    });
+
+    const response = await request(app)
+      .get(`/workspaces/2222/projects`)
+      .set("authorization", "Bearer user");
+
+    expect(response.status).toBe(403);
+    expect(response.body.message).toBe(
+      "Workspace doesn't exist or not accessible"
+    );
+  });
+
+  // End of describe
 });

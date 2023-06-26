@@ -9,6 +9,7 @@ import {
 import bugs from "@src/__mocks__/database/bugs";
 import useCases from "@src/__mocks__/database/use_cases";
 import userTaskMedia from "@src/__mocks__/database/user_task_media";
+import { tryber } from "@src/features/database";
 
 const customer_1 = {
   id: 1,
@@ -63,6 +64,11 @@ const campaign_1 = {
   project_id: 1,
   customer_id: 1,
   campaign_type: 0,
+  cust_bug_vis: 0,
+  platform_id: 1,
+  page_preview_id: 1,
+  page_manual_id: 1,
+  pm_id: 1,
 };
 
 const campaign_2 = {
@@ -169,7 +175,9 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       .get("/workspaces/999898978/campaigns")
       .set("authorization", "Bearer user");
     expect(response.body.code).toBe(403);
-    expect(response.body.message).toBe(ERROR_MESSAGE);
+    expect(response.body.message).toBe(
+      "Workspace doesn't exist or not accessible"
+    );
   });
 
   it("Should return an array of 1 elements because of limit = 1", async () => {
@@ -459,6 +467,153 @@ describe("GET /workspaces/{wid}/campaigns", () => {
 
     expect(response.body.size).toBe(1);
     expect(response.body.total).toBe(2);
+  });
+
+  it("Should return 200 and a cp list if the user is not a workspace member BUT has access to some sub projects or campaigns", async () => {
+    await tryber.tables.WpAppqCustomer.do().insert({
+      ...customer_1,
+      id: 1234,
+      pm_id: 32,
+    });
+
+    await tryber.tables.WpAppqProject.do().insert({
+      id: 567,
+      display_name: "Progettino uno",
+      customer_id: 1234,
+      edited_by: 32,
+    });
+
+    await tryber.tables.WpAppqProject.do().insert({
+      id: 568,
+      display_name: "Progettino due",
+      customer_id: 1234,
+      edited_by: 32,
+    });
+
+    await tryber.tables.WpAppqUserToProject.do().insert({
+      wp_user_id: 1,
+      project_id: 567,
+    });
+
+    await tryber.tables.WpAppqEvdCampaign.do().insert({
+      ...campaign_1,
+      id: 1234,
+      project_id: 567, // Project ACCESSIBLE by the user
+    });
+
+    await tryber.tables.WpAppqEvdCampaign.do().insert({
+      ...campaign_1,
+      id: 1235,
+      project_id: 568, // Project not accessible by the user
+    });
+
+    await tryber.tables.WpAppqUserToCampaign.do().insert({
+      wp_user_id: 1,
+      campaign_id: 1235,
+    });
+
+    const response = await request(app)
+      .get(`/workspaces/1234/campaigns`)
+      .set("authorization", "Bearer user");
+
+    expect(response.status).toBe(200);
+
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 1234,
+          project: {
+            id: 567,
+            name: "Progettino uno",
+          },
+        }),
+        expect.objectContaining({
+          id: 1235,
+          project: {
+            id: 568,
+            name: "Progettino due",
+          },
+        }),
+      ])
+    );
+
+    expect(response.body.start).toEqual(0);
+    expect(response.body.size).toEqual(2);
+    expect(response.body.total).toEqual(2);
+  });
+
+  it("Should return 403 if the users has shared items but nothing related to the workspace", async () => {
+    await tryber.tables.WpAppqCustomer.do().insert({
+      ...customer_1,
+      id: 2222,
+      pm_id: 32,
+    });
+
+    await tryber.tables.WpAppqProject.do().insert({
+      id: 3333,
+      display_name: "Progettino uno",
+      customer_id: 2222,
+      edited_by: 32,
+    });
+
+    await tryber.tables.WpAppqEvdCampaign.do().insert({
+      ...campaign_1,
+      id: 4444,
+      project_id: 3333, // Project not accessible by the user
+    });
+
+    const response = await request(app)
+      .get(`/workspaces/2222/campaigns`)
+      .set("authorization", "Bearer user");
+
+    expect(response.status).toBe(403);
+    expect(response.body.message).toBe(
+      "Workspace doesn't exist or not accessible"
+    );
+  });
+
+  it("Should return 200 and a Campaign if the user is not a workspace member BUT has access only to it", async () => {
+    await tryber.tables.WpAppqCustomer.do().insert({
+      ...customer_1,
+      id: 1111,
+      pm_id: 32,
+    });
+
+    await tryber.tables.WpAppqProject.do().insert({
+      id: 2222,
+      display_name: "Progettino uno",
+      customer_id: 1111,
+      edited_by: 32,
+    });
+
+    await tryber.tables.WpAppqEvdCampaign.do().insert({
+      ...campaign_1,
+      id: 3333,
+      project_id: 2222, // Project not accessible by the user
+    });
+
+    await tryber.tables.WpAppqUserToCampaign.do().insert({
+      wp_user_id: 1,
+      campaign_id: 3333,
+    });
+
+    const response = await request(app)
+      .get(`/workspaces/1111/campaigns`)
+      .set("authorization", "Bearer user");
+
+    expect(response.status).toBe(200);
+
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 3333,
+          project: {
+            id: 2222,
+            name: "Progettino uno",
+          },
+        }),
+      ])
+    );
   });
 
   describe("Outputs", () => {

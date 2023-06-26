@@ -2,7 +2,7 @@ import app from "@src/app";
 import request from "supertest";
 import { fallBackCsmProfile } from "@src/utils/constants";
 import { useBasicWorkspaces } from "@src/features/db/hooks/basicWorkspaces";
-import { unguess } from "@src/features/database";
+import { tryber, unguess } from "@src/features/database";
 
 describe("GET /workspaces/{wid}", () => {
   const context = useBasicWorkspaces();
@@ -74,4 +74,71 @@ describe("GET /workspaces/{wid}", () => {
       })
     );
   });
+
+  it("Should return 403 aif the user has no access and no shared items", async () => {
+    await tryber.tables.WpAppqCustomer.do().insert({
+      ...context.customer_1,
+      id: 9999,
+    });
+
+    await tryber.tables.WpAppqProject.do().insert({
+      id: 123,
+      display_name: "Progettino uno",
+      customer_id: 9999,
+      edited_by: 32,
+    });
+
+    await tryber.tables.WpAppqUserToProject.do().insert({
+      wp_user_id: 12,
+      project_id: 123,
+    });
+
+    const response = await request(app)
+      .get(`/workspaces/9999`)
+      .set("authorization", "Bearer user");
+
+    expect(response.status).toBe(403);
+    expect(response.body.message).toBe(
+      "Workspace doesn't exist or not accessible"
+    );
+  });
+
+  it("Should return 200 and a Workspace if the user is not a member BUT has access to some child item of the workspace", async () => {
+    await tryber.tables.WpAppqCustomer.do().insert({
+      ...context.customer_1,
+      id: 1234,
+    });
+
+    await tryber.tables.WpAppqProject.do().insert({
+      id: 567,
+      display_name: "Progettino uno",
+      customer_id: 1234,
+      edited_by: 32,
+    });
+
+    await tryber.tables.WpAppqUserToProject.do().insert({
+      wp_user_id: 1,
+      project_id: 567,
+    });
+
+    const response = await request(app)
+      .get(`/workspaces/1234`)
+      .set("authorization", "Bearer user");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        id: 1234,
+        company: context.customer_1.company,
+        tokens: context.customer_1.tokens,
+        logo: context.customer_1.company_logo,
+        csm: fallBackCsmProfile,
+      })
+    );
+
+    expect(response.body.isShared).toBe(true);
+    expect(response.body.sharedItems).toBe(1);
+  });
+
+  // End of describe block
 });

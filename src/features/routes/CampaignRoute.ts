@@ -1,7 +1,7 @@
-import UserRoute from "./UserRoute";
 import * as db from "@src/features/db";
-import { getProjectById } from "@src/utils/projects/getProjectById";
 import { getTitleRule } from "@src/utils/campaigns/getTitleRule";
+import ProjectRoute from "./ProjectRoute";
+import { tryber } from "../database";
 
 type CampaignRouteParameters = { cid: string };
 
@@ -11,9 +11,9 @@ export default class CampaignRoute<
   T extends RouteClassTypes & {
     parameters: T["parameters"] & CampaignRouteParameters;
   }
-> extends UserRoute<T> {
+> extends ProjectRoute<T> {
   protected cp_id: number;
-  protected projectId: number | undefined;
+  protected campaignName: string = "";
   protected showNeedReview: boolean = false;
   protected baseBugInternalId: string = "";
   private NEED_REVIEW_STATUS_ID = 4;
@@ -25,14 +25,12 @@ export default class CampaignRoute<
 
     const params = this.getParameters();
 
-    if (!params.cid) throw new Error("Missing campaign id");
+    if (!params?.cid) throw new Error("Missing campaign id");
 
     this.cp_id = parseInt(params.cid);
   }
 
   protected async init(): Promise<void> {
-    await super.init();
-
     if (isNaN(this.cp_id)) {
       this.setError(400, {
         code: 400,
@@ -53,34 +51,65 @@ export default class CampaignRoute<
       throw new Error("Campaign not found");
     }
 
-    this.projectId = campaign.project_id;
-    this.showNeedReview = campaign.showNeedReview;
+    this.project_id = campaign.project_id;
+    this.showNeedReview = campaign.showNeedReview === 1;
     this.baseBugInternalId = campaign.base_bug_internal_id;
+    this.campaignName = campaign.customerTitle || campaign.internalTitle;
+
+    await super.init();
   }
 
   private async initCampaign() {
-    const campaigns: {
-      showNeedReview: boolean;
-      project_id: number;
-      base_bug_internal_id: string;
-    }[] = await db.query(`
-      SELECT 
-        cust_bug_vis as showNeedReview,
-        project_id,
-        base_bug_internal_id
-      FROM wp_appq_evd_campaign 
-      WHERE id = ${this.cp_id}`);
-    if (!campaigns.length) return false;
-    return campaigns[0];
+    const campaign = await tryber.tables.WpAppqEvdCampaign.do()
+      .select(
+        tryber.ref("title").as("internalTitle"),
+        tryber.ref("customer_title").as("customerTitle"),
+        tryber.ref("cust_bug_vis").as("showNeedReview"),
+        tryber.ref("project_id"),
+        tryber.ref("base_bug_internal_id")
+      )
+      .where({ id: this.cp_id })
+      .first();
+
+    if (!campaign) return false;
+
+    return campaign;
   }
 
   protected async filter(): Promise<boolean> {
-    if (!(await super.filter())) return false;
+    if (!(await super.filter())) {
+      // The user does NOT have access to the workspace or project
+      const access = await this.checkCpAccess();
 
-    if (!(await this.hasAccessToProject())) {
+      if (!access) {
+        this.setError(403, {
+          code: 403,
+          message: "Campaign not found or not accessible",
+        } as OpenapiError);
+
+        return false;
+      }
+
+      return true;
+    }
+
+    // The user HAS access to the workspace or project
+    return true;
+  }
+
+  private async checkCpAccess(): Promise<boolean> {
+    const hasAccess = await tryber.tables.WpAppqUserToCampaign.do()
+      .select()
+      .where({
+        campaign_id: this.cp_id,
+        wp_user_id: this.getUser().tryber_wp_user_id,
+      })
+      .first();
+
+    if (!hasAccess) {
       this.setError(403, {
         code: 400,
-        message: "Project not found",
+        message: "You don't have access to this campaign",
       } as OpenapiError);
       return false;
     }
@@ -88,22 +117,9 @@ export default class CampaignRoute<
     return true;
   }
 
-  private async hasAccessToProject() {
-    try {
-      await getProjectById({
-        projectId: this.getProjectId(),
-        user: this.getUser(),
-      });
-    } catch (error) {
-      return false;
-    }
-    return true;
-  }
-
-  protected getProjectId() {
-    if (typeof this.projectId === "undefined")
-      throw new Error("Invalid project");
-    return this.projectId;
+  protected getCampaignId() {
+    if (typeof this.cp_id === "undefined") throw new Error("Invalid campaign");
+    return this.cp_id;
   }
 
   protected async getTags(): Promise<

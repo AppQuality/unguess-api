@@ -12,6 +12,7 @@ const defaultItem: CustomerParams = {
   company: "Company",
   company_logo: "logo.png",
   tokens: 100,
+  pm_id: 32
 };
 
 class Customers extends Table<CustomerParams> {
@@ -30,6 +31,7 @@ class Customers extends Table<CustomerParams> {
 const customers = new Customers();
 export default customers;
 export type { CustomerParams };
+export { data };
 
 // Backward compatibility
 const data = {
@@ -37,5 +39,3 @@ const data = {
     return await customers.insert(params);
   },
 };
-
-export { data };
