@@ -36,6 +36,9 @@ declare global {
   type PartialRecord<K extends keyof any, T> = {
     [P in K]?: T;
   };
+  type GetConstructorArgs<T> = T extends new (...args: infer U) => any
+    ? U
+    : never;
 
   type RouteClassTypes = Record<"response", any> &
     PartialRecord<"body" | "parameters" | "query", any>;

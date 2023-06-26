@@ -7,29 +7,23 @@ import crypto from "crypto";
 
 type InvitationType = "new_user" | "existing_user";
 
-const SUBJECTS: Record<InvitationType, Record<Language, string>> = {
-  new_user: {
-    it: `Entra in Unguess`,
-    en: `You've been invited to join UNGUESS`,
-  },
-  existing_user: {
-    it: `Entra in %%object_name%%`,
-    en: `You've been invited to join %%object_name%%`,
-  },
-};
+export class UserExistsException extends Error {
+  constructor() {
+    super("User already exists");
+  }
+}
 
 class Invitation {
-  private objectName: string;
-  private templates: Record<InvitationType, string>;
-  private subjects: Record<InvitationType, string>;
-  private locale: Language = "en";
+  protected objectName: string;
+  protected locale: Language = "en";
   private redirect: string = process.env.APP_URL ?? "/";
   private message: string = "";
-  private type: InvitationType = "new_user";
-  private email: string;
+  protected type: InvitationType = "new_user";
+  protected email: string;
   private baseUrl: string;
   private userToInvite: { email: string; name?: string; surname?: string };
   private sender: UserType;
+  protected customEvent: string | undefined;
 
   constructor({
     object,
@@ -37,24 +31,22 @@ class Invitation {
     locale,
     email,
     redirect,
+    event,
   }: {
     object: { name: string };
     userToInvite: { email: string; name?: string; surname?: string };
     email: {
       sender: UserType;
-      templates: Record<InvitationType, string>;
-      subjects: Record<InvitationType, string>;
       message?: string;
     };
     locale?: string;
     redirect?: string;
+    event?: string;
   }) {
     this.objectName = object.name;
     this.email = userToInvite.email;
     this.userToInvite = userToInvite;
-    this.templates = email.templates;
     this.sender = email.sender;
-    this.subjects = email.subjects;
     if (this.isLocaleValid(locale)) this.locale = locale;
 
     this.baseUrl = `${process.env.APP_URL}${
@@ -62,10 +54,67 @@ class Invitation {
     }`;
     if (redirect) this.redirect = redirect;
     if (email.message) this.message = email.message;
+    if (event) this.customEvent = event;
   }
 
   private isLocaleValid(locale?: string): locale is Language {
     return !!locale && ["it", "en"].includes(locale);
+  }
+
+  public async invite() {
+    const alreadyInvitedUser = await this.retrieveUserAlreadyInvited();
+
+    if (alreadyInvitedUser) {
+      if (alreadyInvitedUser.type === "existing_user") {
+        throw new UserExistsException();
+      }
+
+      await this.sendNewUserInvitation({
+        profile_id: alreadyInvitedUser.profile_id,
+      });
+      return {
+        profile_id: alreadyInvitedUser.profile_id,
+        tryber_wp_user_id: alreadyInvitedUser.tryber_wp_id,
+        email: alreadyInvitedUser.email,
+      };
+    }
+
+    const userToAdd = await this.createAndInviteUser();
+    await this.addUserToResource(userToAdd);
+
+    return {
+      profile_id: userToAdd.profile_id,
+      tryber_wp_user_id: userToAdd.tryber_wp_id,
+      email: userToAdd.email,
+    };
+  }
+
+  protected getSubject() {
+    const subjects = {
+      existing_user:
+        this.locale === "it"
+          ? `Entra in ${this.objectName}`
+          : `You've been invited to join ${this.objectName}`,
+      new_user:
+        this.locale === "it"
+          ? `Entra in Unguess`
+          : `You've been invited to join UNGUESS`,
+    };
+
+    return subjects[this.type];
+  }
+
+  protected async retrieveUserAlreadyInvited(): Promise<{
+    profile_id: number;
+    tryber_wp_id: number;
+    email: string;
+    type: InvitationType;
+  } | null> {
+    throw new Error("Method not implemented.");
+  }
+
+  protected async addUserToResource(user: { tryber_wp_id: number }) {
+    throw new Error("Method not implemented.");
   }
 
   public async sendNewUserInvitation({ profile_id }: { profile_id: number }) {
@@ -86,8 +135,8 @@ class Invitation {
   }) {
     await sendTemplate({
       email: this.email,
-      template: this.templates[this.type],
-      subject: this.subjects[this.type],
+      template: this.getTemplate(),
+      subject: this.getSubject(),
       optionalFields: {
         "{Inviter.name}": this.sender.email,
         "{Inviter.email}": this.sender.email,
@@ -97,6 +146,10 @@ class Invitation {
         ...params, // additional fields
       },
     });
+  }
+
+  protected getTemplate(): string {
+    throw new Error("Method not implemented.");
   }
 
   private async createInvitation({ profile_id }: { profile_id: number }) {
