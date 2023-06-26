@@ -132,6 +132,8 @@ describe("POST /campaigns/{cid}/users mail checks", () => {
       })
     );
 
+    const firstCallArguments = { ...mockedSendgrid.send.mock.calls[0][0] };
+
     jest.clearAllMocks();
 
     await request(app)
@@ -154,5 +156,9 @@ describe("POST /campaigns/{cid}/users mail checks", () => {
         categories: ["UNGUESSAPP_STAGING"],
       })
     );
+
+    const secondCallArguments = { ...mockedSendgrid.send.mock.calls[0][0] };
+
+    expect(firstCallArguments).toEqual(secondCallArguments);
   });
 });

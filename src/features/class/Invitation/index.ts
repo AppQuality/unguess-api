@@ -89,21 +89,6 @@ class Invitation {
     };
   }
 
-  protected getSubject() {
-    const subjects = {
-      existing_user:
-        this.locale === "it"
-          ? `Entra in ${this.objectName}`
-          : `You've been invited to join ${this.objectName}`,
-      new_user:
-        this.locale === "it"
-          ? `Entra in Unguess`
-          : `You've been invited to join UNGUESS`,
-    };
-
-    return subjects[this.type];
-  }
-
   protected async retrieveUserAlreadyInvited(): Promise<{
     profile_id: number;
     tryber_wp_id: number;
@@ -126,6 +111,28 @@ class Invitation {
         "{Inviter.url}": inviteUrl,
       },
     });
+  }
+
+  public async createAndInviteUser() {
+    const userToAdd = await this.getUserToAdd();
+    if (userToAdd.newUser) {
+      await this.sendNewUserInvitation({
+        profile_id: userToAdd.profile_id,
+      });
+    } else {
+      if (userToAdd.pendingToken) {
+        await this.notifyUser({
+          params: {
+            "{Inviter.url}": this.getInvitationUrl(userToAdd.pendingToken),
+          },
+        });
+      } else {
+        this.type = "existing_user";
+        await this.notifyUser({});
+      }
+    }
+
+    return userToAdd;
   }
 
   private async notifyUser({
@@ -152,6 +159,21 @@ class Invitation {
     throw new Error("Method not implemented.");
   }
 
+  protected getSubject() {
+    const subjects = {
+      existing_user:
+        this.locale === "it"
+          ? `Entra in ${this.objectName}`
+          : `You've been invited to join ${this.objectName}`,
+      new_user:
+        this.locale === "it"
+          ? `Entra in Unguess`
+          : `You've been invited to join UNGUESS`,
+    };
+
+    return subjects[this.type];
+  }
+
   private async createInvitation({ profile_id }: { profile_id: number }) {
     const token = crypto
       .createHash("sha256")
@@ -167,54 +189,41 @@ class Invitation {
       .onConflict("tester_id")
       .merge();
 
-    return `${this.baseUrl}/invites/${profile_id}/${token}`;
+    return this.getInvitationUrl(token);
   }
 
-  private async getUserByEmail() {
-    const alreadyRegisteredEmail = await tryber.tables.WpUsers.do()
-      .select(
-        tryber.ref("ID").withSchema("wp_users").as("tryber_wp_id"),
-        tryber.ref("id").withSchema("wp_appq_evd_profile").as("profile_id"),
-        tryber.ref("name").withSchema("wp_appq_evd_profile"),
-        tryber.ref("surname").withSchema("wp_appq_evd_profile"),
-        tryber.ref("email").withSchema("wp_appq_evd_profile"),
-        tryber
-          .ref("status")
-          .withSchema("wp_appq_customer_account_invitations")
-          .as("invitation_status")
-      )
-      .join(
-        "wp_appq_evd_profile",
-        "wp_users.ID",
-        "wp_appq_evd_profile.wp_user_id"
-      )
-      .leftJoin(
-        "wp_appq_customer_account_invitations",
-        "wp_appq_evd_profile.id",
-        "wp_appq_customer_account_invitations.tester_id"
-      )
-      .where({
-        user_email: this.email,
-      })
-      .first();
-
-    return alreadyRegisteredEmail;
+  private getInvitationUrl(token: string) {
+    return `${this.baseUrl}/invites/${token}`;
   }
 
   private async getUserToAdd() {
     const userExists = await this.getUserByEmail();
     if (userExists) {
-      return { ...userExists, newUser: false };
+      const hasPendingInvitation =
+        userExists.invitation_status &&
+        Number(userExists.invitation_status) === 0;
+      return {
+        ...userExists,
+        newUser: false,
+        pendingToken: hasPendingInvitation
+          ? userExists.token
+          : (false as false),
+      };
     }
 
     try {
       const userToAdd = await this.createUser();
-      return { ...userToAdd, newUser: true };
+      return {
+        ...userToAdd,
+        newUser: true,
+        pendingToken: false as false,
+      };
     } catch (e) {
       this.removeCreatedUser();
       throw e;
     }
   }
+
   private async removeCreatedUser() {
     const user = await this.getUserByEmail();
 
@@ -232,6 +241,41 @@ class Invitation {
     await tryber.tables.WpAppqEvdProfile.do().delete().where({
       email: this.email,
     });
+  }
+
+  private async getUserByEmail() {
+    const alreadyRegisteredEmail = await tryber.tables.WpUsers.do()
+      .select(
+        tryber.ref("ID").withSchema("wp_users").as("tryber_wp_id"),
+        tryber.ref("id").withSchema("wp_appq_evd_profile").as("profile_id"),
+        tryber.ref("name").withSchema("wp_appq_evd_profile"),
+        tryber.ref("surname").withSchema("wp_appq_evd_profile"),
+        tryber.ref("email").withSchema("wp_appq_evd_profile"),
+        tryber
+          .ref("status")
+          .withSchema("wp_appq_customer_account_invitations")
+          .as("invitation_status"),
+        tryber
+          .ref("token")
+          .withSchema("wp_appq_customer_account_invitations")
+          .as("token")
+      )
+      .join(
+        "wp_appq_evd_profile",
+        "wp_users.ID",
+        "wp_appq_evd_profile.wp_user_id"
+      )
+      .leftJoin(
+        "wp_appq_customer_account_invitations",
+        "wp_appq_evd_profile.id",
+        "wp_appq_customer_account_invitations.tester_id"
+      )
+      .where({
+        user_email: this.email,
+      })
+      .first();
+
+    return alreadyRegisteredEmail;
   }
 
   private async createUser() {
@@ -259,24 +303,6 @@ class Invitation {
       email: this.email,
       invitation_status: "0",
     };
-  }
-
-  public async createAndInviteUser() {
-    const userToAdd = await this.getUserToAdd();
-    if (userToAdd.newUser) {
-      await this.sendNewUserInvitation({
-        profile_id: userToAdd.profile_id,
-      });
-    } else {
-      const userHasPendingInvitation =
-        userToAdd.invitation_status &&
-        Number(userToAdd.invitation_status) === 0;
-
-      if (!userHasPendingInvitation) this.type = "existing_user";
-      await this.notifyUser({});
-    }
-
-    return userToAdd;
   }
 }
 
