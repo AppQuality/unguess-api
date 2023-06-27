@@ -103,7 +103,7 @@ export default class WorkspacesRoute extends UserRoute<{
           .as("csmTryberWpUserId"),
         tryber.ref("user_url").withSchema("wp_users").as("csmUserUrl")
       )
-      .join(
+      .leftJoin(
         "wp_appq_user_to_customer",
         "wp_appq_customer.id",
         "wp_appq_user_to_customer.customer_id"
