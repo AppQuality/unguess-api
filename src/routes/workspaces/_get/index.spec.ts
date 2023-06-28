@@ -342,6 +342,27 @@ describe("GET /workspaces", () => {
       expect(response.body.items.length).toEqual(3);
     });
 
+    it("Should return also workspaces even without any user", async () => {
+      await tryber.tables.WpAppqCustomer.do().insert({
+        ...baseWorkspace,
+        id: 500,
+        company: "Workspace without users",
+      });
+
+      const response = await request(app)
+        .get("/workspaces")
+        .set("authorization", "Bearer admin");
+
+      expect(response.status).toBe(200);
+      expect(response.body.items).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 500,
+          }),
+        ])
+      );
+    });
+
     // end of describe GET /workspaces include shared items
   });
 
