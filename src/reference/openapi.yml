@@ -2350,6 +2350,9 @@ components:
           type: object
           x-stoplight:
             id: x8m3n4dg3cg9b
+          required:
+            - id
+            - name
           properties:
             id:
               type: number
