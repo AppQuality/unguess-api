@@ -2346,6 +2346,19 @@ components:
               type: number
             name:
               type: string
+        workspace:
+          type: object
+          x-stoplight:
+            id: x8m3n4dg3cg9b
+          properties:
+            id:
+              type: number
+              x-stoplight:
+                id: ezp503p6272wh
+            name:
+              type: string
+              x-stoplight:
+                id: g7el32chiou14
         description:
           type: string
         base_bug_internal_id:
