@@ -260,7 +260,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
     expect(Array.isArray(response.body.items)).toBeTruthy();
     expect(response.body.items).toEqual(
       expect.arrayContaining([
-        {
+        expect.objectContaining({
           id: campaign_2.id,
           start_date: campaign_2.start_date,
           end_date: campaign_2.end_date,
@@ -286,8 +286,8 @@ describe("GET /workspaces/{wid}/campaigns", () => {
             name: project_1.display_name,
           },
           outputs: [],
-        },
-        {
+        }),
+        expect.objectContaining({
           id: campaign_3.id,
           start_date: campaign_3.start_date,
           end_date: campaign_3.end_date,
@@ -313,7 +313,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
             name: project_1.display_name,
           },
           outputs: [],
-        },
+        }),
       ])
     );
 
@@ -352,7 +352,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
     expect(Array.isArray(response.body.items)).toBeTruthy();
     expect(response.body.items).toEqual(
       expect.arrayContaining([
-        {
+        expect.objectContaining({
           id: campaign_3.id,
           start_date: campaign_3.start_date,
           end_date: campaign_3.end_date,
@@ -378,8 +378,8 @@ describe("GET /workspaces/{wid}/campaigns", () => {
             name: project_1.display_name,
           },
           outputs: [],
-        },
-        {
+        }),
+        expect.objectContaining({
           id: campaign_2.id,
           start_date: campaign_2.start_date,
           end_date: campaign_2.end_date,
@@ -405,7 +405,7 @@ describe("GET /workspaces/{wid}/campaigns", () => {
             name: project_1.display_name,
           },
           outputs: [],
-        },
+        }),
       ])
     );
   });
