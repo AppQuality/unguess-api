@@ -2375,6 +2375,7 @@ components:
         - family
         - status
         - project
+        - workspace
     CampaignWithOutput:
       title: CampaignWithOutput
       allOf:
