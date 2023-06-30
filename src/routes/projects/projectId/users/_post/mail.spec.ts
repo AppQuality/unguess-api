@@ -88,7 +88,7 @@ describe("POST /projects/pid/users", () => {
 
     await tryber.tables.WpAppqUnlayerMailTemplate.do().insert({
       id: 5,
-      html_body: "Test mail it from {Inviter.name}",
+      html_body: "Test mail it from {Inviter.name} {Inviter.surname}",
       name: "Test mail",
       json_body: "",
       last_editor_tester_id: 1,
