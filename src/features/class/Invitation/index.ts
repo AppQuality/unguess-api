@@ -22,7 +22,10 @@ class Invitation {
   protected email: string;
   private baseUrl: string;
   private userToInvite: { email: string; name?: string; surname?: string };
-  private sender: UserType;
+  private sender: UserType & {
+    name?: string;
+    surname?: string;
+  };
   protected customEvent: string | undefined;
 
   constructor({
@@ -148,7 +151,10 @@ class Invitation {
       template: this.getTemplate(),
       subject: this.getSubject(),
       optionalFields: {
-        "{Inviter.name}": this.sender.email,
+        "{Inviter.name}":
+          this.sender.name && this.sender.surname
+            ? this.sender.name + " " + this.sender.surname
+            : this.sender.email,
         "{Inviter.email}": this.sender.email,
         "{Inviter.subject}": this.objectName,
         "{Inviter.redirectUrl}": this.redirect,
