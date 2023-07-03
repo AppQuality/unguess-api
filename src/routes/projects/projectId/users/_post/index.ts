@@ -1,6 +1,7 @@
 /** OPENAPI-CLASS: post-projects-pid-users */
 import { UserExistsException } from "@src/features/class/Invitation";
 import { ProjectInvitation } from "@src/features/class/Invitation/ProjectInvitation";
+import { tryber } from "@src/features/database";
 import ProjectRoute from "@src/features/routes/ProjectRoute";
 
 export default class Route extends ProjectRoute<{
@@ -51,7 +52,7 @@ export default class Route extends ProjectRoute<{
         },
         object: { name: this.projectName, id: this.project_id },
         email: {
-          sender: this.getUser(),
+          sender: await this.getEnrichedUser(),
           message: this.getBody().message,
         },
         locale: this.locale,
@@ -71,5 +72,25 @@ export default class Route extends ProjectRoute<{
         message: "Error adding user to campaign",
       } as OpenapiError);
     }
+  }
+
+  protected async getEnrichedUser() {
+    const sender: UserType & {
+      name?: string;
+      surname?: string;
+    } = this.getUser();
+    const user = await tryber.tables.WpAppqEvdProfile.do()
+      .select()
+      .where({
+        id: sender.profile_id,
+      })
+      .first();
+
+    if (user) {
+      sender.name = user.name;
+      sender.surname = user.surname;
+    }
+
+    return sender;
   }
 }
