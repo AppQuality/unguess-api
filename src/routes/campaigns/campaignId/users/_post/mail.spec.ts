@@ -314,12 +314,10 @@ describe("POST /campaigns/{cid}/users mail checks", () => {
         event_name: "customer_invitation_it_with_sender_name",
       });
 
-    console.log("response", response);
-
     expect(mockedSendgrid.send).toHaveBeenCalledTimes(1);
     expect(mockedSendgrid.send).toHaveBeenCalledWith(
       expect.objectContaining({
-        html: expect.stringContaining("Mario Rossi"),
+        html: expect.stringContaining("Test mail it from Mario Rossi"),
       })
     );
   });

@@ -269,7 +269,7 @@ describe("POST /workspaces/wid/users", () => {
     expect(mockedSendgrid.send).toHaveBeenCalledTimes(1);
     expect(mockedSendgrid.send).toHaveBeenCalledWith(
       expect.objectContaining({
-        html: expect.stringContaining("Mario Rossi"),
+        html: expect.stringContaining("Test mail it from Mario Rossi"),
       })
     );
   });
