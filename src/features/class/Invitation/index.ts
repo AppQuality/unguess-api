@@ -151,10 +151,8 @@ class Invitation {
       template: this.getTemplate(),
       subject: this.getSubject(),
       optionalFields: {
-        ...(this.sender.name && { "{Inviter.name}": this.sender.name }),
-        ...(this.sender.surname && {
-          "{Inviter.surname}": this.sender.surname,
-        }),
+        "{Inviter.name}": this.sender.name ?? "",
+        "{Inviter.surname}": this.sender.surname ?? "",
         "{Inviter.email}": this.sender.email,
         "{Inviter.subject}": this.objectName,
         "{Inviter.redirectUrl}": this.redirect,
