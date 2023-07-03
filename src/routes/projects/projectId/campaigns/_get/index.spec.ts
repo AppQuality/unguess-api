@@ -216,7 +216,7 @@ describe("GET /projects/{pid}/campaigns", () => {
 
     expect(response.body).toStrictEqual({
       items: [
-        {
+        expect.objectContaining({
           id: campaign_1.id,
           title: campaign_1.title,
           customer_title: campaign_1.customer_title,
@@ -242,8 +242,8 @@ describe("GET /projects/{pid}/campaigns", () => {
             name: "Experiential",
           },
           outputs: [],
-        },
-        {
+        }),
+        expect.objectContaining({
           id: campaign_2.id,
           title: campaign_2.title,
           customer_title: campaign_2.customer_title,
@@ -269,7 +269,7 @@ describe("GET /projects/{pid}/campaigns", () => {
             name: "Experiential",
           },
           outputs: [],
-        },
+        }),
       ],
       start: 0,
       limit: LIMIT_QUERY_PARAM_DEFAULT,

@@ -55,7 +55,8 @@ export default class Route extends ProjectRoute<{
         c.is_public,
         c.campaign_type_id,
         c.project_id,
-        c.customer_id,
+        cu.id AS customer_id,
+        cu.company AS customer_name,
         c.campaign_type AS bug_form,
         ct.name AS campaign_type_name,
         ct.type AS campaign_family_id,
@@ -63,6 +64,7 @@ export default class Route extends ProjectRoute<{
         o.media
       FROM wp_appq_evd_campaign c 
       JOIN wp_appq_project p ON c.project_id = p.id 
+      JOIN wp_appq_customer cu ON p.customer_id = cu.id 
       JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id
       LEFT JOIN campaigns_outputs o ON (o.campaign_id = c.id)
       WHERE c.project_id = ? group by c.id`;
@@ -103,6 +105,10 @@ export default class Route extends ProjectRoute<{
         project: {
           id: this.getProjectId(),
           name: this.getProject().name,
+        },
+        workspace: {
+          id: campaign.customer_id,
+          name: campaign.customer_name,
         },
         family: {
           id: campaign.campaign_family_id,

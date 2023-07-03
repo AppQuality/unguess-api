@@ -480,6 +480,10 @@ export interface components {
         id: number;
         name: string;
       };
+      workspace: {
+        id: number;
+        name: string;
+      };
       description?: string;
       base_bug_internal_id?: string;
     };

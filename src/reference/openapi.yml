@@ -1406,8 +1406,6 @@ paths:
                   description: Tryber WP USER ID
                 include_shared:
                   type: boolean
-                  x-stoplight:
-                    id: qbqgxykqow21r
               required:
                 - user_id
   /templates:
@@ -1855,8 +1853,6 @@ paths:
                   description: Tryber WP USER ID
                 include_shared:
                   type: boolean
-                  x-stoplight:
-                    id: w9ulhmmyfq5wv
               required:
                 - user_id
   '/workspaces/{wid}/projects':
@@ -2346,6 +2342,16 @@ components:
               type: number
             name:
               type: string
+        workspace:
+          type: object
+          required:
+            - id
+            - name
+          properties:
+            id:
+              type: number
+            name:
+              type: string
         description:
           type: string
         base_bug_internal_id:
@@ -2362,6 +2368,7 @@ components:
         - family
         - status
         - project
+        - workspace
     CampaignWithOutput:
       title: CampaignWithOutput
       allOf:
