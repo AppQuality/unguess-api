@@ -1,6 +1,7 @@
 /** OPENAPI-CLASS: post-campaign-cid-users */
 import { UserExistsException } from "@src/features/class/Invitation";
 import { CampaignInvitation } from "@src/features/class/Invitation/CampaignInvitation";
+import { tryber } from "@src/features/database";
 import CampaignRoute from "@src/features/routes/CampaignRoute";
 
 export default class Route extends CampaignRoute<{
@@ -45,7 +46,7 @@ export default class Route extends CampaignRoute<{
         },
         object: { name: this.campaignName, id: this.cp_id },
         email: {
-          sender: this.getUser(),
+          sender: await this.getEnrichedUser(),
           message: this.getBody().message,
         },
         locale: this.locale,
@@ -65,5 +66,25 @@ export default class Route extends CampaignRoute<{
         message: "Error adding user to campaign",
       } as OpenapiError);
     }
+  }
+
+  protected async getEnrichedUser() {
+    const sender: UserType & {
+      name?: string;
+      surname?: string;
+    } = this.getUser();
+    const user = await tryber.tables.WpAppqEvdProfile.do()
+      .select()
+      .where({
+        id: sender.profile_id,
+      })
+      .first();
+
+    if (user) {
+      sender.name = user.name;
+      sender.surname = user.surname;
+    }
+
+    return sender;
   }
 }

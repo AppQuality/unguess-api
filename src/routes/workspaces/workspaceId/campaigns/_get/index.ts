@@ -164,6 +164,10 @@ export default class Route extends WorkspaceRoute<{
           id: campaign.project_id,
           name: campaign.display_name,
         },
+        workspace: {
+          id: campaign.customer_id,
+          name: campaign.customer_name,
+        },
         outputs,
       };
     });
@@ -182,12 +186,14 @@ export default class Route extends WorkspaceRoute<{
         c.campaign_type_id,
         c.campaign_type AS bug_form,
         c.project_id,
-        c.customer_id,
+        cu.id AS customer_id,
+        cu.company AS customer_name,
         ct.name AS campaign_type_name,
         ct.type AS campaign_family_id,
         p.display_name
       FROM wp_appq_evd_campaign c 
       JOIN wp_appq_project p ON c.project_id = p.id 
+      JOIN wp_appq_customer cu ON p.customer_id = cu.id 
       JOIN wp_appq_campaign_type ct ON c.campaign_type_id = ct.id`;
 
     let where = [];

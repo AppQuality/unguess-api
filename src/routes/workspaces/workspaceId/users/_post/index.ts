@@ -3,6 +3,7 @@
 import { UserExistsException } from "@src/features/class/Invitation";
 import { WorkspaceInvitation } from "@src/features/class/Invitation/WorkspaceInvitation";
 import WorkspaceRoute from "@src/features/routes/WorkspaceRoute";
+import { tryber } from "@src/features/database";
 
 export default class Route extends WorkspaceRoute<{
   response: StoplightOperations["post-workspaces-wid-users"]["responses"]["200"]["content"]["application/json"];
@@ -57,7 +58,7 @@ export default class Route extends WorkspaceRoute<{
         },
         object: { name: this.workspaceName, id: this.workspaceId },
         email: {
-          sender: this.getUser(),
+          sender: await this.getEnrichedUser(),
           message: this.getBody().message,
         },
         locale: this.locale,
@@ -77,5 +78,25 @@ export default class Route extends WorkspaceRoute<{
         message: "Error adding user to campaign",
       } as OpenapiError);
     }
+  }
+
+  protected async getEnrichedUser() {
+    const sender: UserType & {
+      name?: string;
+      surname?: string;
+    } = this.getUser();
+    const user = await tryber.tables.WpAppqEvdProfile.do()
+      .select()
+      .where({
+        id: sender.profile_id,
+      })
+      .first();
+
+    if (user) {
+      sender.name = user.name;
+      sender.surname = user.surname;
+    }
+
+    return sender;
   }
 }

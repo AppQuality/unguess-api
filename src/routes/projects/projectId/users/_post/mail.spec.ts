@@ -85,6 +85,23 @@ describe("POST /projects/pid/users", () => {
       template_id: 4,
       last_editor_tester_id: 1,
     });
+
+    await tryber.tables.WpAppqUnlayerMailTemplate.do().insert({
+      id: 5,
+      html_body: "Test mail it from {Inviter.name} {Inviter.surname}",
+      name: "Test mail",
+      json_body: "",
+      last_editor_tester_id: 1,
+      lang: "it",
+      category_id: 1,
+    });
+
+    await tryber.tables.WpAppqEventTransactionalMail.do().insert({
+      id: 5,
+      event_name: "customer_invitation_it_with_sender_name",
+      template_id: 5,
+      last_editor_tester_id: 1,
+    });
   });
 
   // Clear templates
@@ -237,6 +254,24 @@ describe("POST /projects/pid/users", () => {
         html: "Test mail it",
         subject: `Entra in ${context.prj1.display_name}`,
         categories: ["UNGUESSAPP_STAGING"],
+      })
+    );
+  });
+
+  it("Should send mail containing the sender name", async () => {
+    await request(app)
+      .post(`/projects/${context.prj1.id}/users`)
+      .set("Authorization", "Bearer user")
+      .send({
+        email: "paolo.gialli@example.com",
+        locale: "it",
+        event_name: "customer_invitation_it_with_sender_name",
+      });
+
+    expect(mockedSendgrid.send).toHaveBeenCalledTimes(1);
+    expect(mockedSendgrid.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        html: expect.stringContaining("Test mail it from Mario Rossi"),
       })
     );
   });
