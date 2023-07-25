@@ -1098,26 +1098,6 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            items?: (components["schemas"]["Bug"] & {
-              tags?: {
-                tag_id: number;
-                tag_name: string;
-              }[];
-              siblings: number;
-            })[];
-            start?: number;
-            limit?: number;
-            size?: number;
-            total?: number;
-          };
-        };
-      };
-      400: components["responses"]["Error"];
-      403: components["responses"]["Error"];
-      500: components["responses"]["Error"];
-      "": {
-        content: {
-          "application/json": {
             findings?: {
               title: string;
               description?: string;
@@ -1127,9 +1107,9 @@ export interface operations {
               };
               cluster:
                 | {
-                    id: number;
-                    name: string;
-                  }
+                    id?: number;
+                    name?: string;
+                  }[]
                 | "all";
               video?: {
                 url: string;
@@ -1149,6 +1129,9 @@ export interface operations {
           };
         };
       };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
     };
   };
   "get-campaigns-cid-bug-types": {
