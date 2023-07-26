@@ -404,7 +404,7 @@ paths:
       parameters:
         - schema:
             type: boolean
-          in: header
+          in: query
           name: showAsCustomer
   '/campaigns/{cid}/bugTypes':
     parameters:

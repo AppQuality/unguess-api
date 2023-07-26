@@ -1089,7 +1089,7 @@ export interface operations {
         /** Campaign id */
         cid: string;
       };
-      header: {
+      query: {
         showAsCustomer?: boolean;
       };
     };
