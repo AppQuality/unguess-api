@@ -258,6 +258,154 @@ paths:
         - $ref: '#/components/parameters/orderBy'
         - $ref: '#/components/parameters/filterBy'
         - $ref: '#/components/parameters/search'
+  '/campaigns/{cid}/ux':
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Campaign id
+    get:
+      summary: Get UX data
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  findings:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        title:
+                          type: string
+                        description:
+                          type: string
+                        severity:
+                          type: object
+                          required:
+                            - id
+                          properties:
+                            id:
+                              type: integer
+                            name:
+                              type: string
+                        cluster:
+                          oneOf:
+                            - type: array
+                              items:
+                                type: object
+                                properties:
+                                  id:
+                                    type: integer
+                                  name:
+                                    type: string
+                            - type: string
+                              enum:
+                                - all
+                        video:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              url:
+                                type: string
+                              streamUrl:
+                                type: string
+                              start:
+                                type: integer
+                              end:
+                                type: integer
+                              description:
+                                type: string
+                            required:
+                              - url
+                              - streamUrl
+                              - start
+                              - end
+                      required:
+                        - title
+                        - severity
+                        - cluster
+                  sentiment:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        cluster:
+                          type: object
+                          required:
+                            - id
+                            - name
+                          properties:
+                            id:
+                              type: integer
+                            name:
+                              type: string
+                        value:
+                          type: integer
+                      required:
+                        - cluster
+                        - value
+              examples:
+                Example 1:
+                  value:
+                    findings:
+                      - title: My finding
+                        description: This is a sample finding
+                        severity:
+                          id: 1
+                          name: Minor
+                        cluster:
+                          - id: 1
+                            name: 'UC1: Example'
+                        video:
+                          - url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
+                            streamUrl: 'http://sample.vodobox.net/skate_phantom_flex_4k/skate_phantom_flex_4k.m3u8'
+                            start: 10
+                            end: 20
+                            description: This is a video
+                      - title: My finding
+                        description: This is a sample finding
+                        severity:
+                          id: 1
+                          name: Minor
+                        cluster: all
+                        video:
+                          - url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
+                            streamUrl: 'http://sample.vodobox.net/skate_phantom_flex_4k/skate_phantom_flex_4k.m3u8'
+                            start: 10
+                            end: 20
+                            description: This is a video
+                    sentiment:
+                      - cluster:
+                          id: 1
+                          name: 'UC1: Example'
+                        value: 1
+                      - cluster:
+                          id: 2
+                          name: 'UC2: Example 2'
+                        value: 2
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-ux
+      description: ''
+      security:
+        - JWT: []
+      parameters:
+        - schema:
+            type: boolean
+          in: header
+          name: showAsCustomer
   '/campaigns/{cid}/bugTypes':
     parameters:
       - $ref: '#/components/parameters/cid'
