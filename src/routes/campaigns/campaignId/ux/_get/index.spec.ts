@@ -253,6 +253,35 @@ describe("GET /campaigns/:campaignId/ux", () => {
           published: 0,
         },
       ]);
+      await tryber.tables.UxCampaignInsights.do().insert([
+        {
+          campaign_id: 1,
+          version: 1,
+          title: "First version",
+          description: "",
+          severity_id: 1,
+          cluster_ids: "0",
+          order: 1,
+        },
+        {
+          campaign_id: 1,
+          version: 2,
+          title: "My second insight",
+          description: "Second insight description",
+          severity_id: 1,
+          cluster_ids: "1,2",
+          order: 1,
+        },
+        {
+          campaign_id: 1,
+          version: 2,
+          title: "My insight",
+          description: "Insight description",
+          severity_id: 1,
+          cluster_ids: "0",
+          order: 0,
+        },
+      ]);
     });
     it("Should answer 200 for admin", async () => {
       const response = await request(app)
@@ -265,6 +294,70 @@ describe("GET /campaigns/:campaignId/ux", () => {
         .get(`/campaigns/1/ux`)
         .set("Authorization", "Bearer user");
       expect(response.status).toBe(200);
+    });
+
+    it("Should answer with published version insights for admin with showAsCustomer", async () => {
+      const response = await request(app)
+        .get(`/campaigns/1/ux?showAsCustomer=true`)
+        .set("Authorization", "Bearer admin");
+      expect(response.status).toBe(200);
+      expect(response.body.findings).toHaveLength(1);
+      expect(response.body.findings[0]).toEqual(
+        expect.objectContaining({
+          title: "First version",
+          description: "",
+          severity: { id: 1, name: "Minor" },
+          cluster: "all",
+        })
+      );
+    });
+    it("Should answer with published version insights for non-admin", async () => {
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer user");
+      expect(response.status).toBe(200);
+      expect(response.body.findings).toHaveLength(1);
+      expect(response.body.findings[0]).toEqual(
+        expect.objectContaining({
+          title: "First version",
+          description: "",
+          severity: { id: 1, name: "Minor" },
+          cluster: "all",
+        })
+      );
+    });
+
+    it("Should return the findings for last draft for admin", async () => {
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer admin");
+      expect(response.body).toHaveProperty("findings");
+      expect(response.body.findings).toHaveLength(2);
+      expect(response.body.findings[0]).toEqual(
+        expect.objectContaining({
+          title: "My insight",
+          description: "Insight description",
+          severity: { id: 1, name: "Minor" },
+          cluster: "all",
+        })
+      );
+      expect(response.body.findings[1]).toEqual(
+        expect.objectContaining({
+          title: "My second insight",
+          description: "Second insight description",
+          severity: { id: 1, name: "Minor" },
+          cluster: [
+            {
+              id: 1,
+              name: "Cluster 1",
+            },
+            {
+              id: 2,
+              name: "Cluster 2",
+            },
+          ],
+        })
+      );
     });
   });
 });
