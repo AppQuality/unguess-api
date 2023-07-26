@@ -64,13 +64,6 @@ export default class Route extends CampaignRoute<{
   }
 
   protected async prepare() {
-    const findings = await tryber.tables.UxCampaignInsights.do()
-      .select()
-      .where({
-        campaign_id: this.cp_id,
-        version: this.version,
-      })
-      .orderBy("order", "asc");
     this.setSuccess(200, {
       findings: await this.getFindings(),
     });
