@@ -151,6 +151,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
       ]);
       await tryber.tables.UxCampaignInsights.do().insert([
         {
+          id: 1,
           campaign_id: 1,
           version: 1,
           title: "First version",
@@ -160,6 +161,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
           order: 1,
         },
         {
+          id: 2,
           campaign_id: 1,
           version: 2,
           title: "My second insight",
@@ -169,6 +171,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
           order: 1,
         },
         {
+          id: 3,
           campaign_id: 1,
           version: 2,
           title: "My insight",
@@ -178,16 +181,43 @@ describe("GET /campaigns/:campaignId/ux", () => {
           order: 0,
         },
       ]);
+      await tryber.tables.UxCampaignVideoParts.do().insert([
+        {
+          insight_id: 1,
+          media_id: 1,
+          start: 0,
+          end: 0,
+          description: "First version",
+        },
+        {
+          insight_id: 2,
+          media_id: 1,
+          start: 5,
+          end: 10,
+          description: "Description",
+        },
+      ]);
+      await tryber.tables.WpAppqUserTaskMedia.do().insert([
+        {
+          id: 1,
+          location:
+            "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          campaign_task_id: 1,
+          user_task_id: 1,
+          tester_id: 1,
+        },
+      ]);
     });
     afterAll(async () => {
       await tryber.tables.UxCampaignData.do().delete();
       await tryber.tables.UxCampaignInsights.do().delete();
+      await tryber.tables.UxCampaignVideoParts.do().delete();
+      await tryber.tables.WpAppqUserTaskMedia.do().delete();
     });
     it("Should answer 200 for admin", async () => {
       const response = await request(app)
         .get(`/campaigns/1/ux`)
         .set("Authorization", "Bearer admin");
-      console.log(response.body);
       expect(response.status).toBe(200);
     });
     it("Should answer 404 for admin if showAsCustomer is set", async () => {
@@ -235,6 +265,25 @@ describe("GET /campaigns/:campaignId/ux", () => {
         })
       );
     });
+    it("Should return the videoparts for last draft", async () => {
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer admin");
+      expect(response.body).toHaveProperty("findings");
+      expect(response.body.findings).toHaveLength(2);
+      expect(response.body.findings[1]).toHaveProperty("video");
+      expect(response.body.findings[1].video).toHaveLength(1);
+      expect(response.body.findings[1].video[0]).toEqual(
+        expect.objectContaining({
+          url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          streamUrl:
+            "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny-stream.m3u8",
+          start: 5,
+          end: 10,
+          description: "Description",
+        })
+      );
+    });
   });
 
   describe("With a published version", () => {
@@ -255,15 +304,17 @@ describe("GET /campaigns/:campaignId/ux", () => {
       ]);
       await tryber.tables.UxCampaignInsights.do().insert([
         {
+          id: 1,
           campaign_id: 1,
           version: 1,
           title: "First version",
           description: "",
           severity_id: 1,
           cluster_ids: "0",
-          order: 1,
+          order: 0,
         },
         {
+          id: 2,
           campaign_id: 1,
           version: 2,
           title: "My second insight",
@@ -273,6 +324,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
           order: 1,
         },
         {
+          id: 3,
           campaign_id: 1,
           version: 2,
           title: "My insight",
@@ -282,7 +334,42 @@ describe("GET /campaigns/:campaignId/ux", () => {
           order: 0,
         },
       ]);
+
+      await tryber.tables.UxCampaignVideoParts.do().insert([
+        {
+          insight_id: 1,
+          media_id: 1,
+          start: 0,
+          end: 0,
+          description: "First version",
+        },
+        {
+          insight_id: 2,
+          media_id: 1,
+          start: 5,
+          end: 10,
+          description: "Description",
+        },
+      ]);
+      await tryber.tables.WpAppqUserTaskMedia.do().insert([
+        {
+          id: 1,
+          location:
+            "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          campaign_task_id: 1,
+          user_task_id: 1,
+          tester_id: 1,
+        },
+      ]);
     });
+
+    afterAll(async () => {
+      await tryber.tables.UxCampaignData.do().delete();
+      await tryber.tables.UxCampaignInsights.do().delete();
+      await tryber.tables.UxCampaignVideoParts.do().delete();
+      await tryber.tables.WpAppqUserTaskMedia.do().delete();
+    });
+
     it("Should answer 200 for admin", async () => {
       const response = await request(app)
         .get(`/campaigns/1/ux`)
@@ -356,6 +443,46 @@ describe("GET /campaigns/:campaignId/ux", () => {
               name: "Cluster 2",
             },
           ],
+        })
+      );
+    });
+
+    it("Should return the videoparts for last draft for admin", async () => {
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer admin");
+      expect(response.body).toHaveProperty("findings");
+      expect(response.body.findings).toHaveLength(2);
+      expect(response.body.findings[1]).toHaveProperty("video");
+      expect(response.body.findings[1].video).toHaveLength(1);
+      expect(response.body.findings[1].video[0]).toEqual(
+        expect.objectContaining({
+          url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          streamUrl:
+            "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny-stream.m3u8",
+          start: 5,
+          end: 10,
+          description: "Description",
+        })
+      );
+    });
+
+    it("Should return the videoparts for last published for non-admin", async () => {
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer user");
+      expect(response.body).toHaveProperty("findings");
+      expect(response.body.findings).toHaveLength(1);
+      expect(response.body.findings[0]).toHaveProperty("video");
+      expect(response.body.findings[0].video).toHaveLength(1);
+      expect(response.body.findings[0].video[0]).toEqual(
+        expect.objectContaining({
+          url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          streamUrl:
+            "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny-stream.m3u8",
+          start: 0,
+          end: 0,
+          description: "First version",
         })
       );
     });

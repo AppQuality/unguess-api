@@ -90,6 +90,7 @@ export default class Route extends CampaignRoute<{
           name: getSeverityName(finding.severity_id),
         },
         cluster: this.getCluster(finding.cluster_ids),
+        video: await this.getVideo(finding),
       });
     }
     return result;
@@ -118,5 +119,28 @@ export default class Route extends CampaignRoute<{
         id,
         name: this.clusters.find((c) => c.id === id)?.name || "",
       }));
+  }
+
+  private async getVideo(finding: { id: number }) {
+    const results = await tryber.tables.UxCampaignVideoParts.do()
+      .select()
+      .where({
+        insight_id: finding.id,
+      })
+      .join(
+        "wp_appq_user_task_media",
+        "wp_appq_user_task_media.id",
+        "ux_campaign_video_parts.media_id"
+      )
+      .where("location", "like", "%.mp4")
+      .orderBy("order", "asc");
+
+    return results.map((r) => ({
+      start: r.start,
+      end: r.end,
+      url: r.location,
+      description: r.description,
+      streamUrl: r.location.replace(".mp4", "-stream.m3u8"),
+    }));
   }
 }
