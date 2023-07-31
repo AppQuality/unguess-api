@@ -1099,6 +1099,7 @@ export interface operations {
         content: {
           "application/json": {
             findings?: {
+              id: number;
               title: string;
               description?: string;
               severity: {

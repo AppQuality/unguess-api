@@ -282,6 +282,8 @@ paths:
                     items:
                       type: object
                       properties:
+                        id:
+                          type: integer
                         title:
                           type: string
                         description:
@@ -329,6 +331,7 @@ paths:
                               - start
                               - end
                       required:
+                        - id
                         - title
                         - severity
                         - cluster
