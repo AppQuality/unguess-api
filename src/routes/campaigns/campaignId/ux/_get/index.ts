@@ -1,6 +1,7 @@
 /** OPENAPI-CLASS: get-campaigns-cid-ux */
 import { tryber } from "@src/features/database";
 import CampaignRoute from "@src/features/routes/CampaignRoute";
+import { checkUrl } from "@src/utils/checkUrl";
 
 export default class Route extends CampaignRoute<{
   response: StoplightOperations["get-campaigns-cid-ux"]["responses"]["200"]["content"]["application/json"];
@@ -135,12 +136,19 @@ export default class Route extends CampaignRoute<{
       .where("location", "like", "%.mp4")
       .orderBy("order", "asc");
 
-    return results.map((r) => ({
-      start: r.start,
-      end: r.end,
-      url: r.location,
-      description: r.description,
-      streamUrl: r.location.replace(".mp4", "-stream.m3u8"),
-    }));
+    const video = [];
+    for (const r of results) {
+      const stream = r.location.replace(".mp4", "-stream.m3u8");
+      const isValidStream = await checkUrl(stream);
+      video.push({
+        start: r.start,
+        end: r.end,
+        url: r.location,
+        description: r.description,
+        streamUrl: isValidStream ? stream : "",
+      });
+    }
+
+    return video;
   }
 }
