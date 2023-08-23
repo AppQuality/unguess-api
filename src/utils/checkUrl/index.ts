@@ -10,7 +10,7 @@ export const checkUrl = async (url: string) => {
 
     return (
       response !== undefined &&
-      (response.status < 400 || response.status >= 500)
+      (response.status === 200 || response.status === 201)
     );
   } catch (error) {
     return false;
