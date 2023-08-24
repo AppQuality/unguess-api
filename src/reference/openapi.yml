@@ -392,16 +392,20 @@ paths:
                         x-stoplight:
                           id: 56018peqzsoj1
                   questions:
-                    type: object
+                    type: array
                     x-stoplight:
                       id: slrve8nlhel16
-                    required:
-                      - text
-                    properties:
-                      text:
-                        x-stoplight:
-                          id: 4nxj0iqkq5v46
-                        type: string
+                    items:
+                      x-stoplight:
+                        id: 9ld031vxbn2no
+                      type: object
+                      properties:
+                        text:
+                          type: string
+                          x-stoplight:
+                            id: emgviiymv9nrg
+                      required:
+                        - text
                 required:
                   - version
                   - status
@@ -412,8 +416,18 @@ paths:
               examples:
                 Example 1:
                   value:
+                    status: draft
+                    version: 1
+                    goal: string
+                    users: 12
+                    methodology:
+                      type: qualitative
+                      description: string
+                    questions:
+                      - text: string
                     findings:
-                      - title: My finding
+                      - id: 18
+                        title: My finding
                         description: This is a sample finding
                         severity:
                           id: 1
@@ -427,7 +441,8 @@ paths:
                             start: 10
                             end: 20
                             description: This is a video
-                      - title: My finding
+                      - id: 19
+                        title: My finding
                         description: This is a sample finding
                         severity:
                           id: 1
@@ -809,6 +824,9 @@ paths:
                       name: string
                     project:
                       id: 0
+                      name: string
+                    workspace:
+                      id: 158
                       name: string
                     description: string
                     base_bug_internal_id: string
