@@ -408,6 +408,7 @@ paths:
                   - goal
                   - users
                   - methodology
+                  - questions
               examples:
                 Example 1:
                   value:
