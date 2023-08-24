@@ -279,20 +279,10 @@ paths:
                 properties:
                   version:
                     type: number
-                    x-stoplight:
-                      id: 88bu6by7z0td3
-                  status:
-                    type: string
-                    x-stoplight:
-                      id: 752fo61tr5dh9
                   goal:
                     type: string
-                    x-stoplight:
-                      id: j6mdo5egbm4gq
                   users:
                     type: number
-                    x-stoplight:
-                      id: u3wlq8jmwcjqc
                   findings:
                     type: array
                     items:
@@ -377,38 +367,25 @@ paths:
                         - value
                   methodology:
                     type: object
-                    x-stoplight:
-                      id: gxg40bjuh22v0
                     required:
                       - type
                       - description
                     properties:
                       type:
                         type: string
-                        x-stoplight:
-                          id: lkg81qot0l3ob
                       description:
                         type: string
-                        x-stoplight:
-                          id: 56018peqzsoj1
                   questions:
                     type: array
-                    x-stoplight:
-                      id: slrve8nlhel16
                     items:
-                      x-stoplight:
-                        id: 9ld031vxbn2no
                       type: object
                       properties:
                         text:
                           type: string
-                          x-stoplight:
-                            id: emgviiymv9nrg
                       required:
                         - text
                 required:
                   - version
-                  - status
                   - goal
                   - users
                   - methodology
@@ -416,7 +393,6 @@ paths:
               examples:
                 Example 1:
                   value:
-                    status: draft
                     version: 1
                     goal: string
                     users: 12
