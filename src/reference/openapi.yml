@@ -351,20 +351,15 @@ paths:
                       type: object
                       properties:
                         cluster:
-                          oneOf:
-                            - type: object
-                              properties:
-                                id:
-                                  type: integer
-                                name:
-                                  type: string
-                              required:
-                                - id
-                                - name
-                            - x-stoplight:
-                                id: 5g7rvfvput00f
-                              enum:
-                                - all
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            name:
+                              type: string
+                          required:
+                            - id
+                            - name
                         value:
                           type: integer
                       required:

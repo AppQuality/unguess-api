@@ -15,6 +15,7 @@ const campaign = {
   customer_id: 1,
   project_id: 1,
 };
+
 describe("GET /campaigns/:campaignId/ux", () => {
   beforeAll(async () => {
     await tryber.tables.WpAppqEvdCampaign.do().insert([
@@ -140,15 +141,28 @@ describe("GET /campaigns/:campaignId/ux", () => {
           campaign_id: 1,
           version: 1,
           published: 0,
+          methodology_description: "Methodology description",
+          methodology_type: "qualitative",
+          goal: "Goal",
+          users: 10,
         },
       ]);
-      await tryber.tables.UxCampaignData.do().insert([
+
+      await tryber.tables.UxCampaignQuestions.do().insert([
         {
+          id: 1,
           campaign_id: 1,
-          version: 2,
-          published: 0,
+          question: "Question 1",
+          version: 1,
+        },
+        {
+          id: 2,
+          campaign_id: 1,
+          question: "Question 2",
+          version: 1,
         },
       ]);
+
       await tryber.tables.UxCampaignInsights.do().insert([
         {
           id: 1,
@@ -158,25 +172,25 @@ describe("GET /campaigns/:campaignId/ux", () => {
           description: "",
           severity_id: 1,
           cluster_ids: "0",
-          order: 1,
+          order: 2,
         },
         {
           id: 2,
           campaign_id: 1,
-          version: 2,
+          version: 1,
           title: "My second insight",
           description: "Second insight description",
-          severity_id: 1,
+          severity_id: 2,
           cluster_ids: "1,2",
           order: 1,
         },
         {
           id: 3,
           campaign_id: 1,
-          version: 2,
+          version: 1,
           title: "My insight",
           description: "Insight description",
-          severity_id: 1,
+          severity_id: 3,
           cluster_ids: "0",
           order: 0,
         },
@@ -201,11 +215,26 @@ describe("GET /campaigns/:campaignId/ux", () => {
         {
           id: 1,
           location:
-            // "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-            "https://s3-eu-west-1.amazonaws.com/appq.use-case-media/CP3461/UC8794/T19095/ebf00412a1bc3fd33fddd52962cf80e6853a10d5_1625090207.mp4",
+            "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
           campaign_task_id: 1,
           user_task_id: 1,
           tester_id: 1,
+        },
+      ]);
+      await tryber.tables.UxCampaignSentiments.do().insert([
+        {
+          campaign_id: 1,
+          version: 1,
+          cluster_id: 1,
+          value: 1,
+          comment: "Comment 1",
+        },
+        {
+          campaign_id: 1,
+          version: 1,
+          cluster_id: 2,
+          value: 5,
+          comment: "Comment 1",
         },
       ]);
     });
@@ -214,6 +243,8 @@ describe("GET /campaigns/:campaignId/ux", () => {
       await tryber.tables.UxCampaignInsights.do().delete();
       await tryber.tables.UxCampaignVideoParts.do().delete();
       await tryber.tables.WpAppqUserTaskMedia.do().delete();
+      await tryber.tables.UxCampaignQuestions.do().delete();
+      await tryber.tables.UxCampaignSentiments.do().delete();
     });
     it("Should answer 200 for admin", async () => {
       const response = await request(app)
@@ -239,49 +270,123 @@ describe("GET /campaigns/:campaignId/ux", () => {
         .get(`/campaigns/1/ux`)
         .set("Authorization", "Bearer admin");
       expect(response.body).toHaveProperty("findings");
-      expect(response.body.findings).toHaveLength(2);
-      expect(response.body.findings[0]).toEqual(
-        expect.objectContaining({
-          title: "My insight",
-          description: "Insight description",
-          severity: { id: 1, name: "Minor" },
-          cluster: "all",
-        })
-      );
-      expect(response.body.findings[1]).toEqual(
-        expect.objectContaining({
-          title: "My second insight",
-          description: "Second insight description",
-          severity: { id: 1, name: "Minor" },
-          cluster: [
-            {
-              id: 1,
-              name: "Cluster 1",
-            },
-            {
-              id: 2,
-              name: "Cluster 2",
-            },
-          ],
-        })
+      expect(response.body.findings).toHaveLength(3);
+
+      expect(response.body.findings).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            title: "First version",
+            description: "",
+            severity: { id: 1, name: "Minor" },
+            cluster: "all",
+          }),
+          expect.objectContaining({
+            title: "My second insight",
+            description: "Second insight description",
+            severity: { id: 2, name: "Major" },
+            cluster: [
+              {
+                id: 1,
+                name: "Cluster 1",
+              },
+              {
+                id: 2,
+                name: "Cluster 2",
+              },
+            ],
+          }),
+          expect.objectContaining({
+            title: "My insight",
+            description: "Insight description",
+            severity: { id: 3, name: "Positive" },
+            cluster: "all",
+          }),
+        ])
       );
     });
+
     it("Should return the videoparts for last draft", async () => {
       const response = await request(app)
         .get(`/campaigns/1/ux`)
         .set("Authorization", "Bearer admin");
       expect(response.body).toHaveProperty("findings");
-      expect(response.body.findings).toHaveLength(2);
+      expect(response.body.findings).toHaveLength(3);
+      expect(response.body.findings[0]).toHaveProperty("video");
       expect(response.body.findings[1]).toHaveProperty("video");
+      expect(response.body.findings[0].video).toHaveLength(0);
       expect(response.body.findings[1].video).toHaveLength(1);
       expect(response.body.findings[1].video[0]).toEqual(
         expect.objectContaining({
-          url: "https://s3-eu-west-1.amazonaws.com/appq.use-case-media/CP3461/UC8794/T19095/ebf00412a1bc3fd33fddd52962cf80e6853a10d5_1625090207.mp4",
+          url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
           streamUrl: "",
           start: 5,
           end: 10,
           description: "Description",
         })
+      );
+    });
+
+    it("Should always return methodology, questions, goal and number of users", async () => {
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer admin");
+
+      expect(response.status).toBe(200);
+
+      expect(response.body).toHaveProperty("methodology");
+      expect(response.body).toHaveProperty("questions");
+      expect(response.body).toHaveProperty("goal");
+      expect(response.body).toHaveProperty("users");
+
+      expect(response.body.methodology).toEqual(
+        expect.objectContaining({
+          description: expect.any(String),
+          type: "qualitative",
+        })
+      );
+
+      expect(response.body.questions.length).toEqual(2);
+      expect(response.body.questions).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            text: "Question 1",
+          }),
+          expect.objectContaining({
+            text: "Question 2",
+          }),
+        ])
+      );
+
+      expect(response.body.goal).toEqual("Goal");
+      expect(response.body.users).toEqual(10);
+    });
+
+    it("Should return the sentiment if there is one", async () => {
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer admin");
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty("sentiment");
+      expect(response.body.sentiment).toHaveLength(2);
+
+      expect(response.body.sentiment).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            cluster: {
+              id: 1,
+              name: "Cluster 1",
+            },
+            value: 1,
+          }),
+          expect.objectContaining({
+            cluster: {
+              id: 2,
+              name: "Cluster 2",
+            },
+            value: 5,
+          }),
+        ])
       );
     });
   });
@@ -293,6 +398,10 @@ describe("GET /campaigns/:campaignId/ux", () => {
           campaign_id: 1,
           version: 1,
           published: 1,
+          methodology_description: "Methodology description",
+          methodology_type: "qualitative",
+          goal: "Goal",
+          users: 10,
         },
       ]);
       await tryber.tables.UxCampaignData.do().insert([
@@ -300,6 +409,10 @@ describe("GET /campaigns/:campaignId/ux", () => {
           campaign_id: 1,
           version: 2,
           published: 0,
+          methodology_description: "Methodology description edited",
+          methodology_type: "quantitative",
+          goal: "Goal updated",
+          users: 11,
         },
       ]);
       await tryber.tables.UxCampaignInsights.do().insert([
@@ -334,7 +447,32 @@ describe("GET /campaigns/:campaignId/ux", () => {
           order: 0,
         },
       ]);
-
+      await tryber.tables.UxCampaignQuestions.do().insert([
+        {
+          id: 1,
+          campaign_id: 1,
+          question: "Question 1",
+          version: 1,
+        },
+        {
+          id: 2,
+          campaign_id: 1,
+          question: "Question 2",
+          version: 1,
+        },
+        {
+          id: 3,
+          campaign_id: 1,
+          question: "Question 1",
+          version: 2,
+        },
+        {
+          id: 4,
+          campaign_id: 1,
+          question: "Question 2 edited",
+          version: 2,
+        },
+      ]);
       await tryber.tables.UxCampaignVideoParts.do().insert([
         {
           insight_id: 1,
@@ -361,6 +499,36 @@ describe("GET /campaigns/:campaignId/ux", () => {
           tester_id: 1,
         },
       ]);
+      await tryber.tables.UxCampaignSentiments.do().insert([
+        {
+          campaign_id: 1,
+          version: 1,
+          cluster_id: 1,
+          value: 1,
+          comment: "Comment 1",
+        },
+        {
+          campaign_id: 1,
+          version: 1,
+          cluster_id: 2,
+          value: 5,
+          comment: "Comment 2",
+        },
+        {
+          campaign_id: 1,
+          version: 2,
+          cluster_id: 1,
+          value: 2,
+          comment: "Comment 1 draft-modified",
+        },
+        {
+          campaign_id: 1,
+          version: 2,
+          cluster_id: 2,
+          value: 4,
+          comment: "Comment 2 draft-modified",
+        },
+      ]);
     });
 
     afterAll(async () => {
@@ -368,6 +536,8 @@ describe("GET /campaigns/:campaignId/ux", () => {
       await tryber.tables.UxCampaignInsights.do().delete();
       await tryber.tables.UxCampaignVideoParts.do().delete();
       await tryber.tables.WpAppqUserTaskMedia.do().delete();
+      await tryber.tables.UxCampaignQuestions.do().delete();
+      await tryber.tables.UxCampaignSentiments.do().delete();
     });
 
     it("Should answer 200 for admin", async () => {
@@ -398,11 +568,13 @@ describe("GET /campaigns/:campaignId/ux", () => {
         })
       );
     });
+
     it("Should answer with published version insights for non-admin", async () => {
       const response = await request(app)
         .get(`/campaigns/1/ux`)
         .set("Authorization", "Bearer user");
       expect(response.status).toBe(200);
+
       expect(response.body.findings).toHaveLength(1);
       expect(response.body.findings[0]).toEqual(
         expect.objectContaining({
@@ -410,6 +582,89 @@ describe("GET /campaigns/:campaignId/ux", () => {
           description: "",
           severity: { id: 1, name: "Minor" },
           cluster: "all",
+        })
+      );
+    });
+
+    it("Should always return methodology, questions, goal and number of users of published version", async () => {
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer user");
+
+      expect(response.status).toBe(200);
+
+      expect(response.body).toHaveProperty("methodology");
+      expect(response.body).toHaveProperty("questions");
+      expect(response.body).toHaveProperty("goal");
+      expect(response.body).toHaveProperty("users");
+
+      expect(response.body.methodology).toEqual(
+        expect.objectContaining({
+          description: expect.any(String),
+          type: "qualitative",
+        })
+      );
+
+      expect(response.body.questions.length).toEqual(2);
+      expect(response.body.questions).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            text: "Question 1",
+          }),
+          expect.objectContaining({
+            text: "Question 2",
+          }),
+        ])
+      );
+
+      expect(response.body.goal).toEqual("Goal");
+      expect(response.body.users).toEqual(10);
+    });
+
+    it("Should return the sentiment if there is one of published", async () => {
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer user");
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty("sentiment");
+      expect(response.body.sentiment).toHaveLength(2);
+
+      expect(response.body.sentiment).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            cluster: {
+              id: 1,
+              name: "Cluster 1",
+            },
+            value: 1,
+          }),
+          expect.objectContaining({
+            cluster: {
+              id: 2,
+              name: "Cluster 2",
+            },
+            value: 5,
+          }),
+        ])
+      );
+    });
+
+    it("Should return the videoparts for last published for non-admin", async () => {
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer user");
+      expect(response.body).toHaveProperty("findings");
+      expect(response.body.findings).toHaveLength(1);
+      expect(response.body.findings[0]).toHaveProperty("video");
+      expect(response.body.findings[0].video).toHaveLength(1);
+      expect(response.body.findings[0].video[0]).toEqual(
+        expect.objectContaining({
+          url: "https://s3-eu-west-1.amazonaws.com/appq.use-case-media/CP3461/UC8794/T19095/ebf00412a1bc3fd33fddd52962cf80e6853a10d5_1625090207.mp4",
+          streamUrl: "",
+          start: 0,
+          end: 0,
+          description: "First version",
         })
       );
     });
@@ -466,22 +721,67 @@ describe("GET /campaigns/:campaignId/ux", () => {
       );
     });
 
-    it("Should return the videoparts for last published for non-admin", async () => {
+    it("Should always return methodology, questions, goal and number of users of last draft", async () => {
       const response = await request(app)
         .get(`/campaigns/1/ux`)
-        .set("Authorization", "Bearer user");
-      expect(response.body).toHaveProperty("findings");
-      expect(response.body.findings).toHaveLength(1);
-      expect(response.body.findings[0]).toHaveProperty("video");
-      expect(response.body.findings[0].video).toHaveLength(1);
-      expect(response.body.findings[0].video[0]).toEqual(
+        .set("Authorization", "Bearer admin");
+
+      expect(response.status).toBe(200);
+
+      expect(response.body).toHaveProperty("methodology");
+      expect(response.body).toHaveProperty("questions");
+      expect(response.body).toHaveProperty("goal");
+      expect(response.body).toHaveProperty("users");
+
+      expect(response.body.methodology).toEqual(
         expect.objectContaining({
-          url: "https://s3-eu-west-1.amazonaws.com/appq.use-case-media/CP3461/UC8794/T19095/ebf00412a1bc3fd33fddd52962cf80e6853a10d5_1625090207.mp4",
-          streamUrl: "",
-          start: 0,
-          end: 0,
-          description: "First version",
+          description: expect.any(String),
+          type: "quantitative",
         })
+      );
+
+      expect(response.body.questions.length).toEqual(2);
+      expect(response.body.questions).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            text: "Question 1",
+          }),
+          expect.objectContaining({
+            text: "Question 2 edited",
+          }),
+        ])
+      );
+
+      expect(response.body.goal).toEqual("Goal updated");
+      expect(response.body.users).toEqual(11);
+    });
+
+    it("Should return the sentiment if there is one of last draft", async () => {
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer admin");
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty("sentiment");
+      expect(response.body.sentiment).toHaveLength(2);
+
+      expect(response.body.sentiment).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            cluster: {
+              id: 1,
+              name: "Cluster 1",
+            },
+            value: 2,
+          }),
+          expect.objectContaining({
+            cluster: {
+              id: 2,
+              name: "Cluster 2",
+            },
+            value: 4,
+          }),
+        ])
       );
     });
 
@@ -489,7 +789,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
       await tryber.tables.WpAppqUserTaskMedia.do()
         .update({
           location:
-            "https://s3-eu-west-1.amazonaws.com/mediaconvert-encoder-staging-bucket/CP4845/UC19596/T32/ad4fc347f2579800a1920a8be6e181dda0f4b290_1692791543.mp4",
+            "https://s3.eu-west-1.amazonaws.com/appq.static/ad4fc347f2579800a1920a8be6e181dda0f4b290_1692791543.mp4",
         })
         .where({
           id: 1,
@@ -501,9 +801,9 @@ describe("GET /campaigns/:campaignId/ux", () => {
       expect(response.body.findings[0].video).toHaveLength(1);
       expect(response.body.findings[0].video[0]).toEqual(
         expect.objectContaining({
-          url: "https://s3-eu-west-1.amazonaws.com/mediaconvert-encoder-staging-bucket/CP4845/UC19596/T32/ad4fc347f2579800a1920a8be6e181dda0f4b290_1692791543.mp4",
+          url: "https://s3.eu-west-1.amazonaws.com/appq.static/ad4fc347f2579800a1920a8be6e181dda0f4b290_1692791543.mp4",
           streamUrl:
-            "https://s3-eu-west-1.amazonaws.com/mediaconvert-encoder-staging-bucket/CP4845/UC19596/T32/ad4fc347f2579800a1920a8be6e181dda0f4b290_1692791543-stream.m3u8",
+            "https://s3.eu-west-1.amazonaws.com/appq.static/ad4fc347f2579800a1920a8be6e181dda0f4b290_1692791543-stream.m3u8",
           start: 0,
           end: 0,
           description: "First version",

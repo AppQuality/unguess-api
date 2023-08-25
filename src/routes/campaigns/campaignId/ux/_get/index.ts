@@ -3,6 +3,19 @@ import { tryber } from "@src/features/database";
 import CampaignRoute from "@src/features/routes/CampaignRoute";
 import { checkUrl } from "@src/utils/checkUrl";
 
+interface iUxCampaignData {
+  id: number;
+  campaign_id: number;
+  version: number;
+  published: number;
+  methodology_description: string;
+  methodology_type: string;
+  goal: string;
+  users: number;
+  modification_time: string;
+  created_time: string;
+}
+
 export default class Route extends CampaignRoute<{
   response: StoplightOperations["get-campaigns-cid-ux"]["responses"]["200"]["content"]["application/json"];
   parameters: StoplightOperations["get-campaigns-cid-ux"]["parameters"]["path"];
@@ -10,6 +23,7 @@ export default class Route extends CampaignRoute<{
 }> {
   private showAsCustomer: boolean = true;
   private version: number | undefined;
+  private uxData: iUxCampaignData | undefined;
   private _clusters: { id: number; name: string }[] | undefined;
 
   constructor(configuration: RouteClassConfiguration) {
@@ -28,7 +42,7 @@ export default class Route extends CampaignRoute<{
   protected async init() {
     await super.init();
     const query = tryber.tables.UxCampaignData.do()
-      .select("version")
+      .select()
       .where({ campaign_id: this.cp_id })
       .orderBy("version", "desc")
       .first();
@@ -41,6 +55,7 @@ export default class Route extends CampaignRoute<{
 
     if (uxData) {
       this.version = uxData.version;
+      this.uxData = uxData;
     }
 
     this._clusters = await tryber.tables.WpAppqUsecaseCluster.do()
@@ -56,7 +71,7 @@ export default class Route extends CampaignRoute<{
   }
 
   private async noUxData() {
-    if (!this.version) {
+    if (!this.version || !this.uxData) {
       this.setError(404, Error("UX data not found") as OpenapiError);
       return true;
     }
@@ -65,9 +80,22 @@ export default class Route extends CampaignRoute<{
   }
 
   protected async prepare() {
-    this.setSuccess(200, {
-      findings: await this.getFindings(),
-    });
+    if (this.version && this.uxData) {
+      const sentiment = await this.getSentiment();
+
+      this.setSuccess(200, {
+        version: this.version,
+        goal: this.uxData.goal ?? "",
+        users: this.uxData.users ?? 0,
+        methodology: {
+          type: this.uxData.methodology_type ?? "",
+          description: this.uxData.methodology_description ?? "",
+        },
+        findings: await this.getFindings(),
+        questions: await this.getQuestions(),
+        ...(sentiment.length && { sentiment: sentiment }),
+      });
+    }
   }
 
   private async getFindings() {
@@ -88,30 +116,67 @@ export default class Route extends CampaignRoute<{
         description: finding.description,
         severity: {
           id: finding.severity_id,
-          name: getSeverityName(finding.severity_id),
+          name: this.getSeverityName(finding.severity_id),
         },
-        cluster: this.getCluster(finding.cluster_ids),
+        cluster: this.getClusters(finding.cluster_ids),
         video: await this.getVideo(finding),
       });
     }
     return result;
-    function getSeverityName(severityId: number) {
-      switch (severityId) {
-        case 1:
-          return "Minor";
-        case 2:
-          return "Major";
-        case 3:
-          return "Positive";
-        case 4:
-          return "Observation";
-        default:
-          throw new Error("Invalid severity id");
-      }
+  }
+
+  private async getQuestions() {
+    const results = await tryber.tables.UxCampaignQuestions.do()
+      .select("question")
+      .where({
+        campaign_id: this.cp_id,
+        version: this.version,
+      });
+
+    if (!results.length) return [];
+
+    return results.map((r) => ({
+      text: r.question,
+    }));
+  }
+
+  private async getSentiment() {
+    if (!this.clusters.length) return [];
+
+    const results = await tryber.tables.UxCampaignSentiments.do()
+      .select("cluster_id", "value")
+      .where({
+        campaign_id: this.cp_id,
+        version: this.version,
+      });
+
+    if (!results.length) return [];
+
+    return results.map((r) => ({
+      cluster: {
+        id: r.cluster_id,
+        name: this.clusters.find((c) => c.id === r.cluster_id)?.name || "",
+      },
+      value: r.value,
+    }));
+  }
+
+  private getSeverityName(severityId: number) {
+    switch (severityId) {
+      case 1:
+        return "Minor";
+      case 2:
+        return "Major";
+      case 3:
+        return "Positive";
+      case 4:
+        return "Observation";
+      default:
+        throw new Error("Invalid severity id");
     }
   }
 
-  private getCluster(clusterIds: string) {
+  private getClusters(clusterIds: string) {
     if (clusterIds === "0") return "all" as const;
     return clusterIds
       .split(",")
