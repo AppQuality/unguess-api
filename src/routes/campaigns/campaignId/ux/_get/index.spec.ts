@@ -811,4 +811,233 @@ describe("GET /campaigns/:campaignId/ux", () => {
       );
     });
   });
+
+  describe("Edge cases with published", () => {
+    beforeEach(async () => {
+      await tryber.tables.UxCampaignData.do().insert([
+        {
+          campaign_id: 1,
+          version: 1,
+          published: 1,
+          methodology_description: "Methodology description",
+          methodology_type: "qualitative",
+          goal: "Goal",
+          users: 10,
+        },
+        {
+          campaign_id: 1,
+          version: 2,
+          published: 0,
+          methodology_description: "Methodology description edited",
+          methodology_type: "quantitative",
+          goal: "Goal updated",
+          users: 11,
+        },
+      ]);
+      await tryber.tables.UxCampaignInsights.do().insert([
+        {
+          id: 1,
+          campaign_id: 1,
+          version: 1,
+          title: "First version",
+          description: "",
+          severity_id: 1,
+          cluster_ids: "0",
+          order: 0,
+        },
+        {
+          id: 2,
+          campaign_id: 1,
+          version: 2,
+          title: "My second insight",
+          description: "Second insight description",
+          severity_id: 1,
+          cluster_ids: "1,2",
+          order: 1,
+        },
+        {
+          id: 3,
+          campaign_id: 1,
+          version: 2,
+          title: "My insight",
+          description: "Insight description",
+          severity_id: 1,
+          cluster_ids: "0",
+          order: 0,
+        },
+      ]);
+      await tryber.tables.UxCampaignQuestions.do().insert([
+        {
+          id: 1,
+          campaign_id: 1,
+          question: "Question 1",
+          version: 1,
+        },
+        {
+          id: 2,
+          campaign_id: 1,
+          question: "Question 2",
+          version: 1,
+        },
+        {
+          id: 3,
+          campaign_id: 1,
+          question: "Question 1",
+          version: 2,
+        },
+        {
+          id: 4,
+          campaign_id: 1,
+          question: "Question 2 edited",
+          version: 2,
+        },
+      ]);
+      await tryber.tables.UxCampaignVideoParts.do().insert([
+        {
+          insight_id: 1,
+          media_id: 1,
+          start: 0,
+          end: 0,
+          description: "First version",
+        },
+        {
+          insight_id: 2,
+          media_id: 1,
+          start: 5,
+          end: 10,
+          description: "Description",
+        },
+      ]);
+      await tryber.tables.WpAppqUserTaskMedia.do().insert([
+        {
+          id: 1,
+          location:
+            "https://s3-eu-west-1.amazonaws.com/appq.use-case-media/CP3461/UC8794/T19095/ebf00412a1bc3fd33fddd52962cf80e6853a10d5_1625090207.mp4",
+          campaign_task_id: 1,
+          user_task_id: 1,
+          tester_id: 1,
+        },
+      ]);
+      await tryber.tables.UxCampaignSentiments.do().insert([
+        {
+          campaign_id: 1,
+          version: 1,
+          cluster_id: 1,
+          value: 1,
+          comment: "Comment 1",
+        },
+        {
+          campaign_id: 1,
+          version: 1,
+          cluster_id: 2,
+          value: 5,
+          comment: "Comment 2",
+        },
+        {
+          campaign_id: 1,
+          version: 2,
+          cluster_id: 1,
+          value: 2,
+          comment: "Comment 1 draft-modified",
+        },
+        {
+          campaign_id: 1,
+          version: 2,
+          cluster_id: 2,
+          value: 4,
+          comment: "Comment 2 draft-modified",
+        },
+      ]);
+    });
+
+    afterEach(async () => {
+      await tryber.tables.UxCampaignData.do().delete();
+      await tryber.tables.UxCampaignInsights.do().delete();
+      await tryber.tables.UxCampaignVideoParts.do().delete();
+      await tryber.tables.WpAppqUserTaskMedia.do().delete();
+      await tryber.tables.UxCampaignQuestions.do().delete();
+      await tryber.tables.UxCampaignSentiments.do().delete();
+    });
+
+    it("Should raise an error if the insight severity is not known", async () => {
+      await tryber.tables.UxCampaignInsights.do()
+        .update({
+          severity_id: 999,
+        })
+        .where({
+          id: 1,
+        });
+
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer user");
+
+      expect(response.status).toBe(500);
+      expect(response.body).toHaveProperty("error");
+      expect(response.body.message).toEqual("Invalid severity id");
+    });
+
+    it("Should return maior if severity has id = 2", async () => {
+      await tryber.tables.UxCampaignInsights.do()
+        .update({
+          severity_id: 2,
+        })
+        .where({
+          id: 1,
+        });
+
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer user");
+
+      expect(response.status).toBe(200);
+      expect(response.body.findings[0]).toEqual(
+        expect.objectContaining({
+          severity: { id: 2, name: "Major" },
+        })
+      );
+    });
+
+    it("Should return Positive if severity has id = 3", async () => {
+      await tryber.tables.UxCampaignInsights.do()
+        .update({
+          severity_id: 3,
+        })
+        .where({
+          id: 1,
+        });
+
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer user");
+
+      expect(response.status).toBe(200);
+      expect(response.body.findings[0]).toEqual(
+        expect.objectContaining({
+          severity: { id: 3, name: "Positive" },
+        })
+      );
+    });
+
+    it("Should return Observation if severity has id = 4", async () => {
+      await tryber.tables.UxCampaignInsights.do()
+        .update({
+          severity_id: 4,
+        })
+        .where({
+          id: 1,
+        });
+
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer user");
+
+      expect(response.status).toBe(200);
+      expect(response.body.findings[0]).toEqual(
+        expect.objectContaining({
+          severity: { id: 4, name: "Observation" },
+        })
+      );
+    });
+  });
 });
