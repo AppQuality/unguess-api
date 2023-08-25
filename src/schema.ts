@@ -1089,7 +1089,7 @@ export interface operations {
         /** Campaign id */
         cid: string;
       };
-      header: {
+      query: {
         showAsCustomer?: boolean;
       };
     };
@@ -1098,17 +1098,21 @@ export interface operations {
       200: {
         content: {
           "application/json": {
+            version: number;
+            goal: string;
+            users: number;
             findings?: {
+              id: number;
               title: string;
-              description?: string;
+              description: string;
               severity: {
                 id: number;
                 name?: string;
               };
               cluster:
                 | {
-                    id?: number;
-                    name?: string;
+                    id: number;
+                    name: string;
                   }[]
                 | "all";
               video?: {
@@ -1126,11 +1130,19 @@ export interface operations {
               };
               value: number;
             }[];
+            methodology: {
+              type: string;
+              description: string;
+            };
+            questions: {
+              text: string;
+            }[];
           };
         };
       };
       400: components["responses"]["Error"];
       403: components["responses"]["Error"];
+      404: components["responses"]["Error"];
       500: components["responses"]["Error"];
     };
   };

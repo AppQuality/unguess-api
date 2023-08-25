@@ -277,11 +277,19 @@ paths:
               schema:
                 type: object
                 properties:
+                  version:
+                    type: number
+                  goal:
+                    type: string
+                  users:
+                    type: number
                   findings:
                     type: array
                     items:
                       type: object
                       properties:
+                        id:
+                          type: integer
                         title:
                           type: string
                         description:
@@ -305,6 +313,9 @@ paths:
                                     type: integer
                                   name:
                                     type: string
+                                required:
+                                  - id
+                                  - name
                             - type: string
                               enum:
                                 - all
@@ -329,7 +340,9 @@ paths:
                               - start
                               - end
                       required:
+                        - id
                         - title
+                        - description
                         - severity
                         - cluster
                   sentiment:
@@ -339,24 +352,58 @@ paths:
                       properties:
                         cluster:
                           type: object
-                          required:
-                            - id
-                            - name
                           properties:
                             id:
                               type: integer
                             name:
                               type: string
+                          required:
+                            - id
+                            - name
                         value:
                           type: integer
                       required:
                         - cluster
                         - value
+                  methodology:
+                    type: object
+                    required:
+                      - type
+                      - description
+                    properties:
+                      type:
+                        type: string
+                      description:
+                        type: string
+                  questions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        text:
+                          type: string
+                      required:
+                        - text
+                required:
+                  - version
+                  - goal
+                  - users
+                  - methodology
+                  - questions
               examples:
                 Example 1:
                   value:
+                    version: 1
+                    goal: string
+                    users: 12
+                    methodology:
+                      type: qualitative
+                      description: string
+                    questions:
+                      - text: string
                     findings:
-                      - title: My finding
+                      - id: 18
+                        title: My finding
                         description: This is a sample finding
                         severity:
                           id: 1
@@ -364,13 +411,15 @@ paths:
                         cluster:
                           - id: 1
                             name: 'UC1: Example'
+                          - all
                         video:
                           - url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
                             streamUrl: 'http://sample.vodobox.net/skate_phantom_flex_4k/skate_phantom_flex_4k.m3u8'
                             start: 10
                             end: 20
                             description: This is a video
-                      - title: My finding
+                      - id: 19
+                        title: My finding
                         description: This is a sample finding
                         severity:
                           id: 1
@@ -395,6 +444,8 @@ paths:
           $ref: '#/components/responses/Error'
         '403':
           $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
       operationId: get-campaigns-cid-ux
@@ -404,7 +455,7 @@ paths:
       parameters:
         - schema:
             type: boolean
-          in: header
+          in: query
           name: showAsCustomer
   '/campaigns/{cid}/bugTypes':
     parameters:
@@ -752,6 +803,9 @@ paths:
                       name: string
                     project:
                       id: 0
+                      name: string
+                    workspace:
+                      id: 158
                       name: string
                     description: string
                     base_bug_internal_id: string
