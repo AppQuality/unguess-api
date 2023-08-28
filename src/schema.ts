@@ -560,7 +560,7 @@ export interface components {
      * @description campaign output item
      * @enum {string}
      */
-    Output: "bugs" | "media";
+    Output: "bugs" | "media" | "insights";
     /** Platform Object */
     Platform: {
       /** @description os */

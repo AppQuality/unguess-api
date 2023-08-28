@@ -2684,6 +2684,7 @@ components:
       enum:
         - bugs
         - media
+        - insights
       description: campaign output item
     Platform:
       title: Platform Object

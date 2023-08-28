@@ -125,16 +125,19 @@ export default class Route extends WorkspaceRoute<{
       .join(",");
     const bugCounts = await this.getBugCounts(campaignIds);
     const mediaCounts = await this.getMediaCounts(campaignIds);
+    const insightsCounts = await this.getInsightsCounts(campaignIds);
     return campaigns.map((campaign: any) => {
       const campaign_family = getCampaignFamily({
         familyId: campaign.campaign_family_id,
       });
 
-      let outputs: ("media" | "bugs")[] = [];
+      let outputs: ("media" | "bugs" | "insights")[] = [];
       if (bugCounts[campaign.id] && bugCounts[campaign.id] > 0)
         outputs.push("bugs");
       if (mediaCounts[campaign.id] && mediaCounts[campaign.id] > 0)
         outputs.push("media");
+      if (insightsCounts[campaign.id] && insightsCounts[campaign.id] > 0)
+        outputs.push("insights");
 
       return {
         id: campaign.id,
@@ -307,6 +310,25 @@ export default class Route extends WorkspaceRoute<{
       );
       if (item) {
         results[id] = item.total;
+      }
+    }
+    return results;
+  }
+
+  private async getInsightsCounts(campaignIds: any) {
+    const data = await tryber.tables.UxCampaignData.do()
+      .select("campaign_id")
+      .whereIn("campaign_id", campaignIds.split(","))
+      .andWhere("published", 1);
+
+    const results: { [key: number]: number } = {};
+    for (const id of campaignIds.split(",")) {
+      results[id] = 0;
+      const item = data.find(
+        (d: { campaign_id: number }) => d.campaign_id === parseInt(id)
+      );
+      if (item) {
+        results[id] = 1;
       }
     }
     return results;
