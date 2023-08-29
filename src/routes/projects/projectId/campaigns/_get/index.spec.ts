@@ -1,16 +1,14 @@
-import app from "@src/app";
-import request from "supertest";
+import bugs from "@src/__mocks__/database/bugs";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
+import useCases from "@src/__mocks__/database/use_cases";
+import userTaskMedia from "@src/__mocks__/database/user_task_media";
+import app from "@src/app";
+import { tryber } from "@src/features/database";
 import {
-  ERROR_MESSAGE,
   EXPERIENTIAL_CAMPAIGN_TYPE_ID,
   LIMIT_QUERY_PARAM_DEFAULT,
 } from "@src/utils/constants";
-import bugs from "@src/__mocks__/database/bugs";
-import useCases from "@src/__mocks__/database/use_cases";
-import userTaskMedia from "@src/__mocks__/database/user_task_media";
-import uxCampaignData from "@src/__mocks__/database/ux_campaign_data";
-import { tryber } from "@src/features/database";
+import request from "supertest";
 
 const customer_profile_1 = {
   id: 1,
@@ -369,6 +367,7 @@ describe("GET /projects/{pid}/campaigns", () => {
         id: 789,
         campaign_task_id: 456,
         location: "http://image1.com",
+        status: 2,
       });
 
       await tryber.tables.UxCampaignData.do().insert({
