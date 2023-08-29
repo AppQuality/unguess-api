@@ -44,7 +44,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: unguess-api
-          IMAGE_TAG: ${{ steps.extract_branch.outputs.tag }}
+          TAG: ${{ steps.extract_tag.outputs.tag }}
         run: |
           # Build a docker container and
           # push it to ECR so that it can
