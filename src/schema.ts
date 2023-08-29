@@ -45,6 +45,15 @@ export interface paths {
       };
     };
   };
+  "/campaigns/{cid}/ux": {
+    get: operations["get-campaigns-cid-ux"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+  };
   "/campaigns/{cid}/bugTypes": {
     get: operations["get-campaigns-cid-bug-types"];
     parameters: {
@@ -551,7 +560,7 @@ export interface components {
      * @description campaign output item
      * @enum {string}
      */
-    Output: "bugs" | "media";
+    Output: "bugs" | "media" | "insights";
     /** Platform Object */
     Platform: {
       /** @description os */
@@ -1071,6 +1080,69 @@ export interface operations {
       400: components["responses"]["Error"];
       401: components["responses"]["Error"];
       403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  "get-campaigns-cid-ux": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+      query: {
+        showAsCustomer?: boolean;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            version: number;
+            goal: string;
+            users: number;
+            findings?: {
+              id: number;
+              title: string;
+              description: string;
+              severity: {
+                id: number;
+                name?: string;
+              };
+              cluster:
+                | {
+                    id: number;
+                    name: string;
+                  }[]
+                | "all";
+              video?: {
+                url: string;
+                streamUrl: string;
+                start: number;
+                end: number;
+                description?: string;
+              }[];
+            }[];
+            sentiment?: {
+              cluster: {
+                id: number;
+                name: string;
+              };
+              value: number;
+            }[];
+            methodology: {
+              type: string;
+              description: string;
+            };
+            questions: {
+              text: string;
+            }[];
+          };
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      404: components["responses"]["Error"];
       500: components["responses"]["Error"];
     };
   };
