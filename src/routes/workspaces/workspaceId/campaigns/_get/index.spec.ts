@@ -681,6 +681,12 @@ describe("GET /workspaces/{wid}/campaigns", () => {
         status: 2,
       });
 
+      await tryber.tables.UxCampaignData.do().insert({
+        campaign_id: campaign_1.id,
+        published: 1,
+        version: 1,
+      });
+
       const response = await request(app)
         .get(`/workspaces/1/campaigns`)
         .set("authorization", "Bearer user");
@@ -689,11 +695,11 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       expect(Array.isArray(response.body.items)).toBe(true);
       expect(response.body.items).toHaveLength(1);
 
-      expect(response.body.items[0].outputs).toHaveLength(2);
+      expect(response.body.items[0].outputs).toHaveLength(3);
       expect(response.body.items).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            outputs: expect.arrayContaining(["bugs", "media"]),
+            outputs: expect.arrayContaining(["bugs", "media", "insights"]),
           }),
         ])
       );
