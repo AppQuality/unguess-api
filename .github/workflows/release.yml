@@ -51,9 +51,9 @@ jobs:
           # be deployed to ECS.
           docker build \
             --build-arg NPM_TOKEN=${{ secrets.NPM_TOKEN }} \
-            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:$TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$TAG"
 
   release-to-prod:
     name: Release to production
