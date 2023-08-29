@@ -355,7 +355,6 @@ export default class WorkspacesRoute extends UserRoute<{
 
       return { workspaces: [], total: 0 };
     } catch (e) {
-      //console.log(e.message);
       return { workspaces: [], total: 0 };
     }
   }

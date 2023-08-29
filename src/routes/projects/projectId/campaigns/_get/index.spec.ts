@@ -1,14 +1,14 @@
-import app from "@src/app";
-import request from "supertest";
+import bugs from "@src/__mocks__/database/bugs";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
+import useCases from "@src/__mocks__/database/use_cases";
+import userTaskMedia from "@src/__mocks__/database/user_task_media";
+import app from "@src/app";
+import { tryber } from "@src/features/database";
 import {
-  ERROR_MESSAGE,
   EXPERIENTIAL_CAMPAIGN_TYPE_ID,
   LIMIT_QUERY_PARAM_DEFAULT,
 } from "@src/utils/constants";
-import bugs from "@src/__mocks__/database/bugs";
-import useCases from "@src/__mocks__/database/use_cases";
-import userTaskMedia from "@src/__mocks__/database/user_task_media";
+import request from "supertest";
 
 const customer_profile_1 = {
   id: 1,
@@ -317,6 +317,7 @@ describe("GET /projects/{pid}/campaigns", () => {
       await bugs.clear();
       await userTaskMedia.clear();
       await useCases.clear();
+      await tryber.tables.UxCampaignData.do().delete();
     });
 
     // Should return a bug output if campaign has bug output
@@ -366,6 +367,15 @@ describe("GET /projects/{pid}/campaigns", () => {
         id: 789,
         campaign_task_id: 456,
         location: "http://image1.com",
+        status: 2,
+      });
+
+      await tryber.tables.UxCampaignData.do().insert({
+        id: 1,
+        campaign_id: campaign_1.id,
+        published: 1,
+        version: 1,
+        goal: "Goal 1",
       });
 
       const response = await request(app)
@@ -376,11 +386,11 @@ describe("GET /projects/{pid}/campaigns", () => {
       expect(Array.isArray(response.body.items)).toBe(true);
       expect(response.body.items).toHaveLength(1);
 
-      expect(response.body.items[0].outputs).toHaveLength(2);
+      expect(response.body.items[0].outputs).toHaveLength(3);
       expect(response.body.items).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            outputs: expect.arrayContaining(["bugs", "media"]),
+            outputs: expect.arrayContaining(["bugs", "media", "insights"]),
           }),
         ])
       );

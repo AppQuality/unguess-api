@@ -38,7 +38,6 @@ describe("POST /analytics/views/campaigns/{cid}", () => {
     const response = await request(app)
       .post("/analytics/views/campaigns/2")
       .set("Authorization", "Bearer user");
-    console.log(response.body);
     expect(response.status).toBe(403);
   });
 
