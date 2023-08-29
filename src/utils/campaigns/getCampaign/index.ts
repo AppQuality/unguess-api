@@ -105,7 +105,7 @@ async function getCampaignOutputs(campaign: {
   id: number;
   showNeedReview: boolean;
 }) {
-  let outputs: ("media" | "bugs")[] = [];
+  let outputs: ("media" | "bugs" | "insights")[] = [];
 
   if (await hasBugs()) {
     outputs.push("bugs");
@@ -113,6 +113,10 @@ async function getCampaignOutputs(campaign: {
 
   if (await hasMedia()) {
     outputs.push("media");
+  }
+
+  if (await hasInsights()) {
+    outputs.push("insights");
   }
   return outputs;
 
@@ -145,5 +149,16 @@ async function getCampaignOutputs(campaign: {
       )
     );
     return media.length && media[0].total > 0;
+  }
+
+  async function hasInsights() {
+    const data = await db.query(
+      db.format(
+        `SELECT campaign_id FROM ux_campaign_data WHERE campaign_id = ? AND published = 1`,
+        [campaign.id]
+      )
+    );
+
+    return data.length > 0;
   }
 }

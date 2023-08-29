@@ -9,6 +9,8 @@ import {
 import bugs from "@src/__mocks__/database/bugs";
 import useCases from "@src/__mocks__/database/use_cases";
 import userTaskMedia from "@src/__mocks__/database/user_task_media";
+import uxCampaignData from "@src/__mocks__/database/ux_campaign_data";
+import { tryber } from "@src/features/database";
 
 const customer_profile_1 = {
   id: 1,
@@ -317,6 +319,7 @@ describe("GET /projects/{pid}/campaigns", () => {
       await bugs.clear();
       await userTaskMedia.clear();
       await useCases.clear();
+      await tryber.tables.UxCampaignData.do().delete();
     });
 
     // Should return a bug output if campaign has bug output
@@ -368,6 +371,14 @@ describe("GET /projects/{pid}/campaigns", () => {
         location: "http://image1.com",
       });
 
+      await tryber.tables.UxCampaignData.do().insert({
+        id: 1,
+        campaign_id: campaign_1.id,
+        published: 1,
+        version: 1,
+        goal: "Goal 1",
+      });
+
       const response = await request(app)
         .get(`/projects/${project_1.id}/campaigns?limit=1`)
         .set("authorization", "Bearer user");
@@ -376,11 +387,11 @@ describe("GET /projects/{pid}/campaigns", () => {
       expect(Array.isArray(response.body.items)).toBe(true);
       expect(response.body.items).toHaveLength(1);
 
-      expect(response.body.items[0].outputs).toHaveLength(2);
+      expect(response.body.items[0].outputs).toHaveLength(3);
       expect(response.body.items).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            outputs: expect.arrayContaining(["bugs", "media"]),
+            outputs: expect.arrayContaining(["bugs", "media", "insights"]),
           }),
         ])
       );

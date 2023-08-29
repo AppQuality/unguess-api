@@ -201,6 +201,7 @@ describe("GET /campaigns/{cid}/widgets - unique bugs", () => {
     const responseBeforeUpdate = await request(app)
       .get(`/campaigns/1/widgets?s=unique-bugs&updateTrend=true`)
       .set("Authorization", "Bearer user");
+    console.log(responseBeforeUpdate.body);
     expect(responseBeforeUpdate.body).toHaveProperty("data");
     expect(responseBeforeUpdate.body.data).toHaveProperty("trend", 1);
     const responseAfterUpdate = await request(app)

@@ -621,6 +621,74 @@ describe("GET /workspaces/{wid}/campaigns", () => {
       await bugs.clear();
       await userTaskMedia.clear();
       await useCases.clear();
+      await tryber.tables.UxCampaignData.do().delete();
+    });
+
+    // Should return a media output if campaign has media output
+    it("Should return a media output if campaign has media output", async () => {
+      await tryber.tables.WpAppqCampaignTask.do().insert({
+        id: 456,
+        campaign_id: campaign_1.id,
+        title: "Task 1",
+        content: "Task 1 description",
+        jf_code: "jf_code",
+        jf_text: "jf_text",
+        is_required: 1,
+        simple_title: "Task 1",
+        info: "Task 1 info",
+        prefix: "Task 1 prefix",
+      });
+      await tryber.tables.WpAppqUserTaskMedia.do().insert({
+        id: 789,
+        campaign_task_id: 456,
+        location: "http://image1.com",
+        status: 2,
+        user_task_id: 1,
+        tester_id: 1,
+      });
+
+      const response = await request(app)
+        .get(`/workspaces/1/campaigns`)
+        .set("authorization", "Bearer user");
+
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body.items)).toBe(true);
+      expect(response.body.items).toHaveLength(1);
+
+      expect(response.body.items[0].outputs).toHaveLength(1);
+      expect(response.body.items).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            outputs: expect.arrayContaining(["media"]),
+          }),
+        ])
+      );
+    });
+
+    // Should return an insight output if campaign has insights output
+    it("Should return an insight output if campaign has insights output", async () => {
+      await tryber.tables.UxCampaignData.do().insert({
+        campaign_id: campaign_1.id,
+        published: 1,
+        version: 1,
+      });
+
+      const response = await request(app)
+        .get(`/workspaces/1/campaigns`)
+        .set("authorization", "Bearer user");
+
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body.items)).toBe(true);
+      expect(response.body.items).toHaveLength(1);
+
+      expect(response.body.items[0].outputs).toHaveLength(1);
+      expect(response.body.items).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            outputs: expect.arrayContaining(["insights"]),
+          }),
+        ])
+      );
     });
 
     // Should return a bug output if campaign has bug output
