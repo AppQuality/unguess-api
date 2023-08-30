@@ -352,19 +352,22 @@ paths:
                       properties:
                         cluster:
                           type: object
+                          required:
+                            - id
+                            - name
                           properties:
                             id:
                               type: integer
                             name:
                               type: string
-                          required:
-                            - id
-                            - name
                         value:
                           type: integer
+                        comment:
+                          type: string
                       required:
                         - cluster
                         - value
+                        - comment
                   methodology:
                     type: object
                     required:
@@ -436,6 +439,7 @@ paths:
                           id: 1
                           name: 'UC1: Example'
                         value: 1
+                        comment: comment
                       - cluster:
                           id: 2
                           name: 'UC2: Example 2'

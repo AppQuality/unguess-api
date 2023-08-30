@@ -144,7 +144,7 @@ export default class Route extends CampaignRoute<{
     if (!this.clusters.length) return [];
 
     const results = await tryber.tables.UxCampaignSentiments.do()
-      .select("cluster_id", "value")
+      .select("cluster_id", "value", "comment")
       .where({
         campaign_id: this.cp_id,
         version: this.version,
@@ -158,6 +158,7 @@ export default class Route extends CampaignRoute<{
         name: this.clusters.find((c) => c.id === r.cluster_id)?.name || "",
       },
       value: r.value,
+      comment: r.comment,
     }));
   }
 

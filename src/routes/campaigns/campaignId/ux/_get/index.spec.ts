@@ -234,7 +234,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
           version: 1,
           cluster_id: 2,
           value: 5,
-          comment: "Comment 1",
+          comment: "Comment 2",
         },
       ]);
     });
@@ -378,6 +378,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
               name: "Cluster 1",
             },
             value: 1,
+            comment: "Comment 1",
           }),
           expect.objectContaining({
             cluster: {
@@ -385,6 +386,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
               name: "Cluster 2",
             },
             value: 5,
+            comment: "Comment 2",
           }),
         ])
       );
@@ -528,6 +530,13 @@ describe("GET /campaigns/:campaignId/ux", () => {
           value: 4,
           comment: "Comment 2 draft-modified",
         },
+        {
+          campaign_id: 2,
+          version: 1,
+          cluster_id: 1,
+          value: 2,
+          comment: "Comment 2 other CP",
+        },
       ]);
     });
 
@@ -638,6 +647,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
               name: "Cluster 1",
             },
             value: 1,
+            comment: "Comment 1",
           }),
           expect.objectContaining({
             cluster: {
@@ -645,6 +655,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
               name: "Cluster 2",
             },
             value: 5,
+            comment: "Comment 2",
           }),
         ])
       );

@@ -1129,6 +1129,7 @@ export interface operations {
                 name: string;
               };
               value: number;
+              comment: string;
             }[];
             methodology: {
               type: string;
