@@ -119,7 +119,6 @@ export default class Route extends CampaignRoute<{
       const comment = comments.find(
         (c) => c.finding_id === finding.finding_id
       )?.comment;
-      console.log(comment);
 
       result.push({
         id: finding.finding_id,
