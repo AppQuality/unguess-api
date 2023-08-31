@@ -173,6 +173,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
           severity_id: 1,
           cluster_ids: "0",
           order: 2,
+          finding_id: 10,
         },
         {
           id: 2,
@@ -183,6 +184,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
           severity_id: 2,
           cluster_ids: "1,2",
           order: 1,
+          finding_id: 11,
         },
         {
           id: 3,
@@ -193,6 +195,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
           severity_id: 3,
           cluster_ids: "0",
           order: 0,
+          finding_id: 12,
         },
       ]);
       await tryber.tables.UxCampaignVideoParts.do().insert([
@@ -387,6 +390,28 @@ describe("GET /campaigns/:campaignId/ux", () => {
             },
             value: 5,
             comment: "Comment 2",
+          }),
+        ])
+      );
+    });
+
+    it("Should return the correct findings_ids for each finding", async () => {
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer admin");
+      expect(response.body).toHaveProperty("findings");
+      expect(response.body.findings).toHaveLength(3);
+
+      expect(response.body.findings).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 10,
+          }),
+          expect.objectContaining({
+            id: 11,
+          }),
+          expect.objectContaining({
+            id: 12,
           }),
         ])
       );

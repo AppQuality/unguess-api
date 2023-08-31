@@ -111,7 +111,7 @@ export default class Route extends CampaignRoute<{
 
     for (const finding of findings) {
       result.push({
-        id: finding.id,
+        id: finding.finding_id,
         title: finding.title,
         description: finding.description,
         severity: {
