@@ -104,6 +104,7 @@ export default class Route extends CampaignRoute<{
       .where({
         campaign_id: this.cp_id,
         version: this.version,
+        enabled: 1,
       })
       .orderBy("order", "asc");
     const comments = await unguess.tables.UxCampaignFindings.do()

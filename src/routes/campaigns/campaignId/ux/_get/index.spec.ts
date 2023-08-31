@@ -174,6 +174,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
           cluster_ids: "0",
           order: 2,
           finding_id: 10,
+          enabled: 1,
         },
         {
           id: 2,
@@ -185,6 +186,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
           cluster_ids: "1,2",
           order: 1,
           finding_id: 11,
+          enabled: 1,
         },
         {
           id: 3,
@@ -196,6 +198,19 @@ describe("GET /campaigns/:campaignId/ux", () => {
           cluster_ids: "0",
           order: 0,
           finding_id: 12,
+          enabled: 1,
+        },
+        {
+          id: 4,
+          campaign_id: 1,
+          version: 1,
+          title: "Insight disabled",
+          description: "Insight description",
+          severity_id: 3,
+          cluster_ids: "0",
+          order: 0,
+          finding_id: 13,
+          enabled: 0,
         },
       ]);
       await tryber.tables.UxCampaignVideoParts.do().insert([
@@ -264,6 +279,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
       await tryber.tables.WpAppqUserTaskMedia.do().delete();
       await tryber.tables.UxCampaignQuestions.do().delete();
       await tryber.tables.UxCampaignSentiments.do().delete();
+      await unguess.tables.UxCampaignFindings.do().delete();
     });
     it("Should answer 200 for admin", async () => {
       const response = await request(app)
@@ -284,6 +300,27 @@ describe("GET /campaigns/:campaignId/ux", () => {
       expect(response.status).toBe(404);
     });
 
+    it("Should return only the enabled findings", async () => {
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer admin");
+      expect(response.body).toHaveProperty("findings");
+      expect(response.body.findings).toHaveLength(3);
+      console.log(response.body.findings);
+      expect(response.body.findings).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 10,
+          }),
+          expect.objectContaining({
+            id: 11,
+          }),
+          expect.objectContaining({
+            id: 12,
+          }),
+        ])
+      );
+    });
     it("Should return the findings for last draft", async () => {
       const response = await request(app)
         .get(`/campaigns/1/ux`)
@@ -465,8 +502,6 @@ describe("GET /campaigns/:campaignId/ux", () => {
           goal: "Goal",
           users: 10,
         },
-      ]);
-      await tryber.tables.UxCampaignData.do().insert([
         {
           campaign_id: 1,
           version: 2,
