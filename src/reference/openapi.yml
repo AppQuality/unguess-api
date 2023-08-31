@@ -2370,6 +2370,17 @@ components:
       required:
         - options
         - kind
+    BugCustomStatus:
+      title: BugCustomStatus
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
     BugMedia:
       title: BugMedia
       type: object
@@ -2397,6 +2408,17 @@ components:
         - mime_type
         - url
         - creation_date
+    BugPriority:
+      title: BugPriority
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
     BugReplicability:
       title: BugReplicability
       type: object
@@ -2421,28 +2443,6 @@ components:
         - name
     BugStatus:
       title: BugStatus
-      type: object
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-      required:
-        - id
-        - name
-    BugPriority:
-      title: BugPriority
-      type: object
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-      required:
-        - id
-        - name
-    BugCustomStatus:
-      title: BugCustomStatus
       type: object
       properties:
         id:
@@ -2994,136 +2994,6 @@ components:
         - profile_id
         - tryber_wp_user_id
         - unguess_wp_user_id
-    Workspace:
-      title: Workspace
-      type: object
-      x-examples:
-        Single Workspace:
-          id: 0
-          company: Scrofalo & Co.
-          tokens: 0
-          logo: string
-          csm:
-            email: user@example.com
-            role: string
-            name: Teomondo Scrofalo
-            workspaces: []
-            picture: 'https://pbs.twimg.com/media/Ccp6RXFWIAAQQ2V.jpg'
-      description: A workspace is the company area with projects and campaigns
-      properties:
-        id:
-          type: integer
-        company:
-          type: string
-        tokens:
-          type: number
-        logo:
-          type: string
-        csm:
-          type: object
-          required:
-            - id
-            - email
-            - name
-            - profile_id
-            - tryber_wp_user_id
-          properties:
-            id:
-              type: integer
-            email:
-              type: string
-            name:
-              type: string
-            profile_id:
-              type: integer
-            tryber_wp_user_id:
-              type: integer
-            picture:
-              type: string
-            url:
-              type: string
-        coins:
-          type: number
-          description: express coins
-        isShared:
-          type: boolean
-          description: Do this workspace have shared items?
-        sharedItems:
-          type: number
-          description: Number of shared items
-      required:
-        - id
-        - company
-        - tokens
-        - csm
-      x-tags:
-        - workspace
-    WidgetBugsByUseCase:
-      title: WidgetBugsByUseCase
-      type: object
-      x-examples:
-        Example 1:
-          data:
-            - title:
-                full: Navigazione Sito
-              description: aasdasdsa
-              uniqueBugs: 10
-              bugs: 12
-            - title:
-                full: Homepage
-              description: aasdasdsa
-              uniqueBugs: 1
-              bugs: 3
-            - title:
-                full: Product List
-              description: lorem ipsum
-              uniqueBugs: 0
-              bugs: 0
-          kind: bugsByUseCase
-      description: Returns a list of use case with the number of bugs
-      properties:
-        data:
-          type: array
-          items:
-            type: object
-            properties:
-              title:
-                type: object
-                required:
-                  - full
-                properties:
-                  full:
-                    type: string
-                  simple:
-                    type: string
-                  prefix:
-                    type: string
-                  info:
-                    type: string
-              description:
-                type: string
-              uniqueBugs:
-                type: number
-              bugs:
-                type: number
-              usecase_completion:
-                type: number
-              usecase_id:
-                type: number
-            required:
-              - title
-              - description
-              - bugs
-              - usecase_id
-        kind:
-          type: string
-          enum:
-            - bugsByUseCase
-          default: bugsByUseCase
-          example: bugsByUseCase
-      required:
-        - data
-        - kind
     WidgetBugsByDevice:
       title: WidgetBugsByDevice
       type: object
@@ -3274,6 +3144,72 @@ components:
       required:
         - data
         - kind
+    WidgetBugsByUseCase:
+      title: WidgetBugsByUseCase
+      type: object
+      x-examples:
+        Example 1:
+          data:
+            - title:
+                full: Navigazione Sito
+              description: aasdasdsa
+              uniqueBugs: 10
+              bugs: 12
+            - title:
+                full: Homepage
+              description: aasdasdsa
+              uniqueBugs: 1
+              bugs: 3
+            - title:
+                full: Product List
+              description: lorem ipsum
+              uniqueBugs: 0
+              bugs: 0
+          kind: bugsByUseCase
+      description: Returns a list of use case with the number of bugs
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              title:
+                type: object
+                required:
+                  - full
+                properties:
+                  full:
+                    type: string
+                  simple:
+                    type: string
+                  prefix:
+                    type: string
+                  info:
+                    type: string
+              description:
+                type: string
+              uniqueBugs:
+                type: number
+              bugs:
+                type: number
+              usecase_completion:
+                type: number
+              usecase_id:
+                type: number
+            required:
+              - title
+              - description
+              - bugs
+              - usecase_id
+        kind:
+          type: string
+          enum:
+            - bugsByUseCase
+          default: bugsByUseCase
+          example: bugsByUseCase
+      required:
+        - data
+        - kind
     WidgetCampaignProgress:
       title: WidgetCampaignProgress
       type: object
@@ -3362,6 +3298,70 @@ components:
       required:
         - data
         - kind
+    Workspace:
+      title: Workspace
+      type: object
+      x-examples:
+        Single Workspace:
+          id: 0
+          company: Scrofalo & Co.
+          tokens: 0
+          logo: string
+          csm:
+            email: user@example.com
+            role: string
+            name: Teomondo Scrofalo
+            workspaces: []
+            picture: 'https://pbs.twimg.com/media/Ccp6RXFWIAAQQ2V.jpg'
+      description: A workspace is the company area with projects and campaigns
+      properties:
+        id:
+          type: integer
+        company:
+          type: string
+        tokens:
+          type: number
+        logo:
+          type: string
+        csm:
+          type: object
+          required:
+            - id
+            - email
+            - name
+            - profile_id
+            - tryber_wp_user_id
+          properties:
+            id:
+              type: integer
+            email:
+              type: string
+            name:
+              type: string
+            profile_id:
+              type: integer
+            tryber_wp_user_id:
+              type: integer
+            picture:
+              type: string
+            url:
+              type: string
+        coins:
+          type: number
+          description: express coins
+        isShared:
+          type: boolean
+          description: Do this workspace have shared items?
+        sharedItems:
+          type: number
+          description: Number of shared items
+      required:
+        - id
+        - company
+        - tokens
+        - csm
+      x-tags:
+        - workspace
     Tenant:
       title: Tenant
       type: object

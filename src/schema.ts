@@ -406,6 +406,11 @@ export interface components {
       /** @enum {string} */
       kind: "select";
     };
+    /** BugCustomStatus */
+    BugCustomStatus: {
+      id: number;
+      name: string;
+    };
     /** BugMedia */
     BugMedia: {
       mime_type: {
@@ -416,6 +421,11 @@ export interface components {
       /** Format: uri */
       url: string;
       creation_date: string;
+    };
+    /** BugPriority */
+    BugPriority: {
+      id: number;
+      name: string;
     };
     /** BugReplicability */
     BugReplicability: {
@@ -429,16 +439,6 @@ export interface components {
     };
     /** BugStatus */
     BugStatus: {
-      id: number;
-      name: string;
-    };
-    /** BugPriority */
-    BugPriority: {
-      id: number;
-      name: string;
-    };
-    /** BugCustomStatus */
-    BugCustomStatus: {
       id: number;
       name: string;
     };
@@ -704,56 +704,6 @@ export interface components {
       features?: components["schemas"]["Feature"][];
     };
     /**
-     * Workspace
-     * @description A workspace is the company area with projects and campaigns
-     */
-    Workspace: {
-      id: number;
-      company: string;
-      tokens: number;
-      logo?: string;
-      csm: {
-        id: number;
-        email: string;
-        name: string;
-        profile_id: number;
-        tryber_wp_user_id: number;
-        picture?: string;
-        url?: string;
-      };
-      /** @description express coins */
-      coins?: number;
-      /** @description Do this workspace have shared items? */
-      isShared?: boolean;
-      /** @description Number of shared items */
-      sharedItems?: number;
-    };
-    /**
-     * WidgetBugsByUseCase
-     * @description Returns a list of use case with the number of bugs
-     */
-    WidgetBugsByUseCase: {
-      data: {
-        title: {
-          full: string;
-          simple?: string;
-          prefix?: string;
-          info?: string;
-        };
-        description: string;
-        uniqueBugs?: number;
-        bugs: number;
-        usecase_completion?: number;
-        usecase_id: number;
-      }[];
-      /**
-       * @default bugsByUseCase
-       * @example bugsByUseCase
-       * @enum {string}
-       */
-      kind: "bugsByUseCase";
-    };
-    /**
      * WidgetBugsByDevice
      * @description Returns a list of devices with the number of bugs
      */
@@ -784,6 +734,31 @@ export interface components {
       })[];
       /** @enum {string} */
       kind: "bugsByDuplicates";
+    };
+    /**
+     * WidgetBugsByUseCase
+     * @description Returns a list of use case with the number of bugs
+     */
+    WidgetBugsByUseCase: {
+      data: {
+        title: {
+          full: string;
+          simple?: string;
+          prefix?: string;
+          info?: string;
+        };
+        description: string;
+        uniqueBugs?: number;
+        bugs: number;
+        usecase_completion?: number;
+        usecase_id: number;
+      }[];
+      /**
+       * @default bugsByUseCase
+       * @example bugsByUseCase
+       * @enum {string}
+       */
+      kind: "bugsByUseCase";
     };
     /**
      * WidgetCampaignProgress
@@ -827,6 +802,31 @@ export interface components {
        * @enum {string}
        */
       kind: "campaignUniqueBugs";
+    };
+    /**
+     * Workspace
+     * @description A workspace is the company area with projects and campaigns
+     */
+    Workspace: {
+      id: number;
+      company: string;
+      tokens: number;
+      logo?: string;
+      csm: {
+        id: number;
+        email: string;
+        name: string;
+        profile_id: number;
+        tryber_wp_user_id: number;
+        picture?: string;
+        url?: string;
+      };
+      /** @description express coins */
+      coins?: number;
+      /** @description Do this workspace have shared items? */
+      isShared?: boolean;
+      /** @description Number of shared items */
+      sharedItems?: number;
     };
     /** Tenant */
     Tenant: {
