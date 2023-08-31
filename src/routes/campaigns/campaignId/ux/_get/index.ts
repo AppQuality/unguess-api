@@ -1,5 +1,5 @@
 /** OPENAPI-CLASS: get-campaigns-cid-ux */
-import { tryber } from "@src/features/database";
+import { tryber, unguess } from "@src/features/database";
 import CampaignRoute from "@src/features/routes/CampaignRoute";
 import { checkUrl } from "@src/utils/checkUrl";
 
@@ -106,10 +106,20 @@ export default class Route extends CampaignRoute<{
         version: this.version,
       })
       .orderBy("order", "asc");
+    const comments = await unguess.tables.UxCampaignFindings.do()
+      .select()
+      .where({
+        campaign_id: this.cp_id,
+      });
 
     const result = [];
 
     for (const finding of findings) {
+      const comment = comments.find(
+        (c) => c.finding_id === finding.finding_id
+      )?.comment;
+      console.log(comment);
+
       result.push({
         id: finding.finding_id,
         title: finding.title,
@@ -118,7 +128,7 @@ export default class Route extends CampaignRoute<{
           id: finding.severity_id,
           name: this.getSeverityName(finding.severity_id),
         },
-        comment: "",
+        comment: comment ? comment : undefined,
         cluster: this.getClusters(finding.cluster_ids),
         video: await this.getVideo(finding),
       });

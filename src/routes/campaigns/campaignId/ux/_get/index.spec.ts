@@ -1,5 +1,5 @@
 import app from "@src/app";
-import { tryber } from "@src/features/database";
+import { tryber, unguess } from "@src/features/database";
 import request from "supertest";
 
 const campaign = {
@@ -240,6 +240,22 @@ describe("GET /campaigns/:campaignId/ux", () => {
           comment: "Comment 2",
         },
       ]);
+      await unguess.tables.UxCampaignFindings.do().insert([
+        {
+          id: 10,
+          finding_id: 10,
+          campaign_id: 1,
+          comment: "Comment finding10",
+          profile_id: 1,
+        },
+        {
+          id: 11,
+          finding_id: 11,
+          campaign_id: 1,
+          comment: "Comment finding11",
+          profile_id: 1,
+        },
+      ]);
     });
     afterAll(async () => {
       await tryber.tables.UxCampaignData.do().delete();
@@ -415,6 +431,25 @@ describe("GET /campaigns/:campaignId/ux", () => {
           }),
         ])
       );
+    });
+    it("Should return the all comments for each finding", async () => {
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer admin");
+
+      expect(response.body.findings).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 10,
+            comment: "Comment finding10",
+          }),
+          expect.objectContaining({
+            id: 11,
+            comment: "Comment finding11",
+          }),
+        ])
+      );
+      expect(response.body.findings[0]).not.toHaveProperty("comment");
     });
   });
 
