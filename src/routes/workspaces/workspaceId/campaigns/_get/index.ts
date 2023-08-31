@@ -1,12 +1,12 @@
 /** OPENAPI-CLASS: get-workspace-campaigns */
+import { tryber } from "@src/features/database";
 import * as db from "@src/features/db";
+import WorkspaceRoute from "@src/features/routes/WorkspaceRoute";
+import { getCampaignFamily, getCampaignStatus } from "@src/utils/campaigns";
 import {
   LIMIT_QUERY_PARAM_DEFAULT,
   START_QUERY_PARAM_DEFAULT,
 } from "@src/utils/constants";
-import { getCampaignFamily, getCampaignStatus } from "@src/utils/campaigns";
-import WorkspaceRoute from "@src/features/routes/WorkspaceRoute";
-import { tryber } from "@src/features/database";
 
 export default class Route extends WorkspaceRoute<{
   response: StoplightOperations["get-workspace-campaigns"]["responses"]["200"]["content"]["application/json"];
@@ -301,7 +301,8 @@ export default class Route extends WorkspaceRoute<{
     SELECT campaign_id,COUNT(t.id) as total
           FROM wp_appq_campaign_task t 
           JOIN wp_appq_user_task_media m ON (m.campaign_task_id = t.id)
-          WHERE t.campaign_id IN (${campaignIds}) AND m.status = 2`);
+          WHERE t.campaign_id IN (${campaignIds}) AND m.status = 2
+    GROUP BY campaign_id`);
     const results: { [key: number]: number } = {};
     for (const id of campaignIds.split(",")) {
       results[id] = 0;

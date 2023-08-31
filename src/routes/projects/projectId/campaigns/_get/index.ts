@@ -177,7 +177,9 @@ export default class Route extends ProjectRoute<{
     SELECT campaign_id,COUNT(t.id) as total
           FROM wp_appq_campaign_task t 
           JOIN wp_appq_user_task_media m ON (m.campaign_task_id = t.id)
-          WHERE t.campaign_id IN (${campaignIds}) AND m.status = 2`);
+          WHERE t.campaign_id IN (${campaignIds}) AND m.status = 2
+    GROUP BY campaign_id`);
+    console.log(data);
     const results: { [key: number]: number } = {};
     for (const id of campaignIds.split(",")) {
       results[id] = 0;
