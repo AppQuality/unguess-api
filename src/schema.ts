@@ -95,12 +95,14 @@ export interface paths {
       };
     };
   };
-  "/campaigns/{cId}/findings/{id}": {
-    put: operations["put-insights-id"];
+  "/campaigns/{cId}/findings/{fid}": {
+    put: operations["put-campaigns-cid-findings-fid"];
     parameters: {
       path: {
-        id: string;
-        cId: string;
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+        /** Finding id */
+        fid: string;
       };
     };
   };
@@ -1273,11 +1275,13 @@ export interface operations {
       500: components["responses"]["Error"];
     };
   };
-  "put-insights-id": {
+  "put-campaigns-cid-findings-fid": {
     parameters: {
       path: {
-        id: string;
-        cId: string;
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+        /** Finding id */
+        fid: string;
       };
     };
     responses: {
