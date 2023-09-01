@@ -95,7 +95,7 @@ export interface paths {
       };
     };
   };
-  "/campaigns/{cId}/findings/{fid}": {
+  "/campaigns/{cid}/findings/{fid}": {
     put: operations["put-campaigns-cid-findings-fid"];
     parameters: {
       path: {

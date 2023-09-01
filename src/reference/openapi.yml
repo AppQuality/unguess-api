@@ -605,15 +605,15 @@ paths:
       security:
         - JWT: []
       parameters: []
-  '/campaigns/{cId}/findings/{fid}':
+  '/campaigns/{cid}/findings/{fid}':
     parameters:
       - $ref: '#/components/parameters/cid'
       - schema:
           type: string
         name: fid
         in: path
-        required: true
         description: Finding id
+        required: true
     put:
       summary: ''
       operationId: put-campaigns-cid-findings-fid
@@ -3454,10 +3454,10 @@ components:
     cid:
       name: cid
       in: path
-      required: true
       schema:
         type: string
       description: Campaign id
+      required: true
     bid:
       name: bid
       in: path
