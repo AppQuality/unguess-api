@@ -62,6 +62,38 @@ export default class Route extends CampaignRoute<{
 
   private async saveComment() {
     try {
+      const comment = await unguess.tables.UxFindingComments.do()
+        .select()
+        .where({ campaign_id: this.cp_id })
+        .where({ finding_id: this.findingId })
+        .where({ profile_id: this.getProfileId() });
+
+      if (comment.length) {
+        await this.updateComment();
+      } else {
+        await this.createComment();
+      }
+    } catch (e) {
+      throw Error("Error on fetching comment");
+    }
+  }
+
+  private async updateComment() {
+    try {
+      await unguess.tables.UxFindingComments.do()
+        .update({
+          comment: this.getBody().comment,
+        })
+        .where({ campaign_id: this.cp_id })
+        .where({ finding_id: this.findingId })
+        .where({ profile_id: this.getProfileId() });
+    } catch (e) {
+      throw Error("Error updating comment");
+    }
+  }
+
+  private async createComment() {
+    try {
       await unguess.tables.UxFindingComments.do().insert({
         campaign_id: this.cp_id,
         finding_id: this.findingId,

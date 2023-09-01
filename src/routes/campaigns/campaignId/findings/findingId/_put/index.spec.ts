@@ -74,8 +74,21 @@ describe("PUT /campaigns/:campaignId/findings/:findingId", () => {
         finding_id: 11,
         enabled: 0,
       },
+      {
+        id: 3,
+        campaign_id: 1,
+        version: 1,
+        title: "Finding disabled",
+        description: "Finding description",
+        severity_id: 1,
+        cluster_ids: "all",
+        order: 1,
+        finding_id: 12,
+        enabled: 1,
+      },
     ]);
   });
+
   afterAll(async () => {
     await tryber.tables.WpAppqEvdCampaign.do().delete();
     await tryber.tables.WpAppqUserToCampaign.do().delete();
@@ -83,6 +96,7 @@ describe("PUT /campaigns/:campaignId/findings/:findingId", () => {
     await tryber.tables.WpAppqCustomer.do().delete();
     await tryber.tables.UxCampaignInsights.do().delete();
   });
+
   afterEach(async () => {
     await unguess.tables.UxFindingComments.do().delete();
   });
@@ -177,6 +191,47 @@ describe("PUT /campaigns/:campaignId/findings/:findingId", () => {
             finding_id: 10,
             profile_id: 1,
             comment: "Customer comment",
+          }),
+        ])
+      );
+    });
+
+    //Should update the comment if it already exists for that finding
+    it("Should update the comment if it already exists for that finding", async () => {
+      await unguess.tables.UxFindingComments.do().insert({
+        campaign_id: 1,
+        finding_id: 12,
+        profile_id: 1,
+        comment: "Customer comment",
+      });
+      const comments = await unguess.tables.UxFindingComments.do()
+        .select()
+        .where({ campaign_id: 1 })
+        .where({ finding_id: 12 });
+      console.log(comments);
+      expect(comments).toHaveLength(1);
+
+      const response = await request(app)
+        .put(`/campaigns/1/findings/12`)
+        .set("Authorization", "Bearer user")
+        .send({ comment: "Customer updated comment" });
+      expect(response.status).toBe(200);
+
+      const updatedComments = await unguess.tables.UxFindingComments.do()
+        .select()
+        .where({ campaign_id: 1 })
+        .where({ finding_id: 12 });
+      expect(updatedComments).toHaveLength(1);
+
+      expect(comments[0].comment).not.toEqual(updatedComments[0].comment);
+
+      expect(updatedComments).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            campaign_id: 1,
+            finding_id: 12,
+            profile_id: 1,
+            comment: "Customer updated comment",
           }),
         ])
       );
