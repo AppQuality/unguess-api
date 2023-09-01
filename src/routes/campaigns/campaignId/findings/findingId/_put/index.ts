@@ -68,6 +68,8 @@ export default class Route extends CampaignRoute<{
         comment: this.getBody().comment,
         profile_id: this.getProfileId(),
       });
-    } catch (e) {}
+    } catch (e) {
+      throw Error("Error saving comment");
+    }
   }
 }
