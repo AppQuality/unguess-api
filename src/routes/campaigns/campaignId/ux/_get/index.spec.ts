@@ -163,7 +163,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
         },
       ]);
 
-      await tryber.tables.UxCampaignFindings.do().insert([
+      await tryber.tables.UxCampaignInsights.do().insert([
         {
           id: 1,
           campaign_id: 1,
@@ -274,7 +274,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
     });
     afterAll(async () => {
       await tryber.tables.UxCampaignData.do().delete();
-      await tryber.tables.UxCampaignFindings.do().delete();
+      await tryber.tables.UxCampaignInsights.do().delete();
       await tryber.tables.UxCampaignVideoParts.do().delete();
       await tryber.tables.WpAppqUserTaskMedia.do().delete();
       await tryber.tables.UxCampaignQuestions.do().delete();
@@ -512,7 +512,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
           users: 11,
         },
       ]);
-      await tryber.tables.UxCampaignFindings.do().insert([
+      await tryber.tables.UxCampaignInsights.do().insert([
         {
           id: 1,
           campaign_id: 1,
@@ -659,7 +659,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
 
     afterAll(async () => {
       await tryber.tables.UxCampaignData.do().delete();
-      await tryber.tables.UxCampaignFindings.do().delete();
+      await tryber.tables.UxCampaignInsights.do().delete();
       await tryber.tables.UxCampaignVideoParts.do().delete();
       await tryber.tables.WpAppqUserTaskMedia.do().delete();
       await tryber.tables.UxCampaignQuestions.do().delete();
@@ -1001,7 +1001,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
           users: 11,
         },
       ]);
-      await tryber.tables.UxCampaignFindings.do().insert([
+      await tryber.tables.UxCampaignInsights.do().insert([
         {
           id: 1,
           campaign_id: 1,
@@ -1154,7 +1154,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
 
     afterEach(async () => {
       await tryber.tables.UxCampaignData.do().delete();
-      await tryber.tables.UxCampaignFindings.do().delete();
+      await tryber.tables.UxCampaignInsights.do().delete();
       await tryber.tables.UxCampaignVideoParts.do().delete();
       await tryber.tables.WpAppqUserTaskMedia.do().delete();
       await tryber.tables.UxCampaignQuestions.do().delete();
@@ -1163,7 +1163,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
     });
 
     it("Should raise an error if the insight severity is not known", async () => {
-      await tryber.tables.UxCampaignFindings.do()
+      await tryber.tables.UxCampaignInsights.do()
         .update({
           severity_id: 999,
         })
@@ -1181,7 +1181,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
     });
 
     it("Should return maior if severity has id = 2", async () => {
-      await tryber.tables.UxCampaignFindings.do()
+      await tryber.tables.UxCampaignInsights.do()
         .update({
           severity_id: 2,
         })
@@ -1202,7 +1202,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
     });
 
     it("Should return Positive if severity has id = 3", async () => {
-      await tryber.tables.UxCampaignFindings.do()
+      await tryber.tables.UxCampaignInsights.do()
         .update({
           severity_id: 3,
         })
@@ -1223,7 +1223,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
     });
 
     it("Should return Observation if severity has id = 4", async () => {
-      await tryber.tables.UxCampaignFindings.do()
+      await tryber.tables.UxCampaignInsights.do()
         .update({
           severity_id: 4,
         })

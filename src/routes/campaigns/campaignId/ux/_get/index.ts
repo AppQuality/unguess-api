@@ -99,7 +99,7 @@ export default class Route extends CampaignRoute<{
   }
 
   private async getFindings() {
-    const findings = await tryber.tables.UxCampaignFindings.do()
+    const findings = await tryber.tables.UxCampaignInsights.do()
       .select()
       .where({
         campaign_id: this.cp_id,
