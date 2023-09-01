@@ -56,8 +56,18 @@ export default class Route extends CampaignRoute<{
   }
 
   protected async prepare() {
-    if (this.version) {
-      this.setSuccess(200, {});
-    }
+    await this.saveComment();
+    this.setSuccess(200, {});
+  }
+
+  private async saveComment() {
+    try {
+      await unguess.tables.UxFindingComments.do().insert({
+        campaign_id: this.cp_id,
+        finding_id: this.findingId,
+        comment: this.getBody().comment,
+        profile_id: this.getProfileId(),
+      });
+    } catch (e) {}
   }
 }

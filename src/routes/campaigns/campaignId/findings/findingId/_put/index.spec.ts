@@ -1,5 +1,5 @@
 import app from "@src/app";
-import { tryber } from "@src/features/database";
+import { tryber, unguess } from "@src/features/database";
 import request from "supertest";
 
 const campaign = {
@@ -83,6 +83,9 @@ describe("PUT /campaigns/:campaignId/findings/:findingId", () => {
     await tryber.tables.WpAppqCustomer.do().delete();
     await tryber.tables.UxCampaignInsights.do().delete();
   });
+  afterEach(async () => {
+    await unguess.tables.UxFindingComments.do().delete();
+  });
 
   describe("Permissions", () => {
     beforeAll(async () => {
@@ -146,6 +149,37 @@ describe("PUT /campaigns/:campaignId/findings/:findingId", () => {
         .set("Authorization", "Bearer user")
         .send({ comment: "test" });
       expect(response.status).toBe(404);
+    });
+
+    //Should insert a comment with correct data
+    it("Should insert a comment with correct data", async () => {
+      const comments = await unguess.tables.UxFindingComments.do()
+        .select()
+        .where({ campaign_id: 1 })
+        .where({ finding_id: 10 });
+      expect(comments).toHaveLength(0);
+
+      const response = await request(app)
+        .put(`/campaigns/1/findings/10`)
+        .set("Authorization", "Bearer user")
+        .send({ comment: "Customer comment" });
+      expect(response.status).toBe(200);
+
+      const newComments = await unguess.tables.UxFindingComments.do()
+        .select()
+        .where({ campaign_id: 1 })
+        .where({ finding_id: 10 });
+      expect(newComments).toHaveLength(1);
+      expect(newComments).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            campaign_id: 1,
+            finding_id: 10,
+            profile_id: 1,
+            comment: "Customer comment",
+          }),
+        ])
+      );
     });
   });
 });
