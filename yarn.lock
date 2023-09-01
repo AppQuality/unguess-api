@@ -29,10 +29,10 @@
     knex "^2.5.1"
     mysql "^2.18.1"
 
-"@appquality/unguess-database@^0.8.0":
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/@appquality/unguess-database/-/unguess-database-0.8.0.tgz#6e30d081c7c0c5b27b0a9d6d89fac3a9785e1402"
-  integrity sha512-IITJ9Qc68UdLKg8KqJul77gwugJs+KAvFc06zRfdByChOu2VXevcuAjDmxnm/qJoXCqGvrkD+mvLwQFU7AHKPA==
+"@appquality/unguess-database@^0.9.0":
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/@appquality/unguess-database/-/unguess-database-0.9.0.tgz#d0972189aa2a2ec0b85fb5a0b6fd1c71a31f28f9"
+  integrity sha512-LRWqLYOm1G1ijTLh1bM9IBwIrthEi2Cyae3DoYht59aZ3I/2+I7jUPOgbc4PO1SCpdpdYV0BHBbiWm3a9mqY9g==
   dependencies:
     better-sqlite3 "^8.1.0"
     knex "^2.4.2"
