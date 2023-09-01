@@ -54,13 +54,25 @@ describe("PUT /campaigns/:campaignId/findings/:findingId", () => {
         id: 1,
         campaign_id: 1,
         version: 1,
-        title: "Insight title",
-        description: "Insight description",
+        title: "Finding title",
+        description: "Finding description",
         severity_id: 1,
         cluster_ids: "all",
         order: 1,
         finding_id: 10,
         enabled: 1,
+      },
+      {
+        id: 2,
+        campaign_id: 1,
+        version: 1,
+        title: "Finding disabled",
+        description: "Finding description",
+        severity_id: 1,
+        cluster_ids: "all",
+        order: 1,
+        finding_id: 11,
+        enabled: 0,
       },
     ]);
   });
@@ -125,6 +137,15 @@ describe("PUT /campaigns/:campaignId/findings/:findingId", () => {
         .set("Authorization", "Bearer user")
         .send({ comment: "test" });
       expect(response.status).toBe(200);
+    });
+
+    // Should return 404 if the finding is disabled
+    it("Should return 404 if the finding is disabled", async () => {
+      const response = await request(app)
+        .put(`/campaigns/1/findings/11`)
+        .set("Authorization", "Bearer user")
+        .send({ comment: "test" });
+      expect(response.status).toBe(404);
     });
   });
 });

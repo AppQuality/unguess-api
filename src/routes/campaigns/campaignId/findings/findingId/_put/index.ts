@@ -45,6 +45,7 @@ export default class Route extends CampaignRoute<{
       .where({ campaign_id: this.cp_id })
       .where({ finding_id: this.findingId })
       .where({ version: this.version })
+      .where({ enabled: 1 })
       .first();
     if (!this.version || !finding) {
       this.setError(404, Error("Finding not found") as OpenapiError);
