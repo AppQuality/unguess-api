@@ -255,7 +255,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
           comment: "Comment 2",
         },
       ]);
-      await unguess.tables.UxCampaignFindings.do().insert([
+      await unguess.tables.UxFindingComments.do().insert([
         {
           id: 10,
           finding_id: 10,
@@ -279,7 +279,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
       await tryber.tables.WpAppqUserTaskMedia.do().delete();
       await tryber.tables.UxCampaignQuestions.do().delete();
       await tryber.tables.UxCampaignSentiments.do().delete();
-      await unguess.tables.UxCampaignFindings.do().delete();
+      await unguess.tables.UxFindingComments.do().delete();
     });
     it("Should answer 200 for admin", async () => {
       const response = await request(app)
@@ -639,7 +639,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
           comment: "Comment 2 other CP",
         },
       ]);
-      await unguess.tables.UxCampaignFindings.do().insert([
+      await unguess.tables.UxFindingComments.do().insert([
         {
           id: 1,
           finding_id: 11,
@@ -664,7 +664,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
       await tryber.tables.WpAppqUserTaskMedia.do().delete();
       await tryber.tables.UxCampaignQuestions.do().delete();
       await tryber.tables.UxCampaignSentiments.do().delete();
-      await unguess.tables.UxCampaignFindings.do().delete();
+      await unguess.tables.UxFindingComments.do().delete();
     });
 
     it("Should answer 200 for admin", async () => {
@@ -1051,7 +1051,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
           finding_id: 13,
         },
       ]);
-      await unguess.tables.UxCampaignFindings.do().insert([
+      await unguess.tables.UxFindingComments.do().insert([
         {
           id: 1,
           finding_id: 10,
@@ -1159,7 +1159,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
       await tryber.tables.WpAppqUserTaskMedia.do().delete();
       await tryber.tables.UxCampaignQuestions.do().delete();
       await tryber.tables.UxCampaignSentiments.do().delete();
-      await unguess.tables.UxCampaignFindings.do().delete();
+      await unguess.tables.UxFindingComments.do().delete();
     });
 
     it("Should raise an error if the insight severity is not known", async () => {
