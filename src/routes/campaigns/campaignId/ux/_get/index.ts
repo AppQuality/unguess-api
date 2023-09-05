@@ -1,5 +1,5 @@
 /** OPENAPI-CLASS: get-campaigns-cid-ux */
-import { tryber } from "@src/features/database";
+import { tryber, unguess } from "@src/features/database";
 import CampaignRoute from "@src/features/routes/CampaignRoute";
 import { checkUrl } from "@src/utils/checkUrl";
 
@@ -104,20 +104,32 @@ export default class Route extends CampaignRoute<{
       .where({
         campaign_id: this.cp_id,
         version: this.version,
+        enabled: 1,
       })
       .orderBy("order", "asc");
+
+    const comments = await unguess.tables.UxFindingComments.do()
+      .select()
+      .where({
+        campaign_id: this.cp_id,
+      });
 
     const result = [];
 
     for (const finding of findings) {
+      const comment = comments.find(
+        (c) => c.finding_id === finding.finding_id
+      )?.comment;
+
       result.push({
-        id: finding.id,
+        id: finding.finding_id,
         title: finding.title,
         description: finding.description,
         severity: {
           id: finding.severity_id,
           name: this.getSeverityName(finding.severity_id),
         },
+        ...(comment && { comment }),
         cluster: this.getClusters(finding.cluster_ids),
         video: await this.getVideo(finding),
       });

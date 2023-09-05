@@ -258,236 +258,6 @@ paths:
         - $ref: '#/components/parameters/orderBy'
         - $ref: '#/components/parameters/filterBy'
         - $ref: '#/components/parameters/search'
-  '/campaigns/{cid}/ux':
-    parameters:
-      - name: cid
-        in: path
-        required: true
-        schema:
-          type: string
-        description: Campaign id
-    get:
-      summary: Get UX data
-      tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  version:
-                    type: number
-                  goal:
-                    type: string
-                  users:
-                    type: number
-                  findings:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                        title:
-                          type: string
-                        description:
-                          type: string
-                        severity:
-                          type: object
-                          required:
-                            - id
-                          properties:
-                            id:
-                              type: integer
-                            name:
-                              type: string
-                        cluster:
-                          oneOf:
-                            - type: array
-                              items:
-                                type: object
-                                properties:
-                                  id:
-                                    type: integer
-                                  name:
-                                    type: string
-                                required:
-                                  - id
-                                  - name
-                            - type: string
-                              enum:
-                                - all
-                        video:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              url:
-                                type: string
-                              streamUrl:
-                                type: string
-                              start:
-                                type: integer
-                              end:
-                                type: integer
-                              description:
-                                type: string
-                            required:
-                              - url
-                              - streamUrl
-                              - start
-                              - end
-                      required:
-                        - id
-                        - title
-                        - description
-                        - severity
-                        - cluster
-                  sentiment:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        cluster:
-                          type: object
-                          required:
-                            - id
-                            - name
-                          properties:
-                            id:
-                              type: integer
-                            name:
-                              type: string
-                        value:
-                          type: integer
-                        comment:
-                          type: string
-                      required:
-                        - cluster
-                        - value
-                        - comment
-                  methodology:
-                    type: object
-                    required:
-                      - type
-                      - description
-                    properties:
-                      type:
-                        type: string
-                      description:
-                        type: string
-                  questions:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        text:
-                          type: string
-                      required:
-                        - text
-                required:
-                  - version
-                  - goal
-                  - users
-                  - methodology
-                  - questions
-              examples:
-                Example 1:
-                  value:
-                    version: 1
-                    goal: string
-                    users: 12
-                    methodology:
-                      type: qualitative
-                      description: string
-                    questions:
-                      - text: string
-                    findings:
-                      - id: 18
-                        title: My finding
-                        description: This is a sample finding
-                        severity:
-                          id: 1
-                          name: Minor
-                        cluster:
-                          - id: 1
-                            name: 'UC1: Example'
-                          - all
-                        video:
-                          - url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
-                            streamUrl: 'http://sample.vodobox.net/skate_phantom_flex_4k/skate_phantom_flex_4k.m3u8'
-                            start: 10
-                            end: 20
-                            description: This is a video
-                      - id: 19
-                        title: My finding
-                        description: This is a sample finding
-                        severity:
-                          id: 1
-                          name: Minor
-                        cluster: all
-                        video:
-                          - url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
-                            streamUrl: 'http://sample.vodobox.net/skate_phantom_flex_4k/skate_phantom_flex_4k.m3u8'
-                            start: 10
-                            end: 20
-                            description: This is a video
-                    sentiment:
-                      - cluster:
-                          id: 1
-                          name: 'UC1: Example'
-                        value: 1
-                        comment: comment
-                      - cluster:
-                          id: 2
-                          name: 'UC2: Example 2'
-                        value: 2
-        '400':
-          $ref: '#/components/responses/Error'
-        '403':
-          $ref: '#/components/responses/Error'
-        '404':
-          $ref: '#/components/responses/Error'
-        '500':
-          $ref: '#/components/responses/Error'
-      operationId: get-campaigns-cid-ux
-      description: ''
-      security:
-        - JWT: []
-      parameters:
-        - schema:
-            type: boolean
-          in: query
-          name: showAsCustomer
-  '/campaigns/{cid}/bugTypes':
-    parameters:
-      - $ref: '#/components/parameters/cid'
-    get:
-      summary: Get Campaigns BugTypes
-      tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/BugType'
-              examples: {}
-        '400':
-          $ref: '#/components/responses/Error'
-        '403':
-          $ref: '#/components/responses/Error'
-        '500':
-          $ref: '#/components/responses/Error'
-      operationId: get-campaigns-cid-bug-types
-      description: ''
-      security:
-        - JWT: []
-      parameters: []
   '/campaigns/{cid}/bugs/{bid}':
     parameters:
       - $ref: '#/components/parameters/cid'
@@ -613,34 +383,6 @@ paths:
                   tags: []
       security:
         - JWT: []
-  '/campaigns/{cid}/replicabilities':
-    parameters:
-      - name: cid
-        in: path
-        required: true
-        schema:
-          type: string
-        description: Campaign id
-    get:
-      summary: GET Replicabilities by Campaign
-      tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/BugReplicability'
-        '400':
-          description: Bad Request
-        '403':
-          description: Forbidden
-      operationId: get-campaigns-replicabilities
-      description: Return all accepted replicabilities of a specific campaign
-      security:
-        - JWT: []
   '/campaigns/{cid}/bugs/{bid}/siblings':
     parameters:
       - name: cid
@@ -759,6 +501,137 @@ paths:
       security:
         - JWT: []
       description: ''
+  '/campaigns/{cid}/bugTypes':
+    parameters:
+      - $ref: '#/components/parameters/cid'
+    get:
+      summary: Get Campaigns BugTypes
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BugType'
+              examples: {}
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-bug-types
+      description: ''
+      security:
+        - JWT: []
+      parameters: []
+  '/campaigns/{cid}/custom_statuses':
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Campaign id
+    get:
+      summary: Get Campaigns Priorities
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BugCustomStatus'
+              examples:
+                Example 1:
+                  value:
+                    - id: 1
+                      name: string
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-custom-statuses
+      description: ''
+      security:
+        - JWT: []
+      parameters: []
+  '/campaigns/{cid}/devices':
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Campaign id
+    get:
+      summary: Get Campaigns Bugs Devices
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    device:
+                      type: string
+                  required:
+                    - device
+              examples:
+                Example 1:
+                  value:
+                    - device: Apple iPhone 11
+                    - device: Desktop
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-devices
+      description: ''
+      security:
+        - JWT: []
+      parameters: []
+  '/campaigns/{cid}/findings/{fid}':
+    parameters:
+      - $ref: '#/components/parameters/cid'
+      - schema:
+          type: string
+        name: fid
+        in: path
+        description: Finding id
+        required: true
+    put:
+      summary: ''
+      operationId: put-campaigns-cid-findings-fid
+      responses:
+        '200':
+          description: OK
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment:
+                  type: string
+              required:
+                - comment
   '/campaigns/{cid}/meta':
     parameters:
       - $ref: '#/components/parameters/cid'
@@ -830,6 +703,110 @@ paths:
         - JWT: []
       parameters: []
       description: Used to extra info about a selected campaign
+  '/campaigns/{cid}/os':
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Campaign id
+    get:
+      summary: Get Campaigns Bugs Os
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    os:
+                      type: string
+                  required:
+                    - os
+              examples:
+                Example 1:
+                  value:
+                    - os: iOS 16
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-os
+      description: ''
+      security:
+        - JWT: []
+      parameters: []
+  '/campaigns/{cid}/priorities':
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Campaign id
+    get:
+      summary: Get Campaigns Priorities
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BugPriority'
+              examples:
+                Example 1:
+                  value:
+                    - id: 1
+                      name: string
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-priorities
+      description: ''
+      security:
+        - JWT: []
+      parameters: []
+  '/campaigns/{cid}/replicabilities':
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Campaign id
+    get:
+      summary: GET Replicabilities by Campaign
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BugReplicability'
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+      operationId: get-campaigns-replicabilities
+      description: Return all accepted replicabilities of a specific campaign
+      security:
+        - JWT: []
   '/campaigns/{cid}/reports':
     parameters:
       - $ref: '#/components/parameters/cid'
@@ -849,6 +826,37 @@ paths:
       description: Return all available report of a specific campaign
       security:
         - JWT: []
+  '/campaigns/{cid}/severities':
+    parameters:
+      - $ref: '#/components/parameters/cid'
+    get:
+      summary: Get Campaigns Severities
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BugSeverity'
+              examples:
+                Example 1:
+                  value:
+                    - id: 1
+                      name: string
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-severities
+      description: ''
+      security:
+        - JWT: []
+      parameters: []
   '/campaigns/{cid}/tags':
     parameters:
       - $ref: '#/components/parameters/cid'
@@ -893,190 +901,6 @@ paths:
         '500':
           $ref: '#/components/responses/Error'
       operationId: get-campaigns-cid-tags
-      description: ''
-      security:
-        - JWT: []
-      parameters: []
-  '/campaigns/{cid}/devices':
-    parameters:
-      - name: cid
-        in: path
-        required: true
-        schema:
-          type: string
-        description: Campaign id
-    get:
-      summary: Get Campaigns Bugs Devices
-      tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    device:
-                      type: string
-                  required:
-                    - device
-              examples:
-                Example 1:
-                  value:
-                    - device: Apple iPhone 11
-                    - device: Desktop
-        '400':
-          $ref: '#/components/responses/Error'
-        '403':
-          $ref: '#/components/responses/Error'
-        '500':
-          $ref: '#/components/responses/Error'
-      operationId: get-campaigns-cid-devices
-      description: ''
-      security:
-        - JWT: []
-      parameters: []
-  '/campaigns/{cid}/os':
-    parameters:
-      - name: cid
-        in: path
-        required: true
-        schema:
-          type: string
-        description: Campaign id
-    get:
-      summary: Get Campaigns Bugs Os
-      tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    os:
-                      type: string
-                  required:
-                    - os
-              examples:
-                Example 1:
-                  value:
-                    - os: iOS 16
-        '400':
-          $ref: '#/components/responses/Error'
-        '403':
-          $ref: '#/components/responses/Error'
-        '500':
-          $ref: '#/components/responses/Error'
-      operationId: get-campaigns-cid-os
-      description: ''
-      security:
-        - JWT: []
-      parameters: []
-  '/campaigns/{cid}/severities':
-    parameters:
-      - $ref: '#/components/parameters/cid'
-    get:
-      summary: Get Campaigns Severities
-      tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/BugSeverity'
-              examples:
-                Example 1:
-                  value:
-                    - id: 1
-                      name: string
-        '400':
-          $ref: '#/components/responses/Error'
-        '403':
-          $ref: '#/components/responses/Error'
-        '500':
-          $ref: '#/components/responses/Error'
-      operationId: get-campaigns-cid-severities
-      description: ''
-      security:
-        - JWT: []
-      parameters: []
-  '/campaigns/{cid}/priorities':
-    parameters:
-      - name: cid
-        in: path
-        required: true
-        schema:
-          type: string
-        description: Campaign id
-    get:
-      summary: Get Campaigns Priorities
-      tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/BugPriority'
-              examples:
-                Example 1:
-                  value:
-                    - id: 1
-                      name: string
-        '400':
-          $ref: '#/components/responses/Error'
-        '403':
-          $ref: '#/components/responses/Error'
-        '500':
-          $ref: '#/components/responses/Error'
-      operationId: get-campaigns-cid-priorities
-      description: ''
-      security:
-        - JWT: []
-      parameters: []
-  '/campaigns/{cid}/custom_statuses':
-    parameters:
-      - name: cid
-        in: path
-        required: true
-        schema:
-          type: string
-        description: Campaign id
-    get:
-      summary: Get Campaigns Priorities
-      tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/BugCustomStatus'
-              examples:
-                Example 1:
-                  value:
-                    - id: 1
-                      name: string
-        '400':
-          $ref: '#/components/responses/Error'
-        '403':
-          $ref: '#/components/responses/Error'
-        '500':
-          $ref: '#/components/responses/Error'
-      operationId: get-campaigns-cid-custom-statuses
       description: ''
       security:
         - JWT: []
@@ -1138,53 +962,6 @@ paths:
       security:
         - JWT: []
       parameters: []
-  '/campaigns/{cid}/widgets':
-    parameters:
-      - $ref: '#/components/parameters/cid'
-    get:
-      summary: Get Campaign widget data
-      tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/WidgetBugsByUseCase'
-                  - $ref: '#/components/schemas/WidgetBugsByDevice'
-                  - $ref: '#/components/schemas/WidgetCampaignProgress'
-                  - $ref: '#/components/schemas/WidgetCampaignUniqueBugs'
-                  - $ref: '#/components/schemas/WidgetBugsByDuplicates'
-              examples:
-                Bugs by UseCase:
-                  value:
-                    data:
-                      - title:
-                          full: UC1 asd
-                        description: string
-                        bugs: 10
-                        uniqueBugs: 8
-                        usecase_id: 1220
-                    kind: bugsByUseCase
-        '400':
-          $ref: '#/components/responses/Error'
-        '401':
-          $ref: '#/components/responses/Error'
-        '403':
-          $ref: '#/components/responses/Error'
-        '500':
-          $ref: '#/components/responses/Error'
-      operationId: get-campaigns-cid-widgets-wslug
-      security:
-        - JWT: []
-      parameters:
-        - $ref: '#/components/parameters/wslug'
-        - schema:
-            type: boolean
-          in: query
-          name: updateTrend
-          description: should update bug trend after request resolves?
   '/campaigns/{cid}/users':
     get:
       summary: Retrieve users of a specific workspace
@@ -1319,6 +1096,255 @@ paths:
                   description: Tryber WP USER ID
               required:
                 - user_id
+  '/campaigns/{cid}/ux':
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Campaign id
+    get:
+      summary: Get UX data
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: number
+                  goal:
+                    type: string
+                  users:
+                    type: number
+                  findings:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: this field is the Finding ID
+                        title:
+                          type: string
+                        description:
+                          type: string
+                        comment:
+                          type: string
+                        severity:
+                          type: object
+                          required:
+                            - id
+                          properties:
+                            id:
+                              type: integer
+                            name:
+                              type: string
+                        cluster:
+                          oneOf:
+                            - type: array
+                              items:
+                                type: object
+                                properties:
+                                  id:
+                                    type: integer
+                                  name:
+                                    type: string
+                                required:
+                                  - id
+                                  - name
+                            - type: string
+                              enum:
+                                - all
+                        video:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              url:
+                                type: string
+                              streamUrl:
+                                type: string
+                              start:
+                                type: integer
+                              end:
+                                type: integer
+                              description:
+                                type: string
+                            required:
+                              - url
+                              - streamUrl
+                              - start
+                              - end
+                      required:
+                        - id
+                        - title
+                        - description
+                        - severity
+                        - cluster
+                  sentiment:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        cluster:
+                          type: object
+                          required:
+                            - id
+                            - name
+                          properties:
+                            id:
+                              type: integer
+                            name:
+                              type: string
+                        value:
+                          type: integer
+                      required:
+                        - cluster
+                        - value
+                  methodology:
+                    type: object
+                    required:
+                      - type
+                      - description
+                    properties:
+                      type:
+                        type: string
+                      description:
+                        type: string
+                  questions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        text:
+                          type: string
+                      required:
+                        - text
+                required:
+                  - version
+                  - goal
+                  - users
+                  - methodology
+                  - questions
+              examples:
+                Example 1:
+                  value:
+                    version: 1
+                    goal: string
+                    users: 12
+                    methodology:
+                      type: qualitative
+                      description: string
+                    questions:
+                      - text: string
+                    findings:
+                      - id: 18
+                        title: My finding
+                        description: This is a sample finding
+                        severity:
+                          id: 1
+                          name: Minor
+                        cluster:
+                          - id: 1
+                            name: 'UC1: Example'
+                          - all
+                        video:
+                          - url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
+                            streamUrl: 'http://sample.vodobox.net/skate_phantom_flex_4k/skate_phantom_flex_4k.m3u8'
+                            start: 10
+                            end: 20
+                            description: This is a video
+                      - id: 19
+                        title: My finding
+                        description: This is a sample finding
+                        severity:
+                          id: 1
+                          name: Minor
+                        cluster: all
+                        video:
+                          - url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
+                            streamUrl: 'http://sample.vodobox.net/skate_phantom_flex_4k/skate_phantom_flex_4k.m3u8'
+                            start: 10
+                            end: 20
+                            description: This is a video
+                    sentiment:
+                      - cluster:
+                          id: 1
+                          name: 'UC1: Example'
+                        value: 1
+                      - cluster:
+                          id: 2
+                          name: 'UC2: Example 2'
+                        value: 2
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-ux
+      description: ''
+      security:
+        - JWT: []
+      parameters:
+        - schema:
+            type: boolean
+          in: query
+          name: showAsCustomer
+  '/campaigns/{cid}/widgets':
+    parameters:
+      - $ref: '#/components/parameters/cid'
+    get:
+      summary: Get Campaign widget data
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/WidgetBugsByUseCase'
+                  - $ref: '#/components/schemas/WidgetBugsByDevice'
+                  - $ref: '#/components/schemas/WidgetCampaignProgress'
+                  - $ref: '#/components/schemas/WidgetCampaignUniqueBugs'
+                  - $ref: '#/components/schemas/WidgetBugsByDuplicates'
+              examples:
+                Bugs by UseCase:
+                  value:
+                    data:
+                      - title:
+                          full: UC1 asd
+                        description: string
+                        bugs: 10
+                        uniqueBugs: 8
+                        usecase_id: 1220
+                    kind: bugsByUseCase
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-widgets-wslug
+      security:
+        - JWT: []
+      parameters:
+        - $ref: '#/components/parameters/wslug'
+        - schema:
+            type: boolean
+          in: query
+          name: updateTrend
+          description: should update bug trend after request resolves?
   /projects:
     post:
       summary: Create a new project
@@ -1925,6 +1951,119 @@ paths:
         - Workspaces
     parameters:
       - $ref: '#/components/parameters/wid'
+  '/workspaces/{wid}/projects':
+    parameters:
+      - $ref: '#/components/parameters/wid'
+    get:
+      summary: GET Workspace Projects
+      tags:
+        - Workspaces
+        - Projects
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Project'
+                  start:
+                    type: integer
+                  limit:
+                    type: integer
+                  size:
+                    type: integer
+                  total:
+                    type: integer
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-workspace-projects
+      security:
+        - JWT: []
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
+  '/workspaces/{wid}/projects/{pid}':
+    parameters:
+      - $ref: '#/components/parameters/wid'
+      - $ref: '#/components/parameters/pid'
+    get:
+      summary: GET Workspace single project
+      tags:
+        - Workspaces
+        - Projects
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-workspace-project
+      security:
+        - JWT: []
+  '/workspaces/{wid}/projects/{pid}/campaigns':
+    parameters:
+      - $ref: '#/components/parameters/wid'
+      - $ref: '#/components/parameters/pid'
+    get:
+      summary: GET Workspace Project campaigns
+      tags:
+        - Projects
+        - Workspaces
+        - Campaigns
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CampaignWithOutput'
+                  start:
+                    type: integer
+                  limit:
+                    type: integer
+                  size:
+                    type: integer
+                  total:
+                    type: integer
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-workspace-project-campaigns
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
+      security:
+        - JWT: []
   '/workspaces/{wid}/users':
     get:
       summary: Retrieve users of a specific workspace
@@ -2061,119 +2200,6 @@ paths:
                   type: boolean
               required:
                 - user_id
-  '/workspaces/{wid}/projects':
-    parameters:
-      - $ref: '#/components/parameters/wid'
-    get:
-      summary: GET Workspace Projects
-      tags:
-        - Workspaces
-        - Projects
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Project'
-                  start:
-                    type: integer
-                  limit:
-                    type: integer
-                  size:
-                    type: integer
-                  total:
-                    type: integer
-        '400':
-          $ref: '#/components/responses/Error'
-        '403':
-          $ref: '#/components/responses/Error'
-        '404':
-          $ref: '#/components/responses/Error'
-        '500':
-          $ref: '#/components/responses/Error'
-      operationId: get-workspace-projects
-      security:
-        - JWT: []
-      parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/start'
-  '/workspaces/{wid}/projects/{pid}':
-    parameters:
-      - $ref: '#/components/parameters/wid'
-      - $ref: '#/components/parameters/pid'
-    get:
-      summary: GET Workspace single project
-      tags:
-        - Workspaces
-        - Projects
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Project'
-        '400':
-          $ref: '#/components/responses/Error'
-        '403':
-          $ref: '#/components/responses/Error'
-        '404':
-          $ref: '#/components/responses/Error'
-        '500':
-          $ref: '#/components/responses/Error'
-      operationId: get-workspace-project
-      security:
-        - JWT: []
-  '/workspaces/{wid}/projects/{pid}/campaigns':
-    parameters:
-      - $ref: '#/components/parameters/wid'
-      - $ref: '#/components/parameters/pid'
-    get:
-      summary: GET Workspace Project campaigns
-      tags:
-        - Projects
-        - Workspaces
-        - Campaigns
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/CampaignWithOutput'
-                  start:
-                    type: integer
-                  limit:
-                    type: integer
-                  size:
-                    type: integer
-                  total:
-                    type: integer
-        '400':
-          $ref: '#/components/responses/Error'
-        '403':
-          $ref: '#/components/responses/Error'
-        '404':
-          $ref: '#/components/responses/Error'
-        '500':
-          $ref: '#/components/responses/Error'
-      operationId: get-workspace-project-campaigns
-      parameters:
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/start'
-      security:
-        - JWT: []
 components:
   schemas:
     Authentication:
@@ -2341,6 +2367,17 @@ components:
       required:
         - options
         - kind
+    BugCustomStatus:
+      title: BugCustomStatus
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
     BugMedia:
       title: BugMedia
       type: object
@@ -2368,6 +2405,17 @@ components:
         - mime_type
         - url
         - creation_date
+    BugPriority:
+      title: BugPriority
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
     BugReplicability:
       title: BugReplicability
       type: object
@@ -2392,28 +2440,6 @@ components:
         - name
     BugStatus:
       title: BugStatus
-      type: object
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-      required:
-        - id
-        - name
-    BugPriority:
-      title: BugPriority
-      type: object
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-      required:
-        - id
-        - name
-    BugCustomStatus:
-      title: BugCustomStatus
       type: object
       properties:
         id:
@@ -2965,136 +2991,6 @@ components:
         - profile_id
         - tryber_wp_user_id
         - unguess_wp_user_id
-    Workspace:
-      title: Workspace
-      type: object
-      x-examples:
-        Single Workspace:
-          id: 0
-          company: Scrofalo & Co.
-          tokens: 0
-          logo: string
-          csm:
-            email: user@example.com
-            role: string
-            name: Teomondo Scrofalo
-            workspaces: []
-            picture: 'https://pbs.twimg.com/media/Ccp6RXFWIAAQQ2V.jpg'
-      description: A workspace is the company area with projects and campaigns
-      properties:
-        id:
-          type: integer
-        company:
-          type: string
-        tokens:
-          type: number
-        logo:
-          type: string
-        csm:
-          type: object
-          required:
-            - id
-            - email
-            - name
-            - profile_id
-            - tryber_wp_user_id
-          properties:
-            id:
-              type: integer
-            email:
-              type: string
-            name:
-              type: string
-            profile_id:
-              type: integer
-            tryber_wp_user_id:
-              type: integer
-            picture:
-              type: string
-            url:
-              type: string
-        coins:
-          type: number
-          description: express coins
-        isShared:
-          type: boolean
-          description: Do this workspace have shared items?
-        sharedItems:
-          type: number
-          description: Number of shared items
-      required:
-        - id
-        - company
-        - tokens
-        - csm
-      x-tags:
-        - workspace
-    WidgetBugsByUseCase:
-      title: WidgetBugsByUseCase
-      type: object
-      x-examples:
-        Example 1:
-          data:
-            - title:
-                full: Navigazione Sito
-              description: aasdasdsa
-              uniqueBugs: 10
-              bugs: 12
-            - title:
-                full: Homepage
-              description: aasdasdsa
-              uniqueBugs: 1
-              bugs: 3
-            - title:
-                full: Product List
-              description: lorem ipsum
-              uniqueBugs: 0
-              bugs: 0
-          kind: bugsByUseCase
-      description: Returns a list of use case with the number of bugs
-      properties:
-        data:
-          type: array
-          items:
-            type: object
-            properties:
-              title:
-                type: object
-                required:
-                  - full
-                properties:
-                  full:
-                    type: string
-                  simple:
-                    type: string
-                  prefix:
-                    type: string
-                  info:
-                    type: string
-              description:
-                type: string
-              uniqueBugs:
-                type: number
-              bugs:
-                type: number
-              usecase_completion:
-                type: number
-              usecase_id:
-                type: number
-            required:
-              - title
-              - description
-              - bugs
-              - usecase_id
-        kind:
-          type: string
-          enum:
-            - bugsByUseCase
-          default: bugsByUseCase
-          example: bugsByUseCase
-      required:
-        - data
-        - kind
     WidgetBugsByDevice:
       title: WidgetBugsByDevice
       type: object
@@ -3245,6 +3141,72 @@ components:
       required:
         - data
         - kind
+    WidgetBugsByUseCase:
+      title: WidgetBugsByUseCase
+      type: object
+      x-examples:
+        Example 1:
+          data:
+            - title:
+                full: Navigazione Sito
+              description: aasdasdsa
+              uniqueBugs: 10
+              bugs: 12
+            - title:
+                full: Homepage
+              description: aasdasdsa
+              uniqueBugs: 1
+              bugs: 3
+            - title:
+                full: Product List
+              description: lorem ipsum
+              uniqueBugs: 0
+              bugs: 0
+          kind: bugsByUseCase
+      description: Returns a list of use case with the number of bugs
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              title:
+                type: object
+                required:
+                  - full
+                properties:
+                  full:
+                    type: string
+                  simple:
+                    type: string
+                  prefix:
+                    type: string
+                  info:
+                    type: string
+              description:
+                type: string
+              uniqueBugs:
+                type: number
+              bugs:
+                type: number
+              usecase_completion:
+                type: number
+              usecase_id:
+                type: number
+            required:
+              - title
+              - description
+              - bugs
+              - usecase_id
+        kind:
+          type: string
+          enum:
+            - bugsByUseCase
+          default: bugsByUseCase
+          example: bugsByUseCase
+      required:
+        - data
+        - kind
     WidgetCampaignProgress:
       title: WidgetCampaignProgress
       type: object
@@ -3333,6 +3295,70 @@ components:
       required:
         - data
         - kind
+    Workspace:
+      title: Workspace
+      type: object
+      x-examples:
+        Single Workspace:
+          id: 0
+          company: Scrofalo & Co.
+          tokens: 0
+          logo: string
+          csm:
+            email: user@example.com
+            role: string
+            name: Teomondo Scrofalo
+            workspaces: []
+            picture: 'https://pbs.twimg.com/media/Ccp6RXFWIAAQQ2V.jpg'
+      description: A workspace is the company area with projects and campaigns
+      properties:
+        id:
+          type: integer
+        company:
+          type: string
+        tokens:
+          type: number
+        logo:
+          type: string
+        csm:
+          type: object
+          required:
+            - id
+            - email
+            - name
+            - profile_id
+            - tryber_wp_user_id
+          properties:
+            id:
+              type: integer
+            email:
+              type: string
+            name:
+              type: string
+            profile_id:
+              type: integer
+            tryber_wp_user_id:
+              type: integer
+            picture:
+              type: string
+            url:
+              type: string
+        coins:
+          type: number
+          description: express coins
+        isShared:
+          type: boolean
+          description: Do this workspace have shared items?
+        sharedItems:
+          type: number
+          description: Number of shared items
+      required:
+        - id
+        - company
+        - tokens
+        - csm
+      x-tags:
+        - workspace
     Tenant:
       title: Tenant
       type: object
@@ -3428,10 +3454,10 @@ components:
     cid:
       name: cid
       in: path
-      required: true
       schema:
         type: string
       description: Campaign id
+      required: true
     bid:
       name: bid
       in: path
