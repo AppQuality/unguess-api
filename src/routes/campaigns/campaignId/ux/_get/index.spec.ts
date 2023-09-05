@@ -1,5 +1,5 @@
 import app from "@src/app";
-import { tryber } from "@src/features/database";
+import { tryber, unguess } from "@src/features/database";
 import request from "supertest";
 
 const campaign = {
@@ -61,6 +61,12 @@ describe("GET /campaigns/:campaignId/ux", () => {
         campaign_id: 1,
         title: "Cluster 2",
         subtitle: "",
+      },
+      {
+        id: 3,
+        campaign_id: 1,
+        title: "Cluster 3",
+        subtitle: "subtitle",
       },
     ]);
   });
@@ -173,6 +179,8 @@ describe("GET /campaigns/:campaignId/ux", () => {
           severity_id: 1,
           cluster_ids: "0",
           order: 2,
+          finding_id: 10,
+          enabled: 1,
         },
         {
           id: 2,
@@ -183,6 +191,8 @@ describe("GET /campaigns/:campaignId/ux", () => {
           severity_id: 2,
           cluster_ids: "1,2",
           order: 1,
+          finding_id: 11,
+          enabled: 1,
         },
         {
           id: 3,
@@ -193,6 +203,20 @@ describe("GET /campaigns/:campaignId/ux", () => {
           severity_id: 3,
           cluster_ids: "0",
           order: 0,
+          finding_id: 12,
+          enabled: 1,
+        },
+        {
+          id: 4,
+          campaign_id: 1,
+          version: 1,
+          title: "Insight disabled",
+          description: "Insight description",
+          severity_id: 3,
+          cluster_ids: "0",
+          order: 0,
+          finding_id: 13,
+          enabled: 0,
         },
       ]);
       await tryber.tables.UxCampaignVideoParts.do().insert([
@@ -234,7 +258,30 @@ describe("GET /campaigns/:campaignId/ux", () => {
           version: 1,
           cluster_id: 2,
           value: 5,
-          comment: "Comment 1",
+          comment: "Comment 2",
+        },
+        {
+          campaign_id: 1,
+          version: 1,
+          cluster_id: 3,
+          value: 4,
+          comment: "Comment 3",
+        },
+      ]);
+      await unguess.tables.UxFindingComments.do().insert([
+        {
+          id: 10,
+          finding_id: 10,
+          campaign_id: 1,
+          comment: "Comment finding10",
+          profile_id: 1,
+        },
+        {
+          id: 11,
+          finding_id: 11,
+          campaign_id: 1,
+          comment: "Comment finding11",
+          profile_id: 1,
         },
       ]);
     });
@@ -245,6 +292,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
       await tryber.tables.WpAppqUserTaskMedia.do().delete();
       await tryber.tables.UxCampaignQuestions.do().delete();
       await tryber.tables.UxCampaignSentiments.do().delete();
+      await unguess.tables.UxFindingComments.do().delete();
     });
     it("Should answer 200 for admin", async () => {
       const response = await request(app)
@@ -265,6 +313,26 @@ describe("GET /campaigns/:campaignId/ux", () => {
       expect(response.status).toBe(404);
     });
 
+    it("Should return only the enabled findings", async () => {
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer admin");
+      expect(response.body).toHaveProperty("findings");
+      expect(response.body.findings).toHaveLength(3);
+      expect(response.body.findings).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 10,
+          }),
+          expect.objectContaining({
+            id: 11,
+          }),
+          expect.objectContaining({
+            id: 12,
+          }),
+        ])
+      );
+    });
     it("Should return the findings for last draft", async () => {
       const response = await request(app)
         .get(`/campaigns/1/ux`)
@@ -368,6 +436,46 @@ describe("GET /campaigns/:campaignId/ux", () => {
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty("sentiment");
+      expect(response.body.sentiment).toHaveLength(3);
+
+      expect(response.body.sentiment).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            cluster: {
+              id: 1,
+              name: "Cluster 1",
+            },
+            value: 1,
+            comment: "Comment 1",
+          }),
+          expect.objectContaining({
+            cluster: {
+              id: 2,
+              name: "Cluster 2",
+            },
+            value: 5,
+            comment: "Comment 2",
+          }),
+          expect.objectContaining({
+            cluster: {
+              id: 3,
+              name: "Cluster 3",
+            },
+            value: 4,
+            comment: "Comment 3",
+          }),
+        ])
+      );
+    });
+
+    it("Should return the sentiments if exist the cluster", async () => {
+      await tryber.tables.WpAppqUsecaseCluster.do().delete().where({ id: 3 });
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer admin");
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty("sentiment");
       expect(response.body.sentiment).toHaveLength(2);
 
       expect(response.body.sentiment).toEqual(
@@ -378,6 +486,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
               name: "Cluster 1",
             },
             value: 1,
+            comment: "Comment 1",
           }),
           expect.objectContaining({
             cluster: {
@@ -385,9 +494,59 @@ describe("GET /campaigns/:campaignId/ux", () => {
               name: "Cluster 2",
             },
             value: 5,
+            comment: "Comment 2",
+          }),
+          expect.not.objectContaining({
+            cluster: {
+              id: 2,
+              name: "Cluster 3",
+            },
+            value: 4,
+            comment: "Comment 3",
           }),
         ])
       );
+    });
+
+    it("Should return the correct findings_ids for each finding", async () => {
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer admin");
+      expect(response.body).toHaveProperty("findings");
+      expect(response.body.findings).toHaveLength(3);
+
+      expect(response.body.findings).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 10,
+          }),
+          expect.objectContaining({
+            id: 11,
+          }),
+          expect.objectContaining({
+            id: 12,
+          }),
+        ])
+      );
+    });
+    it("Should return the all comments for each finding", async () => {
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer admin");
+
+      expect(response.body.findings).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 10,
+            comment: "Comment finding10",
+          }),
+          expect.objectContaining({
+            id: 11,
+            comment: "Comment finding11",
+          }),
+        ])
+      );
+      expect(response.body.findings[0]).not.toHaveProperty("comment");
     });
   });
 
@@ -403,8 +562,6 @@ describe("GET /campaigns/:campaignId/ux", () => {
           goal: "Goal",
           users: 10,
         },
-      ]);
-      await tryber.tables.UxCampaignData.do().insert([
         {
           campaign_id: 1,
           version: 2,
@@ -425,6 +582,8 @@ describe("GET /campaigns/:campaignId/ux", () => {
           severity_id: 1,
           cluster_ids: "0",
           order: 0,
+          finding_id: 10,
+          enabled: 1,
         },
         {
           id: 2,
@@ -435,6 +594,8 @@ describe("GET /campaigns/:campaignId/ux", () => {
           severity_id: 1,
           cluster_ids: "1,2",
           order: 1,
+          finding_id: 11,
+          enabled: 1,
         },
         {
           id: 3,
@@ -445,6 +606,8 @@ describe("GET /campaigns/:campaignId/ux", () => {
           severity_id: 1,
           cluster_ids: "0",
           order: 0,
+          finding_id: 12,
+          enabled: 1,
         },
       ]);
       await tryber.tables.UxCampaignQuestions.do().insert([
@@ -528,6 +691,29 @@ describe("GET /campaigns/:campaignId/ux", () => {
           value: 4,
           comment: "Comment 2 draft-modified",
         },
+        {
+          campaign_id: 2,
+          version: 1,
+          cluster_id: 1,
+          value: 2,
+          comment: "Comment 2 other CP",
+        },
+      ]);
+      await unguess.tables.UxFindingComments.do().insert([
+        {
+          id: 1,
+          finding_id: 11,
+          campaign_id: 1,
+          comment: "Comment finding11",
+          profile_id: 1,
+        },
+        {
+          id: 2,
+          finding_id: 12,
+          campaign_id: 1,
+          comment: "Comment finding12",
+          profile_id: 1,
+        },
       ]);
     });
 
@@ -538,6 +724,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
       await tryber.tables.WpAppqUserTaskMedia.do().delete();
       await tryber.tables.UxCampaignQuestions.do().delete();
       await tryber.tables.UxCampaignSentiments.do().delete();
+      await unguess.tables.UxFindingComments.do().delete();
     });
 
     it("Should answer 200 for admin", async () => {
@@ -638,6 +825,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
               name: "Cluster 1",
             },
             value: 1,
+            comment: "Comment 1",
           }),
           expect.objectContaining({
             cluster: {
@@ -645,6 +833,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
               name: "Cluster 2",
             },
             value: 5,
+            comment: "Comment 2",
           }),
         ])
       );
@@ -810,6 +999,44 @@ describe("GET /campaigns/:campaignId/ux", () => {
         })
       );
     });
+
+    it("Should return the correct findings_ids for each finding", async () => {
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer admin");
+      expect(response.body).toHaveProperty("findings");
+      expect(response.body.findings).toHaveLength(2);
+
+      expect(response.body.findings).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 11,
+          }),
+          expect.objectContaining({
+            id: 12,
+          }),
+        ])
+      );
+    });
+
+    it("Should return the all comments for each finding", async () => {
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer admin");
+
+      expect(response.body.findings).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 11,
+            comment: "Comment finding11",
+          }),
+          expect.objectContaining({
+            id: 12,
+            comment: "Comment finding12",
+          }),
+        ])
+      );
+    });
   });
 
   describe("Edge cases with published", () => {
@@ -844,6 +1071,8 @@ describe("GET /campaigns/:campaignId/ux", () => {
           severity_id: 1,
           cluster_ids: "0",
           order: 0,
+          enabled: 1,
+          finding_id: 10,
         },
         {
           id: 2,
@@ -854,6 +1083,8 @@ describe("GET /campaigns/:campaignId/ux", () => {
           severity_id: 1,
           cluster_ids: "1,2",
           order: 1,
+          enabled: 1,
+          finding_id: 11,
         },
         {
           id: 3,
@@ -864,6 +1095,37 @@ describe("GET /campaigns/:campaignId/ux", () => {
           severity_id: 1,
           cluster_ids: "0",
           order: 0,
+          enabled: 1,
+          finding_id: 12,
+        },
+        {
+          id: 4,
+          campaign_id: 1,
+          version: 1,
+          title: "First version",
+          description: "",
+          severity_id: 1,
+          cluster_ids: "0",
+          order: 0,
+          enabled: 0,
+          finding_id: 13,
+        },
+      ]);
+      await unguess.tables.UxFindingComments.do().insert([
+        {
+          id: 1,
+          finding_id: 10,
+          campaign_id: 1,
+          comment: "Comment finding10",
+          profile_id: 1,
+        },
+
+        {
+          id: 2,
+          finding_id: 13,
+          campaign_id: 1,
+          comment: "Comment finding disabled",
+          profile_id: 1,
         },
       ]);
       await tryber.tables.UxCampaignQuestions.do().insert([
@@ -957,6 +1219,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
       await tryber.tables.WpAppqUserTaskMedia.do().delete();
       await tryber.tables.UxCampaignQuestions.do().delete();
       await tryber.tables.UxCampaignSentiments.do().delete();
+      await unguess.tables.UxFindingComments.do().delete();
     });
 
     it("Should raise an error if the insight severity is not known", async () => {
@@ -1037,6 +1300,66 @@ describe("GET /campaigns/:campaignId/ux", () => {
         expect.objectContaining({
           severity: { id: 4, name: "Observation" },
         })
+      );
+    });
+
+    it("Should return only the enabled findings", async () => {
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer user");
+      expect(response.body).toHaveProperty("findings");
+      expect(response.body.findings).toHaveLength(1);
+      expect(response.body.findings).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 10,
+          }),
+        ])
+      );
+    });
+
+    it("Should return the correct findings_ids for each finding", async () => {
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer user");
+      expect(response.body).toHaveProperty("findings");
+      expect(response.body.findings).toHaveLength(1);
+
+      expect(response.body.findings).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            cluster: "all",
+            comment: "Comment finding10",
+            description: "",
+            id: 10,
+            severity: { id: 1, name: "Minor" },
+            title: "First version",
+            video: [
+              {
+                description: "First version",
+                end: 0,
+                start: 0,
+                streamUrl: "",
+                url: "https://s3-eu-west-1.amazonaws.com/appq.use-case-media/CP3461/UC8794/T19095/ebf00412a1bc3fd33fddd52962cf80e6853a10d5_1625090207.mp4",
+              },
+            ],
+          }),
+        ])
+      );
+    });
+
+    it("Should return the all comments for each enabled finding", async () => {
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer user");
+
+      expect(response.body.findings).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 10,
+            comment: "Comment finding10",
+          }),
+        ])
       );
     });
   });
