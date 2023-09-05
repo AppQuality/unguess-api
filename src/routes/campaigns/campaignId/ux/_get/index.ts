@@ -107,6 +107,7 @@ export default class Route extends CampaignRoute<{
         enabled: 1,
       })
       .orderBy("order", "asc");
+
     const comments = await unguess.tables.UxFindingComments.do()
       .select()
       .where({
@@ -128,7 +129,7 @@ export default class Route extends CampaignRoute<{
           id: finding.severity_id,
           name: this.getSeverityName(finding.severity_id),
         },
-        comment: comment ? comment : undefined,
+        ...(comment && { comment }),
         cluster: this.getClusters(finding.cluster_ids),
         video: await this.getVideo(finding),
       });

@@ -306,7 +306,6 @@ describe("GET /campaigns/:campaignId/ux", () => {
         .set("Authorization", "Bearer admin");
       expect(response.body).toHaveProperty("findings");
       expect(response.body.findings).toHaveLength(3);
-      console.log(response.body.findings);
       expect(response.body.findings).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
@@ -963,7 +962,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
       const response = await request(app)
         .get(`/campaigns/1/ux`)
         .set("Authorization", "Bearer admin");
-      console.log(response.body.findings);
+
       expect(response.body.findings).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
@@ -1249,7 +1248,6 @@ describe("GET /campaigns/:campaignId/ux", () => {
         .set("Authorization", "Bearer user");
       expect(response.body).toHaveProperty("findings");
       expect(response.body.findings).toHaveLength(1);
-      console.log(response.body.findings);
       expect(response.body.findings).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
