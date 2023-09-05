@@ -53,7 +53,7 @@ describe("PUT /campaigns/:campaignId/findings/:findingId", () => {
       {
         id: 1,
         campaign_id: 1,
-        version: 1,
+        version: 3,
         title: "Finding title",
         description: "Finding description",
         severity_id: 1,
@@ -65,7 +65,7 @@ describe("PUT /campaigns/:campaignId/findings/:findingId", () => {
       {
         id: 2,
         campaign_id: 1,
-        version: 1,
+        version: 3,
         title: "Finding disabled",
         description: "Finding description",
         severity_id: 1,
@@ -77,7 +77,7 @@ describe("PUT /campaigns/:campaignId/findings/:findingId", () => {
       {
         id: 3,
         campaign_id: 1,
-        version: 1,
+        version: 3,
         title: "Finding disabled",
         description: "Finding description",
         severity_id: 1,
@@ -106,7 +106,7 @@ describe("PUT /campaigns/:campaignId/findings/:findingId", () => {
       await tryber.tables.UxCampaignData.do().insert([
         {
           campaign_id: 1,
-          version: 1,
+          version: 3,
           published: 1,
         },
       ]);
@@ -208,7 +208,7 @@ describe("PUT /campaigns/:campaignId/findings/:findingId", () => {
         .select()
         .where({ campaign_id: 1 })
         .where({ finding_id: 12 });
-      console.log(comments);
+
       expect(comments).toHaveLength(1);
 
       const response = await request(app)
@@ -236,5 +236,26 @@ describe("PUT /campaigns/:campaignId/findings/:findingId", () => {
         ])
       );
     });
-  });
+
+    it("Should answer 200 with the finding comment even if there are other old version published", async () => {
+      await tryber.tables.UxCampaignData.do().insert([
+        {
+          campaign_id: 1,
+          version: 1,
+          published: 1,
+        },
+        {
+          campaign_id: 1,
+          version: 2,
+          published: 1,
+        },
+      ]);
+
+      const response = await request(app)
+        .put(`/campaigns/1/findings/10`)
+        .set("Authorization", "Bearer user")
+        .send({ comment: "test" });
+      expect(response.status).toBe(200);
+    });
+  }); //End of describe("Permissions")
 });

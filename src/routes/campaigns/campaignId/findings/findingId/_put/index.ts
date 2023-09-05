@@ -34,12 +34,12 @@ export default class Route extends CampaignRoute<{
   protected async filter() {
     if (!(await super.filter())) return false;
 
-    if (await this.noFndingData()) return false;
+    if (await this.noFindingData()) return false;
 
     return true;
   }
 
-  private async noFndingData() {
+  private async noFindingData() {
     const finding = await tryber.tables.UxCampaignInsights.do()
       .select()
       .where({ campaign_id: this.cp_id })
@@ -65,8 +65,7 @@ export default class Route extends CampaignRoute<{
       const comment = await unguess.tables.UxFindingComments.do()
         .select()
         .where({ campaign_id: this.cp_id })
-        .where({ finding_id: this.findingId })
-        .where({ profile_id: this.getProfileId() });
+        .where({ finding_id: this.findingId });
 
       if (comment.length) {
         await this.updateComment();
@@ -83,10 +82,10 @@ export default class Route extends CampaignRoute<{
       await unguess.tables.UxFindingComments.do()
         .update({
           comment: this.getBody().comment,
+          profile_id: this.getProfileId(),
         })
         .where({ campaign_id: this.cp_id })
-        .where({ finding_id: this.findingId })
-        .where({ profile_id: this.getProfileId() });
+        .where({ finding_id: this.findingId });
     } catch (e) {
       throw Error("Error updating comment");
     }
