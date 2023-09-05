@@ -164,14 +164,16 @@ export default class Route extends CampaignRoute<{
 
     if (!results.length) return [];
 
-    return results.map((r) => ({
-      cluster: {
-        id: r.cluster_id,
-        name: this.clusters.find((c) => c.id === r.cluster_id)?.name || "",
-      },
-      value: r.value,
-      comment: r.comment,
-    }));
+    return results
+      .map((r) => ({
+        cluster: {
+          id: r.cluster_id,
+          name: this.clusters.find((c) => c.id === r.cluster_id)?.name || "",
+        },
+        value: r.value,
+        comment: r.comment,
+      }))
+      .filter((r) => this.clusters.map((c) => c.id).includes(r.cluster.id));
   }
 
   private getSeverityName(severityId: number) {
