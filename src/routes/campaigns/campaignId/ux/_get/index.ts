@@ -114,7 +114,13 @@ export default class Route extends CampaignRoute<{
         campaign_id: this.cp_id,
       });
 
-    const result = [];
+    let result = [];
+
+    const clustersIds = (
+      await tryber.tables.WpAppqUsecaseCluster.do()
+        .where({ campaign_id: this.cp_id })
+        .select("id")
+    ).map((c) => c.id);
 
     for (const finding of findings) {
       const comment = comments.find(
@@ -130,10 +136,21 @@ export default class Route extends CampaignRoute<{
           name: this.getSeverityName(finding.severity_id),
         },
         ...(comment && { comment }),
-        cluster: this.getClusters(finding.cluster_ids),
+        cluster: await this.evaluateClusters(finding.cluster_ids),
         video: await this.getVideo(finding),
       });
     }
+
+    result.filter((r: { cluster: "all" | { id: number }[] }) => {
+      if (clustersIds.length === 0) return false;
+      //TODO: decide what to do with findings with cluster all
+      if (r.cluster === "all") return true;
+      const currentClustersIds = r.cluster.map((c) => c.id);
+
+      // return true if all currentClustersIds are in clustersIds
+      return currentClustersIds.every((c) => clustersIds.includes(c));
+    });
+
     return result;
   }
 
@@ -191,7 +208,7 @@ export default class Route extends CampaignRoute<{
     }
   }
 
-  private getClusters(clusterIds: string) {
+  private async evaluateClusters(clusterIds: string) {
     if (clusterIds === "0") return "all" as const;
     return clusterIds
       .split(",")
