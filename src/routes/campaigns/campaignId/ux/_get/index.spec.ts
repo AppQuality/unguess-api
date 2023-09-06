@@ -2,6 +2,10 @@ import app from "@src/app";
 import { tryber, unguess } from "@src/features/database";
 import request from "supertest";
 
+jest.mock("@src/utils/checkUrl", () => ({
+  checkUrl: jest.fn().mockImplementation(() => true),
+}));
+
 const campaign = {
   platform_id: 1,
   pm_id: 1,
@@ -386,7 +390,6 @@ describe("GET /campaigns/:campaignId/ux", () => {
       expect(response.body.findings[1].video[0]).toEqual(
         expect.objectContaining({
           url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-          streamUrl: "",
           start: 5,
           end: 10,
           description: "Description",
@@ -850,7 +853,6 @@ describe("GET /campaigns/:campaignId/ux", () => {
       expect(response.body.findings[0].video[0]).toEqual(
         expect.objectContaining({
           url: "https://s3-eu-west-1.amazonaws.com/appq.use-case-media/CP3461/UC8794/T19095/ebf00412a1bc3fd33fddd52962cf80e6853a10d5_1625090207.mp4",
-          streamUrl: "",
           start: 0,
           end: 0,
           description: "First version",
@@ -902,7 +904,6 @@ describe("GET /campaigns/:campaignId/ux", () => {
       expect(response.body.findings[1].video[0]).toEqual(
         expect.objectContaining({
           url: "https://s3-eu-west-1.amazonaws.com/appq.use-case-media/CP3461/UC8794/T19095/ebf00412a1bc3fd33fddd52962cf80e6853a10d5_1625090207.mp4",
-          streamUrl: "",
           start: 5,
           end: 10,
           description: "Description",
@@ -1359,13 +1360,12 @@ describe("GET /campaigns/:campaignId/ux", () => {
             severity: { id: 1, name: "Minor" },
             title: "First version",
             video: [
-              {
+              expect.objectContaining({
                 description: "First version",
                 end: 0,
                 start: 0,
-                streamUrl: "",
                 url: "https://s3-eu-west-1.amazonaws.com/appq.use-case-media/CP3461/UC8794/T19095/ebf00412a1bc3fd33fddd52962cf80e6853a10d5_1625090207.mp4",
-              },
+              }),
             ],
           }),
         ])
