@@ -1169,6 +1169,8 @@ paths:
                                 type: string
                               streamUrl:
                                 type: string
+                              poster:
+                                type: string
                               start:
                                 type: integer
                               end:
