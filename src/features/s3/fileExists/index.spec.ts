@@ -1,24 +1,28 @@
 import fileExists from ".";
 import AWS from "aws-sdk";
 
-const s3 = new AWS.S3();
+// Use fake timers to allow mocking s3
+jest.useFakeTimers();
+beforeAll(() => {
+  const s3 = new AWS.S3();
 
-s3.headObject({ Bucket: "", Key: "" }, () => {});
+  s3.headObject({ Bucket: "", Key: "" }, () => {});
 
-// @ts-ignore
-AWS.S3 = jest.fn().mockImplementation(() => {
-  return {
-    headObject(params: { Bucket: string; Key: string }) {
-      return {
-        promise: () => {
-          if (params.Bucket !== "bucket") throw new Error("Invalid bucket");
-          if (params.Key === "not-existing")
-            throw new Error("File not existing");
-          return true;
-        },
-      };
-    },
-  };
+  // @ts-ignore
+  AWS.S3 = jest.fn().mockImplementation(() => {
+    return {
+      headObject(params: { Bucket: string; Key: string }) {
+        return {
+          promise: () => {
+            if (params.Bucket !== "bucket") throw new Error("Invalid bucket");
+            if (params.Key === "not-existing")
+              throw new Error("File not existing");
+            return true;
+          },
+        };
+      },
+    };
+  });
 });
 
 describe("fileExists", () => {
