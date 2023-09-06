@@ -1203,9 +1203,12 @@ paths:
                               type: string
                         value:
                           type: integer
+                        comment:
+                          type: string
                       required:
                         - cluster
                         - value
+                        - comment
                   methodology:
                     type: object
                     required:
