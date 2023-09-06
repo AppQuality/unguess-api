@@ -1000,6 +1000,30 @@ describe("GET /campaigns/:campaignId/ux", () => {
       );
     });
 
+    it("Should return the posterUrl if exist", async () => {
+      await tryber.tables.WpAppqUserTaskMedia.do()
+        .update({
+          location:
+            "https://s3.eu-west-1.amazonaws.com/appq.static/ad4fc347f2579800a1920a8be6e181dda0f4b290_1692791543.mp4",
+        })
+        .where({
+          id: 1,
+        });
+
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer user");
+      expect(response.body.findings[0].video).toHaveLength(1);
+      expect(response.body.findings[0].video[0]).toEqual(
+        expect.objectContaining({
+          streamUrl:
+            "https://s3.eu-west-1.amazonaws.com/appq.static/ad4fc347f2579800a1920a8be6e181dda0f4b290_1692791543-stream.m3u8",
+          poster:
+            "https://s3.eu-west-1.amazonaws.com/appq.static/ad4fc347f2579800a1920a8be6e181dda0f4b290_1692791543.0000000.jpg",
+        })
+      );
+    });
+
     it("Should return the correct findings_ids for each finding", async () => {
       const response = await request(app)
         .get(`/campaigns/1/ux`)
