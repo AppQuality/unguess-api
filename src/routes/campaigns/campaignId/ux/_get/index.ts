@@ -99,7 +99,7 @@ export default class Route extends CampaignRoute<{
   }
 
   private async getFindings() {
-    const findings = await tryber.tables.UxCampaignInsights.do()
+    let findings = await tryber.tables.UxCampaignInsights.do()
       .select()
       .where({
         campaign_id: this.cp_id,
@@ -115,12 +115,6 @@ export default class Route extends CampaignRoute<{
       });
 
     let result = [];
-
-    const clustersIds = (
-      await tryber.tables.WpAppqUsecaseCluster.do()
-        .where({ campaign_id: this.cp_id })
-        .select("id")
-    ).map((c) => c.id);
 
     for (const finding of findings) {
       const comment = comments.find(
@@ -141,15 +135,8 @@ export default class Route extends CampaignRoute<{
       });
     }
 
-    result.filter((r: { cluster: "all" | { id: number }[] }) => {
-      if (clustersIds.length === 0) return false;
-      //TODO: decide what to do with findings with cluster all
-      if (r.cluster === "all") return true;
-      const currentClustersIds = r.cluster.map((c) => c.id);
-
-      // return true if all currentClustersIds are in clustersIds
-      return currentClustersIds.every((c) => clustersIds.includes(c));
-    });
+    //remove findings with no clusters
+    result = result.filter((f) => f.cluster.length);
 
     return result;
   }
@@ -167,6 +154,16 @@ export default class Route extends CampaignRoute<{
     return results.map((r) => ({
       text: r.question,
     }));
+  }
+
+  private async getClusterIds() {
+    const results = await tryber.tables.WpAppqUsecaseCluster.do()
+      .where({ campaign_id: this.cp_id })
+      .select("id");
+
+    if (!results.length) return [];
+
+    return results.map((c) => c.id);
   }
 
   private async getSentiment() {
@@ -209,6 +206,7 @@ export default class Route extends CampaignRoute<{
   }
 
   private async evaluateClusters(clusterIds: string) {
+    const clustersIds = await this.getClusterIds();
     if (clusterIds === "0") return "all" as const;
     return clusterIds
       .split(",")
@@ -216,7 +214,8 @@ export default class Route extends CampaignRoute<{
       .map((id) => ({
         id,
         name: this.clusters.find((c) => c.id === id)?.name || "",
-      }));
+      }))
+      .filter((c) => clustersIds.includes(c.id));
   }
 
   private async getVideo(finding: { id: number }) {

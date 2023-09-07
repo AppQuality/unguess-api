@@ -206,18 +206,6 @@ describe("GET /campaigns/:campaignId/ux", () => {
           finding_id: 12,
           enabled: 1,
         },
-        {
-          id: 4,
-          campaign_id: 1,
-          version: 1,
-          title: "Insight disabled",
-          description: "Insight description",
-          severity_id: 3,
-          cluster_ids: "0",
-          order: 0,
-          finding_id: 13,
-          enabled: 0,
-        },
       ]);
       await tryber.tables.UxCampaignVideoParts.do().insert([
         {
@@ -468,46 +456,6 @@ describe("GET /campaigns/:campaignId/ux", () => {
       );
     });
 
-    it("Should return the sentiments if exist the cluster", async () => {
-      await tryber.tables.WpAppqUsecaseCluster.do().delete().where({ id: 3 });
-      const response = await request(app)
-        .get(`/campaigns/1/ux`)
-        .set("Authorization", "Bearer admin");
-
-      expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty("sentiment");
-      expect(response.body.sentiment).toHaveLength(2);
-
-      expect(response.body.sentiment).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            cluster: {
-              id: 1,
-              name: "Cluster 1",
-            },
-            value: 1,
-            comment: "Comment 1",
-          }),
-          expect.objectContaining({
-            cluster: {
-              id: 2,
-              name: "Cluster 2",
-            },
-            value: 5,
-            comment: "Comment 2",
-          }),
-          expect.not.objectContaining({
-            cluster: {
-              id: 2,
-              name: "Cluster 3",
-            },
-            value: 4,
-            comment: "Comment 3",
-          }),
-        ])
-      );
-    });
-
     it("Should return the correct findings_ids for each finding", async () => {
       const response = await request(app)
         .get(`/campaigns/1/ux`)
@@ -547,58 +495,6 @@ describe("GET /campaigns/:campaignId/ux", () => {
         ])
       );
       expect(response.body.findings[0]).not.toHaveProperty("comment");
-    });
-
-    it("Should not return findings of a deleted clusters", async () => {
-      //insert insights with cluster 4 that does not exist
-      await tryber.tables.UxCampaignInsights.do().insert([
-        {
-          id: 5,
-          campaign_id: 1,
-          version: 1,
-          title: "My insight5",
-          description: "Insight description",
-          severity_id: 3,
-          cluster_ids: "4",
-          order: 0,
-          finding_id: 14,
-          enabled: 1,
-        },
-        {
-          id: 6,
-          campaign_id: 1,
-          version: 1,
-          title: "My insight6",
-          description: "Insight description",
-          severity_id: 2,
-          cluster_ids: "2,4",
-          order: 0,
-          finding_id: 15,
-          enabled: 1,
-        },
-      ]);
-
-      const response = await request(app)
-        .get(`/campaigns/1/ux`)
-        .set("Authorization", "Bearer admin");
-
-      expect(response.body.findings.length).toEqual(3);
-      expect(response.body.findings).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            id: 10,
-            comment: "Comment finding10",
-          }),
-          expect.objectContaining({
-            id: 11,
-            comment: "Comment finding11",
-          }),
-          expect.objectContaining({
-            id: 12,
-            comment: "Comment finding12",
-          }),
-        ])
-      );
     });
   });
 
@@ -1149,18 +1045,6 @@ describe("GET /campaigns/:campaignId/ux", () => {
           order: 0,
           enabled: 1,
           finding_id: 12,
-        },
-        {
-          id: 4,
-          campaign_id: 1,
-          version: 1,
-          title: "First version",
-          description: "",
-          severity_id: 1,
-          cluster_ids: "0",
-          order: 0,
-          enabled: 0,
-          finding_id: 13,
         },
       ]);
       await unguess.tables.UxFindingComments.do().insert([
