@@ -236,12 +236,15 @@ export default class Route extends CampaignRoute<{
     for (const r of results) {
       const stream = r.location.replace(".mp4", "-stream.m3u8");
       const isValidStream = await checkUrl(stream);
+      const poster = r.location.replace(".mp4", ".0000000.jpg");
+      const isValidPoster = await checkUrl(poster);
       video.push({
         start: r.start,
         end: r.end,
         url: r.location,
         description: r.description,
         streamUrl: isValidStream ? stream : "",
+        poster: isValidPoster ? poster : undefined,
       });
     }
 
