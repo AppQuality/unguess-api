@@ -269,7 +269,7 @@ describe("With draft only", () => {
         }),
         expect.objectContaining({
           id: 15,
-          clusters: [1],
+          cluster: [{ id: 1, name: "Cluster 1" }],
         }),
       ])
     );
