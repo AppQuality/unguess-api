@@ -1598,6 +1598,7 @@ export interface operations {
               video?: {
                 url: string;
                 streamUrl: string;
+                poster?: string;
                 start: number;
                 end: number;
                 description?: string;
@@ -1609,6 +1610,7 @@ export interface operations {
                 name: string;
               };
               value: number;
+              comment: string;
             }[];
             methodology: {
               type: string;

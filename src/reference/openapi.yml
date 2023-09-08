@@ -1169,6 +1169,8 @@ paths:
                                 type: string
                               streamUrl:
                                 type: string
+                              poster:
+                                type: string
                               start:
                                 type: integer
                               end:
@@ -1203,9 +1205,12 @@ paths:
                               type: string
                         value:
                           type: integer
+                        comment:
+                          type: string
                       required:
                         - cluster
                         - value
+                        - comment
                   methodology:
                     type: object
                     required:

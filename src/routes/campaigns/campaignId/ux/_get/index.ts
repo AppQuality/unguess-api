@@ -99,7 +99,7 @@ export default class Route extends CampaignRoute<{
   }
 
   private async getFindings() {
-    const findings = await tryber.tables.UxCampaignInsights.do()
+    let findings = await tryber.tables.UxCampaignInsights.do()
       .select()
       .where({
         campaign_id: this.cp_id,
@@ -114,7 +114,7 @@ export default class Route extends CampaignRoute<{
         campaign_id: this.cp_id,
       });
 
-    const result = [];
+    let result = [];
 
     for (const finding of findings) {
       const comment = comments.find(
@@ -130,10 +130,14 @@ export default class Route extends CampaignRoute<{
           name: this.getSeverityName(finding.severity_id),
         },
         ...(comment && { comment }),
-        cluster: this.getClusters(finding.cluster_ids),
+        cluster: await this.evaluateClusters(finding.cluster_ids),
         video: await this.getVideo(finding),
       });
     }
+
+    //remove findings with no clusters
+    result = result.filter((f) => f.cluster.length);
+
     return result;
   }
 
@@ -150,6 +154,16 @@ export default class Route extends CampaignRoute<{
     return results.map((r) => ({
       text: r.question,
     }));
+  }
+
+  private async getClusterIds() {
+    const results = await tryber.tables.WpAppqUsecaseCluster.do()
+      .where({ campaign_id: this.cp_id })
+      .select("id");
+
+    if (!results.length) return [];
+
+    return results.map((c) => c.id);
   }
 
   private async getSentiment() {
@@ -191,7 +205,8 @@ export default class Route extends CampaignRoute<{
     }
   }
 
-  private getClusters(clusterIds: string) {
+  private async evaluateClusters(clusterIds: string) {
+    const clustersIds = await this.getClusterIds();
     if (clusterIds === "0") return "all" as const;
     return clusterIds
       .split(",")
@@ -199,7 +214,8 @@ export default class Route extends CampaignRoute<{
       .map((id) => ({
         id,
         name: this.clusters.find((c) => c.id === id)?.name || "",
-      }));
+      }))
+      .filter((c) => clustersIds.includes(c.id));
   }
 
   private async getVideo(finding: { id: number }) {
@@ -220,12 +236,15 @@ export default class Route extends CampaignRoute<{
     for (const r of results) {
       const stream = r.location.replace(".mp4", "-stream.m3u8");
       const isValidStream = await checkUrl(stream);
+      const poster = r.location.replace(".mp4", ".0000000.jpg");
+      const isValidPoster = await checkUrl(poster);
       video.push({
         start: r.start,
         end: r.end,
         url: r.location,
         description: r.description,
         streamUrl: isValidStream ? stream : "",
+        poster: isValidPoster ? poster : undefined,
       });
     }
 

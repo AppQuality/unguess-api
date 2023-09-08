@@ -1,18 +1,6 @@
 import axios from "axios";
+import fileExists from "@src/features/s3/fileExists";
 
 export const checkUrl = async (url: string) => {
-  try {
-    const response = await axios.get(url, {
-      headers: {
-        Accept: "application/json",
-      },
-    });
-
-    return (
-      response !== undefined &&
-      (response.status === 200 || response.status === 201)
-    );
-  } catch (error) {
-    return false;
-  }
+  return await fileExists({ url });
 };

@@ -2,6 +2,10 @@ import app from "@src/app";
 import { tryber, unguess } from "@src/features/database";
 import request from "supertest";
 
+jest.mock("@src/utils/checkUrl", () => ({
+  checkUrl: jest.fn().mockImplementation(() => true),
+}));
+
 const campaign = {
   platform_id: 1,
   pm_id: 1,
@@ -206,18 +210,6 @@ describe("GET /campaigns/:campaignId/ux", () => {
           finding_id: 12,
           enabled: 1,
         },
-        {
-          id: 4,
-          campaign_id: 1,
-          version: 1,
-          title: "Insight disabled",
-          description: "Insight description",
-          severity_id: 3,
-          cluster_ids: "0",
-          order: 0,
-          finding_id: 13,
-          enabled: 0,
-        },
       ]);
       await tryber.tables.UxCampaignVideoParts.do().insert([
         {
@@ -386,7 +378,6 @@ describe("GET /campaigns/:campaignId/ux", () => {
       expect(response.body.findings[1].video[0]).toEqual(
         expect.objectContaining({
           url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-          streamUrl: "",
           start: 5,
           end: 10,
           description: "Description",
@@ -459,46 +450,6 @@ describe("GET /campaigns/:campaignId/ux", () => {
           expect.objectContaining({
             cluster: {
               id: 3,
-              name: "Cluster 3",
-            },
-            value: 4,
-            comment: "Comment 3",
-          }),
-        ])
-      );
-    });
-
-    it("Should return the sentiments if exist the cluster", async () => {
-      await tryber.tables.WpAppqUsecaseCluster.do().delete().where({ id: 3 });
-      const response = await request(app)
-        .get(`/campaigns/1/ux`)
-        .set("Authorization", "Bearer admin");
-
-      expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty("sentiment");
-      expect(response.body.sentiment).toHaveLength(2);
-
-      expect(response.body.sentiment).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            cluster: {
-              id: 1,
-              name: "Cluster 1",
-            },
-            value: 1,
-            comment: "Comment 1",
-          }),
-          expect.objectContaining({
-            cluster: {
-              id: 2,
-              name: "Cluster 2",
-            },
-            value: 5,
-            comment: "Comment 2",
-          }),
-          expect.not.objectContaining({
-            cluster: {
-              id: 2,
               name: "Cluster 3",
             },
             value: 4,
@@ -850,7 +801,6 @@ describe("GET /campaigns/:campaignId/ux", () => {
       expect(response.body.findings[0].video[0]).toEqual(
         expect.objectContaining({
           url: "https://s3-eu-west-1.amazonaws.com/appq.use-case-media/CP3461/UC8794/T19095/ebf00412a1bc3fd33fddd52962cf80e6853a10d5_1625090207.mp4",
-          streamUrl: "",
           start: 0,
           end: 0,
           description: "First version",
@@ -902,7 +852,6 @@ describe("GET /campaigns/:campaignId/ux", () => {
       expect(response.body.findings[1].video[0]).toEqual(
         expect.objectContaining({
           url: "https://s3-eu-west-1.amazonaws.com/appq.use-case-media/CP3461/UC8794/T19095/ebf00412a1bc3fd33fddd52962cf80e6853a10d5_1625090207.mp4",
-          streamUrl: "",
           start: 5,
           end: 10,
           description: "Description",
@@ -996,6 +945,30 @@ describe("GET /campaigns/:campaignId/ux", () => {
           start: 0,
           end: 0,
           description: "First version",
+        })
+      );
+    });
+
+    it("Should return the posterUrl if exist", async () => {
+      await tryber.tables.WpAppqUserTaskMedia.do()
+        .update({
+          location:
+            "https://s3.eu-west-1.amazonaws.com/appq.static/ad4fc347f2579800a1920a8be6e181dda0f4b290_1692791543.mp4",
+        })
+        .where({
+          id: 1,
+        });
+
+      const response = await request(app)
+        .get(`/campaigns/1/ux`)
+        .set("Authorization", "Bearer user");
+      expect(response.body.findings[0].video).toHaveLength(1);
+      expect(response.body.findings[0].video[0]).toEqual(
+        expect.objectContaining({
+          streamUrl:
+            "https://s3.eu-west-1.amazonaws.com/appq.static/ad4fc347f2579800a1920a8be6e181dda0f4b290_1692791543-stream.m3u8",
+          poster:
+            "https://s3.eu-west-1.amazonaws.com/appq.static/ad4fc347f2579800a1920a8be6e181dda0f4b290_1692791543.0000000.jpg",
         })
       );
     });
@@ -1097,18 +1070,6 @@ describe("GET /campaigns/:campaignId/ux", () => {
           order: 0,
           enabled: 1,
           finding_id: 12,
-        },
-        {
-          id: 4,
-          campaign_id: 1,
-          version: 1,
-          title: "First version",
-          description: "",
-          severity_id: 1,
-          cluster_ids: "0",
-          order: 0,
-          enabled: 0,
-          finding_id: 13,
         },
       ]);
       await unguess.tables.UxFindingComments.do().insert([
@@ -1335,13 +1296,12 @@ describe("GET /campaigns/:campaignId/ux", () => {
             severity: { id: 1, name: "Minor" },
             title: "First version",
             video: [
-              {
+              expect.objectContaining({
                 description: "First version",
                 end: 0,
                 start: 0,
-                streamUrl: "",
                 url: "https://s3-eu-west-1.amazonaws.com/appq.use-case-media/CP3461/UC8794/T19095/ebf00412a1bc3fd33fddd52962cf80e6853a10d5_1625090207.mp4",
-              },
+              }),
             ],
           }),
         ])

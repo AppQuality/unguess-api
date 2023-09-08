@@ -11,6 +11,7 @@ export const unguess = unguessDb({
     user: config.unguessDb.user,
     password: config.unguessDb.password,
     database: config.unguessDb.database,
+    charset: "utf8mb4_unicode_ci",
   },
   pool: { min: 0, max: 7 },
 });
@@ -22,6 +23,7 @@ export const tryber = tryberDb({
     user: config.db.user,
     password: config.db.password,
     database: config.db.database,
+    charset: "utf8mb4_unicode_ci",
   },
   pool: { min: 0, max: 7 },
 });
