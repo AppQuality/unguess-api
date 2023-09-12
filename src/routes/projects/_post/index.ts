@@ -23,6 +23,8 @@ export default class Route extends UserRoute<{
   protected async filter(): Promise<boolean> {
     if (!(await super.filter())) return false;
 
+    if (this.isAdmin()) return true;
+
     if (
       !(await this.hasPermission()) ||
       !(await getWorkspace({
@@ -38,6 +40,10 @@ export default class Route extends UserRoute<{
     }
 
     return true;
+  }
+
+  protected isAdmin() {
+    return this.getUser().role === "administrator";
   }
 
   protected async prepare() {
