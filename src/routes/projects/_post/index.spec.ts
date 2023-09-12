@@ -93,4 +93,22 @@ describe("POST /projects", () => {
       ...project_1,
     });
   });
+
+  it("Should create a project in workspace even if the user is not related to the workspace but is admin", async () => {
+    const response = await request(app)
+      .post("/projects")
+      .set("Authorization", "Bearer admin")
+      .send({
+        ...project_request_1,
+        customer_id: 2,
+        name: "Project 2 in workspace",
+      });
+
+    expect(response.status).toBe(200);
+
+    expect(response.body).toMatchObject({
+      ...project_1,
+      name: "Project 2 in workspace",
+    });
+  });
 });
