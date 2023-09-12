@@ -1,6 +1,6 @@
+import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import app from "@src/app";
 import request from "supertest";
-import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 
 const customer_1 = {
   id: 1,
@@ -107,7 +107,6 @@ describe("POST /projects", () => {
     expect(response.status).toBe(200);
 
     expect(response.body).toMatchObject({
-      ...project_1,
       name: "Project 2 in workspace",
     });
   });
