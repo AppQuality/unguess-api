@@ -124,7 +124,7 @@ const usecase_1: UseCaseParams = {
 };
 
 const profile_1 = {
-  id: 32,
+  id: 1,
   name: "Tester 1",
   wp_user_id: 1,
 };
@@ -321,6 +321,12 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
 
     await customStatuses.addDefaultItems();
     await bugCustomStatuses.insert(bug_status_1);
+    await tryber.tables.WpAppqBugReadStatus.do().insert({
+      bug_id: bug_2.id,
+      wp_id: profile_1.wp_user_id,
+      is_read: 0,
+      profile_id: profile_1.id,
+    });
   });
 
   afterEach(async () => {
@@ -619,21 +625,22 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   it("Should set the bug as read if the user when returning a bug", async () => {
     const statusBeforeGet = await readStatus.all(undefined, [
       {
-        wp_id: 1,
-        bug_id: 1,
         is_read: 1,
+      },
+      {
+        profile_id: profile_1.id,
       },
     ]);
     expect(statusBeforeGet.length).toBe(0);
     await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer user");
-
     const statusAfterGet = await readStatus.all(undefined, [
       {
-        wp_id: 1,
-        bug_id: 1,
         is_read: 1,
+      },
+      {
+        profile_id: profile_1.id,
       },
     ]);
     expect(statusAfterGet.length).toBe(1);
@@ -644,9 +651,47 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
 
     const statusAfterSecondGet = await readStatus.all(undefined, [
       {
-        wp_id: 1,
-        bug_id: 1,
         is_read: 1,
+      },
+      {
+        profile_id: profile_1.id,
+      },
+    ]);
+    expect(statusAfterSecondGet.length).toBe(1);
+  });
+  it("Should update the bug as read if the user when returning a bug", async () => {
+    const statusBeforeGet = await readStatus.all(undefined, [
+      {
+        is_read: 1,
+      },
+      {
+        profile_id: profile_1.id,
+      },
+    ]);
+    expect(statusBeforeGet.length).toBe(0);
+    await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_2.id}`)
+      .set("Authorization", "Bearer user");
+    const statusAfterGet = await readStatus.all(undefined, [
+      {
+        is_read: 1,
+      },
+      {
+        profile_id: profile_1.id,
+      },
+    ]);
+    expect(statusAfterGet.length).toBe(1);
+
+    await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_2.id}`)
+      .set("Authorization", "Bearer user");
+
+    const statusAfterSecondGet = await readStatus.all(undefined, [
+      {
+        is_read: 1,
+      },
+      {
+        profile_id: profile_1.id,
       },
     ]);
     expect(statusAfterSecondGet.length).toBe(1);
