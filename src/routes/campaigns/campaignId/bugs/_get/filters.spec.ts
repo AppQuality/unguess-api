@@ -354,8 +354,16 @@ describe("GET /campaigns/{cid}/bugs", () => {
         await priorities.addDefaultItems();
 
         await bugPriorities.insert(bug_1_highest_priority);
-        await bugsReadStatus.insert({ wp_id: 1, bug_id: bug_2.id });
-        await bugsReadStatus.insert({ wp_id: 2, bug_id: bug_2.id });
+        await bugsReadStatus.insert({
+          wp_id: 1,
+          bug_id: bug_2.id,
+          profile_id: 1,
+        });
+        await bugsReadStatus.insert({
+          wp_id: 2,
+          bug_id: bug_2.id,
+          profile_id: 2,
+        });
 
         await tags.insert(tag_1);
         await tags.insert(tag_2);

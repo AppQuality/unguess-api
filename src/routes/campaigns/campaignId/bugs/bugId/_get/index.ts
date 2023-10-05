@@ -48,8 +48,8 @@ export default class Route extends BugsRoute<{
     if (typeof readStatus === "undefined") {
       await db.query(
         db.format(
-          "INSERT INTO wp_appq_bug_read_status (wp_id,bug_id,is_read) VALUES (?,?,1) ",
-          [this.getWordpressId("tryber"), this.bug_id]
+          "INSERT INTO wp_appq_bug_read_status (wp_id,bug_id,is_read, profile_id) VALUES (?,?,1,?) ",
+          [this.getWordpressId("tryber"), this.bug_id, this.getProfileId()]
         )
       );
       return;

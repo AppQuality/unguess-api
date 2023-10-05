@@ -6,6 +6,7 @@ type BugReadStatusParams = {
   bug_id?: number;
   is_read?: number;
   read_on?: string;
+  profile_id?: number;
 };
 
 const defaultItem: BugReadStatusParams = {
@@ -19,6 +20,7 @@ class ReadStatus extends Table<BugReadStatusParams> {
     "bug_id INTEGER",
     "is_read INTEGER DEFAULT 0",
     "read_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+    "profile_id INTEGER NOT NULL DEFAULT 0",
   ];
 
   constructor() {
