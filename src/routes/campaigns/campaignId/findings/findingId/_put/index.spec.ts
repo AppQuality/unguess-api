@@ -87,6 +87,44 @@ describe("PUT /campaigns/:campaignId/findings/:findingId", () => {
         enabled: 1,
       },
     ]);
+    await tryber.tables.UxCampaignInsights.do().insert([
+      {
+        id: 5,
+        campaign_id: 1,
+        version: 4,
+        title: "Finding title",
+        description: "Finding description",
+        severity_id: 1,
+        cluster_ids: "all",
+        order: 1,
+        finding_id: 10,
+        enabled: 1,
+      },
+      {
+        id: 6,
+        campaign_id: 1,
+        version: 4,
+        title: "Finding disabled",
+        description: "Finding description",
+        severity_id: 1,
+        cluster_ids: "all",
+        order: 1,
+        finding_id: 11,
+        enabled: 0,
+      },
+      {
+        id: 7,
+        campaign_id: 1,
+        version: 4,
+        title: "Finding disabled",
+        description: "Finding description",
+        severity_id: 1,
+        cluster_ids: "all",
+        order: 1,
+        finding_id: 12,
+        enabled: 0,
+      },
+    ]);
   });
 
   afterAll(async () => {
@@ -108,6 +146,14 @@ describe("PUT /campaigns/:campaignId/findings/:findingId", () => {
           campaign_id: 1,
           version: 3,
           published: 1,
+        },
+      ]);
+
+      await tryber.tables.UxCampaignData.do().insert([
+        {
+          campaign_id: 1,
+          version: 4,
+          published: 0,
         },
       ]);
     });
@@ -194,6 +240,14 @@ describe("PUT /campaigns/:campaignId/findings/:findingId", () => {
           }),
         ])
       );
+    });
+
+    it("Should be able to update an insight note even if the insight is deleted in the draft version", async () => {
+      const response = await request(app)
+        .put(`/campaigns/1/findings/12`)
+        .set("Authorization", "Bearer admin")
+        .send({ comment: "Test comment" });
+      expect(response.status).toBe(200);
     });
 
     //Should update the comment if it already exists for that finding
