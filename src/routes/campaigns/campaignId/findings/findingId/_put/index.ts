@@ -21,11 +21,11 @@ export default class Route extends CampaignRoute<{
     const query = tryber.tables.UxCampaignData.do()
       .select()
       .where({ campaign_id: this.cp_id })
+      .andWhere({ published: 1 })
       .orderBy("version", "desc")
       .first();
 
     const uxData = await query;
-
     if (uxData) {
       this.version = uxData.version;
     }
