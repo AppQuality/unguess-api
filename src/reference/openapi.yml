@@ -211,8 +211,10 @@ paths:
                           id: 12
                           name: Highest
                         custom_status:
-                          id: 2
-                          name: To do
+                          id: 1
+                          name: to do
+                          color: ffffff
+                          phase_id: 1
                         created: string
                         occurred_date: '2023-02-09T15:15:04+01:00'
                         updated: string
