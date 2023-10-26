@@ -89,14 +89,6 @@ export interface paths {
       };
     };
   };
-  "/campaigns/{cid}/custom_statuses/{csid}": {
-    parameters: {
-      path: {
-        cid: string;
-        csid: string;
-      };
-    };
-  };
   "/campaigns/{cid}/devices": {
     get: operations["get-campaigns-cid-devices"];
     parameters: {

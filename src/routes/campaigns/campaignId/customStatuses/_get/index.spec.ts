@@ -144,7 +144,7 @@ describe("GET /campaigns/{cid}/custom_statuses", () => {
   });
 
   // It should return the list of custom_statuses
-  it("Should return the list of custom_statuses ordered by id DESC", async () => {
+  it("Should return the list of custom_statuses ordered first by phase_id and than by id  ASC", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/custom_statuses`)
       .set("Authorization", "Bearer user");
@@ -153,7 +153,12 @@ describe("GET /campaigns/{cid}/custom_statuses", () => {
     const { body } = response;
 
     expect(body).toEqual(
-      custom_statuses.getDefaultItems().sort((t1, t2) => t2.id - t1.id)
+      custom_statuses.getDefaultItems().sort((t1, t2) => {
+        if (t1.phase_id === t2.phase_id) {
+          return t1.id - t2.id;
+        }
+        return t1.phase_id - t2.phase_id;
+      })
     );
   });
 

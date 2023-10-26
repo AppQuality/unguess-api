@@ -1,4 +1,5 @@
 /** OPENAPI-CLASS: get-campaigns-cid-custom-statuses */
+import { unguess } from "@src/features/database";
 import * as db from "@src/features/db";
 import CampaignRoute from "@src/features/routes/CampaignRoute";
 
@@ -43,7 +44,6 @@ export default class Route extends CampaignRoute<{
       is_default: result.is_default,
     }));
   }
-
   protected async prepare(): Promise<void> {
     return this.setSuccess(200, this.customStatuses);
   }
