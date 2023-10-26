@@ -594,6 +594,71 @@ paths:
                     id: 2ujoqceexzkp7
               required:
                 - name
+    delete:
+      summary: ''
+      operationId: delete-campaigns-cid-custom_statuses
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BugCustomStatus'
+      x-stoplight:
+        id: 2ql3iiqziwqjf
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                custom_status_id:
+                  type: integer
+                  x-stoplight:
+                    id: 8x2209ykbvb7b
+  '/campaigns/{cid}/custom_statuses/{csid}':
+    parameters:
+      - schema:
+          type: string
+        name: cid
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: csid
+        in: path
+        required: true
+    patch:
+      summary: Update custom status
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BugCustomStatus'
+      operationId: patch-campaigns-cid-custom_statuses-csid
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  x-stoplight:
+                    id: yp21xrclsk6bw
+                color:
+                  type: string
+                  x-stoplight:
+                    id: en9vr5mxmo98w
   '/campaigns/{cid}/devices':
     parameters:
       - name: cid
