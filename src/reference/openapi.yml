@@ -2380,9 +2380,14 @@ components:
           type: integer
         name:
           type: string
+        phase_id:
+          type: integer
+          x-stoplight:
+            id: y6lujjbvsc2ie
       required:
         - id
         - name
+        - phase_id
     BugMedia:
       title: BugMedia
       type: object
