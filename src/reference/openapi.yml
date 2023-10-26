@@ -2482,7 +2482,6 @@ components:
       required:
         - id
         - name
-        - phase_id
     BugMedia:
       title: BugMedia
       type: object
