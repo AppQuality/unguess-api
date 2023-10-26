@@ -588,8 +588,6 @@ paths:
                     color: ffffff
                     phase_id: 1
                     is_default: 1
-      x-stoplight:
-        id: f6q0q4lmku75z
       security:
         - JWT: []
       requestBody:
@@ -600,12 +598,8 @@ paths:
               properties:
                 name:
                   type: string
-                  x-stoplight:
-                    id: yerpiqut01rov
                 phase_id:
                   type: integer
-                  x-stoplight:
-                    id: 2ujoqceexzkp7
               required:
                 - name
             examples: {}
@@ -634,8 +628,6 @@ paths:
                       color: '000000'
                       phase_id: 1
                       is_default: 0
-      x-stoplight:
-        id: 2ql3iiqziwqjf
       security:
         - JWT: []
       requestBody:
@@ -646,8 +638,6 @@ paths:
               properties:
                 custom_status_id:
                   type: integer
-                  x-stoplight:
-                    id: 8x2209ykbvb7b
   '/campaigns/{cid}/custom_statuses/{csid}':
     parameters:
       - schema:
@@ -689,12 +679,8 @@ paths:
               properties:
                 name:
                   type: string
-                  x-stoplight:
-                    id: yp21xrclsk6bw
                 color:
                   type: string
-                  x-stoplight:
-                    id: en9vr5mxmo98w
   '/campaigns/{cid}/devices':
     parameters:
       - name: cid
@@ -2514,16 +2500,10 @@ components:
           type: string
         color:
           type: string
-          x-stoplight:
-            id: we9cujmz6lh8l
         phase_id:
           type: integer
-          x-stoplight:
-            id: y6lujjbvsc2ie
         is_default:
           type: integer
-          x-stoplight:
-            id: h7lgnqe8o337g
           minimum: 0
           maximum: 1
       required:
