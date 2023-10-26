@@ -579,29 +579,37 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BugCustomStatus'
+                type: array
+                items:
+                  $ref: '#/components/schemas/BugCustomStatus'
               examples:
                 Example 1:
                   value:
-                    id: 1
-                    name: to do
-                    color: ffffff
-                    phase_id: 1
-                    is_default: 1
+                    - id: 10
+                      name: to be done
+                      color: ffffff
+                      phase_id: 1
+                      is_default: 0
       security:
         - JWT: []
       requestBody:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                phase_id:
-                  type: integer
-              required:
-                - name
+              type: array
+              items:
+                x-stoplight:
+                  id: a6esft9a2ipru
+                type: object
+                properties:
+                  name:
+                    type: string
+                    x-stoplight:
+                      id: mmcdwmjgz9vdp
+                  color:
+                    type: string
+                    x-stoplight:
+                      id: las7zwq9lpl86
             examples: {}
     delete:
       summary: ''
@@ -634,10 +642,70 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                custom_status_id:
-                  type: integer
+              type: array
+              items:
+                x-stoplight:
+                  id: 5s63akyn9b09g
+                type: object
+                properties:
+                  custom_status_id:
+                    type: integer
+                    x-stoplight:
+                      id: yq0xyf41j9pqy
+                required:
+                  - custom_status_id
+            examples:
+              Example 1:
+                value:
+                  - custom_status_id: 10
+    patch:
+      summary: ''
+      operationId: patch-campaigns-cid-custom_statuses
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BugCustomStatus'
+              examples:
+                Example 1:
+                  value:
+                    - id: 10
+                      name: new name
+                      color: '000000'
+                      phase_id: 1
+                      is_default: 0
+      x-stoplight:
+        id: ctmftiuj4yrvu
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                x-stoplight:
+                  id: wb59fm4stpfdo
+                type: object
+                properties:
+                  custom_status_id:
+                    type: integer
+                    x-stoplight:
+                      id: wx4zzf97ag2xt
+                  name:
+                    type: string
+                    x-stoplight:
+                      id: kt5gn4vuhj4n2
+                  color:
+                    type: string
+                    x-stoplight:
+                      id: kh3lxu920v90k
+                required:
+                  - custom_status_id
   '/campaigns/{cid}/custom_statuses/{csid}':
     parameters:
       - schema:
@@ -650,37 +718,6 @@ paths:
         name: csid
         in: path
         required: true
-    patch:
-      summary: Update custom status
-      tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BugCustomStatus'
-              examples:
-                Example 1:
-                  value:
-                    id: 1
-                    name: to do
-                    color: ffffff
-                    phase_id: 1
-                    is_default: 1
-      operationId: patch-campaigns-cid-custom_statuses-csid
-      security:
-        - JWT: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                color:
-                  type: string
   '/campaigns/{cid}/devices':
     parameters:
       - name: cid
