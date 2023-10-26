@@ -79,10 +79,21 @@ export interface paths {
   };
   "/campaigns/{cid}/custom_statuses": {
     get: operations["get-campaigns-cid-custom-statuses"];
+    post: operations["post-campaigns-cid-custom_statuses"];
+    delete: operations["delete-campaigns-cid-custom_statuses"];
     parameters: {
       path: {
         /** Campaign id */
         cid: string;
+      };
+    };
+  };
+  "/campaigns/{cid}/custom_statuses/{csid}": {
+    patch: operations["patch-campaigns-cid-custom_statuses-csid"];
+    parameters: {
+      path: {
+        cid: string;
+        csid: string;
       };
     };
   };
@@ -412,6 +423,9 @@ export interface components {
     BugCustomStatus: {
       id: number;
       name: string;
+      color: string;
+      phase_id: number;
+      is_default: number;
     };
     /** BugMedia */
     BugMedia: {
@@ -1252,6 +1266,77 @@ export interface operations {
       400: components["responses"]["Error"];
       403: components["responses"]["Error"];
       500: components["responses"]["Error"];
+    };
+  };
+  "post-campaigns-cid-custom_statuses": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["BugCustomStatus"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          name: string;
+          phase_id?: number;
+        };
+      };
+    };
+  };
+  "delete-campaigns-cid-custom_statuses": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["BugCustomStatus"][];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          custom_status_id?: number;
+        };
+      };
+    };
+  };
+  "patch-campaigns-cid-custom_statuses-csid": {
+    parameters: {
+      path: {
+        cid: string;
+        csid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["BugCustomStatus"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          name?: string;
+          color?: string;
+        };
+      };
     };
   };
   "get-campaigns-cid-devices": {

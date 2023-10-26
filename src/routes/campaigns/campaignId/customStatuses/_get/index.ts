@@ -6,12 +6,13 @@ export default class Route extends CampaignRoute<{
   response: StoplightOperations["get-campaigns-cid-custom-statuses"]["responses"]["200"]["content"]["application/json"];
   parameters: StoplightOperations["get-campaigns-cid-custom-statuses"]["parameters"]["path"];
 }> {
-  private customStatuses: { id: number; name: string }[] = [];
+  private customStatuses: StoplightComponents["schemas"]["BugCustomStatus"][] =
+    [];
 
   protected async init(): Promise<void> {
     await super.init();
     this.customStatuses = await db.query(
-      "SELECT id, name FROM wp_ug_bug_custom_status ORDER BY id DESC",
+      "SELECT id, name, phase_id, color, is_default FROM wp_ug_bug_custom_status ORDER BY id DESC",
       "unguess"
     );
   }

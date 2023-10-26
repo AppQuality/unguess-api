@@ -10,7 +10,6 @@ import {
   SEVERITY__ID,
   PRIORITY__ID,
   DESC,
-  ASC,
 } from "@src/utils/constants";
 import { getBugTitle } from "@src/utils/campaigns/getTitleRule";
 import { getBugDevice } from "@src/utils/bugs/getBugDevice";
@@ -23,16 +22,6 @@ interface Tag {
   tag_name: string;
 }
 
-interface Priority {
-  id: number;
-  name: string;
-}
-
-interface CustomStatus {
-  id: number;
-  name: string;
-}
-
 export default class BugsRoute extends CampaignRoute<{
   response: StoplightOperations["get-campaigns-cid-bugs"]["responses"]["200"]["content"]["application/json"];
   parameters: StoplightOperations["get-campaigns-cid-bugs"]["parameters"]["path"];
@@ -42,13 +31,19 @@ export default class BugsRoute extends CampaignRoute<{
   private start: number = START_QUERY_PARAM_DEFAULT;
   private order: string = DEFAULT_ORDER_PARAMETER;
   private orderBy: string = DEFAULT_ORDER_BY_PARAMETER;
-  private defaultPriority: Priority = DEFAULT_BUG_PRIORITY;
-  private defaultCustomStatus: CustomStatus = DEFAULT_BUG_CUSTOM_STATUS;
+  private defaultPriority: StoplightComponents["schemas"]["BugPriority"] =
+    DEFAULT_BUG_PRIORITY;
+  private defaultCustomStatus: StoplightComponents["schemas"]["BugCustomStatus"] =
+    DEFAULT_BUG_CUSTOM_STATUS;
 
   private isTitleRuleActive: boolean = false;
   private tags: (Tag & { bug_id: number })[] = [];
-  private priorities: (Priority & { bug_id: number })[] = [];
-  private customStatuses: (CustomStatus & { bug_id: number })[] = [];
+  private priorities: (StoplightComponents["schemas"]["BugPriority"] & {
+    bug_id: number;
+  })[] = [];
+  private customStatuses: (StoplightComponents["schemas"]["BugCustomStatus"] & {
+    bug_id: number;
+  })[] = [];
   private filterBy: { [key: string]: string | string[] } | undefined;
   private filterByTags: number[] | undefined;
   private filterByNoTags: boolean = false;
@@ -266,7 +261,9 @@ export default class BugsRoute extends CampaignRoute<{
   private async getPriorities(bugs: Awaited<ReturnType<typeof this.getBugs>>) {
     if (!bugs || !bugs.length) return [];
 
-    const priorities: (Priority & { bug_id: number })[] = await db.query(
+    const priorities: (StoplightComponents["schemas"]["BugPriority"] & {
+      bug_id: number;
+    })[] = await db.query(
       `SELECT 
         p.id,
         pb.bug_id,
@@ -288,18 +285,22 @@ export default class BugsRoute extends CampaignRoute<{
   ) {
     if (!bugs || !bugs.length) return [];
 
-    const customStatuses: (CustomStatus & { bug_id: number })[] =
-      await db.query(
-        `SELECT 
+    const customStatuses: (StoplightComponents["schemas"]["BugCustomStatus"] & {
+      bug_id: number;
+    })[] = await db.query(
+      `SELECT 
         cs.id,
-        csb.bug_id,
-        cs.name
-      FROM wp_ug_bug_custom_status_to_bug csb
-      JOIN wp_ug_bug_custom_status cs ON (csb.custom_status_id = cs.id)
-      where csb.bug_id IN (${bugs.map((bug) => bug.id).join(",")})
+        cs.name,
+        cs.phase_id,
+        cs.color,
+        cs.is_default,
+        csb.bug_id
+        FROM wp_ug_bug_custom_status_to_bug csb
+        JOIN wp_ug_bug_custom_status cs ON (csb.custom_status_id = cs.id)
+        where csb.bug_id IN (${bugs.map((bug) => bug.id).join(",")})
       `,
-        "unguess"
-      );
+      "unguess"
+    );
 
     if (!customStatuses) return [];
 
@@ -382,7 +383,9 @@ export default class BugsRoute extends CampaignRoute<{
     }
   }
 
-  private getBugPriority(bug_id: number): Priority {
+  private getBugPriority(
+    bug_id: number
+  ): StoplightComponents["schemas"]["BugPriority"] {
     if (!this.priorities.length) return this.defaultPriority;
 
     const priority = this.priorities.find(
@@ -394,7 +397,9 @@ export default class BugsRoute extends CampaignRoute<{
       : this.defaultPriority;
   }
 
-  private getBugCustomStatus(bug_id: number): CustomStatus {
+  private getBugCustomStatus(
+    bug_id: number
+  ): StoplightComponents["schemas"]["BugCustomStatus"] {
     if (!this.customStatuses.length) return this.defaultCustomStatus;
 
     const customStatus = this.customStatuses.find(
@@ -402,7 +407,13 @@ export default class BugsRoute extends CampaignRoute<{
     );
 
     return customStatus
-      ? { id: customStatus.id, name: customStatus.name }
+      ? {
+          id: customStatus.id,
+          name: customStatus.name,
+          phase_id: customStatus.phase_id,
+          color: customStatus.color,
+          is_default: customStatus.is_default,
+        }
       : this.defaultCustomStatus;
   }
 

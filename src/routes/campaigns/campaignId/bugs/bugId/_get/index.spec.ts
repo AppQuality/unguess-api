@@ -737,10 +737,10 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
 
     expect(response.body).toEqual(
       expect.objectContaining({
-        custom_status: {
+        custom_status: expect.objectContaining({
           id: bug_status_1.custom_status_id,
           name: "not a bug",
-        },
+        }),
       })
     );
   });
@@ -753,10 +753,10 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
 
     expect(response.body).toEqual(
       expect.objectContaining({
-        custom_status: {
+        custom_status: expect.objectContaining({
           id: 1,
           name: "to do",
-        },
+        }),
       })
     );
   });

@@ -211,8 +211,11 @@ paths:
                           id: 12
                           name: Highest
                         custom_status:
-                          id: 2
-                          name: To do
+                          id: 1
+                          name: to do
+                          color: ffffff
+                          phase_id: 1
+                          is_default: 0
                         created: string
                         occurred_date: '2023-02-09T15:15:04+01:00'
                         updated: string
@@ -552,7 +555,10 @@ paths:
                 Example 1:
                   value:
                     - id: 1
-                      name: string
+                      name: to do
+                      color: ffffff
+                      phase_id: 1
+                      is_default: 1
         '400':
           $ref: '#/components/responses/Error'
         '403':
@@ -561,9 +567,120 @@ paths:
           $ref: '#/components/responses/Error'
       operationId: get-campaigns-cid-custom-statuses
       description: ''
+      parameters: []
       security:
         - JWT: []
-      parameters: []
+    post:
+      summary: ''
+      operationId: post-campaigns-cid-custom_statuses
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BugCustomStatus'
+              examples:
+                Example 1:
+                  value:
+                    id: 1
+                    name: to do
+                    color: ffffff
+                    phase_id: 1
+                    is_default: 1
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                phase_id:
+                  type: integer
+              required:
+                - name
+            examples: {}
+    delete:
+      summary: ''
+      operationId: delete-campaigns-cid-custom_statuses
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BugCustomStatus'
+              examples:
+                Example 1:
+                  value:
+                    - id: 1
+                      name: to do
+                      color: ffffff
+                      phase_id: 1
+                      is_default: 1
+                    - id: 2
+                      name: pending
+                      color: '000000'
+                      phase_id: 1
+                      is_default: 0
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                custom_status_id:
+                  type: integer
+  '/campaigns/{cid}/custom_statuses/{csid}':
+    parameters:
+      - schema:
+          type: string
+        name: cid
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: csid
+        in: path
+        required: true
+    patch:
+      summary: Update custom status
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BugCustomStatus'
+              examples:
+                Example 1:
+                  value:
+                    id: 1
+                    name: to do
+                    color: ffffff
+                    phase_id: 1
+                    is_default: 1
+      operationId: patch-campaigns-cid-custom_statuses-csid
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                color:
+                  type: string
   '/campaigns/{cid}/devices':
     parameters:
       - name: cid
@@ -1257,7 +1374,6 @@ paths:
                         cluster:
                           - id: 1
                             name: 'UC1: Example'
-                          - all
                         video:
                           - url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
                             streamUrl: 'http://sample.vodobox.net/skate_phantom_flex_4k/skate_phantom_flex_4k.m3u8'
@@ -1282,10 +1398,12 @@ paths:
                           id: 1
                           name: 'UC1: Example'
                         value: 1
+                        comment: comment
                       - cluster:
                           id: 2
                           name: 'UC2: Example 2'
                         value: 2
+                        comment: comment
         '400':
           $ref: '#/components/responses/Error'
         '403':
@@ -2380,9 +2498,20 @@ components:
           type: integer
         name:
           type: string
+        color:
+          type: string
+        phase_id:
+          type: integer
+        is_default:
+          type: integer
+          minimum: 0
+          maximum: 1
       required:
         - id
         - name
+        - color
+        - phase_id
+        - is_default
     BugMedia:
       title: BugMedia
       type: object

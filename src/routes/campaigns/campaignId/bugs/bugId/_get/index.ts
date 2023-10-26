@@ -89,13 +89,13 @@ export default class Route extends BugsRoute<{
   private async getCustomStatus() {
     const result = await db.query(
       db.format(
-        "SELECT cs.id, cs.name FROM wp_ug_bug_custom_status cs JOIN wp_ug_bug_custom_status_to_bug csb ON (csb.custom_status_id = cs.id) WHERE csb.bug_id=?",
+        "SELECT cs.id, cs.name, cs.phase_id, cs.color, cs.is_default FROM wp_ug_bug_custom_status cs JOIN wp_ug_bug_custom_status_to_bug csb ON (csb.custom_status_id = cs.id) WHERE csb.bug_id=?",
         [this.bug_id]
       ),
       "unguess"
     );
     if (!result.length) return DEFAULT_BUG_CUSTOM_STATUS;
-    return result[0] as { id: number; name: string };
+    return result[0] as StoplightComponents["schemas"]["BugCustomStatus"];
   }
 
   private async enhanceBug(bug: Bug) {
