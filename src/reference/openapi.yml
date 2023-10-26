@@ -551,8 +551,9 @@ paths:
               examples:
                 Example 1:
                   value:
-                    - id: 0
-                      name: string
+                    - id: 1
+                      name: to do
+                      color: ffffff
                       phase_id: 1
         '400':
           $ref: '#/components/responses/Error'
@@ -580,6 +581,7 @@ paths:
                   value:
                     id: 1
                     name: to do
+                    color: ffffff
                     phase_id: 1
       x-stoplight:
         id: f6q0q4lmku75z
@@ -619,9 +621,11 @@ paths:
                   value:
                     - id: 1
                       name: to do
+                      color: ffffff
                       phase_id: 1
                     - id: 2
                       name: pending
+                      color: '000000'
                       phase_id: 1
       x-stoplight:
         id: 2ql3iiqziwqjf
@@ -662,9 +666,10 @@ paths:
               examples:
                 Example 1:
                   value:
-                    id: 0
-                    name: string
-                    phase_id: 0
+                    id: 1
+                    name: to do
+                    color: ffffff
+                    phase_id: 1
       operationId: patch-campaigns-cid-custom_statuses-csid
       security:
         - JWT: []
