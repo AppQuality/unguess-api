@@ -16,7 +16,6 @@ import bugCustomStatuses, {
   BugCustomStatusParams,
 } from "@src/__mocks__/database/bug_custom_status";
 import useCases from "@src/__mocks__/database/use_cases";
-import { unguess } from "@src/features/database";
 
 const customer_1 = {
   id: 999,
