@@ -2514,11 +2514,16 @@ components:
           type: integer
           x-stoplight:
             id: y6lujjbvsc2ie
+        is_default:
+          type: boolean
+          x-stoplight:
+            id: h7lgnqe8o337g
       required:
         - id
         - name
         - color
         - phase_id
+        - is_default
     BugMedia:
       title: BugMedia
       type: object
