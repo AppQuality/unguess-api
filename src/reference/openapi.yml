@@ -598,18 +598,12 @@ paths:
             schema:
               type: array
               items:
-                x-stoplight:
-                  id: a6esft9a2ipru
                 type: object
                 properties:
                   name:
                     type: string
-                    x-stoplight:
-                      id: mmcdwmjgz9vdp
                   color:
                     type: string
-                    x-stoplight:
-                      id: las7zwq9lpl86
             examples: {}
     delete:
       summary: ''
@@ -644,14 +638,10 @@ paths:
             schema:
               type: array
               items:
-                x-stoplight:
-                  id: 5s63akyn9b09g
                 type: object
                 properties:
                   custom_status_id:
                     type: integer
-                    x-stoplight:
-                      id: yq0xyf41j9pqy
                 required:
                   - custom_status_id
             examples:
@@ -678,8 +668,6 @@ paths:
                       color: '000000'
                       phase_id: 1
                       is_default: 0
-      x-stoplight:
-        id: ctmftiuj4yrvu
       security:
         - JWT: []
       requestBody:
@@ -688,22 +676,14 @@ paths:
             schema:
               type: array
               items:
-                x-stoplight:
-                  id: wb59fm4stpfdo
                 type: object
                 properties:
                   custom_status_id:
                     type: integer
-                    x-stoplight:
-                      id: wx4zzf97ag2xt
                   name:
                     type: string
-                    x-stoplight:
-                      id: kt5gn4vuhj4n2
                   color:
                     type: string
-                    x-stoplight:
-                      id: kh3lxu920v90k
                 required:
                   - custom_status_id
   '/campaigns/{cid}/custom_statuses/{csid}':
