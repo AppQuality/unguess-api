@@ -425,6 +425,7 @@ export interface components {
       name: string;
       color: string;
       phase_id: number;
+      is_default: number;
     };
     /** BugMedia */
     BugMedia: {
