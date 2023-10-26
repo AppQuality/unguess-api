@@ -551,8 +551,9 @@ paths:
               examples:
                 Example 1:
                   value:
-                    - id: 1
+                    - id: 0
                       name: string
+                      phase_id: 1
         '400':
           $ref: '#/components/responses/Error'
         '403':
@@ -574,6 +575,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BugCustomStatus'
+              examples:
+                Example 1:
+                  value:
+                    id: 1
+                    name: to do
+                    phase_id: 1
       x-stoplight:
         id: f6q0q4lmku75z
       security:
@@ -594,6 +601,7 @@ paths:
                     id: 2ujoqceexzkp7
               required:
                 - name
+            examples: {}
     delete:
       summary: ''
       operationId: delete-campaigns-cid-custom_statuses
@@ -606,6 +614,15 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BugCustomStatus'
+              examples:
+                Example 1:
+                  value:
+                    - id: 1
+                      name: to do
+                      phase_id: 1
+                    - id: 2
+                      name: pending
+                      phase_id: 1
       x-stoplight:
         id: 2ql3iiqziwqjf
       security:
@@ -642,6 +659,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BugCustomStatus'
+              examples:
+                Example 1:
+                  value:
+                    id: 0
+                    name: string
+                    phase_id: 0
       operationId: patch-campaigns-cid-custom_statuses-csid
       security:
         - JWT: []
@@ -2475,6 +2498,10 @@ components:
           type: integer
         name:
           type: string
+        color:
+          type: string
+          x-stoplight:
+            id: we9cujmz6lh8l
         phase_id:
           type: integer
           x-stoplight:
@@ -2482,6 +2509,8 @@ components:
       required:
         - id
         - name
+        - color
+        - phase_id
     BugMedia:
       title: BugMedia
       type: object
