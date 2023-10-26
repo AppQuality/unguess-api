@@ -535,10 +535,12 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
       .send({ custom_status_id: status_open.id });
 
     expect(response.status).toBe(200);
-    expect(response.body.custom_status).toEqual(
+    expect(response.body).toEqual(
       expect.objectContaining({
-        id: status_open.id,
-        name: status_open.name,
+        custom_status: expect.objectContaining({
+          id: status_open.id,
+          name: status_open.name,
+        }),
       })
     );
   });

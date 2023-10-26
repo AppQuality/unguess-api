@@ -317,7 +317,7 @@ export default class Route extends BugsRoute<{
 
   private async getAllStatuses(): Promise<CustomStatus[]> {
     return await db.query(
-      "SELECT id, name FROM wp_ug_bug_custom_status ORDER BY id DESC",
+      "SELECT id, name, phase_id, color, is_default FROM wp_ug_bug_custom_status ORDER BY id DESC",
       "unguess"
     );
   }
