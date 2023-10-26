@@ -561,9 +561,39 @@ paths:
           $ref: '#/components/responses/Error'
       operationId: get-campaigns-cid-custom-statuses
       description: ''
+      parameters: []
       security:
         - JWT: []
-      parameters: []
+    post:
+      summary: ''
+      operationId: post-campaigns-cid-custom_statuses
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BugCustomStatus'
+      x-stoplight:
+        id: f6q0q4lmku75z
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  x-stoplight:
+                    id: yerpiqut01rov
+                phase_id:
+                  type: integer
+                  x-stoplight:
+                    id: 2ujoqceexzkp7
+              required:
+                - name
   '/campaigns/{cid}/devices':
     parameters:
       - name: cid
