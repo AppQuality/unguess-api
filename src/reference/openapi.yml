@@ -208,16 +208,18 @@ paths:
                           id: 0
                           name: string
                         priority:
-                          id: 12
-                          name: Highest
+                          id: 0
+                          name: string
                         custom_status:
-                          id: 1
-                          name: to do
-                          color: ffffff
-                          phase_id: 1
+                          id: 0
+                          name: string
+                          color: string
+                          phase:
+                            id: 0
+                            name: string
                           is_default: 0
                         created: string
-                        occurred_date: '2023-02-09T15:15:04+01:00'
+                        occurred_date: string
                         updated: string
                         note: string
                         device:
@@ -228,9 +230,9 @@ paths:
                           type: smartphone
                         application_section:
                           id: 0
-                          simple_title: string
                           prefix_title: string
                           title: string
+                          simple_title: string
                         duplicated_of_id: 0
                         is_favorite: 0
                         read: true
@@ -540,7 +542,7 @@ paths:
           type: string
         description: Campaign id
     get:
-      summary: Get Campaigns Priorities
+      summary: Get campaign Custom Statuses
       tags: []
       responses:
         '200':
@@ -554,11 +556,13 @@ paths:
               examples:
                 Example 1:
                   value:
-                    - id: 1
-                      name: to do
-                      color: ffffff
-                      phase_id: 1
-                      is_default: 1
+                    - id: 0
+                      name: string
+                      color: string
+                      phase:
+                        id: 0
+                        name: string
+                      is_default: 0
         '400':
           $ref: '#/components/responses/Error'
         '403':
@@ -585,10 +589,12 @@ paths:
               examples:
                 Example 1:
                   value:
-                    - id: 10
-                      name: to be done
-                      color: ffffff
-                      phase_id: 1
+                    - id: 0
+                      name: string
+                      color: string
+                      phase:
+                        id: 0
+                        name: string
                       is_default: 0
       security:
         - JWT: []
@@ -620,15 +626,12 @@ paths:
               examples:
                 Example 1:
                   value:
-                    - id: 1
-                      name: to do
-                      color: ffffff
-                      phase_id: 1
-                      is_default: 1
-                    - id: 2
-                      name: pending
-                      color: '000000'
-                      phase_id: 1
+                    - id: 0
+                      name: string
+                      color: string
+                      phase:
+                        id: 0
+                        name: string
                       is_default: 0
       security:
         - JWT: []
@@ -663,10 +666,12 @@ paths:
               examples:
                 Example 1:
                   value:
-                    - id: 10
-                      name: new name
-                      color: '000000'
-                      phase_id: 1
+                    - id: 0
+                      name: string
+                      color: string
+                      phase:
+                        id: 0
+                        name: string
                       is_default: 0
       security:
         - JWT: []
@@ -686,6 +691,7 @@ paths:
                     type: string
                 required:
                   - custom_status_id
+            examples: {}
   '/campaigns/{cid}/custom_statuses/{csid}':
     parameters:
       - schema:
@@ -2517,8 +2523,8 @@ components:
           type: string
         color:
           type: string
-        phase_id:
-          type: integer
+        phase:
+          $ref: '#/components/schemas/BugCustomStatusPhase'
         is_default:
           type: integer
           minimum: 0
@@ -2527,8 +2533,25 @@ components:
         - id
         - name
         - color
-        - phase_id
+        - phase
         - is_default
+    BugCustomStatusPhase:
+      title: BugCustomStatusPhase
+      x-stoplight:
+        id: 3fs23oeg8eb2w
+      type: object
+      properties:
+        id:
+          type: integer
+          x-stoplight:
+            id: j4c0htwqmpb1j
+        name:
+          type: string
+          x-stoplight:
+            id: pktyvl6o548ea
+      required:
+        - id
+        - name
     BugMedia:
       title: BugMedia
       type: object
