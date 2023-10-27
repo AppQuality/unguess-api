@@ -316,10 +316,37 @@ export default class Route extends BugsRoute<{
   }
 
   private async getAllStatuses(): Promise<CustomStatus[]> {
-    return await db.query(
-      "SELECT id, name, phase_id, color, is_default FROM wp_ug_bug_custom_status ORDER BY id DESC",
+    const results: {
+      id: number;
+      name: string;
+      color: string;
+      is_default: number;
+      phase_id: number;
+      phase_name: string;
+    }[] = await db.query(
+      `SELECT 
+        cs.id, 
+        cs.name,  
+        cs.color, 
+        cs.is_default,
+        csp.id as phase_id,
+        csp.name as phase_name 
+      FROM wp_ug_bug_custom_status cs
+      JOIN wp_ug_bug_custom_status_phase csp ON (cs.phase_id = csp.id) 
+      ORDER BY cs.id DESC`,
       "unguess"
     );
+
+    return results.map((customStatus) => ({
+      id: customStatus.id,
+      name: customStatus.name,
+      color: customStatus.color,
+      is_default: customStatus.is_default,
+      phase: {
+        id: customStatus.phase_id,
+        name: customStatus.phase_name,
+      },
+    }));
   }
 
   private async checkIfBugIdExistsInBugStatus(): Promise<Boolean> {
