@@ -14,6 +14,7 @@ import bug_priorities from "@src/__mocks__/database/bug_priority";
 import priorities from "@src/__mocks__/database/priority";
 import bug_custom_statuses from "@src/__mocks__/database/bug_custom_status";
 import custom_status from "@src/__mocks__/database/custom_status";
+import { unguess } from "@src/features/database";
 
 const campaign_type_1 = {
   id: 1,
@@ -283,9 +284,33 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     await bug_priorities.insert(bug_priority_2);
     await bug_priorities.insert(bug_priority_3);
     await priorities.addDefaultItems();
+    await unguess.tables.WpUgBugCustomStatusPhase.do().insert({
+      id: 1,
+      name: "working",
+    });
+    await unguess.tables.WpUgBugCustomStatusPhase.do().insert({
+      id: 2,
+      name: "completed",
+    });
+    await custom_status.addDefaultItems();
     await bug_custom_statuses.insert(bug_status_2);
     await bug_custom_statuses.insert(bug_status_3);
-    await custom_status.addDefaultItems();
+  });
+
+  afterAll(async () => {
+    await dbAdapter.clear();
+    await bugs.clear();
+    await severities.clear();
+    await replicabilities.clear();
+    await statuses.clear();
+    await devices.clear();
+    await usecases.clear();
+    await bug_tags.clear();
+    await bug_priorities.clear();
+    await priorities.clear();
+    await custom_status.clear();
+    await bug_custom_statuses.clear();
+    await unguess.tables.WpUgBugCustomStatusPhase.do().delete();
   });
 
   // It should answer 403 if user is not logged in

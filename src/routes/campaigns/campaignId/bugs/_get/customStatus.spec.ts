@@ -16,6 +16,7 @@ import bugCustomStatuses, {
   BugCustomStatusParams,
 } from "@src/__mocks__/database/bug_custom_status";
 import useCases from "@src/__mocks__/database/use_cases";
+import { unguess } from "@src/features/database";
 
 const customer_1 = {
   id: 999,
@@ -195,7 +196,6 @@ describe("GET /campaigns/{cid}/bugs", () => {
         userToProjects: [user_to_project_1],
         campaignTypes: [campaign_type_1],
         campaigns: [campaign_1],
-        custom_statuses: customStatuses.getDefaultItems(),
       });
 
       await CampaignMeta.insert({
@@ -232,6 +232,17 @@ describe("GET /campaigns/{cid}/bugs", () => {
       await useCases.insert({ id: 1, campaign_id: campaign_1.id });
       await useCases.insert({ id: 2, campaign_id: campaign_1.id });
 
+      await unguess.tables.WpUgBugCustomStatusPhase.do().insert({
+        id: 1,
+        name: "working",
+      });
+      await unguess.tables.WpUgBugCustomStatusPhase.do().insert({
+        id: 2,
+        name: "completed",
+      });
+
+      await customStatuses.addDefaultItems();
+
       await bugCustomStatuses.insert(bug_custom_status_2);
       await bugCustomStatuses.insert(bug_custom_status_3);
     } catch (error) {
@@ -251,6 +262,8 @@ describe("GET /campaigns/{cid}/bugs", () => {
     await bugsReadStatus.clear();
     await devices.clear();
     await useCases.clear();
+    await unguess.tables.WpUgBugCustomStatusPhase.do().delete();
+    await customStatuses.clear();
     await bugCustomStatuses.clear();
   });
 
@@ -300,7 +313,10 @@ describe("GET /campaigns/{cid}/bugs", () => {
           custom_status: expect.objectContaining({
             id: expect.any(Number),
             name: expect.any(String),
-            phase_id: expect.any(Number),
+            phase: expect.objectContaining({
+              id: expect.any(Number),
+              name: expect.any(String),
+            }),
             color: expect.any(String),
             is_default: expect.any(Number),
           }),

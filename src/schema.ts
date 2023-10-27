@@ -81,6 +81,7 @@ export interface paths {
     get: operations["get-campaigns-cid-custom-statuses"];
     post: operations["post-campaigns-cid-custom_statuses"];
     delete: operations["delete-campaigns-cid-custom_statuses"];
+    patch: operations["patch-campaigns-cid-custom_statuses"];
     parameters: {
       path: {
         /** Campaign id */
@@ -89,7 +90,6 @@ export interface paths {
     };
   };
   "/campaigns/{cid}/custom_statuses/{csid}": {
-    patch: operations["patch-campaigns-cid-custom_statuses-csid"];
     parameters: {
       path: {
         cid: string;
@@ -424,8 +424,13 @@ export interface components {
       id: number;
       name: string;
       color: string;
-      phase_id: number;
+      phase: components["schemas"]["BugCustomStatusPhase"];
       is_default: number;
+    };
+    /** BugCustomStatusPhase */
+    BugCustomStatusPhase: {
+      id: number;
+      name: string;
     };
     /** BugMedia */
     BugMedia: {
@@ -1279,16 +1284,16 @@ export interface operations {
       /** OK */
       200: {
         content: {
-          "application/json": components["schemas"]["BugCustomStatus"];
+          "application/json": components["schemas"]["BugCustomStatus"][];
         };
       };
     };
     requestBody: {
       content: {
         "application/json": {
-          name: string;
-          phase_id?: number;
-        };
+          name?: string;
+          color?: string;
+        }[];
       };
     };
   };
@@ -1310,32 +1315,33 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": {
-          custom_status_id?: number;
-        };
+          custom_status_id: number;
+        }[];
       };
     };
   };
-  "patch-campaigns-cid-custom_statuses-csid": {
+  "patch-campaigns-cid-custom_statuses": {
     parameters: {
       path: {
+        /** Campaign id */
         cid: string;
-        csid: string;
       };
     };
     responses: {
       /** OK */
       200: {
         content: {
-          "application/json": components["schemas"]["BugCustomStatus"];
+          "application/json": components["schemas"]["BugCustomStatus"][];
         };
       };
     };
     requestBody: {
       content: {
         "application/json": {
+          custom_status_id: number;
           name?: string;
           color?: string;
-        };
+        }[];
       };
     };
   };

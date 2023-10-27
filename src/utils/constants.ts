@@ -18,7 +18,10 @@ export const DEFAULT_BUG_CUSTOM_STATUS: StoplightComponents["schemas"]["BugCusto
   {
     id: 1,
     name: "to do",
-    phase_id: 1,
+    phase: {
+      id: 1,
+      name: "working",
+    },
     color: "ffffff",
     is_default: 1,
   };

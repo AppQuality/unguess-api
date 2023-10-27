@@ -285,26 +285,46 @@ export default class BugsRoute extends CampaignRoute<{
   ) {
     if (!bugs || !bugs.length) return [];
 
-    const customStatuses: (StoplightComponents["schemas"]["BugCustomStatus"] & {
+    const customStatuses: {
+      id: number;
+      name: string;
+      phase_id: number;
+      phase_name: string;
+      color: string;
+      is_default: 0 | 1;
       bug_id: number;
-    })[] = await db.query(
+    }[] = await db.query(
       `SELECT 
         cs.id,
         cs.name,
-        cs.phase_id,
         cs.color,
         cs.is_default,
+        csp.id as phase_id,
+        csp.name as phase_name,
         csb.bug_id
         FROM wp_ug_bug_custom_status_to_bug csb
         JOIN wp_ug_bug_custom_status cs ON (csb.custom_status_id = cs.id)
-        where csb.bug_id IN (${bugs.map((bug) => bug.id).join(",")})
+        JOIN wp_ug_bug_custom_status_phase csp ON (cs.phase_id = csp.id)
+        WHERE csb.bug_id IN (${bugs.map((bug) => bug.id).join(",")})
       `,
       "unguess"
     );
 
+    console.log("customStatuses", customStatuses);
+
     if (!customStatuses) return [];
 
-    return customStatuses;
+    return customStatuses.map((customStatus) => ({
+      id: customStatus.id,
+      name: customStatus.name,
+      phase: {
+        id: customStatus.phase_id,
+        name: customStatus.phase_name,
+      },
+      color: customStatus.color,
+      is_default: customStatus.is_default,
+      bug_id: customStatus.bug_id,
+    }));
   }
 
   private enhanceBugs(bugs: Awaited<ReturnType<typeof this.getBugs>>) {
@@ -410,7 +430,10 @@ export default class BugsRoute extends CampaignRoute<{
       ? {
           id: customStatus.id,
           name: customStatus.name,
-          phase_id: customStatus.phase_id,
+          phase: {
+            id: customStatus.phase.id,
+            name: customStatus.phase.name,
+          },
           color: customStatus.color,
           is_default: customStatus.is_default,
         }

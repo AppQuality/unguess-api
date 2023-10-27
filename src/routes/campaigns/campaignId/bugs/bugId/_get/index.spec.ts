@@ -19,7 +19,7 @@ import bugCustomStatuses, {
 import customStatuses from "@src/__mocks__/database/custom_status";
 import useCases, { UseCaseParams } from "@src/__mocks__/database/use_cases";
 import app from "@src/app";
-import { tryber } from "@src/features/database";
+import { tryber, unguess } from "@src/features/database";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 import request from "supertest";
 
@@ -319,6 +319,15 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
       meta_value: "1",
     });
 
+    await unguess.tables.WpUgBugCustomStatusPhase.do().insert({
+      id: 1,
+      name: "working",
+    });
+    await unguess.tables.WpUgBugCustomStatusPhase.do().insert({
+      id: 2,
+      name: "completed",
+    });
+
     await customStatuses.addDefaultItems();
     await bugCustomStatuses.insert(bug_status_1);
     await tryber.tables.WpAppqBugReadStatus.do().insert({
@@ -344,6 +353,9 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
     await bugType.clear();
     await bugStatus.clear();
     await readStatus.clear();
+    await customStatuses.clear();
+    await bugCustomStatuses.clear();
+    await unguess.tables.WpUgBugCustomStatusPhase.do().delete();
   });
 
   // It should answer 403 if user is not logged in
