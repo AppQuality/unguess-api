@@ -20,56 +20,80 @@ const defaultCustomStatuses = [
   {
     id: 1,
     name: "to do",
-    phase_id: 1,
+    phase: {
+      id: 1,
+      name: "working",
+    },
     color: "ffffff",
     is_default: 1,
   },
   {
     id: 2,
     name: "pending",
-    phase_id: 1,
+    phase: {
+      id: 1,
+      name: "working",
+    },
     color: "ffffff",
     is_default: 1,
   },
   {
     id: 3,
     name: "to be imported",
-    phase_id: 1,
+    phase: {
+      id: 1,
+      name: "working",
+    },
     color: "ffffff",
     is_default: 1,
   },
   {
     id: 4,
     name: "open",
-    phase_id: 1,
+    phase: {
+      id: 1,
+      name: "working",
+    },
     color: "ffffff",
     is_default: 1,
   },
   {
     id: 5,
     name: "to be retested",
-    phase_id: 1,
+    phase: {
+      id: 1,
+      name: "working",
+    },
     color: "ffffff",
     is_default: 1,
   },
   {
     id: 6,
     name: "solved",
-    phase_id: 2,
+    phase: {
+      id: 2,
+      name: "completed",
+    },
     color: "ffffff",
     is_default: 1,
   },
   {
     id: 7,
     name: "not a bug",
-    phase_id: 2,
+    phase: {
+      id: 2,
+      name: "completed",
+    },
     color: "ffffff",
     is_default: 1,
   },
   {
     id: 8,
     name: "under IT analysis",
-    phase_id: 1,
+    phase: {
+      id: 1,
+      name: "working",
+    },
     color: "ffffff",
     is_default: 1,
   },
@@ -89,7 +113,13 @@ class CustomStatuses extends Table<CustomStatusParams> {
 
   async addDefaultItems() {
     defaultCustomStatuses.forEach(async (customStatus) => {
-      await this.insert(customStatus);
+      await this.insert({
+        id: customStatus.id,
+        name: customStatus.name,
+        phase_id: customStatus.phase.id,
+        color: customStatus.color,
+        is_default: customStatus.is_default,
+      });
     });
   }
 
