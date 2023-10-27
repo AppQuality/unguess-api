@@ -424,8 +424,13 @@ export interface components {
       id: number;
       name: string;
       color: string;
-      phase_id: number;
+      phase: components["schemas"]["BugCustomStatusPhase"];
       is_default: number;
+    };
+    /** BugCustomStatusPhase */
+    BugCustomStatusPhase: {
+      id: number;
+      name: string;
     };
     /** BugMedia */
     BugMedia: {
