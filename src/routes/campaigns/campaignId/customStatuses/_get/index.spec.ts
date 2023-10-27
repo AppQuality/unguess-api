@@ -3,6 +3,7 @@ import request from "supertest";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 import custom_statuses from "@src/__mocks__/database/custom_status";
+import { unguess } from "@src/features/database";
 
 const campaign_type_1 = {
   id: 1,
@@ -90,7 +91,22 @@ describe("GET /campaigns/{cid}/custom_statuses", () => {
       userToProjects: [user_to_project_1],
     });
 
+    await unguess.tables.WpUgBugCustomStatusPhase.do().insert({
+      id: 1,
+      name: "working",
+    });
+    await unguess.tables.WpUgBugCustomStatusPhase.do().insert({
+      id: 2,
+      name: "completed",
+    });
+
     await custom_statuses.addDefaultItems();
+  });
+
+  afterAll(async () => {
+    await dbAdapter.clear();
+    await unguess.tables.WpUgBugCustomStatusPhase.do().delete();
+    await custom_statuses.clear();
   });
 
   // It should answer 403 if user is not logged in
