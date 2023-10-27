@@ -154,10 +154,10 @@ describe("GET /campaigns/{cid}/custom_statuses", () => {
 
     expect(body).toEqual(
       custom_statuses.getDefaultItems().sort((t1, t2) => {
-        if (t1.phase_id === t2.phase_id) {
+        if (t1.phase.id === t2.phase.id) {
           return t1.id - t2.id;
         }
-        return t1.phase_id - t2.phase_id;
+        return t1.phase.id - t2.phase.id;
       })
     );
   });

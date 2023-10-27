@@ -12,26 +12,29 @@ export default class Route extends CampaignRoute<{
 
   protected async init(): Promise<void> {
     await super.init();
-    const results: {
-      id: number;
-      name: string;
-      color: string;
-      is_default: number;
-      phase_id: number;
-      phase_name: string;
-    }[] = await db.query(
-      `SELECT 
-        cs.id, 
-        cs.name, 
-        cs.color, 
-        cs.is_default,
-        csp.id as phase_id,
-        csp.name as phase_name
-      FROM wp_ug_bug_custom_status cs
-      JOIN wp_ug_bug_custom_status_phase csp ON (cs.phase_id = csp.id)
-      ORDER BY cs.id DESC`,
-      "unguess"
-    );
+    const results = await unguess.tables.WpUgBugCustomStatus.do()
+      .select(
+        unguess.ref("id").withSchema("wp_ug_bug_custom_status"),
+        unguess.ref("name").withSchema("wp_ug_bug_custom_status"),
+        unguess.ref("color").withSchema("wp_ug_bug_custom_status"),
+        unguess.ref("is_default").withSchema("wp_ug_bug_custom_status"),
+        unguess
+          .ref("id")
+          .withSchema("wp_ug_bug_custom_status_phase")
+          .as("phase_id"),
+        unguess
+          .ref("name")
+          .withSchema("wp_ug_bug_custom_status_phase")
+          .as("phase_name")
+      )
+      .join(
+        "wp_ug_bug_custom_status_phase",
+        "wp_ug_bug_custom_status.phase_id",
+        "=",
+        "wp_ug_bug_custom_status_phase.id"
+      )
+      .orderBy("wp_ug_bug_custom_status.phase_id", "asc")
+      .orderBy("wp_ug_bug_custom_status.id", "asc");
 
     this.customStatuses = results.map((result) => ({
       id: result.id,
