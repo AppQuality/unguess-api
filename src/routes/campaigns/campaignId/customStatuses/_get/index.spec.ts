@@ -55,11 +55,18 @@ const status_test_with_campaign_and_default_1 = {
   is_default: 1,
 };
 
-const status_test_with_campaign_and_default_0 = {
+const status_test_with_campaign_and_default_2 = {
   id: 10,
   name: "Default status with campaign and default 0",
   phase_id: 1,
   campaign_id: 1,
+  is_default: 0,
+};
+
+const status_test_with_campaign_and_default_3 = {
+  id: 11,
+  name: "Default status with campaign and default 0",
+  phase_id: 1,
   is_default: 0,
 };
 
@@ -118,7 +125,8 @@ describe("GET /campaigns/{cid}/custom_statuses", () => {
 
     await custom_statuses.addDefaultItems();
     await custom_statuses.insert(status_test_with_campaign_and_default_1);
-    await custom_statuses.insert(status_test_with_campaign_and_default_0);
+    await custom_statuses.insert(status_test_with_campaign_and_default_2);
+    await custom_statuses.insert(status_test_with_campaign_and_default_3);
   });
 
   afterAll(async () => {
@@ -169,28 +177,80 @@ describe("GET /campaigns/{cid}/custom_statuses", () => {
     expect(response.status).toBe(200);
 
     const { body } = response;
-    expect(body).toEqual(
-      custom_statuses.getDefaultItems().sort((t1, t2) => {
-        if (t1.phase.id === t2.phase.id) {
-          return t1.id - t2.id;
-        }
-        return t1.phase.id - t2.phase.id;
-      })
-    );
-  });
-  it("Should not return a custom status with campaign_id not null and is_default = 1 ", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/custom_statuses`)
-      .set("Authorization", "Bearer user");
-    expect(response.body).toContain(status_test_with_campaign_and_default_1.id);
+    const items: StoplightOperations["get-campaigns-cid-custom-statuses"]["responses"]["200"]["content"]["application/json"] =
+      body;
+
+    expect(items).toEqual([
+      expect.objectContaining({
+        id: 1,
+        phase: expect.objectContaining({
+          id: 1,
+        }),
+      }),
+      expect.objectContaining({
+        id: 2,
+        phase: expect.objectContaining({
+          id: 1,
+        }),
+      }),
+      expect.objectContaining({
+        id: 3,
+        phase: expect.objectContaining({
+          id: 1,
+        }),
+      }),
+      expect.objectContaining({
+        id: 4,
+        phase: expect.objectContaining({
+          id: 1,
+        }),
+      }),
+      expect.objectContaining({
+        id: 5,
+        phase: expect.objectContaining({
+          id: 1,
+        }),
+      }),
+      expect.objectContaining({
+        id: 8,
+        phase: expect.objectContaining({
+          id: 1,
+        }),
+      }),
+      expect.objectContaining({
+        id: status_test_with_campaign_and_default_2.id,
+        phase: expect.objectContaining({
+          id: 1,
+        }),
+      }),
+      expect.objectContaining({
+        id: 6,
+        phase: expect.objectContaining({
+          id: 2,
+        }),
+      }),
+      expect.objectContaining({
+        id: 7,
+        phase: expect.objectContaining({
+          id: 2,
+        }),
+      }),
+    ]);
   });
 
-  it("Should only return statuses status with campaign_id null and is_default = 1 or with campaign_id but default = 0", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/custom_statuses`)
-      .set("Authorization", "Bearer user");
-    expect(response.body).toContain(status_test_with_campaign_and_default_0);
-  });
+  // it("Should not return a custom status with campaign_id not null and is_default = 1 ", async () => {
+  //   const response = await request(app)
+  //     .get(`/campaigns/${campaign_1.id}/custom_statuses`)
+  //     .set("Authorization", "Bearer user");
+  //   expect(response.body).toContain(status_test_with_campaign_and_default_1.id);
+  // });
+
+  // it("Should only return statuses status with campaign_id null and is_default = 1 or with campaign_id but default = 0", async () => {
+  //   const response = await request(app)
+  //     .get(`/campaigns/${campaign_1.id}/custom_statuses`)
+  //     .set("Authorization", "Bearer user");
+  //   expect(response.body).toContain(status_test_with_campaign_and_default_2);
+  // });
 
   // It should not return the list of statuses for a campaign where the user is not an owner
   it("Should not return the list of custom_statuses for a campaign where the user is not an owner", async () => {
