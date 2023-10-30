@@ -70,6 +70,14 @@ const status_test_with_campaign_and_default_3 = {
   is_default: 0,
 };
 
+const status_test_with_campaign_and_default_4 = {
+  id: 12,
+  name: "Custom status created by the user",
+  campaign_id: 2,
+  phase_id: 1,
+  is_default: 0,
+};
+
 const campaign_1 = {
   id: 1,
   start_date: "2017-07-20 10:00:00",
@@ -127,6 +135,7 @@ describe("GET /campaigns/{cid}/custom_statuses", () => {
     await custom_statuses.insert(status_test_with_campaign_and_default_1);
     await custom_statuses.insert(status_test_with_campaign_and_default_2);
     await custom_statuses.insert(status_test_with_campaign_and_default_3);
+    await custom_statuses.insert(status_test_with_campaign_and_default_4);
   });
 
   afterAll(async () => {
@@ -169,8 +178,8 @@ describe("GET /campaigns/{cid}/custom_statuses", () => {
     expect(response.status).toBe(403);
   });
 
-  // It should return the list of custom_statuses
-  it("Should return the list of custom_statuses ordered first by phase_id and than by id  ASC", async () => {
+  // Should return the list of custom_statuses ordered first by phase_id and than by id ASC
+  it("Should return the list of custom_statuses ordered first by phase_id and than by id ASC", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/custom_statuses`)
       .set("Authorization", "Bearer user");
@@ -256,6 +265,17 @@ describe("GET /campaigns/{cid}/custom_statuses", () => {
     expect(response.status).toBe(200);
     expect(response.body).not.toContain(
       status_test_with_campaign_and_default_3
+    );
+  });
+
+  // It should return only the custom_statuses for the campaign more than the default ones
+  it("Should return only the custom_statuses for the campaign more than the default ones", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/custom_statuses`)
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(200);
+    expect(response.body).not.toContain(
+      status_test_with_campaign_and_default_4
     );
   });
 
