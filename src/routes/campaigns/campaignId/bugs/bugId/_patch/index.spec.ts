@@ -582,7 +582,6 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
       .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer user")
       .send({ custom_status_id: status_test_with_campaign.id });
-    console.log(response.body, "ciollino");
     expect(response.status).toBe(403);
   });
 
