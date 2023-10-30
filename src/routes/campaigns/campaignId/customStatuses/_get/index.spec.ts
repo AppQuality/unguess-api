@@ -47,6 +47,22 @@ const project_2 = {
   customer_id: 2,
 };
 
+const status_test_with_campaign_and_default_1 = {
+  id: 9,
+  name: "Default status with campaign and default 1",
+  phase_id: 1,
+  campaign_id: 1,
+  is_default: 1,
+};
+
+const status_test_with_campaign_and_default_0 = {
+  id: 10,
+  name: "Default status with campaign and default 0",
+  phase_id: 1,
+  campaign_id: 1,
+  is_default: 0,
+};
+
 const campaign_1 = {
   id: 1,
   start_date: "2017-07-20 10:00:00",
@@ -101,6 +117,8 @@ describe("GET /campaigns/{cid}/custom_statuses", () => {
     });
 
     await custom_statuses.addDefaultItems();
+    await custom_statuses.insert(status_test_with_campaign_and_default_1);
+    await custom_statuses.insert(status_test_with_campaign_and_default_0);
   });
 
   afterAll(async () => {
@@ -151,7 +169,6 @@ describe("GET /campaigns/{cid}/custom_statuses", () => {
     expect(response.status).toBe(200);
 
     const { body } = response;
-
     expect(body).toEqual(
       custom_statuses.getDefaultItems().sort((t1, t2) => {
         if (t1.phase.id === t2.phase.id) {
@@ -160,6 +177,19 @@ describe("GET /campaigns/{cid}/custom_statuses", () => {
         return t1.phase.id - t2.phase.id;
       })
     );
+  });
+  it("Should not return a custom status with campaign_id not null and is_default = 1 ", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/custom_statuses`)
+      .set("Authorization", "Bearer user");
+    expect(response.body).toContain(status_test_with_campaign_and_default_1.id);
+  });
+
+  it("Should only return statuses status with campaign_id null and is_default = 1 or with campaign_id but default = 0", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/custom_statuses`)
+      .set("Authorization", "Bearer user");
+    expect(response.body).toContain(status_test_with_campaign_and_default_0);
   });
 
   // It should not return the list of statuses for a campaign where the user is not an owner
