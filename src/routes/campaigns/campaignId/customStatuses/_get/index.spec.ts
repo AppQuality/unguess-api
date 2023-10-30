@@ -238,19 +238,26 @@ describe("GET /campaigns/{cid}/custom_statuses", () => {
     ]);
   });
 
-  // it("Should not return a custom status with campaign_id not null and is_default = 1 ", async () => {
-  //   const response = await request(app)
-  //     .get(`/campaigns/${campaign_1.id}/custom_statuses`)
-  //     .set("Authorization", "Bearer user");
-  //   expect(response.body).toContain(status_test_with_campaign_and_default_1.id);
-  // });
+  it("Should not return a custom status with campaign_id not null and is_default = 1 ", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/custom_statuses`)
+      .set("Authorization", "Bearer user");
 
-  // it("Should only return statuses status with campaign_id null and is_default = 1 or with campaign_id but default = 0", async () => {
-  //   const response = await request(app)
-  //     .get(`/campaigns/${campaign_1.id}/custom_statuses`)
-  //     .set("Authorization", "Bearer user");
-  //   expect(response.body).toContain(status_test_with_campaign_and_default_2);
-  // });
+    expect(response.status).toBe(200);
+    expect(response.body).not.toContain(
+      status_test_with_campaign_and_default_1
+    );
+  });
+
+  it("Should only return statuses status with campaign_id null and is_default = 1 or with campaign_id but default = 0", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/custom_statuses`)
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(200);
+    expect(response.body).not.toContain(
+      status_test_with_campaign_and_default_3
+    );
+  });
 
   // It should not return the list of statuses for a campaign where the user is not an owner
   it("Should not return the list of custom_statuses for a campaign where the user is not an owner", async () => {
