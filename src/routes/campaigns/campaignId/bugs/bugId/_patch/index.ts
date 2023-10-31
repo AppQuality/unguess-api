@@ -324,16 +324,22 @@ export default class Route extends BugsRoute<{
       phase_id: number;
       phase_name: string;
     }[] = await db.query(
-      `SELECT 
+      db.format(
+        `SELECT 
         cs.id, 
         cs.name,  
         cs.color, 
         cs.is_default,
         csp.id as phase_id,
         csp.name as phase_name 
-      FROM wp_ug_bug_custom_status cs
-      JOIN wp_ug_bug_custom_status_phase csp ON (cs.phase_id = csp.id) 
-      ORDER BY cs.id DESC`,
+    FROM wp_ug_bug_custom_status cs
+    JOIN wp_ug_bug_custom_status_phase csp ON cs.phase_id = csp.id 
+    WHERE(cs.campaign_id = ? AND cs.is_default = 0) 
+    OR (cs.campaign_id IS NULL AND cs.is_default = 1)
+    ORDER BY cs.phase_id ASC, cs.id ASC;
+    `,
+        [this.cid]
+      ),
       "unguess"
     );
 
