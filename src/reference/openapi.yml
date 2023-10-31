@@ -622,45 +622,8 @@ paths:
       security:
         - JWT: []
     post:
-      summary: ''
+      summary: Create/Update/Delete Campaign Custom Statuses
       operationId: post-campaigns-cid-custom_statuses
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BugCustomStatus'
-              examples:
-                Example 1:
-                  value:
-                    id: 0
-                    name: string
-                    color: string
-                    phase:
-                      id: 0
-                      name: string
-                    is_default: 0
-      security:
-        - JWT: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                  x-stoplight:
-                    id: q8ob36a2e400e
-                color:
-                  type: string
-                  x-stoplight:
-                    id: 22g7d2ujg2b9w
-            examples: {}
-    delete:
-      summary: ''
-      operationId: delete-campaigns-cid-custom_statuses
       responses:
         '200':
           description: OK
@@ -680,63 +643,33 @@ paths:
                         id: 0
                         name: string
                       is_default: 0
-      x-stoplight:
-        id: o7wbluig0gims
       security:
         - JWT: []
       requestBody:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                custom_status_id:
-                  type: integer
-                  x-stoplight:
-                    id: 9jme6u98ydf41
-              required:
-                - custom_status_id
-  '/campaigns/{cid}/custom_statuses/{csid}':
-    parameters:
-      - $ref: '#/components/parameters/cid'
-      - $ref: '#/components/parameters/csid'
-    patch:
-      summary: ''
-      operationId: patch-campaigns-cid-custom_statuses-csid
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BugCustomStatus'
-              examples:
-                Example 1:
-                  value:
-                    id: 0
-                    name: string
-                    color: string
-                    phase:
-                      id: 0
-                      name: string
-                    is_default: 0
-      security:
-        - JWT: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                  x-stoplight:
-                    id: h31vcruhuyu46
-                color:
-                  type: string
-                  x-stoplight:
-                    id: 9rc4jcsvxq2km
-        description: ''
+              type: array
+              items:
+                x-stoplight:
+                  id: ioldnlxcwc9pa
+                type: object
+                properties:
+                  custom_status_id:
+                    type: integer
+                    x-stoplight:
+                      id: w3jydm9ih45mn
+                    description: "se esiste già questo parametro viene passato nel request body\r\nse invece non esiste ed il custom status deve essere creato, non viene passato"
+                  name:
+                    type: string
+                    x-stoplight:
+                      id: n5l10da0uyphg
+                  color:
+                    type: string
+                    x-stoplight:
+                      id: 5kotl2afm2w1e
+            examples: {}
+      description: ''
   '/campaigns/{cid}/devices':
     parameters:
       - name: cid
