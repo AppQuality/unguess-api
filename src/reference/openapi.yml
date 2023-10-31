@@ -583,33 +583,33 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/BugCustomStatus'
+                $ref: '#/components/schemas/BugCustomStatus'
               examples:
                 Example 1:
                   value:
-                    - id: 0
+                    id: 0
+                    name: string
+                    color: string
+                    phase:
+                      id: 0
                       name: string
-                      color: string
-                      phase:
-                        id: 0
-                        name: string
-                      is_default: 0
+                    is_default: 0
       security:
         - JWT: []
       requestBody:
         content:
           application/json:
             schema:
-              type: array
-              items:
-                type: object
-                properties:
-                  name:
-                    type: string
-                  color:
-                    type: string
+              type: object
+              properties:
+                name:
+                  type: string
+                  x-stoplight:
+                    id: q8ob36a2e400e
+                color:
+                  type: string
+                  x-stoplight:
+                    id: 22g7d2ujg2b9w
             examples: {}
     delete:
       summary: ''
@@ -633,77 +633,63 @@ paths:
                         id: 0
                         name: string
                       is_default: 0
+      x-stoplight:
+        id: o7wbluig0gims
       security:
         - JWT: []
       requestBody:
         content:
           application/json:
             schema:
-              type: array
-              items:
-                type: object
-                properties:
-                  custom_status_id:
-                    type: integer
-                required:
-                  - custom_status_id
-            examples:
-              Example 1:
-                value:
-                  - custom_status_id: 10
+              type: object
+              properties:
+                custom_status_id:
+                  type: integer
+                  x-stoplight:
+                    id: 9jme6u98ydf41
+              required:
+                - custom_status_id
+  '/campaigns/{cid}/custom_statuses/{csid}':
+    parameters:
+      - $ref: '#/components/parameters/cid'
+      - $ref: '#/components/parameters/csid'
     patch:
       summary: ''
-      operationId: patch-campaigns-cid-custom_statuses
+      operationId: patch-campaigns-cid-custom_statuses-csid
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/BugCustomStatus'
+                $ref: '#/components/schemas/BugCustomStatus'
               examples:
                 Example 1:
                   value:
-                    - id: 0
+                    id: 0
+                    name: string
+                    color: string
+                    phase:
+                      id: 0
                       name: string
-                      color: string
-                      phase:
-                        id: 0
-                        name: string
-                      is_default: 0
+                    is_default: 0
       security:
         - JWT: []
       requestBody:
         content:
           application/json:
             schema:
-              type: array
-              items:
-                type: object
-                properties:
-                  custom_status_id:
-                    type: integer
-                  name:
-                    type: string
-                  color:
-                    type: string
-                required:
-                  - custom_status_id
-            examples: {}
-  '/campaigns/{cid}/custom_statuses/{csid}':
-    parameters:
-      - schema:
-          type: string
-        name: cid
-        in: path
-        required: true
-      - schema:
-          type: string
-        name: csid
-        in: path
-        required: true
+              type: object
+              properties:
+                name:
+                  type: string
+                  x-stoplight:
+                    id: h31vcruhuyu46
+                color:
+                  type: string
+                  x-stoplight:
+                    id: 9rc4jcsvxq2km
+        description: ''
   '/campaigns/{cid}/devices':
     parameters:
       - name: cid
@@ -3659,6 +3645,13 @@ components:
       schema:
         type: string
       description: keywords to search
+    csid:
+      name: csid
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Custom Status id
   requestBodies:
     Credentials:
       content:
