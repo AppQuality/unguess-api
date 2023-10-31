@@ -336,7 +336,7 @@ export default class Route extends BugsRoute<{
     JOIN wp_ug_bug_custom_status_phase csp ON cs.phase_id = csp.id 
     WHERE(cs.campaign_id = ? AND cs.is_default = 0) 
     OR (cs.campaign_id IS NULL AND cs.is_default = 1)
-    ORDER BY cs.phase_id ASC, cs.id;
+    ORDER BY cs.phase_id ASC, cs.id ASC;
     `,
         [this.cid]
       ),
