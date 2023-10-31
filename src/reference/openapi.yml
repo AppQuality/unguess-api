@@ -274,17 +274,62 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/BugCustomStatus'
+                  $ref: '#/components/schemas/Bug'
               examples:
                 Example 1:
                   value:
                     - id: 0
-                      name: string
-                      color: string
-                      phase:
+                      internal_id: string
+                      campaign_id: 0
+                      title:
+                        full: string
+                        compact: string
+                        context:
+                          - string
+                      step_by_step: string
+                      expected_result: string
+                      current_result: string
+                      status:
                         id: 0
                         name: string
-                      is_default: 0
+                      severity:
+                        id: 0
+                        name: string
+                      type:
+                        id: 0
+                        name: string
+                      replicability:
+                        id: 0
+                        name: string
+                      priority:
+                        id: 0
+                        name: string
+                      custom_status:
+                        id: 0
+                        name: string
+                        color: string
+                        phase:
+                          id: 0
+                          name: string
+                        is_default: 0
+                      created: string
+                      occurred_date: string
+                      updated: string
+                      note: string
+                      device:
+                        manufacturer: string
+                        model: string
+                        os: string
+                        os_version: string
+                        type: smartphone
+                      application_section:
+                        id: 0
+                        prefix_title: string
+                        title: string
+                        simple_title: string
+                      duplicated_of_id: 0
+                      is_favorite: 0
+                      read: true
       x-stoplight:
         id: vxj64p9zv7d7h
       security:
@@ -293,23 +338,23 @@ paths:
         content:
           application/json:
             schema:
-              type: array
-              items:
-                x-stoplight:
-                  id: jfsj02nnvc1et
-                type: object
-                properties:
-                  bug_id:
-                    type: integer
+              type: object
+              properties:
+                bugs:
+                  type: array
+                  x-stoplight:
+                    id: bxupec42iqxcn
+                  items:
                     x-stoplight:
-                      id: gmcaqc8vsxrti
-                  custom_status_id:
+                      id: v5iotjb31opbf
                     type: integer
-                    x-stoplight:
-                      id: mdd50fepc3jx5
-                required:
-                  - bug_id
-                  - custom_status_id
+                custom_status_id:
+                  type: integer
+                  x-stoplight:
+                    id: en0av1w68ozu9
+              required:
+                - bugs
+                - custom_status_id
   '/campaigns/{cid}/bugs/{bid}':
     parameters:
       - $ref: '#/components/parameters/cid'
