@@ -713,6 +713,9 @@ paths:
                     type: string
                     x-stoplight:
                       id: 5kotl2afm2w1e
+                required:
+                  - name
+                  - color
             examples: {}
       description: ''
   '/campaigns/{cid}/devices':
