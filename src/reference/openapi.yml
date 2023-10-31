@@ -576,8 +576,6 @@ paths:
         - JWT: []
     patch:
       summary: Create/Update Campaign Custom Statuses
-      x-stoplight:
-        id: 0a82cc4ca7267
       operationId: patch-campaigns-cid-custom_statuses
       responses:
         '200':
@@ -606,23 +604,15 @@ paths:
             schema:
               type: array
               items:
-                x-stoplight:
-                  id: ioldnlxcwc9pa
                 type: object
                 properties:
                   custom_status_id:
                     type: integer
-                    x-stoplight:
-                      id: w3jydm9ih45mn
                     description: "se esiste già questo parametro viene passato nel request body\r\nse invece non esiste ed il custom status deve essere creato, non viene passato"
                   name:
                     type: string
-                    x-stoplight:
-                      id: n5l10da0uyphg
                   color:
                     type: string
-                    x-stoplight:
-                      id: 5kotl2afm2w1e
                 required:
                   - name
                   - color
@@ -634,8 +624,6 @@ paths:
       responses:
         '200':
           description: OK
-      x-stoplight:
-        id: rdbkqjqc7n6tq
       description: ''
       security:
         - JWT: []
@@ -645,18 +633,12 @@ paths:
             schema:
               type: array
               items:
-                x-stoplight:
-                  id: i3wurg75iiln4
                 type: object
                 properties:
                   custom_status_id:
                     type: integer
-                    x-stoplight:
-                      id: zvqi0xnnsntpr
                   to_custom_status_id:
                     type: integer
-                    x-stoplight:
-                      id: hkgmjv3s0ohch
                 required:
                   - custom_status_id
   '/campaigns/{cid}/devices':
@@ -2492,18 +2474,12 @@ components:
         - is_default
     BugCustomStatusPhase:
       title: BugCustomStatusPhase
-      x-stoplight:
-        id: 3fs23oeg8eb2w
       type: object
       properties:
         id:
           type: integer
-          x-stoplight:
-            id: j4c0htwqmpb1j
         name:
           type: string
-          x-stoplight:
-            id: pktyvl6o548ea
       required:
         - id
         - name
