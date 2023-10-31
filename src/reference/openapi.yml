@@ -263,6 +263,53 @@ paths:
         - $ref: '#/components/parameters/orderBy'
         - $ref: '#/components/parameters/filterBy'
         - $ref: '#/components/parameters/search'
+    patch:
+      summary: ''
+      operationId: patch-campaigns-cid-bugs
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BugCustomStatus'
+              examples:
+                Example 1:
+                  value:
+                    - id: 0
+                      name: string
+                      color: string
+                      phase:
+                        id: 0
+                        name: string
+                      is_default: 0
+      x-stoplight:
+        id: vxj64p9zv7d7h
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                x-stoplight:
+                  id: jfsj02nnvc1et
+                type: object
+                properties:
+                  bug_id:
+                    type: integer
+                    x-stoplight:
+                      id: gmcaqc8vsxrti
+                  custom_status_id:
+                    type: integer
+                    x-stoplight:
+                      id: mdd50fepc3jx5
+                required:
+                  - bug_id
+                  - custom_status_id
   '/campaigns/{cid}/bugs/{bid}':
     parameters:
       - $ref: '#/components/parameters/cid'
