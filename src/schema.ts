@@ -38,7 +38,6 @@ export interface paths {
   };
   "/campaigns/{cid}/bugs": {
     get: operations["get-campaigns-cid-bugs"];
-    patch: operations["patch-campaigns-cid-bugs"];
     parameters: {
       path: {
         /** Campaign id */
@@ -80,7 +79,8 @@ export interface paths {
   };
   "/campaigns/{cid}/custom_statuses": {
     get: operations["get-campaigns-cid-custom-statuses"];
-    post: operations["post-campaigns-cid-custom_statuses"];
+    delete: operations["delete-campaigns-cid-custom_statuses"];
+    patch: operations["patch-campaigns-cid-custom_statuses"];
     parameters: {
       path: {
         /** Campaign id */
@@ -1106,30 +1106,6 @@ export interface operations {
       500: components["responses"]["Error"];
     };
   };
-  "patch-campaigns-cid-bugs": {
-    parameters: {
-      path: {
-        /** Campaign id */
-        cid: components["parameters"]["cid"];
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Bug"][];
-        };
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          bugs: number[];
-          custom_status_id: number;
-        };
-      };
-    };
-  };
   "get-campaigns-single-bug": {
     parameters: {
       path: {
@@ -1290,7 +1266,27 @@ export interface operations {
       500: components["responses"]["Error"];
     };
   };
-  "post-campaigns-cid-custom_statuses": {
+  "delete-campaigns-cid-custom_statuses": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          custom_status_id: number;
+          to_custom_status_id?: number;
+        }[];
+      };
+    };
+  };
+  "patch-campaigns-cid-custom_statuses": {
     parameters: {
       path: {
         /** Campaign id */
@@ -1313,8 +1309,8 @@ export interface operations {
            * se invece non esiste ed il custom status deve essere creato, non viene passato
            */
           custom_status_id?: number;
-          name?: string;
-          color?: string;
+          name: string;
+          color: string;
         }[];
       };
     };
