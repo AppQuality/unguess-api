@@ -38,7 +38,6 @@ export interface paths {
   };
   "/campaigns/{cid}/bugs": {
     get: operations["get-campaigns-cid-bugs"];
-    patch: operations["patch-campaigns-cid-bugs"];
     parameters: {
       path: {
         /** Campaign id */
@@ -80,23 +79,12 @@ export interface paths {
   };
   "/campaigns/{cid}/custom_statuses": {
     get: operations["get-campaigns-cid-custom-statuses"];
-    post: operations["post-campaigns-cid-custom_statuses"];
     delete: operations["delete-campaigns-cid-custom_statuses"];
+    patch: operations["patch-campaigns-cid-custom_statuses"];
     parameters: {
       path: {
         /** Campaign id */
         cid: string;
-      };
-    };
-  };
-  "/campaigns/{cid}/custom_statuses/{csid}": {
-    patch: operations["patch-campaigns-cid-custom_statuses-csid"];
-    parameters: {
-      path: {
-        /** Campaign id */
-        cid: components["parameters"]["cid"];
-        /** Custom Status id */
-        csid: components["parameters"]["csid"];
       };
     };
   };
@@ -1118,30 +1106,6 @@ export interface operations {
       500: components["responses"]["Error"];
     };
   };
-  "patch-campaigns-cid-bugs": {
-    parameters: {
-      path: {
-        /** Campaign id */
-        cid: components["parameters"]["cid"];
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/json": components["schemas"]["BugCustomStatus"][];
-        };
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          bug_id: number;
-          custom_status_id: number;
-        }[];
-      };
-    };
-  };
   "get-campaigns-single-bug": {
     parameters: {
       path: {
@@ -1302,7 +1266,7 @@ export interface operations {
       500: components["responses"]["Error"];
     };
   };
-  "post-campaigns-cid-custom_statuses": {
+  "delete-campaigns-cid-custom_statuses": {
     parameters: {
       path: {
         /** Campaign id */
@@ -1311,22 +1275,18 @@ export interface operations {
     };
     responses: {
       /** OK */
-      200: {
-        content: {
-          "application/json": components["schemas"]["BugCustomStatus"];
-        };
-      };
+      200: unknown;
     };
     requestBody: {
       content: {
         "application/json": {
-          name?: string;
-          color?: string;
-        };
+          custom_status_id: number;
+          to_custom_status_id?: number;
+        }[];
       };
     };
   };
-  "delete-campaigns-cid-custom_statuses": {
+  "patch-campaigns-cid-custom_statuses": {
     parameters: {
       path: {
         /** Campaign id */
@@ -1344,34 +1304,14 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": {
-          custom_status_id: number;
-        };
-      };
-    };
-  };
-  "patch-campaigns-cid-custom_statuses-csid": {
-    parameters: {
-      path: {
-        /** Campaign id */
-        cid: components["parameters"]["cid"];
-        /** Custom Status id */
-        csid: components["parameters"]["csid"];
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/json": components["schemas"]["BugCustomStatus"];
-        };
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          name?: string;
-          color?: string;
-        };
+          /**
+           * @description se esiste già questo parametro viene passato nel request body
+           * se invece non esiste ed il custom status deve essere creato, non viene passato
+           */
+          custom_status_id?: number;
+          name: string;
+          color: string;
+        }[];
       };
     };
   };

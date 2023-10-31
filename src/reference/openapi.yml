@@ -263,53 +263,6 @@ paths:
         - $ref: '#/components/parameters/orderBy'
         - $ref: '#/components/parameters/filterBy'
         - $ref: '#/components/parameters/search'
-    patch:
-      summary: ''
-      operationId: patch-campaigns-cid-bugs
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/BugCustomStatus'
-              examples:
-                Example 1:
-                  value:
-                    - id: 0
-                      name: string
-                      color: string
-                      phase:
-                        id: 0
-                        name: string
-                      is_default: 0
-      x-stoplight:
-        id: vxj64p9zv7d7h
-      security:
-        - JWT: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                x-stoplight:
-                  id: jfsj02nnvc1et
-                type: object
-                properties:
-                  bug_id:
-                    type: integer
-                    x-stoplight:
-                      id: gmcaqc8vsxrti
-                  custom_status_id:
-                    type: integer
-                    x-stoplight:
-                      id: mdd50fepc3jx5
-                required:
-                  - bug_id
-                  - custom_status_id
   '/campaigns/{cid}/bugs/{bid}':
     parameters:
       - $ref: '#/components/parameters/cid'
@@ -621,46 +574,9 @@ paths:
       parameters: []
       security:
         - JWT: []
-    post:
-      summary: ''
-      operationId: post-campaigns-cid-custom_statuses
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BugCustomStatus'
-              examples:
-                Example 1:
-                  value:
-                    id: 0
-                    name: string
-                    color: string
-                    phase:
-                      id: 0
-                      name: string
-                    is_default: 0
-      security:
-        - JWT: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                  x-stoplight:
-                    id: q8ob36a2e400e
-                color:
-                  type: string
-                  x-stoplight:
-                    id: 22g7d2ujg2b9w
-            examples: {}
-    delete:
-      summary: ''
-      operationId: delete-campaigns-cid-custom_statuses
+    patch:
+      summary: Create/Update Campaign Custom Statuses
+      operationId: patch-campaigns-cid-custom_statuses
       responses:
         '200':
           description: OK
@@ -680,63 +596,51 @@ paths:
                         id: 0
                         name: string
                       is_default: 0
-      x-stoplight:
-        id: o7wbluig0gims
       security:
         - JWT: []
       requestBody:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                custom_status_id:
-                  type: integer
-                  x-stoplight:
-                    id: 9jme6u98ydf41
-              required:
-                - custom_status_id
-  '/campaigns/{cid}/custom_statuses/{csid}':
-    parameters:
-      - $ref: '#/components/parameters/cid'
-      - $ref: '#/components/parameters/csid'
-    patch:
-      summary: ''
-      operationId: patch-campaigns-cid-custom_statuses-csid
+              type: array
+              items:
+                type: object
+                properties:
+                  custom_status_id:
+                    type: integer
+                    description: "se esiste già questo parametro viene passato nel request body\r\nse invece non esiste ed il custom status deve essere creato, non viene passato"
+                  name:
+                    type: string
+                  color:
+                    type: string
+                required:
+                  - name
+                  - color
+            examples: {}
+      description: ''
+    delete:
+      summary: Delete and migrate Custom Statuses
+      operationId: delete-campaigns-cid-custom_statuses
       responses:
         '200':
           description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BugCustomStatus'
-              examples:
-                Example 1:
-                  value:
-                    id: 0
-                    name: string
-                    color: string
-                    phase:
-                      id: 0
-                      name: string
-                    is_default: 0
+      description: ''
       security:
         - JWT: []
       requestBody:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                  x-stoplight:
-                    id: h31vcruhuyu46
-                color:
-                  type: string
-                  x-stoplight:
-                    id: 9rc4jcsvxq2km
-        description: ''
+              type: array
+              items:
+                type: object
+                properties:
+                  custom_status_id:
+                    type: integer
+                  to_custom_status_id:
+                    type: integer
+                required:
+                  - custom_status_id
   '/campaigns/{cid}/devices':
     parameters:
       - name: cid
@@ -2570,18 +2474,12 @@ components:
         - is_default
     BugCustomStatusPhase:
       title: BugCustomStatusPhase
-      x-stoplight:
-        id: 3fs23oeg8eb2w
       type: object
       properties:
         id:
           type: integer
-          x-stoplight:
-            id: j4c0htwqmpb1j
         name:
           type: string
-          x-stoplight:
-            id: pktyvl6o548ea
       required:
         - id
         - name
