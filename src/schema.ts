@@ -38,6 +38,7 @@ export interface paths {
   };
   "/campaigns/{cid}/bugs": {
     get: operations["get-campaigns-cid-bugs"];
+    patch: operations["patch-campaigns-cid-bugs"];
     parameters: {
       path: {
         /** Campaign id */
@@ -1115,6 +1116,30 @@ export interface operations {
       401: components["responses"]["Error"];
       403: components["responses"]["Error"];
       500: components["responses"]["Error"];
+    };
+  };
+  "patch-campaigns-cid-bugs": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["BugCustomStatus"][];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          bug_id: number;
+          custom_status_id: number;
+        }[];
+      };
     };
   };
   "get-campaigns-single-bug": {
