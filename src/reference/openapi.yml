@@ -631,8 +631,6 @@ paths:
                 properties:
                   status:
                     type: boolean
-                    x-stoplight:
-                      id: 4q6y8c1npb47w
       description: ''
       security:
         - JWT: []
