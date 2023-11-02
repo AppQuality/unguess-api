@@ -22,7 +22,7 @@ export default class Route extends CampaignRoute<{
   }
 
   protected async prepare(): Promise<void> {
-    this.deleteAndMigrateCustomStatuses();
+    await this.deleteAndMigrateCustomStatuses();
 
     return this.setSuccess(200, {
       status: true,
@@ -123,27 +123,29 @@ export default class Route extends CampaignRoute<{
     );
   }
 
-  private deleteAndMigrateCustomStatuses() {
+  private async deleteAndMigrateCustomStatuses() {
     // TODO: add knex.transaction() to process the delete queries
-    this.customStatusIds.forEach(async (customStatus) => {
-      // Delete custom status
-      await unguess.tables.WpUgBugCustomStatus.do()
-        .delete()
-        .where("id", customStatus.custom_status_id);
-
-      if (customStatus.to_custom_status_id) {
-        // Migrate bugs to new custom status
-        await unguess.tables.WpUgBugCustomStatusToBug.do()
-          .update({
-            custom_status_id: customStatus.to_custom_status_id,
-          })
-          .where("custom_status_id", customStatus.custom_status_id);
-      } else {
-        // Delete custom status to bug to set default (no record)
-        await unguess.tables.WpUgBugCustomStatusToBug.do()
+    return Promise.all(
+      this.customStatusIds.map(async (customStatus) => {
+        // Delete custom status
+        await unguess.tables.WpUgBugCustomStatus.do()
           .delete()
-          .where("custom_status_id", customStatus.custom_status_id);
-      }
-    });
+          .where("id", customStatus.custom_status_id);
+
+        if (customStatus.to_custom_status_id) {
+          // Migrate bugs to new custom status
+          await unguess.tables.WpUgBugCustomStatusToBug.do()
+            .update({
+              custom_status_id: customStatus.to_custom_status_id,
+            })
+            .where("custom_status_id", customStatus.custom_status_id);
+        } else {
+          // Delete custom status to bug to set default (no record)
+          await unguess.tables.WpUgBugCustomStatusToBug.do()
+            .delete()
+            .where("custom_status_id", customStatus.custom_status_id);
+        }
+      })
+    );
   }
 }
