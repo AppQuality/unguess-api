@@ -105,7 +105,11 @@ class CustomStatuses extends Table<CustomStatusParams> {
     "id INTEGER PRIMARY KEY NOT NULL",
     "name VARCHAR(45)",
     "phase_id INTEGER",
-    "color VARCHAR(45), is_default INTEGER, created_at DATETIME, updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP",
+    "color VARCHAR(45)",
+    "campaign_id INTEGER",
+    "is_default INTEGER DEFAULT 0",
+    "created_at DATETIME",
+    "updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP",
   ];
   constructor() {
     super(defaultItem);
