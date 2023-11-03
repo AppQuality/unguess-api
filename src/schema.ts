@@ -1275,7 +1275,13 @@ export interface operations {
     };
     responses: {
       /** OK */
-      200: unknown;
+      200: {
+        content: {
+          "application/json": {
+            status?: boolean;
+          };
+        };
+      };
     };
     requestBody: {
       content: {
