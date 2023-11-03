@@ -19,6 +19,7 @@ export default class CampaignRoute<
   private NEED_REVIEW_STATUS_ID = 4;
   private APPROVED_STATUS_ID = 2;
   public CUSTOMER_TITLE_MAX_LENGTH = 256;
+  public CUSTOM_STATUS_NAME_MAX_LENGTH = 17;
 
   constructor(configuration: RouteClassConfiguration) {
     super(configuration);
