@@ -10,7 +10,7 @@ export const getBugCustomStatus = async (bug_id: number) => {
                 cs.color,
                 cs.is_default,
                 csp.id as phase_id,
-                csp.name as phase_name,
+                csp.name as phase_name
             FROM wp_ug_bug_custom_status cs 
             JOIN wp_ug_bug_custom_status_phase csp ON (cs.phase_id = csp.id)
             JOIN wp_ug_bug_custom_status_to_bug csb ON (csb.custom_status_id = cs.id) 
