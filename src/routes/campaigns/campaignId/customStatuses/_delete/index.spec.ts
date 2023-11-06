@@ -6,7 +6,6 @@ import custom_statuses, {
   CustomStatusParams,
 } from "@src/__mocks__/database/custom_status";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
-import devices, { DeviceParams } from "@src/__mocks__/database/device";
 import bugs, { BugsParams } from "@src/__mocks__/database/bugs";
 import { ProjectParams } from "@src/__mocks__/database/project";
 import { UserToCustomerParams } from "@src/__mocks__/database/user_to_customer";
@@ -115,17 +114,6 @@ const custom_status_3: CustomStatusParams & { campaign_id: number } = {
   is_default: 0,
 };
 
-const device_1: DeviceParams = {
-  id: 12,
-  manufacturer: "Apple",
-  model: "iPhone 13",
-  platform_id: 2,
-  id_profile: 61042,
-  os_version: "iOS 16 (16)",
-  operating_system: "iOS",
-  form_factor: "Smartphone",
-};
-
 const bug_1: BugsParams = {
   id: 1,
   internal_id: "BUG011",
@@ -141,13 +129,13 @@ const bug_1: BugsParams = {
   application_section: "Bug 1 application section",
   note: "Bug 1 note",
   wp_user_id: 1,
-  dev_id: device_1.id,
+  dev_id: 12,
   is_duplicated: 1,
   duplicated_of_id: 2,
-  manufacturer: device_1.manufacturer,
-  model: device_1.model,
-  os: device_1.operating_system,
-  os_version: device_1.os_version,
+  manufacturer: "Apple",
+  model: "iPhone 13",
+  os: "iOS",
+  os_version: "iOS 16 (16)",
   severity_id: 1,
 };
 
@@ -204,8 +192,6 @@ describe("DELETE /campaigns/{cid}/custom_statuses", () => {
     await custom_statuses.insert(custom_status_3);
     await custom_statuses.insert(custom_status_4);
 
-    await devices.insert(device_1);
-
     await bugs.insert(bug_1);
     await bugs.insert(bug_2);
     await bugs.insert(bug_3);
@@ -218,7 +204,6 @@ describe("DELETE /campaigns/{cid}/custom_statuses", () => {
     await dbAdapter.clear();
     await unguess.tables.WpUgBugCustomStatusPhase.do().delete();
     await custom_statuses.clear();
-    await devices.clear();
     await bugs.clear();
   });
 
