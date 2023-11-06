@@ -59,7 +59,6 @@ export default class Route extends CampaignRoute<{
         itemsForPost.push(item);
       }
     });
-
     return { itemsForPatch, itemsForPost };
   }
 
@@ -114,16 +113,16 @@ export default class Route extends CampaignRoute<{
 
   private async editOrCreateCustomStatuses() {
     const { itemsForPatch, itemsForPost } = this.getItemsForPatchAndPost();
-
     if (itemsForPatch.length > 0) {
       await Promise.all(
         itemsForPatch.map((item) => {
           return unguess.tables.WpUgBugCustomStatus.do()
-            .where("custom_status_id", item.custom_status_id)
+            .where("id", item.custom_status_id)
             .update({ name: item.name, color: item.color });
         })
       );
     }
+
     if (itemsForPost.length > 0) {
       await Promise.all(
         itemsForPost.map((item) => {
@@ -137,6 +136,6 @@ export default class Route extends CampaignRoute<{
         })
       );
     }
-    return await this.getCustomStatuses(this.cp_id);
+    return this.getCustomStatuses(this.cp_id);
   }
 }

@@ -5,8 +5,9 @@ import custom_statuses, {
   CustomStatusParams,
 } from "@src/__mocks__/database/custom_status";
 import app from "@src/app";
-import { tryber, unguess } from "@src/features/database";
+import { unguess } from "@src/features/database";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
+import { ca } from "date-fns/locale";
 import request from "supertest";
 
 const campaign_type_1 = {
@@ -61,7 +62,7 @@ const status_test_with_campaign_and_default_1 = {
 };
 
 const status_with_long_name = {
-  id: 12,
+  id: 20,
   name: "Status with name longer than 15 chars",
   phase_id: 1,
   color: "ffffff",
@@ -87,6 +88,14 @@ const status_test_with_campaign = {
   campaign_id: 1,
   color: "ffffff",
 };
+
+const test_status = {
+  id: 33,
+  name: "testingStatus",
+  campaign_id: 1,
+  color: "ffffff",
+};
+
 const status_without_phase = {
   id: 15,
   name: "No Phase",
@@ -103,7 +112,7 @@ const status_test_with_campaign_and_default_3 = {
 
 const status_test_with_campaign_and_default_4 = {
   id: 12,
-  name: "Custom status created by the user",
+  name: "CustomUser",
   campaign_id: 2,
   color: "ffffff",
   phase_id: 1,
@@ -170,6 +179,7 @@ describe("PATCH /campaigns/{cid}/custom_statuses", () => {
 
     await custom_statuses.addDefaultItems();
     await custom_statuses.insert(status_test_with_campaign_and_default_1);
+    await custom_statuses.insert(test_status);
     await custom_statuses.insert(status_test_with_campaign);
     await custom_statuses.insert(status_test_with_campaign_and_default_3);
     await custom_statuses.insert(status_test_with_campaign_and_default_4);
@@ -354,5 +364,17 @@ describe("PATCH /campaigns/{cid}/custom_statuses", () => {
       .set("Authorization", "Bearer user")
       .send([status_with_long_name]);
     expect(response.status).toBe(403);
+  });
+
+  it("Should return the correct amount of custom statuses", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}/custom_statuses`)
+      .set("Authorization", "Bearer user")
+      .send([
+        { custom_status_id: 15, name: "testami", color: "000000" },
+        { name: "export", color: "ffffff" },
+        { name: "import", color: "ffffff" },
+      ]);
+    expect(response.body.length).toBe(11);
   });
 });
