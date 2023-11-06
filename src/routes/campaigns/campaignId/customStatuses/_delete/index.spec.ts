@@ -5,7 +5,6 @@ import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import custom_statuses, {
   CustomStatusParams,
 } from "@src/__mocks__/database/custom_status";
-import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 import bugs, { BugsParams } from "@src/__mocks__/database/bugs";
 import { ProjectParams } from "@src/__mocks__/database/project";
 import { UserToCustomerParams } from "@src/__mocks__/database/user_to_customer";
@@ -14,12 +13,6 @@ import { UserToProjectParams } from "@src/__mocks__/database/user_to_project";
 import bug_custom_statuses, {
   BugCustomStatusParams,
 } from "@src/__mocks__/database/bug_custom_status";
-
-const campaign_type_1 = {
-  id: 1,
-  name: "Functional Testing (Bug Hunting)",
-  type: FUNCTIONAL_CAMPAIGN_TYPE_ID,
-};
 
 const customer_1: CustomerParams = {
   id: 1,
@@ -48,7 +41,7 @@ const campaign_1 = {
   customer_title: "Campaign 1 customer title",
   status_id: 1,
   is_public: 1,
-  campaign_type_id: campaign_type_1.id,
+  campaign_type_id: 1,
   campaign_type: -1,
   project_id: project_1.id,
 };
@@ -93,7 +86,7 @@ const campaign_2 = {
   customer_title: "Campaign 2 customer title",
   status_id: 1,
   is_public: 1,
-  campaign_type_id: campaign_type_1.id,
+  campaign_type_id: 1,
   campaign_type: -1,
   project_id: project_2.id,
 };
@@ -169,7 +162,7 @@ const custom_status_4: CustomStatusParams & { campaign_id: number } = {
 describe("DELETE /campaigns/{cid}/custom_statuses", () => {
   beforeEach(async () => {
     await dbAdapter.add({
-      campaignTypes: [campaign_type_1],
+      campaignTypes: [1],
       campaigns: [campaign_1, campaign_2],
       companies: [customer_1],
       projects: [project_1, project_2],
