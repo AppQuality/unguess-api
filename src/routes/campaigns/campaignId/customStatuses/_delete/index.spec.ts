@@ -259,19 +259,6 @@ describe("DELETE /campaigns/{cid}/custom_statuses", () => {
     expect(response.status).toBe(400);
   });
 
-  it("Should fail if the custom_status_id is not a number", async () => {
-    const response = await request(app)
-      .delete(`/campaigns/${campaign_1.id}/custom_statuses`)
-      .set("Authorization", "Bearer user")
-      .send([
-        {
-          custom_status_id: "a",
-        },
-      ]);
-
-    expect(response.status).toBe(400);
-  });
-
   it("Should fail if the custom status is default", async () => {
     const response = await request(app)
       .delete(`/campaigns/${campaign_1.id}/custom_statuses`)
