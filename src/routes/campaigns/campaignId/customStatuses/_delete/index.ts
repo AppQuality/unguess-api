@@ -8,7 +8,7 @@ export default class Route extends CampaignRoute<{
   body: StoplightOperations["delete-campaigns-cid-custom_statuses"]["requestBody"]["content"]["application/json"];
 }> {
   private customStatuses: (StoplightComponents["schemas"]["BugCustomStatus"] & {
-    campaign_id: number;
+    campaign_id: number | null;
   })[] = [];
   private campaignId: number = 0;
   private customStatusIds: StoplightOperations["delete-campaigns-cid-custom_statuses"]["requestBody"]["content"]["application/json"] =
@@ -18,7 +18,7 @@ export default class Route extends CampaignRoute<{
     await super.init();
     this.campaignId = this.cp_id;
     this.customStatuses = await this.getAllCustomStatuses();
-    this.customStatusIds = this.getCustomStatusIds();
+    this.customStatusIds = this.getCustomStatusIds(); //body
   }
 
   protected async prepare(): Promise<void> {
@@ -64,7 +64,6 @@ export default class Route extends CampaignRoute<{
       .join(
         "wp_ug_bug_custom_status_phase",
         "wp_ug_bug_custom_status.phase_id",
-        "=",
         "wp_ug_bug_custom_status_phase.id"
       )
       .where(function () {
@@ -109,9 +108,17 @@ export default class Route extends CampaignRoute<{
   }
 
   private checkTargetCustomStatusIds() {
+    const defaultCustomStatusIds = this.customStatuses
+      .filter((customStatus) => customStatus.is_default === 1)
+      .map((customStatus) => customStatus.id);
+
     return this.customStatusIds.every((bodyCustomStatus) =>
       this.customStatuses.some((customStatus) => {
         if (!bodyCustomStatus.to_custom_status_id) return true;
+        if (
+          defaultCustomStatusIds.includes(bodyCustomStatus.to_custom_status_id)
+        )
+          return true;
         if (
           customStatus.id === bodyCustomStatus.to_custom_status_id &&
           customStatus.is_default === 0 &&

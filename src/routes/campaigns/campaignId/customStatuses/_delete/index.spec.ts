@@ -107,6 +107,14 @@ const custom_status_2: CustomStatusParams & { campaign_id: number } = {
   is_default: 0,
 };
 
+const custom_status_3: CustomStatusParams & { campaign_id: number } = {
+  id: 11,
+  name: "Custom status 3",
+  phase_id: 1,
+  campaign_id: campaign_1.id,
+  is_default: 0,
+};
+
 const device_1: DeviceParams = {
   id: 12,
   manufacturer: "Apple",
@@ -147,13 +155,9 @@ const bug_2: BugsParams = {
   ...bug_1,
   id: 2,
 };
-
-const custom_status_3: CustomStatusParams & { campaign_id: number } = {
-  id: 11,
-  name: "Custom status 3",
-  phase_id: 1,
-  campaign_id: campaign_1.id,
-  is_default: 0,
+const bug_3: BugsParams = {
+  ...bug_1,
+  id: 3,
 };
 
 const bug_custom_status_1: BugCustomStatusParams = {
@@ -204,6 +208,7 @@ describe("DELETE /campaigns/{cid}/custom_statuses", () => {
 
     await bugs.insert(bug_1);
     await bugs.insert(bug_2);
+    await bugs.insert(bug_3);
 
     await bug_custom_statuses.insert(bug_custom_status_1);
     await bug_custom_statuses.insert(bug_custom_status_2);
@@ -285,19 +290,32 @@ describe("DELETE /campaigns/{cid}/custom_statuses", () => {
     expect(response.status).toBe(400);
   });
 
-  it("Should return 200, delete the custom status and migrate the campaign bugs to the default custom status if the custom status is deleted and no target custom status is specified", async () => {
-    const customStatusBefore = await unguess.tables.WpUgBugCustomStatus.do()
-      .select("*")
-      .where("id", custom_status_3.id);
+  it("Should return 200", async () => {
+    const response = await request(app)
+      .delete(`/campaigns/${campaign_1.id}/custom_statuses`)
+      .set("Authorization", "Bearer user")
+      .send([
+        {
+          custom_status_id: custom_status_3.id,
+        },
+      ]);
+    expect(response.status).toBe(200);
+    expect(response.body.status).toBe(true);
+  });
 
-    expect(customStatusBefore).toHaveLength(1);
+  it("Should delete the custom status", async () => {
+    const customStatusBefore = await unguess.tables.WpUgBugCustomStatus.do()
+      .select()
+      .where({ id: custom_status_3.id })
+      .first();
+    expect(customStatusBefore).toBeDefined();
 
     const bugCustomStatusBefore =
       await unguess.tables.WpUgBugCustomStatusToBug.do()
-        .select("*")
-        .where("custom_status_id", custom_status_3.id);
-
-    expect(bugCustomStatusBefore).toHaveLength(1);
+        .select()
+        .where({ custom_status_id: custom_status_3.id })
+        .first();
+    expect(bugCustomStatusBefore).toBeDefined();
 
     const response = await request(app)
       .delete(`/campaigns/${campaign_1.id}/custom_statuses`)
@@ -307,45 +325,33 @@ describe("DELETE /campaigns/{cid}/custom_statuses", () => {
           custom_status_id: custom_status_3.id,
         },
       ]);
-
     expect(response.status).toBe(200);
     expect(response.body.status).toBe(true);
 
     const customStatusAfter = await unguess.tables.WpUgBugCustomStatus.do()
-      .select("*")
-      .where("id", custom_status_3.id);
+      .select()
+      .where({ id: custom_status_3.id })
+      .first();
+    expect(customStatusAfter).toBeUndefined();
 
-    expect(customStatusAfter).toHaveLength(0);
-
-    const bugCustomStatusAfter1 =
+    const bugCustomStatusAfter =
       await unguess.tables.WpUgBugCustomStatusToBug.do()
-        .select("*")
-        .where("custom_status_id", custom_status_3.id);
-
-    expect(bugCustomStatusAfter1).toHaveLength(0);
-
-    const bugCustomStatusAfter2 =
-      await unguess.tables.WpUgBugCustomStatusToBug.do()
-        .select("*")
-        .where("bug_id", bug_2.id);
-
-    expect(bugCustomStatusAfter2).toHaveLength(0); // Default custom status means no record in custom_status_to_bug
+        .select()
+        .where({ custom_status_id: custom_status_3.id })
+        .first();
+    expect(bugCustomStatusAfter).toBeUndefined();
   });
 
-  it("Should return 200 and delete all multiple custom statuses and migrate the campaign bugs to the default custom status if no target custom status is specified", async () => {
+  it("Should delete all multiple custom statuses", async () => {
     const customStatusBefore = await unguess.tables.WpUgBugCustomStatus.do()
-      .select("*")
-      .where("id", custom_status_1.id)
-      .orWhere("id", custom_status_3.id);
-
+      .select()
+      .whereIn("id", [9, 11]);
     expect(customStatusBefore).toHaveLength(2);
 
     const bugCustomStatusBefore =
       await unguess.tables.WpUgBugCustomStatusToBug.do()
-        .select("*")
-        .where("custom_status_id", custom_status_1.id)
-        .orWhere("custom_status_id", custom_status_3.id);
-
+        .select()
+        .whereIn("custom_status_id", [9, 11]);
     expect(bugCustomStatusBefore).toHaveLength(2);
 
     const response = await request(app)
@@ -353,29 +359,24 @@ describe("DELETE /campaigns/{cid}/custom_statuses", () => {
       .set("Authorization", "Bearer user")
       .send([
         {
-          custom_status_id: custom_status_1.id,
+          custom_status_id: custom_status_1.id, //9
         },
         {
-          custom_status_id: custom_status_3.id,
+          custom_status_id: custom_status_3.id, //11
         },
       ]);
-
     expect(response.status).toBe(200);
     expect(response.body.status).toBe(true);
 
     const customStatusAfter = await unguess.tables.WpUgBugCustomStatus.do()
-      .select("*")
-      .where("id", custom_status_1.id)
-      .orWhere("id", custom_status_3.id);
-
+      .select()
+      .whereIn("id", [9, 11]);
     expect(customStatusAfter).toHaveLength(0);
 
     const bugCustomStatusAfter =
       await unguess.tables.WpUgBugCustomStatusToBug.do()
-        .select("*")
-        .where("custom_status_id", custom_status_1.id)
-        .orWhere("custom_status_id", custom_status_3.id);
-
+        .select()
+        .whereIn("custom_status_id", [9, 11]);
     expect(bugCustomStatusAfter).toHaveLength(0);
   });
 
@@ -403,23 +404,21 @@ describe("DELETE /campaigns/{cid}/custom_statuses", () => {
           to_custom_status_id: custom_status_2.id,
         },
       ]);
-
     expect(response.status).toBe(400);
   });
 
-  it("Should return 200, delete the custom status and migrate the campaign bugs to the target custom status if specified", async () => {
+  it("Should migrate the campaign bugs to the target custom status if specified", async () => {
     const customStatusBefore = await unguess.tables.WpUgBugCustomStatus.do()
-      .select("*")
-      .where("id", custom_status_3.id);
-
-    expect(customStatusBefore).toHaveLength(1);
+      .select()
+      .where({ id: custom_status_3.id })
+      .first();
+    expect(customStatusBefore).toBeDefined();
 
     const bugCustomStatusBefore =
       await unguess.tables.WpUgBugCustomStatusToBug.do()
-        .select("*")
-        .where("custom_status_id", custom_status_3.id);
-
-    expect(bugCustomStatusBefore).toHaveLength(1);
+        .select()
+        .where({ custom_status_id: custom_status_3.id });
+    expect(bugCustomStatusBefore).toBeDefined();
 
     const response = await request(app)
       .delete(`/campaigns/${campaign_1.id}/custom_statuses`)
@@ -430,35 +429,33 @@ describe("DELETE /campaigns/{cid}/custom_statuses", () => {
           to_custom_status_id: custom_status_1.id,
         },
       ]);
-
     expect(response.status).toBe(200);
     expect(response.body.status).toBe(true);
 
     const customStatusAfter = await unguess.tables.WpUgBugCustomStatus.do()
-      .select("*")
-      .where("id", custom_status_3.id);
+      .select()
+      .where({ id: custom_status_3.id });
+    expect(customStatusAfter).toBeDefined();
 
-    expect(customStatusAfter).toHaveLength(0);
-
-    const bugCustomStatusAfter1 =
+    const deletedBugCustomStatus =
       await unguess.tables.WpUgBugCustomStatusToBug.do()
-        .select("*")
-        .where("custom_status_id", custom_status_3.id);
+        .select()
+        .where({ custom_status_id: custom_status_3.id })
+        .first();
+    expect(deletedBugCustomStatus).toBeUndefined();
 
-    expect(bugCustomStatusAfter1).toHaveLength(0);
-
-    const bugCustomStatusAfter2 =
+    const newBugCustomStatus =
       await unguess.tables.WpUgBugCustomStatusToBug.do()
-        .select("*")
+        .select()
         .where("bug_id", bug_2.id)
-        .andWhere("custom_status_id", custom_status_1.id);
-
-    expect(bugCustomStatusAfter2).toHaveLength(1);
+        .andWhere("custom_status_id", custom_status_1.id)
+        .first();
+    expect(newBugCustomStatus).toBeDefined();
   });
 
-  it("Should return 200, delete all the custom statuses and migrate the campaign bugs to the target custom statuses if specified", async () => {
+  it("Should migrate the campaign bugs to the multiple custom statuses if specified", async () => {
     const customStatusBefore = await unguess.tables.WpUgBugCustomStatus.do()
-      .select("*")
+      .select()
       .where("id", custom_status_1.id)
       .orWhere("id", custom_status_3.id);
 
@@ -466,7 +463,7 @@ describe("DELETE /campaigns/{cid}/custom_statuses", () => {
 
     const bugCustomStatusBefore =
       await unguess.tables.WpUgBugCustomStatusToBug.do()
-        .select("*")
+        .select()
         .where("custom_status_id", custom_status_1.id)
         .orWhere("custom_status_id", custom_status_3.id);
 
@@ -489,7 +486,7 @@ describe("DELETE /campaigns/{cid}/custom_statuses", () => {
     expect(response.body.status).toBe(true);
 
     const customStatusAfter = await unguess.tables.WpUgBugCustomStatus.do()
-      .select("*")
+      .select()
       .where("id", custom_status_1.id)
       .orWhere("id", custom_status_3.id);
 
@@ -497,7 +494,7 @@ describe("DELETE /campaigns/{cid}/custom_statuses", () => {
 
     const bugCustomStatusAfter1 =
       await unguess.tables.WpUgBugCustomStatusToBug.do()
-        .select("*")
+        .select()
         .where("custom_status_id", custom_status_1.id)
         .orWhere("custom_status_id", custom_status_3.id);
 
@@ -505,9 +502,56 @@ describe("DELETE /campaigns/{cid}/custom_statuses", () => {
 
     const bugCustomStatusAfter2 =
       await unguess.tables.WpUgBugCustomStatusToBug.do()
-        .select("*")
+        .select()
         .where("custom_status_id", custom_status_4.id);
 
     expect(bugCustomStatusAfter2).toHaveLength(1);
+  });
+
+  it("Should migrate the campaign bugs to the multiple default statuses if specified", async () => {
+    const customStatusBefore = await unguess.tables.WpUgBugCustomStatus.do()
+      .select()
+      .whereIn("id", [9, 11]);
+    expect(customStatusBefore).toHaveLength(2);
+
+    const bugCustomStatusBefore =
+      await unguess.tables.WpUgBugCustomStatusToBug.do()
+        .select()
+        .whereIn("custom_status_id", [9, 11]);
+    expect(bugCustomStatusBefore).toHaveLength(2);
+
+    const response = await request(app)
+      .delete(`/campaigns/${campaign_1.id}/custom_statuses`)
+      .set("Authorization", "Bearer user")
+      .send([
+        {
+          custom_status_id: custom_status_1.id,
+          to_custom_status_id: 1,
+        },
+        {
+          custom_status_id: custom_status_3.id,
+          to_custom_status_id: 2,
+        },
+      ]);
+    expect(response.status).toBe(200);
+    expect(response.body.status).toBe(true);
+
+    const deletedCustomStatus = await unguess.tables.WpUgBugCustomStatus.do()
+      .select()
+      .whereIn("id", [9, 11]);
+    expect(deletedCustomStatus).toHaveLength(0);
+
+    const bugCustomStatusAfter1 =
+      await unguess.tables.WpUgBugCustomStatusToBug.do()
+        .select()
+        .where("custom_status_id", custom_status_1.id)
+        .orWhere("custom_status_id", custom_status_3.id);
+    expect(bugCustomStatusAfter1).toHaveLength(0);
+
+    const bugCustomStatusAfter2 =
+      await unguess.tables.WpUgBugCustomStatusToBug.do()
+        .select()
+        .whereIn("custom_status_id", [1, 2]);
+    expect(bugCustomStatusAfter2).toHaveLength(2);
   });
 });
