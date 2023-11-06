@@ -89,13 +89,6 @@ const status_test_with_campaign = {
   color: "ffffff",
 };
 
-const test_status = {
-  id: 33,
-  name: "testingStatus",
-  campaign_id: 1,
-  color: "ffffff",
-};
-
 const status_without_phase = {
   id: 15,
   name: "No Phase",
@@ -179,7 +172,6 @@ describe("PATCH /campaigns/{cid}/custom_statuses", () => {
 
     await custom_statuses.addDefaultItems();
     await custom_statuses.insert(status_test_with_campaign_and_default_1);
-    await custom_statuses.insert(test_status);
     await custom_statuses.insert(status_test_with_campaign);
     await custom_statuses.insert(status_test_with_campaign_and_default_3);
     await custom_statuses.insert(status_test_with_campaign_and_default_4);
@@ -298,13 +290,6 @@ describe("PATCH /campaigns/{cid}/custom_statuses", () => {
       },
       {
         id: 16,
-        name: "Update-campaign",
-        phase: { id: 1, name: "working" },
-        color: "0000",
-        is_default: 0,
-      },
-      {
-        id: 17,
         name: "New-CS",
         phase: { id: 1, name: "working" },
         color: "0000",
