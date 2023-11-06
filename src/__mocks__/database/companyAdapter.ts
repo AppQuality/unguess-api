@@ -42,6 +42,7 @@ import priorities from "./priority";
 
 import bugCustomStatuses from "./bug_custom_status";
 import customStatuses from "./custom_status";
+import customStatusPhases from "./custom_status_phase";
 
 import defaultUsers from "@src/__mocks__/database/seed/users.json";
 import campaignOutputs from "./cp_outputs_view";
@@ -97,6 +98,7 @@ interface dataObject {
   unguess_users?: Array<any>;
   custom_statuses?: Array<any>;
   bug_custom_statuses?: Array<any>;
+  custom_status_phases?: Array<any>;
 }
 
 export const adapter = {
@@ -153,6 +155,7 @@ export const adapter = {
     await priorities.mock();
     await bugsPriorities.mock();
     await customStatuses.mock();
+    await customStatusPhases.mock();
     await bugCustomStatuses.mock();
     await customerInvitations.mock();
 
@@ -213,6 +216,7 @@ export const adapter = {
     await priorities.dropMock();
     await bugsPriorities.dropMock();
     await customStatuses.dropMock();
+    await customStatusPhases.dropMock();
     await bugCustomStatuses.dropMock();
     await customerInvitations.dropMock();
 
@@ -252,6 +256,7 @@ export const adapter = {
     await unlayerTemplate.clear();
     await mailEvents.clear();
     await customStatuses.clear();
+    await customStatusPhases.clear();
     await bugCustomStatuses.clear();
   },
   addCampaignWithProject: async ({

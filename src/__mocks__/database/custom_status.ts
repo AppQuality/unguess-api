@@ -6,6 +6,7 @@ type CustomStatusParams = {
   phase_id?: number;
   color?: string;
   is_default?: number;
+  campaign_id?: number;
 };
 
 const defaultItem: CustomStatusParams = {

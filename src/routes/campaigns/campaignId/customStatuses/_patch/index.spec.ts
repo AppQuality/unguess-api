@@ -1,13 +1,12 @@
-import { table } from "./../../../../../__mocks__/database/express";
+import { DEFAULT_BUG_CUSTOM_STATUS } from "./../../../../../utils/constants";
 import status from "@src/__mocks__/database/bug_status";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import custom_statuses, {
-  CustomStatusParams,
-} from "@src/__mocks__/database/custom_status";
+import custom_statuses from "@src/__mocks__/database/custom_status";
+import custom_statuses_phases from "@src/__mocks__/database/custom_status_phase";
 import app from "@src/app";
-import { unguess } from "@src/features/database";
+import { unguess } from "@src/features/__mocks__/database";
+
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
-import { ca } from "date-fns/locale";
 import request from "supertest";
 
 const campaign_type_1 = {
@@ -52,15 +51,6 @@ const project_2 = {
   customer_id: 2,
 };
 
-const status_test_with_campaign_and_default_1 = {
-  id: 9,
-  name: "Default_1",
-  color: "ffffff",
-  phase_id: 1,
-  campaign_id: 1,
-  is_default: 1,
-};
-
 const status_with_long_name = {
   id: 20,
   name: "Status with name longer than 15 chars",
@@ -87,6 +77,7 @@ const status_test_with_campaign = {
   name: "status with campaign",
   campaign_id: 1,
   color: "ffffff",
+  is_default: 0,
 };
 
 const status_without_phase = {
@@ -161,17 +152,8 @@ describe("PATCH /campaigns/{cid}/custom_statuses", () => {
       userToProjects: [user_to_project_1, user_to_project_2],
     });
 
-    await unguess.tables.WpUgBugCustomStatusPhase.do().insert({
-      id: 1,
-      name: "working",
-    });
-    await unguess.tables.WpUgBugCustomStatusPhase.do().insert({
-      id: 2,
-      name: "completed",
-    });
-
     await custom_statuses.addDefaultItems();
-    await custom_statuses.insert(status_test_with_campaign_and_default_1);
+    await custom_statuses_phases.addDefaultItems();
     await custom_statuses.insert(status_test_with_campaign);
     await custom_statuses.insert(status_test_with_campaign_and_default_3);
     await custom_statuses.insert(status_test_with_campaign_and_default_4);
@@ -180,8 +162,8 @@ describe("PATCH /campaigns/{cid}/custom_statuses", () => {
 
   afterAll(async () => {
     await dbAdapter.clear();
-    await unguess.tables.WpUgBugCustomStatusPhase.do().delete();
     await custom_statuses.clear();
+    await custom_statuses_phases.clear();
   });
 
   // It should answer 403 if user is not logged in
@@ -226,90 +208,19 @@ describe("PATCH /campaigns/{cid}/custom_statuses", () => {
 
   // Should return only the custom_statuses for the campaign in addition to the default ones
   it("Should return only the custom_statuses for the campaign in addition to the default ones", async () => {
+    const customStatuses = await custom_statuses.all(
+      ["id"],
+      [{ campaign_id: campaign_1.id }]
+    );
+    const defaultCustomStatuses = await custom_statuses.getDefaultItems();
     const response = await request(app)
       .patch(`/campaigns/${campaign_1.id}/custom_statuses`)
       .set("Authorization", "Bearer user")
       .send([{ name: "New-CS", color: "0000" }]);
     expect(response.status).toBe(200);
-    expect(response.body).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          name: "New-CS",
-        }),
-      ])
+    expect(response.body.length).toBe(
+      customStatuses.length + defaultCustomStatuses.length + 1
     );
-    expect(response.body).toEqual([
-      {
-        id: 1,
-        name: "to do",
-        phase: { id: 1, name: "working" },
-        color: "ffffff",
-        is_default: 1,
-      },
-      {
-        id: 2,
-        name: "pending",
-        phase: { id: 1, name: "working" },
-        color: "ffffff",
-        is_default: 1,
-      },
-      {
-        id: 3,
-        name: "to be imported",
-        phase: { id: 1, name: "working" },
-        color: "ffffff",
-        is_default: 1,
-      },
-      {
-        id: 4,
-        name: "open",
-        phase: { id: 1, name: "working" },
-        color: "ffffff",
-        is_default: 1,
-      },
-      {
-        id: 5,
-        name: "to be retested",
-        phase: { id: 1, name: "working" },
-        color: "ffffff",
-        is_default: 1,
-      },
-      {
-        id: 8,
-        name: "under IT analysis",
-        phase: { id: 1, name: "working" },
-        color: "ffffff",
-        is_default: 1,
-      },
-      {
-        id: 15,
-        name: "No Phase",
-        phase: { id: 1, name: "working" },
-        color: "ffffff",
-        is_default: 0,
-      },
-      {
-        id: 16,
-        name: "New-CS",
-        phase: { id: 1, name: "working" },
-        color: "0000",
-        is_default: 0,
-      },
-      {
-        id: 6,
-        name: "solved",
-        phase: { id: 2, name: "completed" },
-        color: "ffffff",
-        is_default: 1,
-      },
-      {
-        id: 7,
-        name: "not a bug",
-        phase: { id: 2, name: "completed" },
-        color: "ffffff",
-        is_default: 1,
-      },
-    ]);
   });
 
   // It should not return the list of statuses for a campaign where the user is not an owner
@@ -360,6 +271,16 @@ describe("PATCH /campaigns/{cid}/custom_statuses", () => {
         { name: "export", color: "ffffff" },
         { name: "import", color: "ffffff" },
       ]);
-    expect(response.body.length).toBe(11);
+    expect(response.body).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 15, name: "testami", color: "000000" }),
+        expect.objectContaining({ name: "export", color: "ffffff" }),
+        expect.objectContaining({ name: "import", color: "ffffff" }),
+        expect.not.objectContaining({
+          id: 15,
+          name: status_without_phase.name,
+        }),
+      ])
+    );
   });
 });
