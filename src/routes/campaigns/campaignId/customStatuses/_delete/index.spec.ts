@@ -2,34 +2,49 @@ import app from "@src/app";
 import request from "supertest";
 import { unguess } from "@src/features/database";
 import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import custom_statuses, {
-  CustomStatusParams,
-} from "@src/__mocks__/database/custom_status";
-import bugs, { BugsParams } from "@src/__mocks__/database/bugs";
-import { ProjectParams } from "@src/__mocks__/database/project";
-import { UserToCustomerParams } from "@src/__mocks__/database/user_to_customer";
-import { CustomerParams } from "@src/__mocks__/database/customer";
-import { UserToProjectParams } from "@src/__mocks__/database/user_to_project";
-import bug_custom_statuses, {
-  BugCustomStatusParams,
-} from "@src/__mocks__/database/bug_custom_status";
+import custom_statuses from "@src/__mocks__/database/custom_status";
+import bugs from "@src/__mocks__/database/bugs";
+import bug_custom_statuses from "@src/__mocks__/database/bug_custom_status";
 
-const customer_1: CustomerParams = {
+const customer_1 = {
   id: 1,
   company: "Company 1",
   company_logo: "logo1.png",
   tokens: 100,
 };
 
-const user_to_customer_1: UserToCustomerParams = {
+const customer_2 = {
+  id: 2,
+  company: "Company 2",
+  company_logo: "logo2.png",
+  tokens: 100,
+};
+
+const user_to_customer_1 = {
   wp_user_id: 1,
   customer_id: customer_1.id,
 };
 
-const project_1: ProjectParams = {
+const user_to_customer_2 = {
+  wp_user_id: 2,
+  customer_id: customer_2.id,
+};
+
+const project_1 = {
   id: 1,
   display_name: "Project 1",
   customer_id: customer_1.id,
+};
+
+const project_2 = {
+  id: 2,
+  display_name: "Project 2",
+  customer_id: customer_2.id,
+};
+
+const user_to_project_1 = {
+  wp_user_id: 1,
+  project_id: project_1.id,
 };
 
 const campaign_1 = {
@@ -46,37 +61,6 @@ const campaign_1 = {
   project_id: project_1.id,
 };
 
-const user_to_project_1: UserToProjectParams = {
-  wp_user_id: 1,
-  project_id: project_1.id,
-};
-
-const custom_status_1: CustomStatusParams & { campaign_id: number } = {
-  id: 9,
-  name: "Custom status 1",
-  phase_id: 1,
-  campaign_id: campaign_1.id,
-  is_default: 0,
-};
-
-const customer_2: CustomerParams = {
-  id: 2,
-  company: "Company 2",
-  company_logo: "logo2.png",
-  tokens: 100,
-};
-
-const user_to_customer_2: UserToCustomerParams = {
-  wp_user_id: 2,
-  customer_id: customer_2.id,
-};
-
-const project_2: ProjectParams = {
-  id: 2,
-  display_name: "Project 2",
-  customer_id: customer_2.id,
-};
-
 const campaign_2 = {
   id: 2,
   start_date: "2017-07-20 10:00:00",
@@ -91,7 +75,15 @@ const campaign_2 = {
   project_id: project_2.id,
 };
 
-const custom_status_2: CustomStatusParams & { campaign_id: number } = {
+const custom_status_1 = {
+  id: 9,
+  name: "Custom status 1",
+  phase_id: 1,
+  campaign_id: campaign_1.id,
+  is_default: 0,
+};
+
+const custom_status_2 = {
   id: 10,
   name: "Custom status 2",
   phase_id: 1,
@@ -99,15 +91,29 @@ const custom_status_2: CustomStatusParams & { campaign_id: number } = {
   is_default: 0,
 };
 
-const custom_status_3: CustomStatusParams & { campaign_id: number } = {
+const custom_status_3 = {
   id: 11,
   name: "Custom status 3",
   phase_id: 1,
   campaign_id: campaign_1.id,
   is_default: 0,
 };
+const custom_status_4 = {
+  id: 12,
+  name: "Custom status 4",
+  phase_id: 1,
+  campaign_id: campaign_1.id,
+  is_default: 0,
+};
+const custom_status_5 = {
+  id: 13,
+  name: "Custom status 5",
+  phase_id: 1,
+  campaign_id: campaign_1.id,
+  is_default: 0,
+};
 
-const bug_1: BugsParams = {
+const bug_1 = {
   id: 1,
   internal_id: "BUG011",
   message: "[CON-TEXT-bike] - Bug 1 super-message",
@@ -132,31 +138,31 @@ const bug_1: BugsParams = {
   severity_id: 1,
 };
 
-const bug_2: BugsParams = {
+const bug_2 = {
   ...bug_1,
   id: 2,
 };
-const bug_3: BugsParams = {
+const bug_3 = {
   ...bug_1,
   id: 3,
 };
 
-const bug_custom_status_1: BugCustomStatusParams = {
+const bug_custom_status_1 = {
+  id: 1,
   custom_status_id: custom_status_1.id,
   bug_id: bug_1.id,
 };
 
-const bug_custom_status_2: BugCustomStatusParams = {
+const bug_custom_status_2 = {
+  id: 2,
   custom_status_id: custom_status_3.id,
   bug_id: bug_2.id,
 };
 
-const custom_status_4: CustomStatusParams & { campaign_id: number } = {
-  id: 12,
-  name: "Custom status 4",
-  phase_id: 1,
-  campaign_id: campaign_1.id,
-  is_default: 0,
+const bug_custom_status_3 = {
+  id: 3,
+  custom_status_id: custom_status_5.id,
+  bug_id: bug_3.id,
 };
 
 describe("DELETE /campaigns/{cid}/custom_statuses", () => {
@@ -184,16 +190,18 @@ describe("DELETE /campaigns/{cid}/custom_statuses", () => {
     await custom_statuses.insert(custom_status_2);
     await custom_statuses.insert(custom_status_3);
     await custom_statuses.insert(custom_status_4);
+    await custom_statuses.insert(custom_status_5);
 
     await bugs.insert(bug_1);
     await bugs.insert(bug_2);
     await bugs.insert(bug_3);
-
     await bug_custom_statuses.insert(bug_custom_status_1);
     await bug_custom_statuses.insert(bug_custom_status_2);
+    await bug_custom_statuses.insert(bug_custom_status_3);
   });
 
   afterEach(async () => {
+    await unguess.tables.WpUgBugCustomStatusToBug.do().delete();
     await dbAdapter.clear();
     await unguess.tables.WpUgBugCustomStatusPhase.do().delete();
     await custom_statuses.clear();
@@ -531,5 +539,48 @@ describe("DELETE /campaigns/{cid}/custom_statuses", () => {
         .select()
         .whereIn("custom_status_id", [1, 2]);
     expect(bugCustomStatusAfter2).toHaveLength(2);
+  });
+
+  it("Should delete bug custom status and change to default and custom statuses if specified", async () => {
+    const customStatusBefore = await unguess.tables.WpUgBugCustomStatus.do()
+      .select()
+      .whereIn("id", [9, 11, 13]);
+    expect(customStatusBefore).toHaveLength(3);
+
+    const bugCustomStatusBefore =
+      await unguess.tables.WpUgBugCustomStatusToBug.do().select();
+    expect(bugCustomStatusBefore).toHaveLength(3);
+
+    const response = await request(app)
+      .delete(`/campaigns/${campaign_1.id}/custom_statuses`)
+      .set("Authorization", "Bearer user")
+      .send([
+        {
+          custom_status_id: custom_status_1.id, //9
+          to_custom_status_id: 1, //default
+        },
+        {
+          custom_status_id: custom_status_3.id, //11
+          to_custom_status_id: custom_status_4.id, //12
+        },
+        {
+          custom_status_id: custom_status_5.id, //13
+        },
+      ]);
+    expect(response.status).toBe(200);
+    expect(response.body.status).toBe(true);
+
+    const deletedCustomStatus = await unguess.tables.WpUgBugCustomStatus.do()
+      .select()
+      .whereIn("id", [9, 11, 13]);
+    expect(deletedCustomStatus).toHaveLength(0);
+
+    const bugCustomStatusAfter =
+      await unguess.tables.WpUgBugCustomStatusToBug.do().select();
+    expect(bugCustomStatusAfter).toHaveLength(2);
+    expect(bugCustomStatusAfter).toEqual([
+      { id: 1, bug_id: 1, custom_status_id: 1 },
+      { id: 2, bug_id: 2, custom_status_id: 12 },
+    ]);
   });
 });
