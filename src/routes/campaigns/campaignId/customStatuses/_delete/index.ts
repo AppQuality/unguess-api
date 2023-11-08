@@ -11,14 +11,14 @@ export default class Route extends CampaignRoute<{
     campaign_id: number | null;
   })[] = [];
   private campaignId: number = 0;
-  private customStatusIds: StoplightOperations["delete-campaigns-cid-custom_statuses"]["requestBody"]["content"]["application/json"] =
+  private bodyCustomStatusIds: StoplightOperations["delete-campaigns-cid-custom_statuses"]["requestBody"]["content"]["application/json"] =
     [];
 
   protected async init(): Promise<void> {
     await super.init();
     this.campaignId = this.cp_id;
     this.customStatuses = await this.getAllCustomStatuses();
-    this.customStatusIds = this.getCustomStatusIds(); //body
+    this.bodyCustomStatusIds = this.getBodyCustomStatusIds();
   }
 
   protected async prepare(): Promise<void> {
@@ -31,6 +31,8 @@ export default class Route extends CampaignRoute<{
 
   protected async filter() {
     if (!(await super.filter())) return false;
+
+    console.log(this.checkTargetCustomStatusIds());
 
     if (!this.checkCustomStatusIds() || !this.checkTargetCustomStatusIds()) {
       this.setError(400, {} as OpenapiError);
@@ -92,12 +94,12 @@ export default class Route extends CampaignRoute<{
     }));
   }
 
-  private getCustomStatusIds() {
+  private getBodyCustomStatusIds() {
     return this.getBody();
   }
 
   private checkCustomStatusIds() {
-    return this.customStatusIds.every((bodyCustomStatus) =>
+    return this.bodyCustomStatusIds.every((bodyCustomStatus) =>
       this.customStatuses.some(
         (customStatus) =>
           customStatus.id === bodyCustomStatus.custom_status_id &&
@@ -112,7 +114,7 @@ export default class Route extends CampaignRoute<{
       .filter((customStatus) => customStatus.is_default === 1)
       .map((customStatus) => customStatus.id);
 
-    return this.customStatusIds.every((bodyCustomStatus) =>
+    return this.bodyCustomStatusIds.every((bodyCustomStatus) =>
       this.customStatuses.some((customStatus) => {
         if (!bodyCustomStatus.to_custom_status_id) return true;
         if (
@@ -133,7 +135,7 @@ export default class Route extends CampaignRoute<{
   private async deleteAndMigrateCustomStatuses() {
     // TODO: add knex.transaction() to process the delete queries
     return Promise.all(
-      this.customStatusIds.map(async (customStatus) => {
+      this.bodyCustomStatusIds.map(async (customStatus) => {
         // Delete custom status
         await unguess.tables.WpUgBugCustomStatus.do()
           .delete()
