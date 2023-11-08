@@ -4,7 +4,7 @@ import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 import custom_statuses from "@src/__mocks__/database/custom_status";
 import custom_statuses_phases from "@src/__mocks__/database/custom_status_phase";
 import app from "@src/app";
-import { unguess } from "@src/features/__mocks__/database";
+import { unguess } from "@src/features/database";
 
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 import request from "supertest";
@@ -142,7 +142,7 @@ const user_to_project_2 = {
 };
 
 describe("PATCH /campaigns/{cid}/custom_statuses", () => {
-  beforeAll(async () => {
+  beforeEach(async () => {
     await dbAdapter.add({
       campaignTypes: [campaign_type_1],
       campaigns: [campaign_1, campaign_2],
@@ -160,7 +160,7 @@ describe("PATCH /campaigns/{cid}/custom_statuses", () => {
     await custom_statuses.insert(status_without_phase);
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     await dbAdapter.clear();
     await custom_statuses.clear();
     await custom_statuses_phases.clear();
@@ -263,6 +263,10 @@ describe("PATCH /campaigns/{cid}/custom_statuses", () => {
   });
 
   it("Should return the correct amount of custom statuses", async () => {
+    const customStatuses = await unguess.tables.WpUgBugCustomStatus.do()
+      .select("*")
+      .where("campaign_id", campaign_1.id);
+    const defaultCustomStatuses = await custom_statuses.getDefaultItems();
     const response = await request(app)
       .patch(`/campaigns/${campaign_1.id}/custom_statuses`)
       .set("Authorization", "Bearer user")
@@ -271,16 +275,21 @@ describe("PATCH /campaigns/{cid}/custom_statuses", () => {
         { name: "export", color: "ffffff" },
         { name: "import", color: "ffffff" },
       ]);
-    expect(response.body).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ id: 15, name: "testami", color: "000000" }),
-        expect.objectContaining({ name: "export", color: "ffffff" }),
-        expect.objectContaining({ name: "import", color: "ffffff" }),
-        expect.not.objectContaining({
-          id: 15,
-          name: status_without_phase.name,
-        }),
-      ])
+    expect(response.body.length).toBe(
+      customStatuses.length + defaultCustomStatuses.length + 2
     );
+
+    expect(response.body).toEqual([
+      ...defaultCustomStatuses.filter((status) => status.phase.id === 1),
+      expect.objectContaining({
+        id: status_test_with_campaign.id,
+        name: status_test_with_campaign.name,
+        color: status_test_with_campaign.color,
+      }),
+      expect.objectContaining({ id: 15, name: "testami", color: "000000" }),
+      expect.objectContaining({ name: "export", color: "ffffff" }),
+      expect.objectContaining({ name: "import", color: "ffffff" }),
+      ...defaultCustomStatuses.filter((status) => status.phase.id === 2),
+    ]);
   });
 });
