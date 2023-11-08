@@ -32,8 +32,6 @@ export default class Route extends CampaignRoute<{
   protected async filter() {
     if (!(await super.filter())) return false;
 
-    console.log(this.checkTargetCustomStatusIds());
-
     if (!this.checkCustomStatusIds() || !this.checkTargetCustomStatusIds()) {
       this.setError(400, {} as OpenapiError);
       return false;
