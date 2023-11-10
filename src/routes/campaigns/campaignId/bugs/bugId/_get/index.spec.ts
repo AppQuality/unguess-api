@@ -22,6 +22,15 @@ import app from "@src/app";
 import { tryber, unguess } from "@src/features/database";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 import request from "supertest";
+import { getPresignedUrl } from "@src/features/s3/getPresignedUrl";
+
+jest.mock("@src/features/s3/getPresignedUrl", () => {
+  return {
+    getPresignedUrl: jest.fn(() => {
+      return "https://example.com/PRE_SIGNED_URL";
+    }),
+  };
+});
 
 const customer_1 = {
   id: 999,
@@ -206,6 +215,14 @@ const bug_media_1 = {
   type: "image",
   uploaded: "2021-10-19 12:57:57.0",
 };
+const bug_media_new_authorized_url = {
+  id: 125,
+  bug_id: bug_1.id,
+  location:
+    "https://example.com/bug_media_new_authorized_url.png?X-Amz-Algorithm=aaaa",
+  type: "image",
+  uploaded: "2021-10-19 12:57:57.0",
+};
 const bug_media_other_type = {
   id: 1234,
   bug_id: bug_34.id,
@@ -292,6 +309,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
     await devices.insert(device_1);
     await devices.insert(device_2);
     await bugMedia.insert(bug_media_1);
+    await bugMedia.insert(bug_media_new_authorized_url);
     await bugMedia.insert(bug_media_other_type);
     await tags.insert(tag_1);
     await tags.insert(tag_2);
@@ -356,6 +374,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
     await customStatuses.clear();
     await bugCustomStatuses.clear();
     await unguess.tables.WpUgBugCustomStatusPhase.do().delete();
+    jest.clearAllMocks();
   });
 
   // It should answer 403 if user is not logged in
@@ -411,7 +430,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
       })
     );
 
-    expect(response.body.media.length).toEqual(1);
+    expect(response.body.media.length).toEqual(2);
   });
 
   // It should answer 400 if an invalid campaign id is provided
@@ -482,6 +501,13 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
         response.body.media[0].mime_type.type
       )
     ).toEqual(true);
+  });
+  it("Should presign all bug media", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(200);
+    expect(getPresignedUrl).toBeCalledTimes(2);
   });
 
   //Should return a list of tags if available
