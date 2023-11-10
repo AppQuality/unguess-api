@@ -215,11 +215,10 @@ const bug_media_1 = {
   type: "image",
   uploaded: "2021-10-19 12:57:57.0",
 };
-const bug_media_new_authorized_url = {
+const bug_media_2 = {
   id: 125,
   bug_id: bug_1.id,
-  location:
-    "https://example.com/bug_media_new_authorized_url.png?X-Amz-Algorithm=aaaa",
+  location: "https://example.com/bug_media_2.png",
   type: "image",
   uploaded: "2021-10-19 12:57:57.0",
 };
@@ -309,7 +308,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
     await devices.insert(device_1);
     await devices.insert(device_2);
     await bugMedia.insert(bug_media_1);
-    await bugMedia.insert(bug_media_new_authorized_url);
+    await bugMedia.insert(bug_media_2);
     await bugMedia.insert(bug_media_other_type);
     await tags.insert(tag_1);
     await tags.insert(tag_2);
