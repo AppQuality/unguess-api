@@ -116,7 +116,7 @@ export default class Route extends BugsRoute<{
           return this.setError(403, {} as OpenapiError);
         default:
           return this.setError(500, {
-            message: "Something went wrong! Unable to update data",
+            message: error,
           } as OpenapiError);
       }
     }
