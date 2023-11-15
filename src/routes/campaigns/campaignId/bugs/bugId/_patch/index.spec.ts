@@ -249,6 +249,12 @@ const status_test_with_campaign = {
   campaign_id: campaign_2.id,
 };
 
+const status_10 = {
+  id: 10,
+  name: "status 10",
+  campaign_id: campaign_1.id,
+};
+
 const bug_status_2 = {
   bug_id: bug_2.id,
   custom_status_id: status_to_be_imported.id,
@@ -300,6 +306,7 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     });
     await custom_status.addDefaultItems();
     await custom_status.insert(status_test_with_campaign);
+    await custom_status.insert(status_10);
     await bug_custom_statuses.insert(bug_status_2);
     await bug_custom_statuses.insert(bug_status_3);
   });
@@ -594,6 +601,16 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({});
+  });
+
+  // It shouldn't throw an error if the body is a non default custom_status_id
+  it("It shouldn't throw an error if the body is a non default custom_status_id", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user")
+      .send({ custom_status_id: status_10.id });
+
+    expect(response.status).toBe(200);
   });
 
   // --- End of file
