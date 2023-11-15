@@ -221,7 +221,9 @@ export default class BugsRoute extends CampaignRoute<{
       JOIN wp_appq_evd_bug_status status ON (b.status_id = status.id)
       LEFT JOIN wp_crowd_appq_device device ON (b.dev_id = device.id)
       LEFT JOIN wp_appq_campaign_task uc ON (uc.id = b.application_section_id)
-      LEFT JOIN wp_appq_bug_read_status rs ON (rs.bug_id = b.id AND rs.is_read = 1 AND rs.profile_id = ${this.getProfileId()})
+      LEFT JOIN wp_appq_bug_read_status rs ON (rs.bug_id = b.id AND rs.is_read = 1 AND rs.wp_id = ${this.getWordpressId(
+        "tryber"
+      )})
       WHERE b.campaign_id = ${this.cp_id}
       AND b.publish = 1
       AND ${
