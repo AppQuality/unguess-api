@@ -123,7 +123,10 @@ export default class Route extends BugsRoute<{
   }
 
   private async bugCustomStatusPatch() {
+    // Check if custom_status_id is in the body array
     if (!this.fields.includes("custom_status_id")) return;
+
+    // Check if the custom_status_ids exist
     const allStatuses = await this.getAllStatuses();
     const [result] = allStatuses.filter(
       (customStatus: CustomStatus) =>
@@ -131,14 +134,12 @@ export default class Route extends BugsRoute<{
     );
     if (!result) return Promise.reject("NOT_FOUND");
 
+    // Update bug status
     if (!(await this.checkIfBugIdExistsInBugStatus())) {
       await this.addStatusToBugStatus(result.id);
     } else {
-      this.updateStatusToBugStatus(result.id);
+      await this.updateStatusToBugStatus(result.id);
     }
-    const [{ custom_status_id }] = await this.getBugStatus();
-    if (custom_status_id !== this.customStatusId)
-      return Promise.reject("NOT_UPDATED");
 
     return Promise.resolve(result);
   }
