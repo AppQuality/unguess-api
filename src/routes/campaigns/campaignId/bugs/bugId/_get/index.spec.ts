@@ -19,7 +19,7 @@ import bugCustomStatuses, {
 import customStatuses from "@src/__mocks__/database/custom_status";
 import useCases, { UseCaseParams } from "@src/__mocks__/database/use_cases";
 import app from "@src/app";
-import { tryber } from "@src/features/database";
+import { tryber, unguess } from "@src/features/database";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 import request from "supertest";
 
@@ -124,7 +124,7 @@ const usecase_1: UseCaseParams = {
 };
 
 const profile_1 = {
-  id: 32,
+  id: 1,
   name: "Tester 1",
   wp_user_id: 1,
 };
@@ -139,6 +139,7 @@ const bug_1: BugsParams = {
   id: 12999,
   internal_id: "UG12999",
   wp_user_id: 1,
+  profile_id: profile_1.id,
   message: "[CON-TEXT][2ndContext] - Bug 12-999 message",
   description: "Bug 12999 description",
   expected_result: "Bug 12999 expected result",
@@ -187,6 +188,7 @@ const bug_4 = {
   ...bug_1,
   id: 13002,
   wp_user_id: profile_2.wp_user_id,
+  profile_id: profile_2.id,
 };
 
 const bug_5_from_unknown = {
@@ -194,6 +196,7 @@ const bug_5_from_unknown = {
   id: 13003,
   campaign_id: campaign_2.id,
   wp_user_id: 999,
+  profile_id: 999,
 };
 
 const bug_media_1 = {
@@ -316,8 +319,23 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
       meta_value: "1",
     });
 
+    await unguess.tables.WpUgBugCustomStatusPhase.do().insert({
+      id: 1,
+      name: "working",
+    });
+    await unguess.tables.WpUgBugCustomStatusPhase.do().insert({
+      id: 2,
+      name: "completed",
+    });
+
     await customStatuses.addDefaultItems();
     await bugCustomStatuses.insert(bug_status_1);
+    await tryber.tables.WpAppqBugReadStatus.do().insert({
+      bug_id: bug_2.id,
+      wp_id: profile_1.wp_user_id,
+      is_read: 0,
+      profile_id: profile_1.id,
+    });
   });
 
   afterEach(async () => {
@@ -335,6 +353,9 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
     await bugType.clear();
     await bugStatus.clear();
     await readStatus.clear();
+    await customStatuses.clear();
+    await bugCustomStatuses.clear();
+    await unguess.tables.WpUgBugCustomStatusPhase.do().delete();
   });
 
   // It should answer 403 if user is not logged in
@@ -616,21 +637,22 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
   it("Should set the bug as read if the user when returning a bug", async () => {
     const statusBeforeGet = await readStatus.all(undefined, [
       {
-        wp_id: 1,
-        bug_id: 1,
         is_read: 1,
+      },
+      {
+        profile_id: profile_1.id,
       },
     ]);
     expect(statusBeforeGet.length).toBe(0);
     await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
       .set("Authorization", "Bearer user");
-
     const statusAfterGet = await readStatus.all(undefined, [
       {
-        wp_id: 1,
-        bug_id: 1,
         is_read: 1,
+      },
+      {
+        profile_id: profile_1.id,
       },
     ]);
     expect(statusAfterGet.length).toBe(1);
@@ -641,9 +663,47 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
 
     const statusAfterSecondGet = await readStatus.all(undefined, [
       {
-        wp_id: 1,
-        bug_id: 1,
         is_read: 1,
+      },
+      {
+        profile_id: profile_1.id,
+      },
+    ]);
+    expect(statusAfterSecondGet.length).toBe(1);
+  });
+  it("Should update the bug as read if the user when returning a bug", async () => {
+    const statusBeforeGet = await readStatus.all(undefined, [
+      {
+        is_read: 1,
+      },
+      {
+        profile_id: profile_1.id,
+      },
+    ]);
+    expect(statusBeforeGet.length).toBe(0);
+    await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_2.id}`)
+      .set("Authorization", "Bearer user");
+    const statusAfterGet = await readStatus.all(undefined, [
+      {
+        is_read: 1,
+      },
+      {
+        profile_id: profile_1.id,
+      },
+    ]);
+    expect(statusAfterGet.length).toBe(1);
+
+    await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_2.id}`)
+      .set("Authorization", "Bearer user");
+
+    const statusAfterSecondGet = await readStatus.all(undefined, [
+      {
+        is_read: 1,
+      },
+      {
+        profile_id: profile_1.id,
       },
     ]);
     expect(statusAfterSecondGet.length).toBe(1);
@@ -689,10 +749,10 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
 
     expect(response.body).toEqual(
       expect.objectContaining({
-        custom_status: {
+        custom_status: expect.objectContaining({
           id: bug_status_1.custom_status_id,
           name: "not a bug",
-        },
+        }),
       })
     );
   });
@@ -705,10 +765,10 @@ describe("GET /campaigns/{cid}/bugs/{bid}", () => {
 
     expect(response.body).toEqual(
       expect.objectContaining({
-        custom_status: {
+        custom_status: expect.objectContaining({
           id: 1,
           name: "to do",
-        },
+        }),
       })
     );
   });

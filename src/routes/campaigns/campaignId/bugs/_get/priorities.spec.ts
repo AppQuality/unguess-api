@@ -219,8 +219,16 @@ describe("GET /campaigns/{cid}/bugs", () => {
       await bugPriorities.insert(bug_1_highest_priority);
       await bugPriorities.insert(bug_2_lowest_priority);
 
-      await bugsReadStatus.insert({ wp_id: 1, bug_id: bug_2.id });
-      await bugsReadStatus.insert({ wp_id: 2, bug_id: bug_2.id });
+      await bugsReadStatus.insert({
+        wp_id: 1,
+        bug_id: bug_2.id,
+        profile_id: 1,
+      });
+      await bugsReadStatus.insert({
+        wp_id: 2,
+        bug_id: bug_2.id,
+        profile_id: 2,
+      });
 
       await useCases.insert({ id: 1, campaign_id: campaign_1.id });
       await useCases.insert({ id: 2, campaign_id: campaign_1.id });

@@ -21,6 +21,7 @@ import customStatuses from "@src/__mocks__/database/custom_status";
 import bugCustomStatuses, {
   BugCustomStatusParams,
 } from "@src/__mocks__/database/bug_custom_status";
+import { unguess } from "@src/features/database";
 
 const customer_1 = {
   id: 999,
@@ -354,8 +355,16 @@ describe("GET /campaigns/{cid}/bugs", () => {
         await priorities.addDefaultItems();
 
         await bugPriorities.insert(bug_1_highest_priority);
-        await bugsReadStatus.insert({ wp_id: 1, bug_id: bug_2.id });
-        await bugsReadStatus.insert({ wp_id: 2, bug_id: bug_2.id });
+        await bugsReadStatus.insert({
+          wp_id: 1,
+          bug_id: bug_2.id,
+          profile_id: 1,
+        });
+        await bugsReadStatus.insert({
+          wp_id: 2,
+          bug_id: bug_2.id,
+          profile_id: 2,
+        });
 
         await tags.insert(tag_1);
         await tags.insert(tag_2);
@@ -364,6 +373,14 @@ describe("GET /campaigns/{cid}/bugs", () => {
         await useCases.insert({ id: 1, campaign_id: campaign_1.id });
         await useCases.insert({ id: 2, campaign_id: campaign_1.id });
 
+        await unguess.tables.WpUgBugCustomStatusPhase.do().insert({
+          id: 1,
+          name: "working",
+        });
+        await unguess.tables.WpUgBugCustomStatusPhase.do().insert({
+          id: 2,
+          name: "completed",
+        });
         await customStatuses.addDefaultItems();
         await bugCustomStatuses.insert(bug_customStatus_1);
         await bugCustomStatuses.insert(bug_customStatus_2);
@@ -375,6 +392,22 @@ describe("GET /campaigns/{cid}/bugs", () => {
       resolve(true);
     });
   });
+
+  afterAll(async () => {
+    await dbAdapter.clear();
+    await CampaignMeta.clear();
+    await bugs.clear();
+    await bugMedia.clear();
+    await bugSeverity.clear();
+    await bugReplicability.clear();
+    await bugType.clear();
+    await bugStatus.clear();
+    await bugsReadStatus.clear();
+    await devices.clear();
+    await useCases.clear();
+    await unguess.tables.WpUgBugCustomStatusPhase.do().delete();
+  });
+
   // Should return the normal results if the filterBy is not accepted
   it("Should ignore filterBy if is not valid", async () => {
     const response = await request(app)

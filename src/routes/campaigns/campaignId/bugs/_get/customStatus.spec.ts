@@ -16,6 +16,7 @@ import bugCustomStatuses, {
   BugCustomStatusParams,
 } from "@src/__mocks__/database/bug_custom_status";
 import useCases from "@src/__mocks__/database/use_cases";
+import { unguess } from "@src/features/database";
 
 const customer_1 = {
   id: 999,
@@ -196,6 +197,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
         campaignTypes: [campaign_type_1],
         campaigns: [campaign_1],
       });
+
       await CampaignMeta.insert({
         meta_id: 1,
         campaign_id: campaign_1.id,
@@ -216,11 +218,28 @@ describe("GET /campaigns/{cid}/bugs", () => {
       await devices.insert(device_2);
       await devices.insert(device_3);
 
-      await bugsReadStatus.insert({ wp_id: 1, bug_id: bug_2.id });
-      await bugsReadStatus.insert({ wp_id: 2, bug_id: bug_2.id });
+      await bugsReadStatus.insert({
+        wp_id: 1,
+        bug_id: bug_2.id,
+        profile_id: 1,
+      });
+      await bugsReadStatus.insert({
+        wp_id: 2,
+        bug_id: bug_2.id,
+        profile_id: 2,
+      });
 
       await useCases.insert({ id: 1, campaign_id: campaign_1.id });
       await useCases.insert({ id: 2, campaign_id: campaign_1.id });
+
+      await unguess.tables.WpUgBugCustomStatusPhase.do().insert({
+        id: 1,
+        name: "working",
+      });
+      await unguess.tables.WpUgBugCustomStatusPhase.do().insert({
+        id: 2,
+        name: "completed",
+      });
 
       await customStatuses.addDefaultItems();
 
@@ -229,6 +248,23 @@ describe("GET /campaigns/{cid}/bugs", () => {
     } catch (error) {
       console.error(error);
     }
+  });
+
+  afterAll(async () => {
+    await dbAdapter.clear();
+    await CampaignMeta.clear();
+    await bugs.clear();
+    await bugMedia.clear();
+    await bugSeverity.clear();
+    await bugReplicability.clear();
+    await bugType.clear();
+    await bugStatus.clear();
+    await bugsReadStatus.clear();
+    await devices.clear();
+    await useCases.clear();
+    await unguess.tables.WpUgBugCustomStatusPhase.do().delete();
+    await customStatuses.clear();
+    await bugCustomStatuses.clear();
   });
 
   // --- Start of file
@@ -244,22 +280,46 @@ describe("GET /campaigns/{cid}/bugs", () => {
     expect(response.body.items).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          custom_status: {
+          custom_status: expect.objectContaining({
             id: 1,
             name: "to do",
-          },
+          }),
         }),
         expect.objectContaining({
-          custom_status: {
+          custom_status: expect.objectContaining({
             id: 2,
             name: "pending",
-          },
+          }),
         }),
         expect.objectContaining({
-          custom_status: {
+          custom_status: expect.objectContaining({
             id: 7,
             name: "not a bug",
-          },
+          }),
+        }),
+      ])
+    );
+  });
+
+  it("Should return the list of bugs with the custom_status field and the custom_status field should have all the required fields", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs`)
+      .set("Authorization", "Bearer user");
+
+    expect(response.status).toBe(200);
+    expect(response.body.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          custom_status: expect.objectContaining({
+            id: expect.any(Number),
+            name: expect.any(String),
+            phase: expect.objectContaining({
+              id: expect.any(Number),
+              name: expect.any(String),
+            }),
+            color: expect.any(String),
+            is_default: expect.any(Number),
+          }),
         }),
       ])
     );

@@ -9,14 +9,22 @@ export const DT_CONSOLE = 4;
 export const DT_TV = 5;
 export const FUNCTIONAL_CAMPAIGN_TYPE_ID = 0;
 export const EXPERIENTIAL_CAMPAIGN_TYPE_ID = 1;
-export const DEFAULT_BUG_PRIORITY = {
-  id: 3,
-  name: "medium",
-};
-export const DEFAULT_BUG_CUSTOM_STATUS = {
-  id: 1,
-  name: "to do",
-};
+export const DEFAULT_BUG_PRIORITY: StoplightComponents["schemas"]["BugPriority"] =
+  {
+    id: 3,
+    name: "medium",
+  };
+export const DEFAULT_BUG_CUSTOM_STATUS: StoplightComponents["schemas"]["BugCustomStatus"] =
+  {
+    id: 1,
+    name: "to do",
+    phase: {
+      id: 1,
+      name: "working",
+    },
+    color: "ffffff",
+    is_default: 1,
+  };
 
 /******* Related to Ordering *******/
 export const DEFAULT_ORDER_BY_PARAMETER = "id";

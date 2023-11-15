@@ -79,6 +79,8 @@ export interface paths {
   };
   "/campaigns/{cid}/custom_statuses": {
     get: operations["get-campaigns-cid-custom-statuses"];
+    delete: operations["delete-campaigns-cid-custom_statuses"];
+    patch: operations["patch-campaigns-cid-custom_statuses"];
     parameters: {
       path: {
         /** Campaign id */
@@ -410,6 +412,14 @@ export interface components {
     };
     /** BugCustomStatus */
     BugCustomStatus: {
+      id: number;
+      name: string;
+      color: string;
+      phase: components["schemas"]["BugCustomStatusPhase"];
+      is_default: number;
+    };
+    /** BugCustomStatusPhase */
+    BugCustomStatusPhase: {
       id: number;
       name: string;
     };
@@ -881,6 +891,8 @@ export interface components {
       | "bugs-by-duplicates";
     /** @description keywords to search */
     search: string;
+    /** @description Custom Status id */
+    csid: string;
   };
   requestBodies: {
     Credentials: {
@@ -1252,6 +1264,61 @@ export interface operations {
       400: components["responses"]["Error"];
       403: components["responses"]["Error"];
       500: components["responses"]["Error"];
+    };
+  };
+  "delete-campaigns-cid-custom_statuses": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            status?: boolean;
+          };
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          custom_status_id: number;
+          to_custom_status_id?: number;
+        }[];
+      };
+    };
+  };
+  "patch-campaigns-cid-custom_statuses": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["BugCustomStatus"][];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /**
+           * @description se esiste già questo parametro viene passato nel request body
+           * se invece non esiste ed il custom status deve essere creato, non viene passato
+           */
+          custom_status_id?: number;
+          name: string;
+          color: string;
+        }[];
+      };
     };
   };
   "get-campaigns-cid-devices": {

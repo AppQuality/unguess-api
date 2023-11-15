@@ -14,6 +14,7 @@ import bug_priorities from "@src/__mocks__/database/bug_priority";
 import priorities from "@src/__mocks__/database/priority";
 import bug_custom_statuses from "@src/__mocks__/database/bug_custom_status";
 import custom_status from "@src/__mocks__/database/custom_status";
+import { unguess } from "@src/features/database";
 
 const campaign_type_1 = {
   id: 1,
@@ -242,6 +243,12 @@ const status_open = {
   name: "open",
 };
 
+const status_test_with_campaign = {
+  id: 9,
+  name: "test",
+  campaign_id: campaign_2.id,
+};
+
 const bug_status_2 = {
   bug_id: bug_2.id,
   custom_status_id: status_to_be_imported.id,
@@ -283,9 +290,34 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
     await bug_priorities.insert(bug_priority_2);
     await bug_priorities.insert(bug_priority_3);
     await priorities.addDefaultItems();
+    await unguess.tables.WpUgBugCustomStatusPhase.do().insert({
+      id: 1,
+      name: "working",
+    });
+    await unguess.tables.WpUgBugCustomStatusPhase.do().insert({
+      id: 2,
+      name: "completed",
+    });
+    await custom_status.addDefaultItems();
+    await custom_status.insert(status_test_with_campaign);
     await bug_custom_statuses.insert(bug_status_2);
     await bug_custom_statuses.insert(bug_status_3);
-    await custom_status.addDefaultItems();
+  });
+
+  afterAll(async () => {
+    await dbAdapter.clear();
+    await bugs.clear();
+    await severities.clear();
+    await replicabilities.clear();
+    await statuses.clear();
+    await devices.clear();
+    await usecases.clear();
+    await bug_tags.clear();
+    await bug_priorities.clear();
+    await priorities.clear();
+    await custom_status.clear();
+    await bug_custom_statuses.clear();
+    await unguess.tables.WpUgBugCustomStatusPhase.do().delete();
   });
 
   // It should answer 403 if user is not logged in
@@ -535,12 +567,22 @@ describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
       .send({ custom_status_id: status_open.id });
 
     expect(response.status).toBe(200);
-    expect(response.body.custom_status).toEqual(
+    expect(response.body).toEqual(
       expect.objectContaining({
-        id: status_open.id,
-        name: status_open.name,
+        custom_status: expect.objectContaining({
+          id: status_open.id,
+          name: status_open.name,
+        }),
       })
     );
+  });
+
+  it("It should not be possible to assign a customs status from a different campaign", async () => {
+    const response = await request(app)
+      .patch(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}`)
+      .set("Authorization", "Bearer user")
+      .send({ custom_status_id: status_test_with_campaign.id });
+    expect(response.status).toBe(403);
   });
 
   // It should return an empty response if no field is sent

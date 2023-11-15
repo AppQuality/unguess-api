@@ -208,13 +208,18 @@ paths:
                           id: 0
                           name: string
                         priority:
-                          id: 12
-                          name: Highest
+                          id: 0
+                          name: string
                         custom_status:
-                          id: 2
-                          name: To do
+                          id: 0
+                          name: string
+                          color: string
+                          phase:
+                            id: 0
+                            name: string
+                          is_default: 0
                         created: string
-                        occurred_date: '2023-02-09T15:15:04+01:00'
+                        occurred_date: string
                         updated: string
                         note: string
                         device:
@@ -225,9 +230,9 @@ paths:
                           type: smartphone
                         application_section:
                           id: 0
-                          simple_title: string
                           prefix_title: string
                           title: string
+                          simple_title: string
                         duplicated_of_id: 0
                         is_favorite: 0
                         read: true
@@ -537,7 +542,7 @@ paths:
           type: string
         description: Campaign id
     get:
-      summary: Get Campaigns Priorities
+      summary: Get campaign Custom Statuses
       tags: []
       responses:
         '200':
@@ -551,8 +556,13 @@ paths:
               examples:
                 Example 1:
                   value:
-                    - id: 1
+                    - id: 0
                       name: string
+                      color: string
+                      phase:
+                        id: 0
+                        name: string
+                      is_default: 0
         '400':
           $ref: '#/components/responses/Error'
         '403':
@@ -561,9 +571,83 @@ paths:
           $ref: '#/components/responses/Error'
       operationId: get-campaigns-cid-custom-statuses
       description: ''
+      parameters: []
       security:
         - JWT: []
-      parameters: []
+    patch:
+      summary: Create/Update Campaign Custom Statuses
+      operationId: patch-campaigns-cid-custom_statuses
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BugCustomStatus'
+              examples:
+                Example 1:
+                  value:
+                    - id: 0
+                      name: string
+                      color: string
+                      phase:
+                        id: 0
+                        name: string
+                      is_default: 0
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  custom_status_id:
+                    type: integer
+                    description: "se esiste già questo parametro viene passato nel request body\r\nse invece non esiste ed il custom status deve essere creato, non viene passato"
+                  name:
+                    type: string
+                  color:
+                    type: string
+                required:
+                  - name
+                  - color
+            examples: {}
+      description: ''
+    delete:
+      summary: Delete and migrate Custom Statuses
+      operationId: delete-campaigns-cid-custom_statuses
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+      description: ''
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  custom_status_id:
+                    type: integer
+                  to_custom_status_id:
+                    type: integer
+                required:
+                  - custom_status_id
   '/campaigns/{cid}/devices':
     parameters:
       - name: cid
@@ -1257,7 +1341,6 @@ paths:
                         cluster:
                           - id: 1
                             name: 'UC1: Example'
-                          - all
                         video:
                           - url: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
                             streamUrl: 'http://sample.vodobox.net/skate_phantom_flex_4k/skate_phantom_flex_4k.m3u8'
@@ -1282,10 +1365,12 @@ paths:
                           id: 1
                           name: 'UC1: Example'
                         value: 1
+                        comment: comment
                       - cluster:
                           id: 2
                           name: 'UC2: Example 2'
                         value: 2
+                        comment: comment
         '400':
           $ref: '#/components/responses/Error'
         '403':
@@ -2374,6 +2459,28 @@ components:
         - kind
     BugCustomStatus:
       title: BugCustomStatus
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        color:
+          type: string
+        phase:
+          $ref: '#/components/schemas/BugCustomStatusPhase'
+        is_default:
+          type: integer
+          minimum: 0
+          maximum: 1
+      required:
+        - id
+        - name
+        - color
+        - phase
+        - is_default
+    BugCustomStatusPhase:
+      title: BugCustomStatusPhase
       type: object
       properties:
         id:
@@ -3490,6 +3597,13 @@ components:
       schema:
         type: string
       description: keywords to search
+    csid:
+      name: csid
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Custom Status id
   requestBodies:
     Credentials:
       content:

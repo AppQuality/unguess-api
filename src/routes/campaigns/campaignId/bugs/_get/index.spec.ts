@@ -415,8 +415,16 @@ describe("GET /campaigns/{cid}/bugs", () => {
         await usecases.insert(usecase_with_meta);
         await usecases.insert(usecase_without_meta);
 
-        await bugsReadStatus.insert({ wp_id: 1, bug_id: bug_2.id });
-        await bugsReadStatus.insert({ wp_id: 2, bug_id: bug_2.id });
+        await bugsReadStatus.insert({
+          wp_id: 1,
+          bug_id: bug_2.id,
+          profile_id: 1,
+        });
+        await bugsReadStatus.insert({
+          wp_id: 2,
+          bug_id: bug_2.id,
+          profile_id: 2,
+        });
         await bugPriorities.insert(bug_1_highest_priority);
 
         await tags.insert(tag_1);
@@ -863,7 +871,6 @@ describe("GET /campaigns/{cid}/bugs", () => {
     expect(response.body.items[1]).toHaveProperty("read", true);
     expect(response.body.items[2]).toHaveProperty("read", false);
   });
-
   it("Should not return read_status prop", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs`)

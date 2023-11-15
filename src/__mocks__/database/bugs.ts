@@ -33,6 +33,7 @@ type BugsParams = {
   is_duplicated?: number;
   duplicated_of_id?: number;
   is_favorite?: number;
+  profile_id?: number;
 };
 
 const defaultItem: BugsParams = {
@@ -55,6 +56,7 @@ const defaultItem: BugsParams = {
   os_version: "???",
   reviewer: 1,
   last_editor_id: 1,
+  profile_id: 1,
 };
 class Bugs extends Table<BugsParams> {
   protected name = "wp_appq_evd_bug";
@@ -91,6 +93,7 @@ class Bugs extends Table<BugsParams> {
     "is_duplicated INTEGER DEFAULT 0",
     "duplicated_of_id INTEGER",
     "is_favorite INTEGER DEFAULT 0",
+    "profile_id INTEGER DEFAULT 0",
   ];
   constructor() {
     super(defaultItem);
