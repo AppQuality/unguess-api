@@ -310,8 +310,6 @@ export default class BugsRoute extends CampaignRoute<{
       "unguess"
     );
 
-    console.log("customStatuses", customStatuses);
-
     if (!customStatuses) return [];
 
     return customStatuses.map((customStatus) => ({
