@@ -102,6 +102,7 @@ describe("/campaigns/cid/ux?filterBy[severity]", () => {
       {
         ...insight,
         id: 2,
+        finding_id: 2,
         severity_id: 2,
       },
     ]);
