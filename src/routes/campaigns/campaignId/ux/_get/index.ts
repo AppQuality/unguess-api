@@ -25,6 +25,7 @@ export default class Route extends CampaignRoute<{
   private version: number | undefined;
   private uxData: iUxCampaignData | undefined;
   private _clusters: { id: number; name: string }[] | undefined;
+  private filterBy: { [key: string]: string | string[] } | undefined;
 
   constructor(configuration: RouteClassConfiguration) {
     super(configuration);
@@ -32,6 +33,8 @@ export default class Route extends CampaignRoute<{
     if (this.getUser().role === "administrator" && !query.showAsCustomer) {
       this.showAsCustomer = false;
     }
+    if (query.filterBy)
+      this.filterBy = query.filterBy as { [key: string]: string | string[] };
   }
 
   get clusters() {
