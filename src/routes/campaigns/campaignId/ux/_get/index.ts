@@ -272,8 +272,27 @@ export default class Route extends CampaignRoute<{
   }
 
   private filterFindingByCluster(finding: iFilterableFinding) {
-    // Filter by cluster
-    return true;
+    if (!this.filterBy) return true;
+    if (!this.filterBy["clusters"]) return true;
+    if (typeof this.filterBy["clusters"] !== "string") return true;
+
+    const clusterIds = finding.cluster_ids
+      .split(",")
+      .filter((id) => !Number.isNaN(Number(id)))
+      .map((id) => Number(id));
+    const clustersToFilter = this.filterBy["clusters"]
+      .split(",")
+      .map((clId) => (parseInt(clId) > 0 ? parseInt(clId) : 0))
+      .filter((clId) => clId > 0);
+    if (!clustersToFilter.length) return true;
+    return this.areElementsContained(clusterIds, clustersToFilter);
+  }
+
+  private areElementsContained(
+    clusterIds: number[],
+    clustersToFilter: number[]
+  ) {
+    return clusterIds.some((id) => clustersToFilter.includes(id));
   }
 
   private filterFindingBySeverity(finding: iFilterableFinding) {
