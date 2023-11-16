@@ -296,7 +296,17 @@ export default class Route extends CampaignRoute<{
   }
 
   private filterFindingBySeverity(finding: iFilterableFinding) {
-    // Filter by severity
-    return true;
+    if (!this.filterBy) return true;
+    if (!this.filterBy["severities"]) return true;
+    if (typeof this.filterBy["severities"] !== "string") return true;
+
+    const severitiesToFilter = this.filterBy["severities"]
+      .split(",")
+      .map((sevId) => (parseInt(sevId) > 0 ? parseInt(sevId) : 0))
+      .filter((sevId) => sevId > 0);
+
+    if (!severitiesToFilter.length) return true;
+
+    return severitiesToFilter.includes(finding.severity_id);
   }
 }
