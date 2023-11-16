@@ -16,6 +16,11 @@ interface iUxCampaignData {
   created_time: string;
 }
 
+interface iFilterableFinding {
+  cluster_ids: string;
+  severity_id: number;
+}
+
 export default class Route extends CampaignRoute<{
   response: StoplightOperations["get-campaigns-cid-ux"]["responses"]["200"]["content"]["application/json"];
   parameters: StoplightOperations["get-campaigns-cid-ux"]["parameters"]["path"];
@@ -120,6 +125,9 @@ export default class Route extends CampaignRoute<{
     let result = [];
 
     for (const finding of findings) {
+      // Apply filterBy
+      if (this.filterBy) if (!this.filterFinding(finding)) continue;
+
       const comment = comments.find(
         (c) => c.finding_id === finding.finding_id
       )?.comment;
@@ -252,5 +260,24 @@ export default class Route extends CampaignRoute<{
     }
 
     return video;
+  }
+
+  private filterFinding(finding: iFilterableFinding) {
+    if (!this.filterBy) return true;
+
+    if (this.filterFindingByCluster(finding) === false) return false;
+    if (this.filterFindingBySeverity(finding) === false) return false;
+
+    return true;
+  }
+
+  private filterFindingByCluster(finding: iFilterableFinding) {
+    // Filter by cluster
+    return true;
+  }
+
+  private filterFindingBySeverity(finding: iFilterableFinding) {
+    // Filter by severity
+    return true;
   }
 }
