@@ -1388,6 +1388,7 @@ paths:
             type: boolean
           in: query
           name: showAsCustomer
+        - $ref: '#/components/parameters/filterBy'
   '/campaigns/{cid}/widgets':
     parameters:
       - $ref: '#/components/parameters/cid'
