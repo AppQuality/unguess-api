@@ -1644,6 +1644,8 @@ export interface operations {
       };
       query: {
         showAsCustomer?: boolean;
+        /** filterBy[<fieldName>]=<fieldValue> */
+        filterBy?: components["parameters"]["filterBy"];
       };
     };
     responses: {
