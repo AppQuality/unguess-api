@@ -1,5 +1,5 @@
 import app from "@src/app";
-import { tryber, unguess } from "@src/features/database";
+import { tryber } from "@src/features/database";
 import request from "supertest";
 
 const campaign = {
@@ -112,6 +112,7 @@ describe("/campaigns/cid/ux?filterBy[severity]", () => {
     await tryber.tables.WpAppqUserToCampaign.do().delete();
     await tryber.tables.WpAppqProject.do().delete();
     await tryber.tables.WpAppqCustomer.do().delete();
+    await tryber.tables.WpAppqUsecaseCluster.do().delete();
     await tryber.tables.UxCampaignData.do().delete();
     await tryber.tables.UxCampaignInsights.do().delete();
   });
