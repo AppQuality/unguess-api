@@ -60,9 +60,9 @@ const campaign_2 = {
   title: "This is the title",
   page_preview_id: 1,
   page_manual_id: 1,
-  customer_id: 1,
+  customer_id: 15,
   pm_id: 1,
-  project_id: 1,
+  project_id: 22,
   customer_title: "",
   campaign_pts: 200,
 };
@@ -135,7 +135,6 @@ describe("GET /campaigns/{cid}/clusters", () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/clusters`)
       .set("Authorization", "Bearer user");
-    console.log(response.error);
     expect(response.status).toBe(200);
   });
 
@@ -144,6 +143,13 @@ describe("GET /campaigns/{cid}/clusters", () => {
       .get(`/campaigns/${campaign_1.id}/clusters`)
       .set("Authorization", "Bearer admin");
     expect(response.status).toBe(200);
+  });
+
+  it("Should not be able to fetch clusters from a campain the user does not have access to", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_2.id}/clusters`)
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(403);
   });
 
   it("Should return items array", async () => {
