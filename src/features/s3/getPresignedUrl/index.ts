@@ -5,6 +5,7 @@ import { Hash } from "@aws-sdk/hash-node";
 import { formatUrl } from "@aws-sdk/util-format-url";
 
 export const getPresignedUrl = async (url: string): Promise<string> => {
+  const expirationSeconds = 1200; // 20 minutes
   const s3ObjectUrl = parseUrl(url);
   const presigner = new S3RequestPresigner({
     credentials: {
@@ -15,6 +16,8 @@ export const getPresignedUrl = async (url: string): Promise<string> => {
     sha256: Hash.bind(null, "sha256"), // In Node.js
   });
   // Create a GET request from S3 url.
-  const presignedUrl = await presigner.presign(new HttpRequest(s3ObjectUrl));
+  const presignedUrl = await presigner.presign(new HttpRequest(s3ObjectUrl), {
+    expiresIn: expirationSeconds,
+  });
   return formatUrl(presignedUrl);
 };
