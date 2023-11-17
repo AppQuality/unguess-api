@@ -5,6 +5,7 @@ import BugsRoute from "@src/features/routes/BugRoute";
 import { getProjectById } from "@src/utils/projects";
 import { getBugById } from "@src/utils/bugs";
 import * as db from "@src/features/db";
+import { unguess } from "@src/features/database";
 
 type AcceptedField = "tags" | "priority_id" | "custom_status_id";
 type Priority =
@@ -115,14 +116,17 @@ export default class Route extends BugsRoute<{
           return this.setError(403, {} as OpenapiError);
         default:
           return this.setError(500, {
-            message: "Something went wrong! Unable to update data",
+            message: error,
           } as OpenapiError);
       }
     }
   }
 
   private async bugCustomStatusPatch() {
+    // Check if custom_status_id is in the body array
     if (!this.fields.includes("custom_status_id")) return;
+
+    // Check if the custom_status_ids exist
     const allStatuses = await this.getAllStatuses();
     const [result] = allStatuses.filter(
       (customStatus: CustomStatus) =>
@@ -130,14 +134,12 @@ export default class Route extends BugsRoute<{
     );
     if (!result) return Promise.reject("NOT_FOUND");
 
+    // Update bug status
     if (!(await this.checkIfBugIdExistsInBugStatus())) {
       await this.addStatusToBugStatus(result.id);
     } else {
-      this.updateStatusToBugStatus(result.id);
+      await this.updateStatusToBugStatus(result.id);
     }
-    const [{ custom_status_id }] = await this.getBugStatus();
-    if (custom_status_id !== this.customStatusId)
-      return Promise.reject("NOT_UPDATED");
 
     return Promise.resolve(result);
   }
@@ -316,32 +318,32 @@ export default class Route extends BugsRoute<{
   }
 
   private async getAllStatuses(): Promise<CustomStatus[]> {
-    const results: {
-      id: number;
-      name: string;
-      color: string;
-      is_default: number;
-      phase_id: number;
-      phase_name: string;
-    }[] = await db.query(
-      db.format(
-        `SELECT 
-        cs.id, 
-        cs.name,  
-        cs.color, 
-        cs.is_default,
-        csp.id as phase_id,
-        csp.name as phase_name 
-    FROM wp_ug_bug_custom_status cs
-    JOIN wp_ug_bug_custom_status_phase csp ON cs.phase_id = csp.id 
-    WHERE(cs.campaign_id = ? AND cs.is_default = 0) 
-    OR (cs.campaign_id IS NULL AND cs.is_default = 1)
-    ORDER BY cs.phase_id ASC, cs.id ASC;
-    `,
-        [this.cid]
-      ),
-      "unguess"
-    );
+    const campaignId = this.cid;
+    const results = await unguess.tables.WpUgBugCustomStatus.do()
+      .select(
+        unguess.ref("id").withSchema("wp_ug_bug_custom_status"),
+        unguess.ref("name").withSchema("wp_ug_bug_custom_status"),
+        unguess.ref("color").withSchema("wp_ug_bug_custom_status"),
+        unguess.ref("is_default").withSchema("wp_ug_bug_custom_status"),
+        unguess.ref("campaign_id").withSchema("wp_ug_bug_custom_status"),
+        unguess
+          .ref("id")
+          .withSchema("wp_ug_bug_custom_status_phase")
+          .as("phase_id"),
+        unguess
+          .ref("name")
+          .withSchema("wp_ug_bug_custom_status_phase")
+          .as("phase_name")
+      )
+      .join(
+        "wp_ug_bug_custom_status_phase",
+        "wp_ug_bug_custom_status.phase_id",
+        "wp_ug_bug_custom_status_phase.id"
+      )
+      .where("campaign_id", campaignId)
+      .orWhereNull("campaign_id")
+      .orderBy("wp_ug_bug_custom_status.phase_id", "asc")
+      .orderBy("wp_ug_bug_custom_status.id", "asc");
 
     return results.map((customStatus) => ({
       id: customStatus.id,

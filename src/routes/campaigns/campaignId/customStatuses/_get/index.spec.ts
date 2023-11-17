@@ -227,7 +227,19 @@ describe("GET /campaigns/{cid}/custom_statuses", () => {
         }),
       }),
       expect.objectContaining({
+        id: status_test_with_campaign_and_default_1.id,
+        phase: expect.objectContaining({
+          id: 1,
+        }),
+      }),
+      expect.objectContaining({
         id: status_test_with_campaign_and_default_2.id,
+        phase: expect.objectContaining({
+          id: 1,
+        }),
+      }),
+      expect.objectContaining({
+        id: status_test_with_campaign_and_default_3.id,
         phase: expect.objectContaining({
           id: 1,
         }),
