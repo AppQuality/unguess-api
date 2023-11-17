@@ -25,22 +25,35 @@ describe("GET /media/:id", () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
-  it("Should respond 403 if there is no media that when base64 encoded matches id", async () => {
-    const response = await request(app).get("/media/bm9uZXNpc3Rl");
-    expect(response.status).toBe(403);
-  });
-
-  it("Should respond 302 if media that when base64 encoded matches id exists", async () => {
+  it("Should redirect to login page if logged out", async () => {
     const response = await request(app).get(
       "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQva2V5LmpwZw=="
     );
     expect(response.status).toBe(302);
+    expect(response.headers.location).toBe("https://app.unguess.io/login");
+  });
+  it("Should respond 403 if there is no media that when base64 encoded matches id", async () => {
+    const response = await request(app)
+      .get("/media/bm9uZXNpc3Rl")
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(403);
+  });
+
+  it("Should respond 302 if media that when base64 encoded matches id exists", async () => {
+    const response = await request(app)
+      .get(
+        "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQva2V5LmpwZw=="
+      )
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(302);
   });
 
   it("Should respond 302 and redirect to presigned url", async () => {
-    const response = await request(app).get(
-      "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQva2V5LmpwZw=="
-    );
+    const response = await request(app)
+      .get(
+        "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQva2V5LmpwZw=="
+      )
+      .set("Authorization", "Bearer user");
     expect(response.status).toBe(302);
     expect(getPresignedUrl).toBeCalledTimes(1);
     expect(response.headers.location).toBe(

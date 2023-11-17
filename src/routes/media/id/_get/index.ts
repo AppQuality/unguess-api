@@ -3,6 +3,7 @@
 import { tryber } from "@src/features/database";
 import Route from "@src/features/routes/Route";
 import { getPresignedUrl } from "@src/features/s3/getPresignedUrl";
+import jwtSecurityHandler from "@src/middleware/jwtSecurityHandler";
 
 export default class GetMedia extends Route<{
   response: void;
@@ -38,7 +39,26 @@ export default class GetMedia extends Route<{
     return this._media;
   }
 
+  protected async filter(): Promise<boolean> {
+    if (!(await super.filter())) return false;
+
+    if (await this.isLoggedOut()) {
+      this.setRedirect("https://app.unguess.io/login");
+      return false;
+    }
+
+    return true;
+  }
   protected async prepare(): Promise<void> {
     this.setRedirect(await getPresignedUrl(this.media.location));
+  }
+
+  protected async isLoggedOut() {
+    const user = await jwtSecurityHandler(
+      this.configuration.context,
+      this.configuration.request,
+      this.configuration.response
+    );
+    return !user;
   }
 }
