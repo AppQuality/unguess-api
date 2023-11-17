@@ -141,7 +141,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
     expect(response.body.findings).toHaveLength(3);
     expect(response.body).toEqual(
       expect.objectContaining({
-        findings: expect.arrayContaining([
+        findings: [
           expect.objectContaining({
             id: 1,
           }),
@@ -151,7 +151,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
           expect.objectContaining({
             id: 3,
           }),
-        ]),
+        ],
       })
     );
   });
@@ -160,9 +160,10 @@ describe("GET /campaigns/:campaignId/ux", () => {
       .get("/campaigns/1/ux?filterBy[clusters]=1,2,test")
       .set("Authorization", "Bearer user");
     expect(response.statusCode).toBe(200);
+    expect(response.body.findings).toHaveLength(3);
     expect(response.body).toEqual(
       expect.objectContaining({
-        findings: expect.arrayContaining([
+        findings: [
           expect.objectContaining({
             id: 1,
           }),
@@ -172,7 +173,31 @@ describe("GET /campaigns/:campaignId/ux", () => {
           expect.objectContaining({
             id: 3,
           }),
-        ]),
+        ],
+      })
+    );
+  });
+
+  it("Should filter only by cluster ignoring filter by severity with only an invalid value", async () => {
+    const response = await request(app)
+      .get("/campaigns/1/ux?filterBy[clusters]=1,2&filterBy[severities]=test")
+      .set("Authorization", "Bearer user");
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.findings).toHaveLength(3);
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        findings: [
+          expect.objectContaining({
+            id: 1,
+          }),
+          expect.objectContaining({
+            id: 2,
+          }),
+          expect.objectContaining({
+            id: 3,
+          }),
+        ],
       })
     );
   });
