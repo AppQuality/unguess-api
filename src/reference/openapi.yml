@@ -533,6 +533,41 @@ paths:
       security:
         - JWT: []
       parameters: []
+  '/campaigns/{cid}/clusters':
+    parameters:
+      - schema:
+          type: string
+        name: cid
+        in: path
+        required: true
+    get:
+      summary: Get campaign clusters
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    x-stoplight:
+                      id: tv3a4tr2r85zu
+                    items:
+                      $ref: '#/components/schemas/Cluster'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-clusters
+      x-stoplight:
+        id: bb39ovjwysvis
+      security:
+        - JWT: []
   '/campaigns/{cid}/custom_statuses':
     parameters:
       - name: cid
@@ -2737,6 +2772,20 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/Output'
+    Cluster:
+      title: Cluster
+      x-stoplight:
+        id: bef65vfi2zwcs
+      type: object
+      properties:
+        id:
+          type: integer
+          x-stoplight:
+            id: tw3wby7rvt7r9
+        name:
+          type: string
+          x-stoplight:
+            id: on15oa03tfl5t
     Coin:
       title: Coin
       type: object
