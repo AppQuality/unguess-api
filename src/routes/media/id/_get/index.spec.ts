@@ -13,10 +13,23 @@ jest.mock("@src/features/s3/getPresignedUrl", () => {
 
 describe("GET /media/:id", () => {
   beforeAll(async () => {
-    await tryber.tables.WpAppqEvdBugMedia.do().insert({
+    await tryber.tables.WpAppqEvdBugMedia.do().insert([
+      {
+        id: 1,
+        bug_id: 1,
+        location: "https://s3.eu-west-1.amazonaws.com/bucket/key.jpg",
+      },
+      {
+        id: 2,
+        bug_id: 2,
+        location: "https://s3.eu-west-1.amazonaws.com/bucket/public_bug.jpg",
+      },
+    ]);
+    await tryber.tables.WpAppqBugLink.do().insert({
       id: 1,
-      bug_id: 1,
-      location: "https://s3.eu-west-1.amazonaws.com/bucket/key.jpg",
+      bug_id: 2,
+      expiration: 1,
+      creation_date: "2021-01-01 00:00:00",
     });
   });
   afterAll(async () => {
@@ -54,6 +67,16 @@ describe("GET /media/:id", () => {
         "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQva2V5LmpwZw=="
       )
       .set("Authorization", "Bearer user");
+    expect(response.status).toBe(302);
+    expect(getPresignedUrl).toBeCalledTimes(1);
+    expect(response.headers.location).toBe(
+      "https://example.com/PRE_SIGNED_URL"
+    );
+  });
+  it("Should redirect to presigned url if logged out and bug is public", async () => {
+    const response = await request(app).get(
+      "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvcHVibGljX2J1Zy5qcGc="
+    );
     expect(response.status).toBe(302);
     expect(getPresignedUrl).toBeCalledTimes(1);
     expect(response.headers.location).toBe(

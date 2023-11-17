@@ -42,10 +42,21 @@ export default class GetMedia extends Route<{
   protected async filter(): Promise<boolean> {
     if (!(await super.filter())) return false;
 
-    if (await this.isLoggedOut()) {
+    if ((await this.isLoggedOut()) && (await this.bugIsPrivate())) {
       this.setRedirect("https://app.unguess.io/login");
       return false;
     }
+
+    // const access = await this.checkWSAccess();
+
+    // if (!access) {
+    //   this.setError(403, {
+    //     code: 403,
+    //     message: "Workspace doesn't exist or not accessible",
+    //   } as OpenapiError);
+
+    //   return false;
+    // }
 
     return true;
   }
@@ -60,5 +71,18 @@ export default class GetMedia extends Route<{
       this.configuration.response
     );
     return !user;
+  }
+
+  protected async bugIsPrivate() {
+    const bug = await tryber.tables.WpAppqEvdBugMedia.do()
+      .select(tryber.ref("bug_id").withSchema("wp_appq_evd_bug_media"))
+      .where("wp_appq_evd_bug_media.id", this.media.id)
+      .join(
+        "wp_appq_bug_link",
+        "wp_appq_bug_link.bug_id",
+        "wp_appq_evd_bug_media.bug_id"
+      )
+      .first();
+    return !bug?.bug_id;
   }
 }
