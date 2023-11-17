@@ -2,6 +2,7 @@
 
 import { tryber } from "@src/features/database";
 import Route from "@src/features/routes/Route";
+import { getPresignedUrl } from "@src/features/s3/getPresignedUrl";
 
 export default class GetMedia extends Route<{
   response: void;
@@ -38,6 +39,6 @@ export default class GetMedia extends Route<{
   }
 
   protected async prepare(): Promise<void> {
-    this.setRedirect(this.media.location);
+    this.setRedirect(await getPresignedUrl(this.media.location));
   }
 }
