@@ -77,6 +77,14 @@ export interface paths {
       };
     };
   };
+  "/campaigns/{cid}/clusters": {
+    get: operations["get-campaigns-cid-clusters"];
+    parameters: {
+      path: {
+        cid: string;
+      };
+    };
+  };
   "/campaigns/{cid}/custom_statuses": {
     get: operations["get-campaigns-cid-custom-statuses"];
     delete: operations["delete-campaigns-cid-custom_statuses"];
@@ -528,6 +536,11 @@ export interface components {
     /** CampaignWithOutput */
     CampaignWithOutput: components["schemas"]["Campaign"] & {
       outputs?: components["schemas"]["Output"][];
+    };
+    /** Cluster */
+    Cluster: {
+      id?: number;
+      name?: string;
     };
     /**
      * Coin
@@ -1248,6 +1261,26 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["BugType"][];
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  "get-campaigns-cid-clusters": {
+    parameters: {
+      path: {
+        cid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            items?: components["schemas"]["Cluster"][];
+          };
         };
       };
       400: components["responses"]["Error"];
