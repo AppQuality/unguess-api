@@ -132,7 +132,6 @@ describe("GET /campaigns/:campaignId/ux", () => {
 
   it("Should filter by multiple clusters", async () => {
     const findings = await tryber.tables.UxCampaignInsights.do().select();
-    console.log(findings, "findings");
     const response = await request(app)
       .get("/campaigns/1/ux?filterBy[clusters]=1,2")
       .set("Authorization", "Bearer user");
