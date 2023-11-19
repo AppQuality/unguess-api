@@ -539,8 +539,8 @@ export interface components {
     };
     /** Cluster */
     Cluster: {
-      id?: number;
-      name?: string;
+      id: number;
+      name: string;
     };
     /**
      * Coin
