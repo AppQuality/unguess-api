@@ -1,4 +1,5 @@
 import * as db from "@src/features/db";
+import { getPresignedUrl } from "@src/features/s3/getPresignedUrl";
 
 interface BugMedia {
   type: StoplightComponents["schemas"]["BugMedia"]["mime_type"]["type"];
@@ -27,16 +28,21 @@ export const getBugMedia = async (
   }
 
   const media = [] as StoplightComponents["schemas"]["BugMedia"][];
-  results.forEach((result: BugMedia) => {
-    media.push({
-      mime_type: {
-        type: ["image", "video"].includes(result.type) ? result.type : "other",
-        extension: result.location.split(".").pop()?.toLowerCase() || "-",
-      },
-      url: result.location,
-      creation_date: result.uploaded.toString(),
-    });
-  });
+  for (const prop in results) {
+    if (Object.prototype.hasOwnProperty.call(results, prop)) {
+      const result = results[prop];
+      media.push({
+        mime_type: {
+          type: ["image", "video"].includes(result.type)
+            ? result.type
+            : "other",
+          extension: result.location.split(".").pop()?.toLowerCase() || "-",
+        },
+        url: await getPresignedUrl(result.location),
+        creation_date: result.uploaded.toString(),
+      });
+    }
+  }
 
   return media;
 };

@@ -337,6 +337,14 @@ export interface paths {
       };
     };
   };
+  "/media/{id}": {
+    get: operations["get-media-id"];
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+  };
 }
 
 export interface components {
@@ -2293,6 +2301,14 @@ export interface operations {
         };
       };
     };
+  };
+  "get-media-id": {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    responses: {};
   };
 }
 

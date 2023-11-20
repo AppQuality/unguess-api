@@ -2290,6 +2290,19 @@ paths:
                   type: boolean
               required:
                 - user_id
+  '/media/{id}':
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses: {}
+      operationId: get-media-id
+      description: ''
 components:
   schemas:
     Authentication:

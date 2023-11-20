@@ -7,7 +7,7 @@ export default class Route<T extends RouteClassTypes> {
       error: true,
       message: "Generic error",
     };
-  private responseData:
+  private _responseData:
     | T["response"]
     | StoplightComponents["responses"]["Error"]["content"]["application/json"]
     | undefined;
@@ -17,6 +17,7 @@ export default class Route<T extends RouteClassTypes> {
   protected query: T["query"] | undefined;
   protected response: T["response"] | undefined;
   private id: number | undefined;
+  private redirect: string | undefined;
 
   constructor(
     protected configuration: RouteClassConfiguration & {
@@ -30,22 +31,33 @@ export default class Route<T extends RouteClassTypes> {
     if (configuration.request.query) this.query = configuration.request.query;
   }
 
+  get responseData() {
+    if (this.redirect) {
+      return this.configuration.response.redirect(this.redirect);
+    }
+    return this._responseData;
+  }
+
   protected async init() {}
   protected async prepare() {}
   protected async filter() {
     return true;
   }
 
-  protected setSuccess(statusCode: number, data: typeof this.responseData) {
+  protected setRedirect(redirect: string) {
+    this.redirect = redirect;
+  }
+
+  protected setSuccess(statusCode: number, data: typeof this._responseData) {
     this.configuration.response.status_code = statusCode;
-    this.responseData = data;
+    this._responseData = data;
   }
 
   protected setError(statusCode: number, error: OpenapiError) {
     this.configuration.response.status_code = statusCode;
     debugMessage(error);
 
-    this.responseData = {
+    this._responseData = {
       ...this.errorMessage,
       message: error.message,
       code: statusCode,

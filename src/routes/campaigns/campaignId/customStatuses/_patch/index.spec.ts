@@ -87,12 +87,6 @@ const status_without_phase = {
   color: "ffffff",
   is_default: 0,
 };
-const status_test_with_campaign_and_default_3 = {
-  id: 11,
-  name: "Default status with campaign and default 0",
-  phase_id: 1,
-  is_default: 0,
-};
 
 const status_test_with_campaign_and_default_4 = {
   id: 12,
@@ -153,11 +147,10 @@ describe("PATCH /campaigns/{cid}/custom_statuses", () => {
     });
 
     await custom_statuses.addDefaultItems();
-    await custom_statuses_phases.addDefaultItems();
     await custom_statuses.insert(status_test_with_campaign);
-    await custom_statuses.insert(status_test_with_campaign_and_default_3);
     await custom_statuses.insert(status_test_with_campaign_and_default_4);
     await custom_statuses.insert(status_without_phase);
+    await custom_statuses_phases.addDefaultItems();
   });
 
   afterEach(async () => {
@@ -208,18 +201,22 @@ describe("PATCH /campaigns/{cid}/custom_statuses", () => {
 
   // Should return only the custom_statuses for the campaign in addition to the default ones
   it("Should return only the custom_statuses for the campaign in addition to the default ones", async () => {
-    const customStatuses = await custom_statuses.all(
-      ["id"],
-      [{ campaign_id: campaign_1.id }]
-    );
-    const defaultCustomStatuses = await custom_statuses.getDefaultItems();
+    const cpCustomStatuses = await unguess.tables.WpUgBugCustomStatus.do()
+      .select()
+      .where("campaign_id", campaign_1.id);
+
+    const defaultCustomStatuses = await unguess.tables.WpUgBugCustomStatus.do()
+      .select()
+      .where("is_default", 1);
+
     const response = await request(app)
       .patch(`/campaigns/${campaign_1.id}/custom_statuses`)
       .set("Authorization", "Bearer user")
       .send([{ name: "New-CS", color: "0000" }]);
+
     expect(response.status).toBe(200);
     expect(response.body.length).toBe(
-      customStatuses.length + defaultCustomStatuses.length + 1
+      cpCustomStatuses.length + defaultCustomStatuses.length + 1
     );
   });
 
@@ -253,8 +250,8 @@ describe("PATCH /campaigns/{cid}/custom_statuses", () => {
     expect(response.status).toBe(403);
   });
 
-  // It should not be possible to create a custom status with a name  > 17chars
-  it("Should not be possible to create a custom status with a name  > 17chars", async () => {
+  // It should not be possible to create a custom status with a name > 17chars
+  it("Should not be possible to create a custom status with a name > 17chars", async () => {
     const response = await request(app)
       .patch(`/campaigns/${campaign_2.id}/custom_statuses`)
       .set("Authorization", "Bearer user")
