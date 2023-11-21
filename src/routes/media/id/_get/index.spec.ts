@@ -2,6 +2,71 @@ import app from "@src/app";
 import { tryber } from "@src/features/database";
 import request from "supertest";
 import { getPresignedUrl } from "@src/features/s3/getPresignedUrl";
+import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
+
+const customer_1 = {
+  id: 999,
+  company: "Company 999",
+  company_logo: "logo999.png",
+  tokens: 100,
+};
+const user_to_customer_1 = {
+  wp_user_id: 1,
+  customer_id: 999,
+};
+const project_1 = {
+  id: 999,
+  display_name: "Project 999",
+  customer_id: 999,
+};
+const user_to_project_1 = {
+  wp_user_id: 1,
+  project_id: 999,
+};
+const user_to_campaign_1 = {
+  wp_user_id: 1,
+  campaign_id: 1,
+};
+const campaign_1 = {
+  id: 1,
+  start_date: "2017-07-20 10:00:00",
+  end_date: "2017-07-20 10:00:00",
+  close_date: "2017-07-20 10:00:00",
+  title: "Campaign 2 title",
+  customer_title: "Campaign 1 customer title",
+  status_id: 1,
+  is_public: 1,
+  campaign_type_id: 1,
+  campaign_type: -1,
+  project_id: project_1.id,
+  base_bug_internal_id: "CP01",
+};
+const bug_1 = {
+  id: 1,
+  internal_id: "BUG011",
+  message: "[CON-TEXT-bike] - Bug 1 super-message",
+  description: "Bug 1 description",
+  expected_result: "Bug 1 expected result",
+  current_result: "Bug 1 current result",
+  campaign_id: campaign_1.id,
+  bug_type_id: 1,
+  bug_replicability_id: 1,
+  status_id: 2,
+  status_reason: "Bug 1 status reason",
+  application_section: "Bug 1 application section",
+  note: "Bug 1 note",
+  wp_user_id: 1,
+  dev_id: 1,
+  is_duplicated: 1,
+  duplicated_of_id: 2,
+  manufacturer: "Apple",
+  model: "iPhone 13",
+  os: "iOS",
+  os_version: "iOS 16 (16)",
+  severity_id: 1,
+  reviewer: 1,
+  last_editor_id: 1,
+};
 
 jest.mock("@src/features/s3/getPresignedUrl", () => {
   return {
@@ -13,6 +78,19 @@ jest.mock("@src/features/s3/getPresignedUrl", () => {
 
 describe("GET /media/:id", () => {
   beforeAll(async () => {
+    await dbAdapter.add({
+      companies: [customer_1],
+      userToCustomers: [user_to_customer_1],
+      userToCampaigns: [user_to_campaign_1],
+      projects: [project_1],
+      userToProjects: [user_to_project_1],
+      campaigns: [campaign_1],
+    });
+    await tryber.tables.WpAppqEvdBug.do().insert([
+      bug_1,
+      { ...bug_1, id: 2 },
+      { ...bug_1, id: 3, campaign_id: 2 },
+    ]);
     await tryber.tables.WpAppqEvdBugMedia.do().insert([
       {
         id: 1,
@@ -22,7 +100,14 @@ describe("GET /media/:id", () => {
       {
         id: 2,
         bug_id: 2,
-        location: "https://s3.eu-west-1.amazonaws.com/bucket/public_bug.jpg",
+        location:
+          "https://s3.eu-west-1.amazonaws.com/bucket/public_bug_media.jpg",
+      },
+      {
+        id: 3,
+        bug_id: 3,
+        location:
+          "https://s3.eu-west-1.amazonaws.com/bucket/unauthorized_bug_media.jpg",
       },
     ]);
     await tryber.tables.WpAppqBugLink.do().insert({
@@ -34,10 +119,19 @@ describe("GET /media/:id", () => {
   });
   afterAll(async () => {
     await tryber.tables.WpAppqEvdBugMedia.do().delete();
+    await tryber.tables.WpAppqEvdBug.do().delete();
+    await tryber.tables.WpAppqBugLink.do().delete();
+    await tryber.tables.WpAppqEvdCampaign.do().delete();
+    await tryber.tables.WpAppqUserToCampaign.do().delete();
+    await tryber.tables.WpAppqUserToProject.do().delete();
+    await tryber.tables.WpAppqUserToCustomer.do().delete();
+    await tryber.tables.WpAppqProject.do().delete();
+    await tryber.tables.WpAppqCustomer.do().delete();
   });
   afterEach(() => {
     jest.clearAllMocks();
   });
+
   it("Should redirect to login page if logged out", async () => {
     const response = await request(app).get(
       "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQva2V5LmpwZw=="
@@ -53,6 +147,7 @@ describe("GET /media/:id", () => {
   });
 
   it("Should respond 302 if media that when base64 encoded matches id exists", async () => {
+    //media of bug1 in cp1
     const response = await request(app)
       .get(
         "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQva2V5LmpwZw=="
@@ -62,6 +157,7 @@ describe("GET /media/:id", () => {
   });
 
   it("Should respond 302 and redirect to presigned url", async () => {
+    //media of bug1 in cp1
     const response = await request(app)
       .get(
         "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQva2V5LmpwZw=="
@@ -73,14 +169,28 @@ describe("GET /media/:id", () => {
       "https://example.com/PRE_SIGNED_URL"
     );
   });
+
   it("Should redirect to presigned url if logged out and bug is public", async () => {
+    //media of public bug2 in cp1
     const response = await request(app).get(
-      "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvcHVibGljX2J1Zy5qcGc="
+      "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvcHVibGljX2J1Z19tZWRpYS5qcGc="
     );
     expect(response.status).toBe(302);
     expect(getPresignedUrl).toBeCalledTimes(1);
     expect(response.headers.location).toBe(
       "https://example.com/PRE_SIGNED_URL"
     );
+  });
+
+  it("Should redirect to ErrorPage if logged in and user is unauthorized to campaign", async () => {
+    //media of unauthorize bug3 in cp2
+    const response = await request(app)
+      .get(
+        "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvdW5hdXRob3JpemVkX2J1Z19tZWRpYS5qcGc="
+      )
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(302);
+    expect(getPresignedUrl).toBeCalledTimes(0);
+    expect(response.headers.location).toBe("https://app.unguess.io/error");
   });
 });
