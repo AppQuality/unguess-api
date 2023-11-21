@@ -13,6 +13,8 @@ export default class GetMedia extends Route<{
 }> {
   private mediaUrl: string;
   private _media: { id: number; location: string; bug_id: number } | undefined;
+  private customerId: number = 0;
+  private projectId: number = 0;
   private campaignId: number = 0;
   private user: { tryber_wp_user_id: number } | undefined;
 
@@ -30,7 +32,11 @@ export default class GetMedia extends Route<{
       throw error;
     }
     this._media = media;
+
     this.campaignId = await this.getCampaignId();
+    this.customerId = await this.getCustomerId();
+    this.projectId = await this.getProjectId();
+
     const user = await jwtSecurityHandler(
       this.configuration.context,
       this.configuration.request,
@@ -45,6 +51,22 @@ export default class GetMedia extends Route<{
       .select("id", "location", "bug_id")
       .where("location", this.mediaUrl)
       .first();
+  }
+  protected async getCustomerId() {
+    const customer = await tryber.tables.WpAppqEvdCampaign.do()
+      .select("customer_id")
+      .where("id", this.campaignId)
+      .first();
+    if (!customer) return 0;
+    return customer?.customer_id;
+  }
+  protected async getProjectId() {
+    const project = await tryber.tables.WpAppqEvdCampaign.do()
+      .select("project_id")
+      .where("id", this.campaignId)
+      .first();
+    if (!project) return 0;
+    return project?.project_id;
   }
   protected async getCampaignId() {
     const bug = await tryber.tables.WpAppqEvdBug.do()
@@ -114,10 +136,26 @@ export default class GetMedia extends Route<{
   }
 
   protected async hasNoAccess() {
+    if (await this.hasWorkspaceAccess()) return false;
+    if (await this.hasProjectAccess()) return false;
     if (await this.hasCampaignAccess()) return false;
-    //if (await this.hasProjectAccess()) return false;
-    //if (await this.hasWorkspaceAccess()) return false;
     return true;
+  }
+
+  private async hasWorkspaceAccess() {
+    if (!this.user) return false;
+    let workspaceAccess = await tryber.tables.WpAppqUserToCustomer.do()
+      .select("wp_user_id")
+      .where("customer_id", this.customerId)
+      .andWhere("wp_user_id", this.user.tryber_wp_user_id);
+    return workspaceAccess.length > 0;
+  }
+
+  private async hasProjectAccess() {
+    let projectAccess = await tryber.tables.WpAppqUserToProject.do()
+      .select()
+      .where("project_id", this.projectId);
+    return projectAccess.length > 0;
   }
 
   private async hasCampaignAccess() {
