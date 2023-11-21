@@ -85,16 +85,32 @@ export default class GetMedia extends Route<{
   }
 
   protected async bugIsPublic() {
-    const bugs = await tryber.tables.WpAppqEvdBugMedia.do()
-      .select(tryber.ref("bug_id").withSchema("wp_appq_evd_bug_media"))
+    let bugs = await tryber.tables.WpAppqEvdBugMedia.do()
+      .select(
+        tryber.ref("bug_id").withSchema("wp_appq_evd_bug_media"),
+        tryber.ref("creation_date").withSchema("wp_appq_bug_link"),
+        tryber.ref("expiration").withSchema("wp_appq_bug_link")
+      )
       .where("wp_appq_evd_bug_media.id", this.media.id)
-      // todo: andWhere("wp_appq_bug_link.expiration", ">" now)
       .join(
         "wp_appq_bug_link",
         "wp_appq_bug_link.bug_id",
         "wp_appq_evd_bug_media.bug_id"
       );
-    return bugs.length > 0;
+
+    return (
+      //remove expired bugs
+      bugs.filter((bug) => {
+        const today = new Date();
+        const creationDate = new Date(bug.creation_date);
+        const differenceInMilliseconds =
+          today.getTime() - creationDate.getTime();
+        const differenceInDays = Math.floor(
+          differenceInMilliseconds / (1000 * 60 * 60 * 24)
+        );
+        return differenceInDays < bug.expiration;
+      }).length > 0
+    );
   }
 
   protected async hasNoAccess() {

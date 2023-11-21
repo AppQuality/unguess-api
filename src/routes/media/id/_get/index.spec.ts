@@ -2,6 +2,10 @@ import app from "@src/app";
 import { tryber } from "@src/features/database";
 import request from "supertest";
 import { getPresignedUrl } from "@src/features/s3/getPresignedUrl";
+import formatDate from "@src/features/formatDate";
+
+const twoDaysAgo = new Date();
+twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
 
 const customer_1 = {
   id: 999,
@@ -84,8 +88,14 @@ jest.mock("@src/features/s3/getPresignedUrl", () => {
 
 describe("GET /media/:id", () => {
   beforeAll(async () => {
-    await tryber.tables.WpAppqCustomer.do().insert(customer_1); //companies
+    // permission on workspaces - user_to_workspace
     await tryber.tables.WpAppqUserToCustomer.do().insert(user_to_customer_1); //user to companies
+    //permission on projects - user_to_project
+    await tryber.tables.WpAppqUserToProject.do().insert([
+      user_to_project_1,
+      { wp_user_id: 1, project_id: 1000 },
+    ]);
+    // permission on campaigns user_to_campaign
     await tryber.tables.WpAppqUserToCampaign.do().insert([
       user_to_campaign_1,
       {
@@ -93,15 +103,6 @@ describe("GET /media/:id", () => {
         wp_user_id: 1,
         campaign_id: 3,
       },
-    ]);
-    //projects
-    await tryber.tables.WpAppqProject.do().insert([
-      project_1,
-      { ...project_1, id: 2, customer_id: 1 },
-    ]);
-    await tryber.tables.WpAppqUserToProject.do().insert([
-      user_to_project_1,
-      { wp_user_id: 1, project_id: 1000 },
     ]);
     await tryber.tables.WpAppqEvdCampaign.do().insert([
       campaign_1,
@@ -112,34 +113,50 @@ describe("GET /media/:id", () => {
     await tryber.tables.WpAppqEvdBug.do().insert([
       bug_1, //normal bug - CP1
       { ...bug_1, id: 2 }, //public bug - CP1
-      { ...bug_1, id: 3, campaign_id: 2 }, //unauthorized bug to cp - CP2
-      { ...bug_1, id: 4, campaign_id: 3 }, //unauthorized bug to project - CP3
+      { ...bug_1, id: 3 }, //expired public bug - CP1
+      { ...bug_1, id: 4, campaign_id: 2 }, //unauthorized bug to cp - CP2
+      { ...bug_1, id: 5, campaign_id: 3 }, //unauthorized bug to project - CP3
     ]);
     await tryber.tables.WpAppqEvdBugMedia.do().insert([
       {
         id: 1,
-        bug_id: 1,
-        location: "https://s3.eu-west-1.amazonaws.com/bucket/key.jpg",
+        bug_id: 1, //media of normal bug - CP1
+        location:
+          "https://s3.eu-west-1.amazonaws.com/bucket/media_of_normal_bug.jpg",
       },
       {
         id: 2,
-        bug_id: 2,
+        bug_id: 2, //media of public bug - CP1
         location:
-          "https://s3.eu-west-1.amazonaws.com/bucket/public_bug_media.jpg",
+          "https://s3.eu-west-1.amazonaws.com/bucket/media_of_public_bug.jpg",
       },
       {
         id: 3,
-        bug_id: 3,
+        bug_id: 3, //exipred media of public bug - CP1
         location:
-          "https://s3.eu-west-1.amazonaws.com/bucket/unauthorized_bug_media.jpg",
+          "https://s3.eu-west-1.amazonaws.com/bucket/expired_media_of_public_bug.jpg",
+      },
+      {
+        id: 4,
+        bug_id: 4, //unauthorized bug to cp - CP2
+        location:
+          "https://s3.eu-west-1.amazonaws.com/bucket/media_of_unauthorized_bug.jpg",
       },
     ]);
-    await tryber.tables.WpAppqBugLink.do().insert({
-      id: 1,
-      bug_id: 2,
-      expiration: 1,
-      creation_date: "2021-01-01 00:00:00",
-    });
+    await tryber.tables.WpAppqBugLink.do().insert([
+      {
+        id: 1,
+        bug_id: 2,
+        expiration: 1, //not expired
+        creation_date: formatDate(new Date()),
+      },
+      {
+        id: 2,
+        bug_id: 3,
+        expiration: 1, //expired
+        creation_date: formatDate(twoDaysAgo),
+      },
+    ]);
   });
   afterAll(async () => {
     await tryber.tables.WpAppqEvdBugMedia.do().delete();
@@ -158,7 +175,7 @@ describe("GET /media/:id", () => {
 
   it("Should redirect to login page if logged out", async () => {
     const response = await request(app).get(
-      "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQva2V5LmpwZw=="
+      "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbWVkaWFfb2Zfbm9ybWFsX2J1Zy5qcGc="
     );
     expect(response.status).toBe(302);
     expect(response.headers.location).toBe("https://app.unguess.io/login");
@@ -174,7 +191,7 @@ describe("GET /media/:id", () => {
     //media of bug1 in cp1
     const response = await request(app)
       .get(
-        "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQva2V5LmpwZw=="
+        "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbWVkaWFfb2Zfbm9ybWFsX2J1Zy5qcGc="
       )
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(302);
@@ -184,7 +201,7 @@ describe("GET /media/:id", () => {
     //media of bug1 in cp1
     const response = await request(app)
       .get(
-        "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQva2V5LmpwZw=="
+        "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbWVkaWFfb2Zfbm9ybWFsX2J1Zy5qcGc="
       )
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(302);
@@ -197,7 +214,7 @@ describe("GET /media/:id", () => {
   it("Should redirect to presigned url if logged out and bug is public", async () => {
     //media of public bug2 in cp1
     const response = await request(app).get(
-      "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvcHVibGljX2J1Z19tZWRpYS5qcGc="
+      "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbWVkaWFfb2ZfcHVibGljX2J1Zy5qcGc="
     );
     expect(response.status).toBe(302);
     expect(getPresignedUrl).toBeCalledTimes(1);
@@ -205,12 +222,21 @@ describe("GET /media/:id", () => {
       "https://example.com/PRE_SIGNED_URL"
     );
   });
+  it("Should redirect to login if bug is public but media is expired", async () => {
+    //expired media of public bug2 in cp1
+    const response = await request(app).get(
+      "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvZXhwaXJlZF9tZWRpYV9vZl9wdWJsaWNfYnVnLmpwZw=="
+    );
+    expect(response.status).toBe(302);
+    expect(getPresignedUrl).toBeCalledTimes(0);
+    expect(response.headers.location).toBe("https://app.unguess.io/login");
+  });
 
   it("Should redirect to ErrorPage if logged in and user is unauthorized to campaign", async () => {
     //media of unauthorize bug3 in cp2
     const response = await request(app)
       .get(
-        "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvdW5hdXRob3JpemVkX2J1Z19tZWRpYS5qcGc="
+        "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbWVkaWFfb2ZfdW5hdXRob3JpemVkX2J1Zy5qcGc="
       )
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(302);
