@@ -14,7 +14,7 @@ export default class GetMedia extends Route<{
   private mediaUrl: string;
   private _media: { id: number; location: string; bug_id: number } | undefined;
   private campaignId: number = 0;
-  private user: UserType | JwtPayload | string | undefined;
+  private user: { tryber_wp_user_id: number } | undefined;
 
   protected constructor(configuration: RouteClassConfiguration) {
     super(configuration);
@@ -31,12 +31,13 @@ export default class GetMedia extends Route<{
     }
     this._media = media;
     this.campaignId = await this.getCampaignId();
-    this.user = await jwtSecurityHandler(
+    const user = await jwtSecurityHandler(
       this.configuration.context,
       this.configuration.request,
       this.configuration.response
     );
-    console.log(">>>> this.user", this.user);
+    if (user && typeof user === "object" && "tryber_wp_user_id" in user)
+      this.user = { tryber_wp_user_id: user.tryber_wp_user_id };
   }
 
   protected async initMedia() {
@@ -62,14 +63,15 @@ export default class GetMedia extends Route<{
   protected async filter(): Promise<boolean> {
     if (!(await super.filter())) return false;
 
-    if (await this.bugIsPrivate()) {
-      if (this.isLoggedOut()) {
-        this.setRedirect("https://app.unguess.io/login");
-        return false;
-      } else if (await this.hasNoAccess() /*&& this.userIsNotAdmin()*/) {
-        this.setRedirect(temporaryErrorPage);
-        return false;
-      }
+    if (await this.bugIsPublic()) return true;
+
+    if (this.isLoggedOut()) {
+      this.setRedirect("https://app.unguess.io/login");
+      return false;
+    }
+    if (await this.hasNoAccess() /*&& this.userIsNotAdmin()*/) {
+      this.setRedirect(temporaryErrorPage);
+      return false;
     }
 
     return true;
@@ -82,40 +84,32 @@ export default class GetMedia extends Route<{
     return !this.user;
   }
 
-  protected async bugIsPrivate() {
-    const bug = await tryber.tables.WpAppqEvdBugMedia.do()
+  protected async bugIsPublic() {
+    const bugs = await tryber.tables.WpAppqEvdBugMedia.do()
       .select(tryber.ref("bug_id").withSchema("wp_appq_evd_bug_media"))
       .where("wp_appq_evd_bug_media.id", this.media.id)
+      // todo: andWhere("wp_appq_bug_link.expiration", ">" now)
       .join(
         "wp_appq_bug_link",
         "wp_appq_bug_link.bug_id",
         "wp_appq_evd_bug_media.bug_id"
-      )
-      .first();
-    return !bug?.bug_id;
+      );
+    return bugs.length > 0;
   }
 
   protected async hasNoAccess() {
-    return await this.hasNoCampaignAccess();
+    if (await this.hasCampaignAccess()) return false;
+    //if (await this.hasProjectAccess()) return false;
+    //if (await this.hasWorkspaceAccess()) return false;
+    return true;
   }
 
-  private async hasNoCampaignAccess() {
-    if (
-      !(
-        this.user &&
-        typeof this.user === "object" &&
-        "tryber_wp_user_id" in this.user
-      )
-    )
-      return true;
+  private async hasCampaignAccess() {
+    if (!this.user) return false;
     let campaignAccess = await tryber.tables.WpAppqUserToCampaign.do()
       .select()
       .where("campaign_id", this.campaignId)
-      .andWhere("wp_user_id", this.user.tryber_wp_user_id)
-      .first();
-    if (!campaignAccess) {
-      return true;
-    }
-    return !campaignAccess;
+      .andWhere("wp_user_id", this.user.tryber_wp_user_id);
+    return campaignAccess.length > 0;
   }
 }

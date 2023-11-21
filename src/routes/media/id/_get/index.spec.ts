@@ -2,13 +2,13 @@ import app from "@src/app";
 import { tryber } from "@src/features/database";
 import request from "supertest";
 import { getPresignedUrl } from "@src/features/s3/getPresignedUrl";
-import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
 
 const customer_1 = {
   id: 999,
   company: "Company 999",
   company_logo: "logo999.png",
   tokens: 100,
+  pm_id: 1,
 };
 const user_to_customer_1 = {
   wp_user_id: 1,
@@ -18,6 +18,7 @@ const project_1 = {
   id: 999,
   display_name: "Project 999",
   customer_id: 999,
+  edited_by: 666,
 };
 const user_to_project_1 = {
   wp_user_id: 1,
@@ -40,6 +41,11 @@ const campaign_1 = {
   campaign_type: -1,
   project_id: project_1.id,
   base_bug_internal_id: "CP01",
+  platform_id: 1,
+  page_preview_id: 1,
+  page_manual_id: 1,
+  customer_id: 1,
+  pm_id: 1,
 };
 const bug_1 = {
   id: 1,
@@ -78,18 +84,36 @@ jest.mock("@src/features/s3/getPresignedUrl", () => {
 
 describe("GET /media/:id", () => {
   beforeAll(async () => {
-    await dbAdapter.add({
-      companies: [customer_1],
-      userToCustomers: [user_to_customer_1],
-      userToCampaigns: [user_to_campaign_1],
-      projects: [project_1],
-      userToProjects: [user_to_project_1],
-      campaigns: [campaign_1],
-    });
+    await tryber.tables.WpAppqCustomer.do().insert(customer_1); //companies
+    await tryber.tables.WpAppqUserToCustomer.do().insert(user_to_customer_1); //user to companies
+    await tryber.tables.WpAppqUserToCampaign.do().insert([
+      user_to_campaign_1,
+      {
+        //user not authorized to project
+        wp_user_id: 1,
+        campaign_id: 3,
+      },
+    ]);
+    //projects
+    await tryber.tables.WpAppqProject.do().insert([
+      project_1,
+      { ...project_1, id: 2, customer_id: 1 },
+    ]);
+    await tryber.tables.WpAppqUserToProject.do().insert([
+      user_to_project_1,
+      { wp_user_id: 1, project_id: 1000 },
+    ]);
+    await tryber.tables.WpAppqEvdCampaign.do().insert([
+      campaign_1,
+      { ...campaign_1, id: 2 },
+      { ...campaign_1, id: 3, project_id: 2 },
+    ]);
+
     await tryber.tables.WpAppqEvdBug.do().insert([
-      bug_1,
-      { ...bug_1, id: 2 },
-      { ...bug_1, id: 3, campaign_id: 2 },
+      bug_1, //normal bug - CP1
+      { ...bug_1, id: 2 }, //public bug - CP1
+      { ...bug_1, id: 3, campaign_id: 2 }, //unauthorized bug to cp - CP2
+      { ...bug_1, id: 4, campaign_id: 3 }, //unauthorized bug to project - CP3
     ]);
     await tryber.tables.WpAppqEvdBugMedia.do().insert([
       {
