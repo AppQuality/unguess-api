@@ -4,9 +4,7 @@ import { tryber } from "@src/features/database";
 import Route from "@src/features/routes/Route";
 import { getPresignedUrl } from "@src/features/s3/getPresignedUrl";
 import jwtSecurityHandler from "@src/middleware/jwtSecurityHandler";
-import { JwtPayload } from "jsonwebtoken";
 
-const temporaryErrorPage = "https://app.unguess.io/error";
 export default class GetMedia extends Route<{
   response: void;
   parameters: StoplightOperations["get-media-id"]["parameters"]["path"];
@@ -92,7 +90,7 @@ export default class GetMedia extends Route<{
       return false;
     }
     if (await this.hasNoAccess() /*&& this.userIsNotAdmin()*/) {
-      this.setRedirect(temporaryErrorPage);
+      this.setRedirect("https://app.unguess.io/media/oops");
       return false;
     }
 

@@ -268,7 +268,7 @@ describe("GET /media/:id - no access to workspace", () => {
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(302);
     expect(getPresignedUrl).toBeCalledTimes(0);
-    expect(response.headers.location).toBe("https://app.unguess.io/error");
+    expect(response.headers.location).toBe("https://app.unguess.io/media/oops");
   });
   it("Should redirect to ErrorPage if logged in and user is unauthorized to project", async () => {
     //media of unauthorized bug5 in project
@@ -279,7 +279,7 @@ describe("GET /media/:id - no access to workspace", () => {
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(302);
     expect(getPresignedUrl).toBeCalledTimes(0);
-    expect(response.headers.location).toBe("https://app.unguess.io/error");
+    expect(response.headers.location).toBe("https://app.unguess.io/media/oops");
   });
   it("Should redirect to ErrorPage if logged in and user is unauthorized to campaign", async () => {
     //media of unauthorize bug3 in cp2
@@ -290,6 +290,6 @@ describe("GET /media/:id - no access to workspace", () => {
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(302);
     expect(getPresignedUrl).toBeCalledTimes(0);
-    expect(response.headers.location).toBe("https://app.unguess.io/error");
+    expect(response.headers.location).toBe("https://app.unguess.io/media/oops");
   });
 });
