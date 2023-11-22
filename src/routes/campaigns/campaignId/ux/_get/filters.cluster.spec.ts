@@ -84,6 +84,7 @@ describe("GET /campaigns/:campaignId/ux", () => {
       { ...insight, id: 1, finding_id: 1, cluster_ids: "1,2" },
       { ...insight, id: 2, finding_id: 2, cluster_ids: "1,2,3" },
       { ...insight, id: 3, finding_id: 3, cluster_ids: "1,3" },
+      { ...insight, id: 4, finding_id: 4, cluster_ids: "0" },
     ]);
 
     await tryber.tables.UxCampaignData.do().insert([campaign_ux_data]);
@@ -131,13 +132,12 @@ describe("GET /campaigns/:campaignId/ux", () => {
   });
 
   it("Should filter by multiple clusters", async () => {
-    const findings = await tryber.tables.UxCampaignInsights.do().select();
     const response = await request(app)
-      .get("/campaigns/1/ux?filterBy[clusters]=1,2")
+      .get("/campaigns/1/ux?filterBy[clusters]=1,2,0")
       .set("Authorization", "Bearer user");
 
     expect(response.statusCode).toBe(200);
-    expect(response.body.findings).toHaveLength(3);
+    expect(response.body.findings).toHaveLength(4);
     expect(response.body).toEqual(
       expect.objectContaining({
         findings: [
@@ -149,6 +149,9 @@ describe("GET /campaigns/:campaignId/ux", () => {
           }),
           expect.objectContaining({
             id: 3,
+          }),
+          expect.objectContaining({
+            id: 4,
           }),
         ],
       })
@@ -195,6 +198,23 @@ describe("GET /campaigns/:campaignId/ux", () => {
           }),
           expect.objectContaining({
             id: 3,
+          }),
+        ],
+      })
+    );
+  });
+
+  it("Should filter for cluster 0 (general)", async () => {
+    const response = await request(app)
+      .get("/campaigns/1/ux?filterBy[clusters]=0")
+      .set("Authorization", "Bearer user");
+    expect(response.statusCode).toBe(200);
+    expect(response.body.findings).toHaveLength(1);
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        findings: [
+          expect.objectContaining({
+            id: 4,
           }),
         ],
       })

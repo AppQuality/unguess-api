@@ -282,8 +282,8 @@ export default class Route extends CampaignRoute<{
       .map((id) => Number(id));
     const clustersToFilter = this.filterBy["clusters"]
       .split(",")
-      .map((clId) => (parseInt(clId) > 0 ? parseInt(clId) : 0))
-      .filter((clId) => clId > 0);
+      .filter((id) => !Number.isNaN(Number(id)))
+      .map((id) => Number(id));
     if (!clustersToFilter.length) return true;
     return this.areElementsContained(clusterIds, clustersToFilter);
   }
