@@ -292,4 +292,17 @@ describe("GET /media/:id - no access to workspace", () => {
     expect(getPresignedUrl).toBeCalledTimes(0);
     expect(response.headers.location).toBe("https://app.unguess.io/media/oops");
   });
+  it("Should respond 302 and redirect to presigned url if logged in as admin", async () => {
+    //media of unauthorize bug3 in cp2
+    const response = await request(app)
+      .get(
+        "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbm9fYWNjZXNzX3RvX2NwLmpwZw=="
+      )
+      .set("Authorization", "Bearer admin");
+    expect(response.status).toBe(302);
+    expect(getPresignedUrl).toBeCalledTimes(1);
+    expect(response.headers.location).toBe(
+      "https://example.com/PRE_SIGNED_URL"
+    );
+  });
 });

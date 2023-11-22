@@ -14,7 +14,9 @@ export default class GetMedia extends Route<{
   private customerId: number = 0;
   private projectId: number = 0;
   private campaignId: number = 0;
-  private user: { tryber_wp_user_id: number } | undefined;
+  private user:
+    | { tryber_wp_user_id: number; role: "customer" | "administrator" }
+    | undefined;
 
   protected constructor(configuration: RouteClassConfiguration) {
     super(configuration);
@@ -40,8 +42,16 @@ export default class GetMedia extends Route<{
       this.configuration.request,
       this.configuration.response
     );
-    if (user && typeof user === "object" && "tryber_wp_user_id" in user)
-      this.user = { tryber_wp_user_id: user.tryber_wp_user_id };
+    if (
+      user &&
+      typeof user === "object" &&
+      "tryber_wp_user_id" in user &&
+      "role" in user
+    )
+      this.user = {
+        tryber_wp_user_id: user.tryber_wp_user_id,
+        role: user.role,
+      };
   }
 
   protected async initMedia() {
@@ -89,7 +99,7 @@ export default class GetMedia extends Route<{
       this.setRedirect("https://app.unguess.io/login");
       return false;
     }
-    if (await this.hasNoAccess() /*&& this.userIsNotAdmin()*/) {
+    if (await this.hasNoAccess()) {
       this.setRedirect("https://app.unguess.io/media/oops");
       return false;
     }
@@ -131,10 +141,15 @@ export default class GetMedia extends Route<{
   }
 
   protected async hasNoAccess() {
+    if (await this.isAdmin()) return false;
     if (await this.hasWorkspaceAccess()) return false;
     if (await this.hasProjectAccess()) return false;
     if (await this.hasCampaignAccess()) return false;
     return true;
+  }
+
+  private async isAdmin() {
+    return this.user?.role === "administrator";
   }
 
   private async hasWorkspaceAccess() {
