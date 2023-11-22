@@ -125,7 +125,7 @@ export default class GetMedia extends Route<{
         const creationDate = new Date(bug.creation_date);
         const differenceInMilliseconds =
           today.getTime() - creationDate.getTime();
-        const differenceInDays = Math.floor(
+        const differenceInDays = Math.ceil(
           differenceInMilliseconds / (1000 * 60 * 60 * 24)
         );
         return differenceInDays < bug.expiration;
