@@ -16,6 +16,11 @@ interface iUxCampaignData {
   created_time: string;
 }
 
+interface iFilterableFinding {
+  cluster_ids: string;
+  severity_id: number;
+}
+
 export default class Route extends CampaignRoute<{
   response: StoplightOperations["get-campaigns-cid-ux"]["responses"]["200"]["content"]["application/json"];
   parameters: StoplightOperations["get-campaigns-cid-ux"]["parameters"]["path"];
@@ -25,6 +30,7 @@ export default class Route extends CampaignRoute<{
   private version: number | undefined;
   private uxData: iUxCampaignData | undefined;
   private _clusters: { id: number; name: string }[] | undefined;
+  private filterBy: { [key: string]: string | string[] } | undefined;
 
   constructor(configuration: RouteClassConfiguration) {
     super(configuration);
@@ -32,6 +38,8 @@ export default class Route extends CampaignRoute<{
     if (this.getUser().role === "administrator" && !query.showAsCustomer) {
       this.showAsCustomer = false;
     }
+    if (query.filterBy)
+      this.filterBy = query.filterBy as { [key: string]: string | string[] };
   }
 
   get clusters() {
@@ -117,6 +125,9 @@ export default class Route extends CampaignRoute<{
     let result = [];
 
     for (const finding of findings) {
+      // Apply filterBy
+      if (this.filterBy) if (!this.filterFinding(finding)) continue;
+
       const comment = comments.find(
         (c) => c.finding_id === finding.finding_id
       )?.comment;
@@ -249,5 +260,53 @@ export default class Route extends CampaignRoute<{
     }
 
     return video;
+  }
+
+  private filterFinding(finding: iFilterableFinding) {
+    if (!this.filterBy) return true;
+
+    if (this.filterFindingByCluster(finding) === false) return false;
+    if (this.filterFindingBySeverity(finding) === false) return false;
+
+    return true;
+  }
+
+  private filterFindingByCluster(finding: iFilterableFinding) {
+    if (!this.filterBy) return true;
+    if (!this.filterBy["clusters"]) return true;
+    if (typeof this.filterBy["clusters"] !== "string") return true;
+
+    const clusterIds = finding.cluster_ids
+      .split(",")
+      .filter((id) => !Number.isNaN(Number(id)))
+      .map((id) => Number(id));
+    const clustersToFilter = this.filterBy["clusters"]
+      .split(",")
+      .filter((id) => !Number.isNaN(Number(id)))
+      .map((id) => Number(id));
+    if (!clustersToFilter.length) return true;
+    return this.areElementsContained(clusterIds, clustersToFilter);
+  }
+
+  private areElementsContained(
+    clusterIds: number[],
+    clustersToFilter: number[]
+  ) {
+    return clusterIds.some((id) => clustersToFilter.includes(id));
+  }
+
+  private filterFindingBySeverity(finding: iFilterableFinding) {
+    if (!this.filterBy) return true;
+    if (!this.filterBy["severities"]) return true;
+    if (typeof this.filterBy["severities"] !== "string") return true;
+
+    const severitiesToFilter = this.filterBy["severities"]
+      .split(",")
+      .map((sevId) => (parseInt(sevId) > 0 ? parseInt(sevId) : 0))
+      .filter((sevId) => sevId > 0);
+
+    if (!severitiesToFilter.length) return true;
+
+    return severitiesToFilter.includes(finding.severity_id);
   }
 }
