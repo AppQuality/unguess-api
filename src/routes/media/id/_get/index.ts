@@ -96,11 +96,11 @@ export default class GetMedia extends Route<{
     if (await this.bugIsPublic()) return true;
 
     if (this.isLoggedOut()) {
-      this.setRedirect("/login");
+      this.setRedirect("https://app.unguess.io/login");
       return false;
     }
     if (await this.hasNoAccess()) {
-      this.setRedirect("oops");
+      this.setRedirect("https://app.unguess.io/media/oops");
       return false;
     }
 
