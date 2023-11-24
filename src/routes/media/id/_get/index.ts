@@ -21,15 +21,19 @@ export default class GetMedia extends Route<{
   protected constructor(configuration: RouteClassConfiguration) {
     super(configuration);
     const { id } = this.getParameters();
-    this.mediaUrl = atob(id);
+    try {
+      this.mediaUrl = atob(id);
+    } catch (e) {
+      this.mediaUrl = "";
+    }
   }
 
   protected async init(): Promise<void> {
     const media = await this.initMedia();
+
     if (!media) {
-      const error = new Error("Media not found") as OpenapiError;
-      this.setError(403, error);
-      throw error;
+      this.setRedirect("https://app.unguess.io/media/oops");
+      throw new Error("Media not found");
     }
     this._media = media;
 

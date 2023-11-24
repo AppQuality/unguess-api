@@ -148,13 +148,6 @@ describe("GET /media/:id", () => {
     expect(response.status).toBe(302);
     expect(response.headers.location).toBe("https://app.unguess.io/login");
   });
-  it("Should respond 403 if there is no media that when base64 encoded matches id", async () => {
-    const response = await request(app)
-      .get("/media/bm9uZXNpc3Rl")
-      .set("Authorization", "Bearer user");
-    expect(response.status).toBe(403);
-  });
-
   it("Should respond 302 if media that when base64 encoded matches id exists", async () => {
     //media of bug1 in cp1
     const response = await request(app)
@@ -265,6 +258,22 @@ describe("GET /media/:id - no access to workspace", () => {
       .get(
         "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbm9fYWNjZXNzX3RvX3dvcmtzcGFjZS5qcGc="
       )
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(302);
+    expect(getPresignedUrl).toBeCalledTimes(0);
+    expect(response.headers.location).toBe("https://app.unguess.io/media/oops");
+  });
+  it("Should redirect to ErrorPage if logged in and decoded base64 does not exist", async () => {
+    const response = await request(app)
+      .get("/media/ZmFrZV9iYXNlNjQ=")
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(302);
+    expect(getPresignedUrl).toBeCalledTimes(0);
+    expect(response.headers.location).toBe("https://app.unguess.io/media/oops");
+  });
+  it("Should redirect to ErrorPage if logged in and base64 is not valid", async () => {
+    const response = await request(app)
+      .get("/media/invalid_base64=")
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(302);
     expect(getPresignedUrl).toBeCalledTimes(0);
