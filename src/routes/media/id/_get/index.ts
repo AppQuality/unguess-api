@@ -37,11 +37,16 @@ export default class GetMedia extends Route<{
     this.customerId = await this.getCustomerId();
     this.projectId = await this.getProjectId();
 
-    const user = await jwtSecurityHandler(
-      this.configuration.context,
-      this.configuration.request,
-      this.configuration.response
-    );
+    let user;
+    try {
+      user = await jwtSecurityHandler(
+        this.configuration.context,
+        this.configuration.request,
+        this.configuration.response
+      );
+    } catch (e) {
+      console.log(e);
+    }
     if (
       user &&
       typeof user === "object" &&
