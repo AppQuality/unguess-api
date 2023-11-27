@@ -78,12 +78,12 @@ export default class GetMedia extends Route<{
     return customer?.customer_id;
   }
   protected async getProjectId() {
-    const project = await tryber.tables.WpAppqEvdCampaign.do()
-      .select("project_id")
-      .where("id", this.campaignId)
+    const project = await tryber.tables.WpAppqProject.do()
+      .select("id")
+      .where("customer_id", this.customerId)
       .first();
     if (!project) return 0;
-    return project?.project_id;
+    return project?.id;
   }
   protected async getCampaignId() {
     const bug = await tryber.tables.WpAppqEvdBug.do()

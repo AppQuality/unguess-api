@@ -88,6 +88,13 @@ describe("GET /media/:id", () => {
       { ...campaign_1, id: 1, project_id: 999 },
     ]);
 
+    await tryber.tables.WpAppqProject.do().insert({
+      id: 999,
+      customer_id: 123,
+      display_name: "Project 999",
+      edited_by: 1,
+    });
+
     await tryber.tables.WpAppqEvdBug.do().insert([
       bug_1, //normal bug - CP1
       { ...bug_1, id: 2 }, //public bug - CP1
