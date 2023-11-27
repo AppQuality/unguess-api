@@ -149,7 +149,7 @@ export default class GetMedia extends Route<{
         "wp_appq_customer",
         "wp_appq_customer.id",
         "wp_appq_user_to_customer.customer_id"
-      )
+      ) //
       .andWhere("wp_user_id", this.user.tryber_wp_user_id);
     return workspaceAccess.length > 0;
   }
