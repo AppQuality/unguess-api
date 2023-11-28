@@ -30,7 +30,7 @@ export default class GetMedia extends Route<{
     const media = await this.initMedia();
 
     if (!media) {
-      this.setRedirect("https://app.unguess.io/media/oops");
+      this.setRedirect("/media/oops");
       throw new Error("Media not found");
     }
     this._media = media;
@@ -84,11 +84,11 @@ export default class GetMedia extends Route<{
     if (await this.bugIsPublic()) return true;
 
     if (this.isLoggedOut()) {
-      this.setRedirect("https://app.unguess.io/login");
+      this.setRedirect("/login");
       return false;
     }
     if ((await this.hasAccess()) === false) {
-      this.setRedirect("https://app.unguess.io/media/oops");
+      this.setRedirect("/media/oops");
       return false;
     }
 

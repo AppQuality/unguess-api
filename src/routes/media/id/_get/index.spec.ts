@@ -125,7 +125,7 @@ describe("GET /media/:id", () => {
       "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbWVkaWFfb2Zfbm9ybWFsX2J1Zy5qcGc="
     );
     expect(response.status).toBe(302);
-    expect(response.headers.location).toBe("https://app.unguess.io/login");
+    expect(response.headers.location).toBe("/login");
   });
   it("Should redirect to presigned url if logged out and bug is public", async () => {
     //media of public bug2 in cp1
@@ -145,7 +145,7 @@ describe("GET /media/:id", () => {
     );
     expect(response.status).toBe(302);
     expect(getPresignedUrl).toBeCalledTimes(0);
-    expect(response.headers.location).toBe("https://app.unguess.io/login");
+    expect(response.headers.location).toBe("/login");
   });
   it("Should redirect to ErrorPage if logged in and user is unauthorized to workspace", async () => {
     const response = await request(app)
@@ -155,7 +155,7 @@ describe("GET /media/:id", () => {
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(302);
     expect(getPresignedUrl).toBeCalledTimes(0);
-    expect(response.headers.location).toBe("https://app.unguess.io/media/oops");
+    expect(response.headers.location).toBe("/media/oops");
   });
   it("Should respond 302 and redirect to presigned url if logged in as admin", async () => {
     //media of unauthorize bug3 in cp2
@@ -176,7 +176,7 @@ describe("GET /media/:id", () => {
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(302);
     expect(getPresignedUrl).toBeCalledTimes(0);
-    expect(response.headers.location).toBe("https://app.unguess.io/media/oops");
+    expect(response.headers.location).toBe("/media/oops");
   });
   it("Should redirect to ErrorPage if logged in and base64 is not valid", async () => {
     const response = await request(app)
@@ -184,7 +184,7 @@ describe("GET /media/:id", () => {
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(302);
     expect(getPresignedUrl).toBeCalledTimes(0);
-    expect(response.headers.location).toBe("https://app.unguess.io/media/oops");
+    expect(response.headers.location).toBe("/media/oops");
   });
   describe("Only workspace access", () => {
     beforeAll(async () => {
@@ -212,7 +212,6 @@ describe("GET /media/:id", () => {
         .set("Authorization", "Bearer user");
       expect(response.status).toBe(302);
     });
-
     it("Should respond 302 and redirect to presigned url", async () => {
       //media of bug1 in cp1
       const response = await request(app)
@@ -227,7 +226,6 @@ describe("GET /media/:id", () => {
       );
     });
   });
-
   describe("GET /media/:id - only project access", () => {
     beforeAll(async () => {
       //permission on projects - user_to_project
@@ -242,12 +240,10 @@ describe("GET /media/:id", () => {
         { id: 1, customer_id: 999, display_name: "Project 1", edited_by: 1 },
       ]);
     });
-
     afterAll(async () => {
       await tryber.tables.WpAppqUserToProject.do().delete();
       await tryber.tables.WpAppqProject.do().delete();
     });
-
     it("Should respond 302 if media that when base64 encoded matches id exists", async () => {
       //media of bug1 in cp1
       const response = await request(app)
@@ -272,7 +268,6 @@ describe("GET /media/:id", () => {
       );
     });
   });
-
   describe("GET /media/:id - only campaign access", () => {
     beforeAll(async () => {
       // permission on campaigns user_to_campaign
@@ -286,7 +281,6 @@ describe("GET /media/:id", () => {
     afterAll(async () => {
       await tryber.tables.WpAppqUserToCampaign.do().delete();
     });
-
     it("Should respond 302 if media that when base64 encoded matches id exists", async () => {
       //media of bug1 in cp1
       const response = await request(app)
@@ -296,7 +290,6 @@ describe("GET /media/:id", () => {
         .set("Authorization", "Bearer user");
       expect(response.status).toBe(302);
     });
-
     it("Should respond 302 and redirect to presigned url", async () => {
       //media of bug1 in cp1
       const response = await request(app)
@@ -322,9 +315,7 @@ describe("GET /media/:id", () => {
         .set("Authorization", "Bearer user");
       expect(response.status).toBe(302);
       expect(getPresignedUrl).toBeCalledTimes(0);
-      expect(response.headers.location).toBe(
-        "https://app.unguess.io/media/oops"
-      );
+      expect(response.headers.location).toBe("/media/oops");
     });
   });
 });
