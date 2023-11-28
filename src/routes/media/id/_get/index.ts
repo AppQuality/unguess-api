@@ -144,13 +144,22 @@ export default class GetMedia extends Route<{
   private async hasWorkspaceAccess() {
     if (!this.user) return false;
     let workspaceAccess = await tryber.tables.WpAppqUserToCustomer.do()
-      .select("wp_user_id")
+      .select(tryber.ref("wp_user_id").withSchema("wp_appq_user_to_customer"))
       .join(
-        "wp_appq_customer",
-        "wp_appq_customer.id",
+        "wp_appq_project",
+        "wp_appq_project.customer_id",
         "wp_appq_user_to_customer.customer_id"
       )
-      .andWhere("wp_user_id", this.user.tryber_wp_user_id);
+      .join(
+        "wp_appq_evd_campaign",
+        "wp_appq_evd_campaign.project_id",
+        "wp_appq_project.id"
+      )
+      .where("wp_appq_evd_campaign.id", this.campaignId)
+      .andWhere(
+        "wp_appq_user_to_customer.wp_user_id",
+        this.user.tryber_wp_user_id
+      );
     return workspaceAccess.length > 0;
   }
 

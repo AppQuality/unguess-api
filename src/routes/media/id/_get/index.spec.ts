@@ -59,16 +59,8 @@ jest.mock("@src/features/s3/getPresignedUrl", () => {
     }),
   };
 });
-
-describe("GET /media/:id - only workspace access", () => {
+describe("GET /media/:id", () => {
   beforeAll(async () => {
-    // permission on workspaces - user_to_workspace - user to companies
-    await tryber.tables.WpAppqUserToCustomer.do().insert([
-      {
-        wp_user_id: 1,
-        customer_id: 999,
-      },
-    ]);
     await tryber.tables.WpAppqCustomer.do().insert({
       id: 999,
       company: "Company 999",
@@ -123,13 +115,11 @@ describe("GET /media/:id - only workspace access", () => {
     await tryber.tables.WpAppqEvdBug.do().delete();
     await tryber.tables.WpAppqBugLink.do().delete();
     await tryber.tables.WpAppqEvdCampaign.do().delete();
-    await tryber.tables.WpAppqUserToCustomer.do().delete();
     await tryber.tables.WpAppqCustomer.do().delete();
   });
   afterEach(() => {
     jest.clearAllMocks();
   });
-
   it("Should redirect to login page if logged out", async () => {
     const response = await request(app).get(
       "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbWVkaWFfb2Zfbm9ybWFsX2J1Zy5qcGc="
@@ -137,30 +127,6 @@ describe("GET /media/:id - only workspace access", () => {
     expect(response.status).toBe(302);
     expect(response.headers.location).toBe("https://app.unguess.io/login");
   });
-  it("Should respond 302 if media that when base64 encoded matches id exists", async () => {
-    //media of bug1 in cp1
-    const response = await request(app)
-      .get(
-        "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbWVkaWFfb2Zfbm9ybWFsX2J1Zy5qcGc="
-      )
-      .set("Authorization", "Bearer user");
-    expect(response.status).toBe(302);
-  });
-
-  it("Should respond 302 and redirect to presigned url", async () => {
-    //media of bug1 in cp1
-    const response = await request(app)
-      .get(
-        "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbWVkaWFfb2Zfbm9ybWFsX2J1Zy5qcGc="
-      )
-      .set("Authorization", "Bearer user");
-    expect(response.status).toBe(302);
-    expect(getPresignedUrl).toBeCalledTimes(1);
-    expect(response.headers.location).toBe(
-      "https://example.com/PRE_SIGNED_URL"
-    );
-  });
-
   it("Should redirect to presigned url if logged out and bug is public", async () => {
     //media of public bug2 in cp1
     const response = await request(app).get(
@@ -181,300 +147,6 @@ describe("GET /media/:id - only workspace access", () => {
     expect(getPresignedUrl).toBeCalledTimes(0);
     expect(response.headers.location).toBe("https://app.unguess.io/login");
   });
-});
-
-describe("GET /media/:id - only project access", () => {
-  beforeAll(async () => {
-    //permission on projects - user_to_project
-    await tryber.tables.WpAppqUserToProject.do().insert([
-      {
-        wp_user_id: 1,
-        project_id: 2,
-      },
-      { wp_user_id: 1, project_id: 2222 },
-    ]);
-    await tryber.tables.WpAppqEvdCampaign.do().insert([
-      { ...campaign_1, id: 1, project_id: 2 },
-    ]);
-
-    await tryber.tables.WpAppqProject.do().insert({
-      id: 2,
-      customer_id: 123,
-      display_name: "Project 2",
-      edited_by: 1,
-    });
-
-    await tryber.tables.WpAppqEvdBug.do().insert([
-      bug_1, //normal bug - CP1
-      { ...bug_1, id: 2 }, //public bug - CP1
-      { ...bug_1, id: 3 }, //expired public bug - CP1
-    ]);
-    await tryber.tables.WpAppqEvdBugMedia.do().insert([
-      {
-        id: 1,
-        bug_id: 1, //media of normal bug - CP1
-        location:
-          "https://s3.eu-west-1.amazonaws.com/bucket/media_of_normal_bug.jpg",
-      },
-      {
-        id: 2,
-        bug_id: 2, //media of public bug - CP1
-        location:
-          "https://s3.eu-west-1.amazonaws.com/bucket/media_of_public_bug.jpg",
-      },
-      {
-        id: 3,
-        bug_id: 3, //exipred media of public bug - CP1
-        location:
-          "https://s3.eu-west-1.amazonaws.com/bucket/expired_media_of_public_bug.jpg",
-      },
-    ]);
-    await tryber.tables.WpAppqBugLink.do().insert([
-      {
-        id: 1,
-        bug_id: 2,
-        expiration: 1, //not expired
-        creation_date: formatDate(new Date()),
-      },
-      {
-        id: 2,
-        bug_id: 3,
-        expiration: 1, //expired
-        creation_date: formatDate(twoDaysAgo),
-      },
-    ]);
-  });
-  afterAll(async () => {
-    await tryber.tables.WpAppqEvdBugMedia.do().delete();
-    await tryber.tables.WpAppqEvdBug.do().delete();
-    await tryber.tables.WpAppqBugLink.do().delete();
-    await tryber.tables.WpAppqEvdCampaign.do().delete();
-    await tryber.tables.WpAppqUserToProject.do().delete();
-  });
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it("Should redirect to login page if logged out", async () => {
-    const response = await request(app).get(
-      "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbWVkaWFfb2Zfbm9ybWFsX2J1Zy5qcGc="
-    );
-    expect(response.status).toBe(302);
-    expect(response.headers.location).toBe("https://app.unguess.io/login");
-  });
-  it("Should respond 302 if media that when base64 encoded matches id exists", async () => {
-    //media of bug1 in cp1
-    const response = await request(app)
-      .get(
-        "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbWVkaWFfb2Zfbm9ybWFsX2J1Zy5qcGc="
-      )
-      .set("Authorization", "Bearer user");
-    expect(response.status).toBe(302);
-  });
-
-  it("Should respond 302 and redirect to presigned url", async () => {
-    //media of bug1 in cp1
-    const response = await request(app)
-      .get(
-        "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbWVkaWFfb2Zfbm9ybWFsX2J1Zy5qcGc="
-      )
-      .set("Authorization", "Bearer user");
-    expect(response.status).toBe(302);
-    expect(getPresignedUrl).toBeCalledTimes(1);
-    expect(response.headers.location).toBe(
-      "https://example.com/PRE_SIGNED_URL"
-    );
-  });
-
-  it("Should redirect to presigned url if logged out and bug is public", async () => {
-    //media of public bug2 in cp1
-    const response = await request(app).get(
-      "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbWVkaWFfb2ZfcHVibGljX2J1Zy5qcGc="
-    );
-    expect(response.status).toBe(302);
-    expect(getPresignedUrl).toBeCalledTimes(1);
-    expect(response.headers.location).toBe(
-      "https://example.com/PRE_SIGNED_URL"
-    );
-  });
-  it("Should redirect to login if bug is public but media is expired", async () => {
-    //expired media of public bug2 in cp1
-    const response = await request(app).get(
-      "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvZXhwaXJlZF9tZWRpYV9vZl9wdWJsaWNfYnVnLmpwZw=="
-    );
-    expect(response.status).toBe(302);
-    expect(getPresignedUrl).toBeCalledTimes(0);
-    expect(response.headers.location).toBe("https://app.unguess.io/login");
-  });
-});
-
-describe("GET /media/:id - only campaign access", () => {
-  beforeAll(async () => {
-    // permission on campaigns user_to_campaign
-    await tryber.tables.WpAppqUserToCampaign.do().insert([
-      {
-        wp_user_id: 1,
-        campaign_id: 1,
-      },
-    ]);
-    await tryber.tables.WpAppqEvdCampaign.do().insert([
-      { ...campaign_1, id: 1, project_id: 3 },
-    ]);
-
-    await tryber.tables.WpAppqProject.do().insert({
-      id: 3,
-      customer_id: 123,
-      display_name: "Project 3",
-      edited_by: 1,
-    });
-
-    await tryber.tables.WpAppqEvdBug.do().insert([
-      bug_1, //normal bug - CP1
-      { ...bug_1, id: 2 }, //public bug - CP1
-      { ...bug_1, id: 3 }, //expired public bug - CP1
-    ]);
-    await tryber.tables.WpAppqEvdBugMedia.do().insert([
-      {
-        id: 1,
-        bug_id: 1, //media of normal bug - CP1
-        location:
-          "https://s3.eu-west-1.amazonaws.com/bucket/media_of_normal_bug.jpg",
-      },
-      {
-        id: 2,
-        bug_id: 2, //media of public bug - CP1
-        location:
-          "https://s3.eu-west-1.amazonaws.com/bucket/media_of_public_bug.jpg",
-      },
-      {
-        id: 3,
-        bug_id: 3, //exipred media of public bug - CP1
-        location:
-          "https://s3.eu-west-1.amazonaws.com/bucket/expired_media_of_public_bug.jpg",
-      },
-    ]);
-    await tryber.tables.WpAppqBugLink.do().insert([
-      {
-        id: 1,
-        bug_id: 2,
-        expiration: 1, //not expired
-        creation_date: formatDate(new Date()),
-      },
-      {
-        id: 2,
-        bug_id: 3,
-        expiration: 1, //expired
-        creation_date: formatDate(twoDaysAgo),
-      },
-    ]);
-  });
-  afterAll(async () => {
-    await tryber.tables.WpAppqEvdBugMedia.do().delete();
-    await tryber.tables.WpAppqEvdBug.do().delete();
-    await tryber.tables.WpAppqBugLink.do().delete();
-    await tryber.tables.WpAppqEvdCampaign.do().delete();
-    await tryber.tables.WpAppqUserToCampaign.do().delete();
-  });
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it("Should redirect to login page if logged out", async () => {
-    const response = await request(app).get(
-      "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbWVkaWFfb2Zfbm9ybWFsX2J1Zy5qcGc="
-    );
-    expect(response.status).toBe(302);
-    expect(response.headers.location).toBe("https://app.unguess.io/login");
-  });
-  it("Should respond 302 if media that when base64 encoded matches id exists", async () => {
-    //media of bug1 in cp1
-    const response = await request(app)
-      .get(
-        "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbWVkaWFfb2Zfbm9ybWFsX2J1Zy5qcGc="
-      )
-      .set("Authorization", "Bearer user");
-    expect(response.status).toBe(302);
-  });
-
-  it("Should respond 302 and redirect to presigned url", async () => {
-    //media of bug1 in cp1
-    const response = await request(app)
-      .get(
-        "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbWVkaWFfb2Zfbm9ybWFsX2J1Zy5qcGc="
-      )
-      .set("Authorization", "Bearer user");
-    expect(response.status).toBe(302);
-    expect(getPresignedUrl).toBeCalledTimes(1);
-    expect(response.headers.location).toBe(
-      "https://example.com/PRE_SIGNED_URL"
-    );
-  });
-
-  it("Should redirect to presigned url if logged out and bug is public", async () => {
-    //media of public bug2 in cp1
-    const response = await request(app).get(
-      "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbWVkaWFfb2ZfcHVibGljX2J1Zy5qcGc="
-    );
-    expect(response.status).toBe(302);
-    expect(getPresignedUrl).toBeCalledTimes(1);
-    expect(response.headers.location).toBe(
-      "https://example.com/PRE_SIGNED_URL"
-    );
-  });
-  it("Should redirect to login if bug is public but media is expired", async () => {
-    //expired media of public bug2 in cp1
-    const response = await request(app).get(
-      "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvZXhwaXJlZF9tZWRpYV9vZl9wdWJsaWNfYnVnLmpwZw=="
-    );
-    expect(response.status).toBe(302);
-    expect(getPresignedUrl).toBeCalledTimes(0);
-    expect(response.headers.location).toBe("https://app.unguess.io/login");
-  });
-});
-
-describe("GET /media/:id - no access to media", () => {
-  beforeAll(async () => {
-    await tryber.tables.WpAppqEvdCampaign.do().insert([
-      { ...campaign_1, id: 2, project_id: 1234 },
-      { ...campaign_1, id: 3, project_id: 1234 },
-      { ...campaign_1, id: 4, project_id: 1234 },
-    ]);
-
-    await tryber.tables.WpAppqEvdBug.do().insert([
-      { ...bug_1, id: 4, campaign_id: 2 }, //unauthorized bug to cp - CP2
-      { ...bug_1, id: 5, campaign_id: 3 }, //unauthorized bug to project - CP3
-      { ...bug_1, id: 6, campaign_id: 4 }, //unauthorized bug to project - CP3
-    ]);
-    await tryber.tables.WpAppqEvdBugMedia.do().insert([
-      {
-        id: 4,
-        bug_id: 4, //unauthorized bug to cp - CP2
-        location:
-          "https://s3.eu-west-1.amazonaws.com/bucket/no_access_to_cp.jpg",
-      },
-      {
-        id: 5,
-        bug_id: 5, //unauthorized bug to project - CP3
-        location:
-          "https://s3.eu-west-1.amazonaws.com/bucket/no_access_to_project.jpg",
-      },
-      {
-        id: 6,
-        bug_id: 6, //unauthorized bug to workspace - CP4
-        location:
-          "https://s3.eu-west-1.amazonaws.com/bucket/no_access_to_workspace.jpg",
-      },
-    ]);
-  });
-  afterAll(async () => {
-    await tryber.tables.WpAppqEvdBugMedia.do().delete();
-    await tryber.tables.WpAppqEvdBug.do().delete();
-    await tryber.tables.WpAppqEvdCampaign.do().delete();
-  });
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
   it("Should redirect to ErrorPage if logged in and user is unauthorized to workspace", async () => {
     const response = await request(app)
       .get(
@@ -484,6 +156,19 @@ describe("GET /media/:id - no access to media", () => {
     expect(response.status).toBe(302);
     expect(getPresignedUrl).toBeCalledTimes(0);
     expect(response.headers.location).toBe("https://app.unguess.io/media/oops");
+  });
+  it("Should respond 302 and redirect to presigned url if logged in as admin", async () => {
+    //media of unauthorize bug3 in cp2
+    const response = await request(app)
+      .get(
+        "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbWVkaWFfb2Zfbm9ybWFsX2J1Zy5qcGc="
+      )
+      .set("Authorization", "Bearer admin");
+    expect(response.status).toBe(302);
+    expect(getPresignedUrl).toBeCalledTimes(1);
+    expect(response.headers.location).toBe(
+      "https://example.com/PRE_SIGNED_URL"
+    );
   });
   it("Should redirect to ErrorPage if logged in and decoded base64 does not exist", async () => {
     const response = await request(app)
@@ -501,39 +186,145 @@ describe("GET /media/:id - no access to media", () => {
     expect(getPresignedUrl).toBeCalledTimes(0);
     expect(response.headers.location).toBe("https://app.unguess.io/media/oops");
   });
-  it("Should redirect to ErrorPage if logged in and user is unauthorized to project", async () => {
-    //media of unauthorized bug5 in project
-    const response = await request(app)
-      .get(
-        "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbm9fYWNjZXNzX3RvX3Byb2plY3QuanBn"
-      )
-      .set("Authorization", "Bearer user");
-    expect(response.status).toBe(302);
-    expect(getPresignedUrl).toBeCalledTimes(0);
-    expect(response.headers.location).toBe("https://app.unguess.io/media/oops");
+  describe("Only workspace access", () => {
+    beforeAll(async () => {
+      // permission on workspaces - user_to_workspace - user to companies
+      await tryber.tables.WpAppqUserToCustomer.do().insert([
+        {
+          wp_user_id: 1,
+          customer_id: 999,
+        },
+      ]);
+      await tryber.tables.WpAppqProject.do().insert([
+        { id: 1, customer_id: 999, display_name: "Project 1", edited_by: 1 },
+      ]);
+    });
+    afterAll(async () => {
+      await tryber.tables.WpAppqUserToCustomer.do().delete();
+      await tryber.tables.WpAppqProject.do().delete();
+    });
+    it("Should respond 302 if media that when base64 encoded matches id exists", async () => {
+      //media of bug1 in cp1
+      const response = await request(app)
+        .get(
+          "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbWVkaWFfb2Zfbm9ybWFsX2J1Zy5qcGc="
+        )
+        .set("Authorization", "Bearer user");
+      expect(response.status).toBe(302);
+    });
+
+    it("Should respond 302 and redirect to presigned url", async () => {
+      //media of bug1 in cp1
+      const response = await request(app)
+        .get(
+          "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbWVkaWFfb2Zfbm9ybWFsX2J1Zy5qcGc="
+        )
+        .set("Authorization", "Bearer user");
+      expect(response.status).toBe(302);
+      expect(getPresignedUrl).toBeCalledTimes(1);
+      expect(response.headers.location).toBe(
+        "https://example.com/PRE_SIGNED_URL"
+      );
+    });
   });
-  it("Should redirect to ErrorPage if logged in and user is unauthorized to campaign", async () => {
-    //media of unauthorize bug3 in cp2
-    const response = await request(app)
-      .get(
-        "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbm9fYWNjZXNzX3RvX2NwLmpwZw=="
-      )
-      .set("Authorization", "Bearer user");
-    expect(response.status).toBe(302);
-    expect(getPresignedUrl).toBeCalledTimes(0);
-    expect(response.headers.location).toBe("https://app.unguess.io/media/oops");
+
+  describe("GET /media/:id - only project access", () => {
+    beforeAll(async () => {
+      //permission on projects - user_to_project
+      await tryber.tables.WpAppqUserToProject.do().insert([
+        {
+          wp_user_id: 1,
+          project_id: 1,
+        },
+        { wp_user_id: 1, project_id: 2222 },
+      ]);
+      await tryber.tables.WpAppqProject.do().insert([
+        { id: 1, customer_id: 999, display_name: "Project 1", edited_by: 1 },
+      ]);
+    });
+
+    afterAll(async () => {
+      await tryber.tables.WpAppqUserToProject.do().delete();
+      await tryber.tables.WpAppqProject.do().delete();
+    });
+
+    it("Should respond 302 if media that when base64 encoded matches id exists", async () => {
+      //media of bug1 in cp1
+      const response = await request(app)
+        .get(
+          "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbWVkaWFfb2Zfbm9ybWFsX2J1Zy5qcGc="
+        )
+        .set("Authorization", "Bearer user");
+      expect(response.status).toBe(302);
+    });
+
+    it("Should respond 302 and redirect to presigned url", async () => {
+      //media of bug1 in cp1
+      const response = await request(app)
+        .get(
+          "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbWVkaWFfb2Zfbm9ybWFsX2J1Zy5qcGc="
+        )
+        .set("Authorization", "Bearer user");
+      expect(response.status).toBe(302);
+      expect(getPresignedUrl).toBeCalledTimes(1);
+      expect(response.headers.location).toBe(
+        "https://example.com/PRE_SIGNED_URL"
+      );
+    });
   });
-  it("Should respond 302 and redirect to presigned url if logged in as admin", async () => {
-    //media of unauthorize bug3 in cp2
-    const response = await request(app)
-      .get(
-        "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbm9fYWNjZXNzX3RvX2NwLmpwZw=="
-      )
-      .set("Authorization", "Bearer admin");
-    expect(response.status).toBe(302);
-    expect(getPresignedUrl).toBeCalledTimes(1);
-    expect(response.headers.location).toBe(
-      "https://example.com/PRE_SIGNED_URL"
-    );
+
+  describe("GET /media/:id - only campaign access", () => {
+    beforeAll(async () => {
+      // permission on campaigns user_to_campaign
+      await tryber.tables.WpAppqUserToCampaign.do().insert([
+        {
+          wp_user_id: 1,
+          campaign_id: 1,
+        },
+      ]);
+    });
+    afterAll(async () => {
+      await tryber.tables.WpAppqUserToCampaign.do().delete();
+    });
+
+    it("Should respond 302 if media that when base64 encoded matches id exists", async () => {
+      //media of bug1 in cp1
+      const response = await request(app)
+        .get(
+          "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbWVkaWFfb2Zfbm9ybWFsX2J1Zy5qcGc="
+        )
+        .set("Authorization", "Bearer user");
+      expect(response.status).toBe(302);
+    });
+
+    it("Should respond 302 and redirect to presigned url", async () => {
+      //media of bug1 in cp1
+      const response = await request(app)
+        .get(
+          "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbWVkaWFfb2Zfbm9ybWFsX2J1Zy5qcGc="
+        )
+        .set("Authorization", "Bearer user");
+      expect(response.status).toBe(302);
+      expect(getPresignedUrl).toBeCalledTimes(1);
+      expect(response.headers.location).toBe(
+        "https://example.com/PRE_SIGNED_URL"
+      );
+    });
+  });
+
+  describe("GET /media/:id - no access to media", () => {
+    it("Should redirect to ErrorPage if logged in and user is unauthorized to workspace,project,campaign", async () => {
+      //media of unauthorized bug5 in project
+      const response = await request(app)
+        .get(
+          "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbm9fYWNjZXNzX3RvX3Byb2plY3QuanBn"
+        )
+        .set("Authorization", "Bearer user");
+      expect(response.status).toBe(302);
+      expect(getPresignedUrl).toBeCalledTimes(0);
+      expect(response.headers.location).toBe(
+        "https://app.unguess.io/media/oops"
+      );
+    });
   });
 });
