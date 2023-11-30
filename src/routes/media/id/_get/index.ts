@@ -176,7 +176,11 @@ export default class GetMedia extends Route<{
         "wp_appq_evd_campaign.project_id",
         "wp_appq_project.id"
       )
-      .where("wp_appq_evd_campaign.id", this.campaignId);
+      .where("wp_appq_evd_campaign.id", this.campaignId)
+      .andWhere(
+        "wp_appq_user_to_project.wp_user_id",
+        this.user?.tryber_wp_user_id
+      );
     return projectAccess.length > 0;
   }
 

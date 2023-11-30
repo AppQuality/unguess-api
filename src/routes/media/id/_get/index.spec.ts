@@ -304,13 +304,41 @@ describe("GET /media/:id", () => {
       );
     });
   });
-
   describe("GET /media/:id - no access to media", () => {
+    beforeAll(async () => {
+      await tryber.tables.WpAppqProject.do().insert([
+        { id: 1, customer_id: 999, display_name: "Project 1", edited_by: 1 },
+      ]);
+      // permission on campaigns user_to_campaign
+      await tryber.tables.WpAppqUserToCampaign.do().insert([
+        {
+          wp_user_id: 2,
+          campaign_id: 1,
+        },
+      ]);
+      await tryber.tables.WpAppqUserToCustomer.do().insert([
+        {
+          wp_user_id: 2,
+          customer_id: 999,
+        },
+      ]);
+      await tryber.tables.WpAppqUserToProject.do().insert([
+        {
+          project_id: 1,
+          wp_user_id: 2,
+        },
+      ]);
+    });
+    afterAll(async () => {
+      await tryber.tables.WpAppqUserToCampaign.do().delete();
+      await tryber.tables.WpAppqUserToCustomer.do().delete();
+      await tryber.tables.WpAppqProject.do().delete();
+    });
     it("Should redirect to ErrorPage if logged in and user is unauthorized to workspace,project,campaign", async () => {
       //media of unauthorized bug5 in project
       const response = await request(app)
         .get(
-          "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbm9fYWNjZXNzX3RvX3Byb2plY3QuanBn"
+          "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbWVkaWFfb2Zfbm9ybWFsX2J1Zy5qcGc="
         )
         .set("Authorization", "Bearer user");
       expect(response.status).toBe(302);
