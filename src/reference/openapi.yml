@@ -2348,18 +2348,26 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/BugComment'
+                type: object
+                properties:
+                  items:
+                    type: array
+                    x-stoplight:
+                      id: 0cydi7y7vsl1w
+                    items:
+                      $ref: '#/components/schemas/BugComment'
+                required:
+                  - items
               examples:
                 Example 1:
                   value:
-                    - id: 0
-                      text: string
-                      creation_date: string
-                      creator:
-                        id: 0
-                        name: string
+                    items:
+                      - id: 0
+                        text: string
+                        creation_date: string
+                        creator:
+                          id: 0
+                          name: string
         '400':
           $ref: '#/components/responses/Error'
           description: ''
