@@ -2335,6 +2335,123 @@ paths:
       responses: {}
       operationId: get-media-id
       description: ''
+  '/campaigns/{cid}/bugs/{bid}/comments':
+    parameters:
+      - $ref: '#/components/parameters/cid'
+      - $ref: '#/components/parameters/bid'
+    get:
+      summary: Bug comments
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BugComment'
+              examples:
+                Example 1:
+                  value:
+                    - id: 0
+                      text: string
+                      creation_date: string
+                      creator:
+                        id: 0
+                        name: string
+        '400':
+          $ref: '#/components/responses/Error'
+          description: ''
+        '403':
+          $ref: '#/components/responses/Error'
+          description: ''
+        '500':
+          $ref: '#/components/responses/Error'
+          description: ''
+      operationId: get-campaigns-cid-bugs-bid-comments
+      x-stoplight:
+        id: r0d1wvxwiwbf3
+      security:
+        - JWT: []
+    post:
+      summary: Bug comments
+      operationId: post-campaigns-cid-bugs-bid-comments
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BugComment'
+        '400':
+          $ref: '#/components/responses/Error'
+          description: ''
+        '403':
+          $ref: '#/components/responses/Error'
+          description: ''
+        '500':
+          $ref: '#/components/responses/Error'
+          description: ''
+      x-stoplight:
+        id: rlzjy82r0itvm
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                  x-stoplight:
+                    id: q1nsiz251ht8v
+              required:
+                - text
+  '/campaigns/{cid}/bugs/{bid}/comments/{cmid}':
+    parameters:
+      - schema:
+          type: string
+        name: cid
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: bid
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: cmid
+        in: path
+        required: true
+    delete:
+      summary: Delete Comment
+      operationId: delete-campaigns-cid-bugs-bid-comments-cmid
+      responses:
+        '200':
+          description: OK
+          content: {}
+        '400':
+          $ref: '#/components/responses/Error'
+          description: ''
+        '403':
+          $ref: '#/components/responses/Error'
+          description: ''
+        '500':
+          $ref: '#/components/responses/Error'
+          description: ''
+      x-stoplight:
+        id: 4noxjmx6ten6y
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
 components:
   schemas:
     Authentication:
@@ -3558,6 +3675,45 @@ components:
         - name
         - email
         - invitationPending
+    BugComment:
+      title: BugComment
+      x-stoplight:
+        id: ddukvzscrp0pl
+      type: object
+      properties:
+        id:
+          type: integer
+          x-stoplight:
+            id: sx3hbv88axcpm
+        text:
+          type: string
+          x-stoplight:
+            id: h16af30keslgo
+        creation_date:
+          type: string
+          x-stoplight:
+            id: 49ced8ziwjik6
+        creator:
+          type: object
+          x-stoplight:
+            id: in0if2rfkorh9
+          required:
+            - id
+            - name
+          properties:
+            id:
+              type: integer
+              x-stoplight:
+                id: j2493k7qdfxfq
+            name:
+              type: string
+              x-stoplight:
+                id: 8xqal4x8r400y
+      required:
+        - id
+        - text
+        - creation_date
+        - creator
   securitySchemes:
     JWT:
       type: http
