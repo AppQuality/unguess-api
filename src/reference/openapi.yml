@@ -2409,6 +2409,49 @@ paths:
                     id: q1nsiz251ht8v
               required:
                 - text
+  '/campaigns/{cid}/bugs/{bid}/comments/{cmid}':
+    parameters:
+      - schema:
+          type: string
+        name: cid
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: bid
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: cmid
+        in: path
+        required: true
+    delete:
+      summary: Delete Comment
+      operationId: delete-campaigns-cid-bugs-bid-comments-cmid
+      responses:
+        '200':
+          description: OK
+          content: {}
+        '400':
+          $ref: '#/components/responses/Error'
+          description: ''
+        '403':
+          $ref: '#/components/responses/Error'
+          description: ''
+        '500':
+          $ref: '#/components/responses/Error'
+          description: ''
+      x-stoplight:
+        id: 4noxjmx6ten6y
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
 components:
   schemas:
     Authentication:
