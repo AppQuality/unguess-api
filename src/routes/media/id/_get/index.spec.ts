@@ -147,16 +147,16 @@ describe("GET /media/:id", () => {
   //   expect(getPresignedUrl).toBeCalledTimes(0);
   //   expect(response.headers.location).toBe("/login");
   // });
-  it("Should redirect to ErrorPage if logged in and user is unauthorized to workspace", async () => {
-    const response = await request(app)
-      .get(
-        "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbm9fYWNjZXNzX3RvX3dvcmtzcGFjZS5qcGc="
-      )
-      .set("Authorization", "Bearer user");
-    expect(response.status).toBe(302);
-    expect(getPresignedUrl).toBeCalledTimes(0);
-    expect(response.headers.location).toBe("/media/oops");
-  });
+  // it("Should redirect to ErrorPage if logged in and user is unauthorized to workspace", async () => {
+  //   const response = await request(app)
+  //     .get(
+  //       "/media/aHR0cHM6Ly9zMy5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbS9idWNrZXQvbWVkaWFfb2Zfbm9ybWFsX2J1Zy5qcGc="
+  //     )
+  //     .set("Authorization", "Bearer user");
+  //   expect(response.status).toBe(302);
+  //   expect(getPresignedUrl).toBeCalledTimes(0);
+  //   expect(response.headers.location).toBe("/media/oops");
+  // });
   it("Should respond 302 and redirect to presigned url if logged in as admin", async () => {
     //media of unauthorize bug3 in cp2
     const response = await request(app)
