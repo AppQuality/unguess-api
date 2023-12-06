@@ -2390,7 +2390,9 @@ export interface operations {
       /** OK */
       200: {
         content: {
-          "application/json": components["schemas"]["BugComment"][];
+          "application/json": {
+            items: components["schemas"]["BugComment"][];
+          };
         };
       };
       400: components["responses"]["Error"];
