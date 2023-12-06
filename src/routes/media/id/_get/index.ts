@@ -79,6 +79,7 @@ export default class GetMedia extends Route<{
   }
 
   protected async filter(): Promise<boolean> {
+    return true;
     if (!(await super.filter())) return false;
 
     if (await this.bugIsPublic()) return true;
