@@ -2374,6 +2374,41 @@ paths:
         id: r0d1wvxwiwbf3
       security:
         - JWT: []
+    post:
+      summary: Bug comments
+      operationId: post-campaigns-cid-bugs-bid-comments
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BugComment'
+        '400':
+          $ref: '#/components/responses/Error'
+          description: ''
+        '403':
+          $ref: '#/components/responses/Error'
+          description: ''
+        '500':
+          $ref: '#/components/responses/Error'
+          description: ''
+      x-stoplight:
+        id: rlzjy82r0itvm
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                  x-stoplight:
+                    id: q1nsiz251ht8v
+              required:
+                - text
 components:
   schemas:
     Authentication:
