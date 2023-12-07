@@ -1,9 +1,10 @@
 import wpAuthProvider from "@appquality/wp-auth";
-import jwt from "jsonwebtoken";
-import { Context } from "openapi-backend";
 import config from "@src/config";
+import Sentry from "@src/features/sentry";
 import authenticate from "@src/features/wp/authenticate";
 import getUserById from "@src/features/wp/getUserById";
+import jwt from "jsonwebtoken";
+import { Context } from "openapi-backend";
 
 const wpAuth = wpAuthProvider.create({
   wpurl: config.APP_URL,
@@ -66,5 +67,6 @@ export default async (
   const decoded = jwt.verify(token, config.jwt.secret);
   req.user = decoded as unknown as UserType;
 
+  Sentry.identifyUser(req.user.user_login);
   return req.user;
 };
