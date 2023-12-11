@@ -353,6 +353,28 @@ export interface paths {
       };
     };
   };
+  "/campaigns/{cid}/bugs/{bid}/comments": {
+    get: operations["get-campaigns-cid-bugs-bid-comments"];
+    post: operations["post-campaigns-cid-bugs-bid-comments"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+        /** Defines an identifier for the bug object (BUG ID) */
+        bid: components["parameters"]["bid"];
+      };
+    };
+  };
+  "/campaigns/{cid}/bugs/{bid}/comments/{cmid}": {
+    delete: operations["delete-campaigns-cid-bugs-bid-comments-cmid"];
+    parameters: {
+      path: {
+        cid: string;
+        bid: string;
+        cmid: string;
+      };
+    };
+  };
 }
 
 export interface components {
@@ -873,6 +895,16 @@ export interface components {
         /** @enum {string} */
         type?: "workspace" | "project";
         id?: number;
+      };
+    };
+    /** BugComment */
+    BugComment: {
+      id: number;
+      text: string;
+      creation_date: string;
+      creator: {
+        id: number;
+        name: string;
       };
     };
   };
@@ -2344,6 +2376,78 @@ export interface operations {
       };
     };
     responses: {};
+  };
+  "get-campaigns-cid-bugs-bid-comments": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+        /** Defines an identifier for the bug object (BUG ID) */
+        bid: components["parameters"]["bid"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            items: components["schemas"]["BugComment"][];
+          };
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  "post-campaigns-cid-bugs-bid-comments": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+        /** Defines an identifier for the bug object (BUG ID) */
+        bid: components["parameters"]["bid"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["BugComment"];
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          text: string;
+        };
+      };
+    };
+  };
+  "delete-campaigns-cid-bugs-bid-comments-cmid": {
+    parameters: {
+      path: {
+        cid: string;
+        bid: string;
+        cmid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: unknown;
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+    requestBody: {
+      content: {
+        "application/json": { [key: string]: unknown };
+      };
+    };
   };
 }
 
