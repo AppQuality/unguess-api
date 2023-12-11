@@ -4,9 +4,6 @@ import BugsRoute from "@src/features/routes/BugRoute";
 import { ERROR_MESSAGE } from "@src/utils/constants";
 import { zonedTimeToUtc } from "date-fns-tz";
 
-type Comment =
-  StoplightOperations["get-campaigns-cid-bugs-bid-comments"]["responses"]["200"]["content"]["application/json"];
-
 export default class Route extends BugsRoute<{
   response: StoplightOperations["get-campaigns-cid-bugs-bid-comments"]["responses"]["200"]["content"]["application/json"];
   parameters: StoplightOperations["get-campaigns-cid-bugs-bid-comments"]["parameters"]["path"];
@@ -72,6 +69,7 @@ export default class Route extends BugsRoute<{
       items: comments,
     };
   }
+
   private emptyResponse() {
     return this.setSuccess(200, {
       items: [],
