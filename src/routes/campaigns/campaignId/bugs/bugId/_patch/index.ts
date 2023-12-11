@@ -18,8 +18,8 @@ export default class Route extends BugsRoute<{
   body: StoplightOperations["patch-campaigns-cid-bugs-bid"]["requestBody"]["content"]["application/json"];
   response: StoplightOperations["patch-campaigns-cid-bugs-bid"]["responses"]["200"]["content"]["application/json"];
 }> {
-  private cid: number;
-  private bid: number;
+  private cid: number; // REFACTOR: use BugsRoute parameters
+  private bid: number; // REFACTOR: use BugsRoute parameters
   private tags: ({ tag_id: number } | { tag_name: string })[] | undefined;
   private priorityId: number | undefined;
   private customStatusId: number | undefined;
