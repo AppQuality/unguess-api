@@ -296,7 +296,6 @@ describe("GET /campaigns/{cid}/bugs/{bid}/comments", () => {
         {
           id: comment_1.id,
           text: comment_1.text,
-          bug_id: bug_1.id,
           creator: {
             id: profile_1.wp_user_id,
             name: `${profile_1.name} ${profile_1.surname}`,
@@ -321,7 +320,6 @@ describe("GET /campaigns/{cid}/bugs/{bid}/comments", () => {
         {
           id: comment_1.id,
           text: comment_1.text,
-          bug_id: bug_1.id,
           creator: {
             id: profile_1.wp_user_id,
             name: `${profile_1.name} ${profile_1.surname}`,
