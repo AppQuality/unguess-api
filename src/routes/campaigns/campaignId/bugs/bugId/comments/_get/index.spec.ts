@@ -199,6 +199,7 @@ const comment_1 = {
   creation_date_utc: "2021-10-19 12:57:57.0",
   is_deleted: 0,
 };
+
 const comment_2 = {
   id: 24562,
   text: "comment 2",
@@ -330,6 +331,15 @@ describe("GET /campaigns/{cid}/bugs/{bid}/comments", () => {
           ).toISOString(),
         },
       ],
+    });
+  });
+  it("Should answer 200 and empty array if the bug has no comments", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_34.id}/comments`)
+      .set("Authorization", "Bearer admin");
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({
+      items: [],
     });
   });
 });
