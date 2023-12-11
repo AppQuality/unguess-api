@@ -54,7 +54,6 @@ export default class Route extends BugsRoute<{
       result.map(async (comment) => ({
         id: comment.id,
         text: comment.text,
-        bug_id: comment.bug_id,
         creation_date: zonedTimeToUtc(
           comment.creation_date_utc,
           "UTC"
