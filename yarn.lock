@@ -20,19 +20,19 @@
     call-me-maybe "^1.0.1"
     js-yaml "^4.1.0"
 
-"@appquality/tryber-database@0.24.1":
-  version "0.24.1"
-  resolved "https://registry.yarnpkg.com/@appquality/tryber-database/-/tryber-database-0.24.1.tgz#c11114aa971c69da01313930c91227ea6b1e45e3"
-  integrity sha512-AR0dhtVZAguwiXRsoof8/ru4FD83ybGrSSkEV3rLFUiLOQTAfnYuzPE9UtWJ6IKtGVOIdFHLejKwNKPhnDWbCw==
+"@appquality/tryber-database@0.26.5":
+  version "0.26.5"
+  resolved "https://registry.yarnpkg.com/@appquality/tryber-database/-/tryber-database-0.26.5.tgz#df15b09c2f9ebf6a3449ad004795001884238f68"
+  integrity sha512-lEtj3QWmea2FzpYTVh0DTUCzbkbAEOFBUtFJ0BET05FURDrh4Jm7fkg67re0oBLpTk+D6AtOEsYTU8RAF2ponw==
   dependencies:
     better-sqlite3 "^8.1.0"
     knex "^2.5.1"
     mysql "^2.18.1"
 
-"@appquality/unguess-database@^0.12.4":
-  version "0.12.4"
-  resolved "https://registry.yarnpkg.com/@appquality/unguess-database/-/unguess-database-0.12.4.tgz#c216840989d9399cbae23e167c0d4f7745cdebb5"
-  integrity sha512-k/5YgpP3NWiq29YSDlzr30NMj/rKkFmxwc18yGb5HxQ0RInm+PXEsb9l+I+DXh2OvaAzkqea2fTJu2NPqhyimg==
+"@appquality/unguess-database@^0.12.7":
+  version "0.12.7"
+  resolved "https://registry.yarnpkg.com/@appquality/unguess-database/-/unguess-database-0.12.7.tgz#8d4bd51c2be68c2f4d40ef924cf320f88aee4e91"
+  integrity sha512-eA/DAUjiYi94DyoNRS/W05iJC3jTuFl9mj+KO3zT9+EOmIT7wuWVtogC0igZ32JoDdVm/sy4NIjpv2Lu4HO/RQ==
   dependencies:
     better-sqlite3 "^8.1.0"
     knex "^2.4.2"

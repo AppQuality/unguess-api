@@ -19,8 +19,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@appquality/tryber-database": "0.24.1",
-    "@appquality/unguess-database": "^0.12.4",
+    "@appquality/tryber-database": "0.26.5",
+    "@appquality/unguess-database": "^0.12.7",
     "@appquality/wp-auth": "^1.0.7",
     "@aws-sdk/hash-node": "^3.374.0",
     "@aws-sdk/protocol-http": "^3.374.0",
