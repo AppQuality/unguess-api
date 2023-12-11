@@ -39,10 +39,10 @@ export default class Route extends BugsRoute<{
     return this.setSuccess(200, comments);
   }
 
-  private async getCreator(creatorId: number) {
+  private async getProfile(profileId: number) {
     const result = await tryber.tables.WpAppqEvdProfile.do()
       .select("name", "surname")
-      .where("wp_user_id", creatorId)
+      .where("id", profileId)
       .first();
     if (!result) return null;
     return `${result.name} ${result.surname}`;
@@ -63,8 +63,8 @@ export default class Route extends BugsRoute<{
           "UTC"
         ).toISOString(),
         creator: {
-          id: comment.creator_id,
-          name: (await this.getCreator(comment.creator_id)) || "",
+          id: comment.profile_id,
+          name: (await this.getProfile(comment.profile_id)) || "",
         },
       }))
     );

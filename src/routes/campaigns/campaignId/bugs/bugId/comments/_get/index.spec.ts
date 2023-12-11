@@ -162,6 +162,7 @@ const bug_2 = {
   wp_user_id: 34,
   profile_id: profile_2.id,
   id: 999999,
+  campaign_id: campaign_2.id,
   dev_id: device_2.id,
   manufacturer: device_2.manufacturer,
   model: device_2.model,
@@ -194,7 +195,7 @@ const comment_1 = {
   id: 2654,
   text: "comment 1",
   bug_id: bug_1.id,
-  creator_id: 1,
+  profile_id: 1,
   creation_date_utc: "2021-10-19 12:57:57.0",
   is_deleted: 0,
 };
@@ -202,7 +203,7 @@ const comment_2 = {
   id: 24562,
   text: "comment 2",
   bug_id: bug_2.id,
-  creator_id: 34,
+  profile_id: 34,
   creation_date_utc: "2021-10-19 12:57:57.0",
   is_deleted: 0,
 };
@@ -210,7 +211,7 @@ const comment_3 = {
   id: 23547,
   text: "comment 3",
   bug_id: bug_3.id,
-  creator_id: 1,
+  profile_id: 1,
   creation_date_utc: "2021-10-19 12:57:57.0",
   is_deleted: 0,
 };
@@ -270,7 +271,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}/comments", () => {
   // It should answer 400 if bug does not exist
   it("Should answer 400 if bug does not exist", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs/8512}/comments`)
+      .get(`/campaigns/${campaign_1.id}/bugs/8512/comments`)
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(400);
   });
@@ -278,7 +279,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}/comments", () => {
   // It should answer 403 if the campaign exists but the user has no permissions to see the campaign
   it("Should answer 403 if the campaign exists but the user has no permissions to see the campaign", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_2.id}/bugs/${bug_1.id}/comments`)
+      .get(`/campaigns/${campaign_2.id}/bugs/${bug_2.id}/comments`)
       .set("Authorization", "Bearer user");
 
     expect(response.status).toBe(403);
