@@ -242,7 +242,8 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     expect(response.status).toBe(403);
   });
 
-  it("Should fail if the body is not provider", async () => {
+  // Should fail if the body is not provided
+  it("Should fail if the body is not provided", async () => {
     const response = await request(app)
       .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
       .set("Authorization", "Bearer user");
