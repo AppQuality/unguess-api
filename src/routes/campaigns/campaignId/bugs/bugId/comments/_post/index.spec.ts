@@ -293,5 +293,25 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     );
   });
 
+  it("Should answer 200 with the comment if the user is an admin", async () => {
+    const response = await request(app)
+      .post(`/campaigns/${campaign_2.id}/bugs/${bug_2.id}/comments`)
+      .set("Authorization", "Bearer admin")
+      .send({ text: "comment text" });
+
+    console.log(response.error);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        text: "comment text",
+        creator: {
+          id: 0,
+          name: "Name Surname",
+        },
+      })
+    );
+  });
+
   // --- End of file
 });

@@ -83,6 +83,20 @@ export default class Route extends BugsRoute<{
 
     if (!comment) return null;
 
+    if (comment.creator_id === 0) {
+      return {
+        id: comment.id,
+        text: comment.text,
+        creation_date_utc: formatISO(
+          zonedTimeToUtc(comment.creation_date_utc, "UTC")
+        ),
+        creator: {
+          id: 0,
+          name: "Name Surname",
+        },
+      };
+    }
+
     const author = await tryber.tables.WpAppqEvdProfile.do()
       .select("id", "name", "surname")
       .where("id", comment?.creator_id)
