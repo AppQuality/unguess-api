@@ -170,7 +170,7 @@ const bug_3 = {
   last_editor_id: 1,
 };
 
-describe("PATCH /campaigns/{cid}/bugs/{bid}", () => {
+describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
   const context = useBasicProjectsContext();
 
   beforeAll(async () => {
