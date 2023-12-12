@@ -1,4 +1,3 @@
-import { zonedTimeToUtc } from "date-fns-tz";
 import app from "@src/app";
 import request from "supertest";
 import { tryber, unguess } from "@src/features/database";
@@ -235,7 +234,7 @@ const comment_3 = {
   is_deleted: 0,
 };
 
-describe("GET /campaigns/{cid}/bugs/{bid}/comments", () => {
+describe("DELETE /campaigns/{cid}/bugs/{bid}/comments/{cmid}", () => {
   beforeAll(async () => {
     await tryber.tables.WpAppqEvdBug.do().insert([
       bug_1,
@@ -279,8 +278,8 @@ describe("GET /campaigns/{cid}/bugs/{bid}/comments", () => {
   });
 
   it("Should answer 403 if user is not logged in", async () => {
-    const response = await request(app).get(
-      `/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`
+    const response = await request(app).delete(
+      `/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments/${comment_1.id}`
     );
     expect(response.status).toBe(403);
   });
@@ -288,7 +287,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}/comments", () => {
   // It should answer 400 if campaign does not exist
   it("Should answer 400 if campaign does not exist", async () => {
     const response = await request(app)
-      .get(`/campaigns/99999/bugs/${bug_1.id}/comments`)
+      .delete(`/campaigns/99999/bugs/${bug_1.id}/comments/${comment_1.id}`)
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(400);
   });
@@ -296,74 +295,68 @@ describe("GET /campaigns/{cid}/bugs/{bid}/comments", () => {
   // It should answer 400 if bug does not exist
   it("Should answer 400 if bug does not exist", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs/8512/comments`)
+      .delete(`/campaigns/${campaign_1.id}/bugs/8512/comments/${comment_1.id}`)
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(400);
+  });
+
+  // It should answer 400 if the comment does not exist
+  it("Should answer 400 if the comment does not exist", async () => {
+    const response = await request(app)
+      .delete(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments/99999`)
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(400);
   });
 
   // It should answer 403 if the campaign exists but the user has no permissions to see the campaign
-  it("Should answer 403 if the campaign exists but the user has no permissions to see the campaign", async () => {
+  it("It should answer 403 if the campaign exists but the user has no permissions to see the campaign", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_2.id}/bugs/${bug_2.id}/comments`)
+      .delete(
+        `/campaigns/${campaign_2.id}/bugs/${bug_2.id}/comments/${comment_2.id}`
+      )
       .set("Authorization", "Bearer user");
 
     expect(response.status).toBe(403);
   });
 
-  // It should answer 200 with the campaign if the user is an admin
-  it("Should answer 200 with all the comments for the bug if the user is an admin", async () => {
+  // It should answer 403 if the comment exists but the user is not the creator
+  it("It should answer 403 if the comment exists but the user is not the creator", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
-      .set("Authorization", "Bearer admin");
-    expect(response.status).toBe(200);
-    expect(response.body).toEqual({
-      items: [
-        {
-          id: comment_1.id,
-          text: comment_1.text,
-          creator: {
-            id: profile_1.wp_user_id,
-            name: `${profile_1.name} ${profile_1.surname}`,
-          },
-          creation_date: zonedTimeToUtc(
-            comment_1.creation_date_utc,
-            "UTC"
-          ).toISOString(),
-        },
-      ],
-    });
+      .delete(
+        `/campaigns/${campaign_2.id}/bugs/${bug_2.id}/comments/${comment_2.id}`
+      )
+      .set("Authorization", "Bearer user");
+
+    expect(response.status).toBe(403);
   });
 
-  // Should answer 200 with the comment if the user has specific permission to see the campaign
-  it("Should answer 200 with all the comments for the bug if the user has specific permission to see the campaign", async () => {
+  // It should answer 200 if the user is an admin and not the creator
+  it("It should answer 200 if the user is an admin and not the creator", async () => {
     const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
-      .set("Authorization", "Bearer user");
-    expect(response.status).toBe(200);
-    expect(response.body).toEqual({
-      items: [
-        {
-          id: comment_1.id,
-          text: comment_1.text,
-          creator: {
-            id: profile_1.wp_user_id,
-            name: `${profile_1.name} ${profile_1.surname}`,
-          },
-          creation_date: zonedTimeToUtc(
-            comment_1.creation_date_utc,
-            "UTC"
-          ).toISOString(),
-        },
-      ],
-    });
-  });
-  it("Should answer 200 and empty array if the bug has no comments", async () => {
-    const response = await request(app)
-      .get(`/campaigns/${campaign_1.id}/bugs/${bug_34.id}/comments`)
+      .delete(
+        `/campaigns/${campaign_2.id}/bugs/${bug_2.id}/comments/${comment_2.id}`
+      )
       .set("Authorization", "Bearer admin");
     expect(response.status).toBe(200);
-    expect(response.body).toEqual({
-      items: [],
-    });
+  });
+
+  // It should answer 200 if the user is an admin and the creator
+  it("It should answer 200 if the user is an admin", async () => {
+    const response = await request(app)
+      .delete(
+        `/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments/${comment_1.id}`
+      )
+      .set("Authorization", "Bearer admin");
+    expect(response.status).toBe(200);
+  });
+
+  // Should answer 200 with the comment if the user has specific permission to see the campaign and is the creator of the comment
+  it("Should answer 200 with the comment if the user has specific permission to see the campaign and is the creator of the comment", async () => {
+    const response = await request(app)
+      .delete(
+        `/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments/${comment_1.id}`
+      )
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(200);
   });
 });

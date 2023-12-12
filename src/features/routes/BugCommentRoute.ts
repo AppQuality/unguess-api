@@ -17,8 +17,8 @@ export default class BugCommentRoute<
         bug_id: number;
         text: string;
         profile_id: number;
-        creation_date_utc: Date;
-        is_deleted: 0 | 1;
+        creation_date_utc: string;
+        is_deleted: number;
       }
     | undefined;
 
@@ -59,7 +59,6 @@ export default class BugCommentRoute<
       .first();
 
     if (!comment) return null;
-
     const author = await tryber.tables.WpAppqEvdProfile.do()
       .select("id", "name", "surname")
       .where("id", comment.profile_id)
