@@ -77,13 +77,13 @@ export default class Route extends BugsRoute<{
 
   private async getComment(id: number) {
     const comment = await unguess.tables.UgBugsComments.do()
-      .select("id", "text", "creation_date_utc", "creator_id")
+      .select("id", "text", "creation_date_utc", "profile_id")
       .where("id", id)
       .first();
 
     if (!comment) return null;
 
-    if (comment.creator_id === 0) {
+    if (comment.profile_id === 0) {
       return {
         id: comment.id,
         text: comment.text,
@@ -99,7 +99,7 @@ export default class Route extends BugsRoute<{
 
     const author = await tryber.tables.WpAppqEvdProfile.do()
       .select("id", "name", "surname")
-      .where("id", comment?.creator_id)
+      .where("id", comment?.profile_id)
       .first();
 
     if (!author) return null;
@@ -122,7 +122,7 @@ export default class Route extends BugsRoute<{
       .insert({
         text: this.comment,
         bug_id: this.bid,
-        creator_id: this.getProfileId(),
+        profile_id: this.getProfileId(),
         creation_date_utc: formatInTimeZone(
           new Date(),
           "UTC",

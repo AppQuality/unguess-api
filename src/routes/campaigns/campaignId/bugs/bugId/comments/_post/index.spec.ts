@@ -191,7 +191,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       text: "Comment 1",
       is_deleted: 0,
       bug_id: bug_1.id,
-      creator_id: context.profile2.id,
+      profile_id: context.profile2.id,
       creation_date_utc: "2023-12-11 09:23:00",
     });
   });
