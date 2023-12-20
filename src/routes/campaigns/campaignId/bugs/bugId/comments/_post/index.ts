@@ -3,6 +3,7 @@ import BugsRoute from "@src/features/routes/BugRoute";
 import { tryber, unguess } from "@src/features/database";
 import { formatInTimeZone, zonedTimeToUtc } from "date-fns-tz";
 import { formatISO } from "date-fns";
+import sgMail from "@sendgrid/mail";
 
 export default class Route extends BugsRoute<{
   parameters: StoplightOperations["post-campaigns-cid-bugs-bid-comments"]["parameters"]["path"];
@@ -130,7 +131,68 @@ export default class Route extends BugsRoute<{
         ),
       })
       .returning("id");
-
+    if (comment) {
+      await this.sendEmail();
+    }
     return comment[0].id ?? comment[0];
+  }
+
+  private replaceAll = (str: string, find: string, replace: string) => {
+    return str.replace(new RegExp(find, "g"), replace);
+  };
+
+  private async getTemplate({
+    template,
+    optionalFields,
+  }: {
+    template: string;
+    optionalFields?: { [key: string]: any };
+  }) {
+    const mailTemplate = await tryber.tables.WpAppqUnlayerMailTemplate.do()
+      .select("html_body")
+      .join(
+        "wp_appq_event_transactional_mail",
+        "wp_appq_event_transactional_mail.template_id",
+        "wp_appq_unlayer_mail_template.id"
+      )
+      .where("wp_appq_event_transactional_mail.event_name", template)
+      .first();
+
+    if (!mailTemplate) return;
+
+    let templateHtml = mailTemplate.html_body as string;
+
+    if (optionalFields) {
+      for (const key in optionalFields) {
+        if (templateHtml.includes(key)) {
+          templateHtml = this.replaceAll(
+            templateHtml,
+            key,
+            optionalFields[key as keyof typeof optionalFields]
+          );
+        }
+      }
+    }
+
+    return templateHtml;
+  }
+  private async sendEmail() {
+    const html = await this.getTemplate({
+      template: "notify_campaign_bug_approved",
+      optionalFields: { "{{bug_id}}": this.bid, "{{bug_name}}": "bug name" },
+    });
+
+    if (!html) {
+      throw new Error("No html email template");
+    }
+    const notification = {
+      to: "",
+      from: { name: "UNGUESS", email: "" },
+      subject: "",
+      html: "",
+      categories: [""],
+    };
+
+    await sgMail.send(notification);
   }
 }
