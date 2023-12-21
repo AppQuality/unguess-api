@@ -50,7 +50,6 @@ export default class Route extends BugsRoute<{
   protected async prepare(): Promise<void> {
     try {
       const commentId = await this.addComment();
-
       if (!commentId) {
         this.setError(400, {
           message: "Something went wrong!",
@@ -78,7 +77,7 @@ export default class Route extends BugsRoute<{
           return this.setError(403, {} as OpenapiError);
         default:
           return this.setError(500, {
-            message: error,
+            message: "Something went wrong!",
           } as OpenapiError);
       }
     }
@@ -138,8 +137,7 @@ export default class Route extends BugsRoute<{
           "yyyy-MM-dd HH:mm:ss"
         ),
       })
-      .returning("id, text");
-
+      .returning(["id", "text"]);
     if (comment[0].id && comment[0].text) {
       await this.sendEmail(comment[0].text);
       return comment[0].id;
@@ -167,7 +165,7 @@ export default class Route extends BugsRoute<{
       )
       .where("wp_appq_event_transactional_mail.event_name", template)
       .first();
-
+    console.log(mailTemplate, "mailTemplate");
     if (!mailTemplate) return;
 
     let templateHtml = mailTemplate.html_body as string;
@@ -190,22 +188,21 @@ export default class Route extends BugsRoute<{
   private async getPMFullName() {
     const campaignPm = await tryber.tables.WpAppqEvdCampaign.do()
       .select(
-        "id",
-        "project_id",
-        "status_id",
-        "c.customer_title",
-        "wp_appq_evd_profile.name as csm_name",
-        "wp_appq_evd_profile.surname as csm_surname"
+        tryber.ref("id").withSchema("wp_appq_evd_campaign"),
+        tryber.ref("project_id").withSchema("wp_appq_evd_campaign"),
+        tryber.ref("status_id").withSchema("wp_appq_evd_campaign"),
+        tryber.ref("customer_title").withSchema("wp_appq_evd_campaign"),
+        tryber.ref("wp_appq_evd_profile.name").as("csm_name"),
+        tryber.ref("wp_appq_evd_profile.surname").as("csm_surname")
       )
       .join(
         "wp_appq_evd_profile",
         "wp_appq_evd_campaign.pm_id",
         "wp_appq_evd_profile.id"
       )
-      .where("id", this.cid)
+      .where("wp_appq_evd_campaign.id", this.cid)
       .first();
-
-    return `${campaignPm.csm_name} ${campaignPm.csm_surname}`;
+    return `${campaignPm?.csm_name} ${campaignPm?.csm_surname}`;
   }
 
   private async getBugData() {
@@ -225,14 +222,16 @@ export default class Route extends BugsRoute<{
         "{Bug.id}": this.bid,
         "{Bug.message}": bug?.message,
         "{Comment}": text,
+        "{Inviter.url}": `${process.env.APP_URL}/campaigns/${this.cid}/bugs`,
       },
     });
 
     if (!html) {
       throw new Error("No html email template");
     }
+    console.log(html, "html");
     const notification = {
-      to: "",
+      to: "platform@unguess.io",
       from: { name: "UNGUESS", email: "info@unguess.io" },
       subject: "Nuovo commento sul bug",
       html: html,

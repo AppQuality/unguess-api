@@ -39,7 +39,7 @@ const campaign_1 = {
   page_preview_id: -1,
   page_manual_id: -1,
   customer_id: -1,
-  pm_id: -1,
+  pm_id: 1,
   description: "Campaign description",
 };
 
@@ -197,6 +197,23 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       profile_id: context.profile2.id,
       creation_date_utc: "2023-12-11 09:23:00",
     });
+    await tryber.tables.WpAppqUnlayerMailTemplate.do().insert({
+      id: 1,
+      html_body:
+        "Test mail it {Bug.id},{Bug.message},{Inviter.url},{Campaign.pm_full_name},{Comment}",
+      name: "Test mail",
+      json_body: "",
+      last_editor_tester_id: 1,
+      lang: "it",
+      category_id: 1,
+    });
+
+    await tryber.tables.WpAppqEventTransactionalMail.do().insert({
+      id: 1,
+      event_name: "notify_campaign_bug_comment",
+      template_id: 1,
+      last_editor_tester_id: 1,
+    });
   });
 
   afterAll(async () => {
@@ -204,6 +221,8 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     await severities.clear();
     await replicabilities.clear();
     await statuses.clear();
+    await tryber.tables.WpAppqEventTransactionalMail.do().delete();
+    await tryber.tables.WpAppqUnlayerMailTemplate.do().delete();
   });
 
   // Clear mocks call counter
@@ -320,6 +339,24 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       })
     );
   });
-
-  // --- End of file
+  it("Should send an email when the comment is created successfully", async () => {
+    const response = await request(app)
+      .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
+      .set("Authorization", "Bearer user")
+      .send({ text: "Test comment" });
+    console.log(response.error);
+    expect(response.status).toBe(200);
+    expect(mockedSendgrid.send).toHaveBeenCalledTimes(1);
+    expect(mockedSendgrid.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: "platform@unguess.io",
+        from: {
+          email: "info@unguess.io",
+          name: "UNGUESS",
+        },
+        subject: "Nuovo commento sul bug",
+        category: `CP${campaign_1.id}_BUG_COMMENT_NOTIFICATION`,
+      })
+    );
+  });
 });
