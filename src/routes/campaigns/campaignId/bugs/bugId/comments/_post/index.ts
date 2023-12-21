@@ -4,6 +4,7 @@ import { tryber, unguess } from "@src/features/database";
 import { formatInTimeZone, zonedTimeToUtc } from "date-fns-tz";
 import { formatISO } from "date-fns";
 import sgMail from "@sendgrid/mail";
+import { getCampaign } from "@src/utils/campaigns";
 
 export default class Route extends BugsRoute<{
   parameters: StoplightOperations["post-campaigns-cid-bugs-bid-comments"]["parameters"]["path"];
@@ -49,6 +50,13 @@ export default class Route extends BugsRoute<{
   protected async prepare(): Promise<void> {
     try {
       const commentId = await this.addComment();
+
+      if (!commentId) {
+        this.setError(400, {
+          message: "Something went wrong!",
+        } as OpenapiError);
+        return;
+      }
       const comment = await this.getComment(commentId);
 
       if (!comment) {
@@ -130,11 +138,13 @@ export default class Route extends BugsRoute<{
           "yyyy-MM-dd HH:mm:ss"
         ),
       })
-      .returning("id");
-    if (comment) {
-      await this.sendEmail();
+      .returning("id, text");
+
+    if (comment[0].id && comment[0].text) {
+      await this.sendEmail(comment[0].text);
+      return comment[0].id;
     }
-    return comment[0].id ?? comment[0];
+    return false;
   }
 
   private replaceAll = (str: string, find: string, replace: string) => {
@@ -176,10 +186,46 @@ export default class Route extends BugsRoute<{
 
     return templateHtml;
   }
-  private async sendEmail() {
+
+  private async getPMFullName() {
+    const campaignPm = await tryber.tables.WpAppqEvdCampaign.do()
+      .select(
+        "id",
+        "project_id",
+        "status_id",
+        "c.customer_title",
+        "wp_appq_evd_profile.name as csm_name",
+        "wp_appq_evd_profile.surname as csm_surname"
+      )
+      .join(
+        "wp_appq_evd_profile",
+        "wp_appq_evd_campaign.pm_id",
+        "wp_appq_evd_profile.id"
+      )
+      .where("id", this.cid)
+      .first();
+
+    return `${campaignPm.csm_name} ${campaignPm.csm_surname}`;
+  }
+
+  private async getBugData() {
+    return await tryber.tables.WpAppqEvdBug.do()
+      .select("id", "internal_id", "message")
+      .where("id", this.bid)
+      .first();
+  }
+
+  private async sendEmail(text: string) {
+    const bug = await this.getBugData();
+    const pmFullName = await this.getPMFullName();
     const html = await this.getTemplate({
-      template: "notify_campaign_bug_approved",
-      optionalFields: { "{{bug_id}}": this.bid, "{{bug_name}}": "bug name" },
+      template: "notify_campaign_bug_comment",
+      optionalFields: {
+        "{Campaign.pm_full_name}": pmFullName,
+        "{Bug.id}": this.bid,
+        "{Bug.message}": bug?.message,
+        "{Comment}": text,
+      },
     });
 
     if (!html) {
@@ -187,10 +233,10 @@ export default class Route extends BugsRoute<{
     }
     const notification = {
       to: "",
-      from: { name: "UNGUESS", email: "" },
-      subject: "",
-      html: "",
-      categories: [""],
+      from: { name: "UNGUESS", email: "info@unguess.io" },
+      subject: "Nuovo commento sul bug",
+      html: html,
+      category: `CP${this.cid}_BUG_COMMENT_NOTIFICATION`,
     };
 
     await sgMail.send(notification);
