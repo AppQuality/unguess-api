@@ -3,6 +3,8 @@ import BugsRoute from "@src/features/routes/BugRoute";
 import { tryber, unguess } from "@src/features/database";
 import { formatInTimeZone, zonedTimeToUtc } from "date-fns-tz";
 import { formatISO } from "date-fns";
+import sgMail from "@sendgrid/mail";
+import { getCampaign } from "@src/utils/campaigns";
 
 export default class Route extends BugsRoute<{
   parameters: StoplightOperations["post-campaigns-cid-bugs-bid-comments"]["parameters"]["path"];
@@ -48,6 +50,12 @@ export default class Route extends BugsRoute<{
   protected async prepare(): Promise<void> {
     try {
       const commentId = await this.addComment();
+      if (!commentId) {
+        this.setError(400, {
+          message: "Something went wrong!",
+        } as OpenapiError);
+        return;
+      }
       const comment = await this.getComment(commentId);
 
       if (!comment) {
@@ -69,7 +77,7 @@ export default class Route extends BugsRoute<{
           return this.setError(403, {} as OpenapiError);
         default:
           return this.setError(500, {
-            message: error,
+            message: "Something went wrong!",
           } as OpenapiError);
       }
     }
@@ -129,8 +137,107 @@ export default class Route extends BugsRoute<{
           "yyyy-MM-dd HH:mm:ss"
         ),
       })
-      .returning("id");
+      .returning(["id", "text"]);
+    if (comment[0].id && comment[0].text) {
+      await this.sendEmail(comment[0].text);
+      return comment[0].id;
+    }
+    return false;
+  }
 
-    return comment[0].id ?? comment[0];
+  private replaceAll = (str: string, find: string, replace: string) => {
+    return str.replace(new RegExp(find, "g"), replace);
+  };
+
+  private async getTemplate({
+    template,
+    optionalFields,
+  }: {
+    template: string;
+    optionalFields?: { [key: string]: any };
+  }) {
+    const mailTemplate = await tryber.tables.WpAppqUnlayerMailTemplate.do()
+      .select("html_body")
+      .join(
+        "wp_appq_event_transactional_mail",
+        "wp_appq_event_transactional_mail.template_id",
+        "wp_appq_unlayer_mail_template.id"
+      )
+      .where("wp_appq_event_transactional_mail.event_name", template)
+      .first();
+    console.log(mailTemplate, "mailTemplate");
+    if (!mailTemplate) return;
+
+    let templateHtml = mailTemplate.html_body as string;
+
+    if (optionalFields) {
+      for (const key in optionalFields) {
+        if (templateHtml.includes(key)) {
+          templateHtml = this.replaceAll(
+            templateHtml,
+            key,
+            optionalFields[key as keyof typeof optionalFields]
+          );
+        }
+      }
+    }
+
+    return templateHtml;
+  }
+
+  private async getPMFullName() {
+    const campaignPm = await tryber.tables.WpAppqEvdCampaign.do()
+      .select(
+        tryber.ref("id").withSchema("wp_appq_evd_campaign"),
+        tryber.ref("project_id").withSchema("wp_appq_evd_campaign"),
+        tryber.ref("status_id").withSchema("wp_appq_evd_campaign"),
+        tryber.ref("customer_title").withSchema("wp_appq_evd_campaign"),
+        tryber.ref("wp_appq_evd_profile.name").as("csm_name"),
+        tryber.ref("wp_appq_evd_profile.surname").as("csm_surname")
+      )
+      .join(
+        "wp_appq_evd_profile",
+        "wp_appq_evd_campaign.pm_id",
+        "wp_appq_evd_profile.id"
+      )
+      .where("wp_appq_evd_campaign.id", this.cid)
+      .first();
+    return `${campaignPm?.csm_name} ${campaignPm?.csm_surname}`;
+  }
+
+  private async getBugData() {
+    return await tryber.tables.WpAppqEvdBug.do()
+      .select("id", "internal_id", "message")
+      .where("id", this.bid)
+      .first();
+  }
+
+  private async sendEmail(text: string) {
+    const bug = await this.getBugData();
+    const pmFullName = await this.getPMFullName();
+    const html = await this.getTemplate({
+      template: "notify_campaign_bug_comment",
+      optionalFields: {
+        "{Campaign.pm_full_name}": pmFullName,
+        "{Bug.id}": this.bid,
+        "{Bug.message}": bug?.message,
+        "{Comment}": text,
+        "{Inviter.url}": `${process.env.APP_URL}/campaigns/${this.cid}/bugs`,
+      },
+    });
+
+    if (!html) {
+      throw new Error("No html email template");
+    }
+    console.log(html, "html");
+    const notification = {
+      to: "platform@unguess.io",
+      from: { name: "UNGUESS", email: "info@unguess.io" },
+      subject: "Nuovo commento sul bug",
+      html: html,
+      category: `CP${this.cid}_BUG_COMMENT_NOTIFICATION`,
+    };
+
+    await sgMail.send(notification);
   }
 }

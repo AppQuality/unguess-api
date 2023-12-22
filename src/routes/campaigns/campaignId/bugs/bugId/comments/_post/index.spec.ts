@@ -1,21 +1,21 @@
-import app from "@src/app";
-import request from "supertest";
-import { adapter as dbAdapter } from "@src/__mocks__/database/companyAdapter";
-import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
-import bugType from "@src/__mocks__/database/bug_type";
-import bugs, { BugsParams } from "@src/__mocks__/database/bugs";
-import severities from "@src/__mocks__/database/bug_severity";
 import replicabilities from "@src/__mocks__/database/bug_replicability";
+import severities from "@src/__mocks__/database/bug_severity";
 import statuses from "@src/__mocks__/database/bug_status";
-import devices, { DeviceParams } from "@src/__mocks__/database/device";
-import usecases, { UseCaseParams } from "@src/__mocks__/database/use_cases";
-import bug_tags from "@src/__mocks__/database/bug_tags";
-import bug_priorities from "@src/__mocks__/database/bug_priority";
-import priorities from "@src/__mocks__/database/priority";
-import bug_custom_statuses from "@src/__mocks__/database/bug_custom_status";
-import custom_status from "@src/__mocks__/database/custom_status";
+import bugType from "@src/__mocks__/database/bug_type";
+import { DeviceParams } from "@src/__mocks__/database/device";
+import { UseCaseParams } from "@src/__mocks__/database/use_cases";
+import app from "@src/app";
 import { tryber, unguess } from "@src/features/database";
 import { useBasicProjectsContext } from "@src/features/db/hooks/basicProjects";
+import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
+import request from "supertest";
+import sgMail from "@sendgrid/mail";
+
+// Mocking sendgrid
+jest.mock("@sendgrid/mail", () => ({
+  setApiKey: jest.fn(),
+  send: jest.fn(),
+}));
 
 const campaign_type_1 = {
   id: 1,
@@ -39,7 +39,7 @@ const campaign_1 = {
   page_preview_id: -1,
   page_manual_id: -1,
   customer_id: -1,
-  pm_id: -1,
+  pm_id: 1,
   description: "Campaign description",
 };
 
@@ -170,6 +170,9 @@ const bug_3 = {
   last_editor_id: 1,
 };
 
+// Get Mocked Function
+const mockedSendgrid = jest.mocked(sgMail, true);
+
 describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
   const context = useBasicProjectsContext();
 
@@ -194,6 +197,23 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       profile_id: context.profile2.id,
       creation_date_utc: "2023-12-11 09:23:00",
     });
+    await tryber.tables.WpAppqUnlayerMailTemplate.do().insert({
+      id: 1,
+      html_body:
+        "Test mail it {Bug.id},{Bug.message},{Inviter.url},{Campaign.pm_full_name},{Comment}",
+      name: "Test mail",
+      json_body: "",
+      last_editor_tester_id: 1,
+      lang: "it",
+      category_id: 1,
+    });
+
+    await tryber.tables.WpAppqEventTransactionalMail.do().insert({
+      id: 1,
+      event_name: "notify_campaign_bug_comment",
+      template_id: 1,
+      last_editor_tester_id: 1,
+    });
   });
 
   afterAll(async () => {
@@ -201,6 +221,13 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     await severities.clear();
     await replicabilities.clear();
     await statuses.clear();
+    await tryber.tables.WpAppqEventTransactionalMail.do().delete();
+    await tryber.tables.WpAppqUnlayerMailTemplate.do().delete();
+  });
+
+  // Clear mocks call counter
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
   // It should answer 403 if user is not logged in
@@ -312,6 +339,27 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       })
     );
   });
-
-  // --- End of file
+  it("Should send an email when the comment is created successfully", async () => {
+    const response = await request(app)
+      .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
+      .set("Authorization", "Bearer user")
+      .send({ text: "Test comment" });
+    console.log(response.error);
+    expect(response.status).toBe(200);
+    expect(mockedSendgrid.send).toHaveBeenCalledTimes(1);
+    expect(mockedSendgrid.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: "platform@unguess.io",
+        from: {
+          email: "info@unguess.io",
+          name: "UNGUESS",
+        },
+        subject: "Nuovo commento sul bug",
+        category: `CP${campaign_1.id}_BUG_COMMENT_NOTIFICATION`,
+        html: expect.stringContaining(
+          `Test mail it ${bug_1.id},${bug_1.message},${process.env.APP_URL}/campaigns/${campaign_1.id}/bugs,${context.profile1.name} ${context.profile1.surname},Test comment`
+        ),
+      })
+    );
+  });
 });
