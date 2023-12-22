@@ -356,6 +356,9 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
         },
         subject: "Nuovo commento sul bug",
         category: `CP${campaign_1.id}_BUG_COMMENT_NOTIFICATION`,
+        html: expect.stringContaining(
+          `Test mail it ${bug_1.id},${bug_1.message},${process.env.APP_URL}/campaigns/${campaign_1.id}/bugs,${context.profile1.name} ${context.profile1.surname},Test comment`
+        ),
       })
     );
   });
