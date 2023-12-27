@@ -64,7 +64,7 @@ export default class BugCommentRoute<
       .where("id", comment.profile_id)
       .first();
 
-    if (!author) return null;
+    if (!author && comment.profile_id !== 0) return null;
 
     this.comment = comment;
 
@@ -75,8 +75,8 @@ export default class BugCommentRoute<
         zonedTimeToUtc(comment.creation_date_utc, "UTC")
       ),
       creator: {
-        id: author.id,
-        name: `${author.name} ${author.surname}`,
+        id: author?.id,
+        name: `${author?.name} ${author?.surname}`,
       },
     };
   }
