@@ -16,10 +16,10 @@ export default class ProjectRoute<
     const { pid } = this.getParameters() as T["parameters"] & { pid: string };
 
     if (pid) {
-      this.project_id = Number.parseInt(pid);
+      this.project_id = Number(pid);
     }
 
-    this.project_id = Number.parseInt(pid);
+    this.project_id = Number(pid);
   }
 
   protected async init(): Promise<void> {

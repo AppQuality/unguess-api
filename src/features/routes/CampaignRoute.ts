@@ -28,7 +28,7 @@ export default class CampaignRoute<
 
     if (!params?.cid) throw new Error("Missing campaign id");
 
-    this.cp_id = parseInt(params.cid);
+    this.cp_id = Number(params.cid);
   }
 
   protected async init(): Promise<void> {

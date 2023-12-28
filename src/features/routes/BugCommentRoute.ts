@@ -25,8 +25,9 @@ export default class BugCommentRoute<
   constructor(configuration: RouteClassConfiguration) {
     super(configuration);
 
-    const { cmid } = this.getParameters();
-    this.comment_id = parseInt(cmid);
+    const params = this.getParameters();
+    if (!params?.cmid) throw new Error("Missing comment id");
+    this.comment_id = Number(params.cmid);
   }
 
   protected async init(): Promise<void> {
@@ -61,6 +62,7 @@ export default class BugCommentRoute<
       .select("id", "name", "surname")
       .where("id", comment.profile_id)
       .first();
+
     if (!author && comment.profile_id !== 0) return null;
 
     this.comment = comment;

@@ -137,9 +137,10 @@ export default class Route extends BugsRoute<{
           "yyyy-MM-dd HH:mm:ss"
         ),
       })
-      .returning(["id", "text"]);
-    if (comment[0].id && comment[0].text) {
-      await this.sendEmail(comment[0].text);
+      .returning("id");
+    const commentId = comment[0].id ?? comment[0];
+    if (commentId) {
+      await this.sendEmail();
       return comment[0].id;
     }
     return false;
@@ -212,7 +213,8 @@ export default class Route extends BugsRoute<{
       .first();
   }
 
-  private async sendEmail(text: string) {
+  private async sendEmail() {
+    if (!this.comment) return false;
     const bug = await this.getBugData();
     const pmFullName = await this.getPMFullName();
     const html = await this.getTemplate({
@@ -221,7 +223,7 @@ export default class Route extends BugsRoute<{
         "{Campaign.pm_full_name}": pmFullName,
         "{Bug.id}": this.bid,
         "{Bug.message}": bug?.message,
-        "{Comment}": text,
+        "{Comment}": this.comment,
         "{Inviter.url}": `${process.env.APP_URL}/campaigns/${this.cid}/bugs`,
       },
     });
