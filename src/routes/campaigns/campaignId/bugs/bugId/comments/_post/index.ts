@@ -71,7 +71,6 @@ export default class Route extends BugsRoute<{
         creator: comment.creator,
       });
     } catch (error) {
-      console.error(error);
       switch (error) {
         case "NOT_FOUND":
           return this.setError(403, {} as OpenapiError);
