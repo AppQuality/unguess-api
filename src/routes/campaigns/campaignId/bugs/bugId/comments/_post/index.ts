@@ -146,45 +146,6 @@ export default class Route extends BugsRoute<{
     return false;
   }
 
-  private replaceAll = (str: string, find: string, replace: string) => {
-    return str.replace(new RegExp(find, "g"), replace);
-  };
-
-  private async getTemplate({
-    template,
-    optionalFields,
-  }: {
-    template: string;
-    optionalFields?: { [key: string]: any };
-  }) {
-    const mailTemplate = await tryber.tables.WpAppqUnlayerMailTemplate.do()
-      .select("html_body")
-      .join(
-        "wp_appq_event_transactional_mail",
-        "wp_appq_event_transactional_mail.template_id",
-        "wp_appq_unlayer_mail_template.id"
-      )
-      .where("wp_appq_event_transactional_mail.event_name", template)
-      .first();
-    if (!mailTemplate) return;
-
-    let templateHtml = mailTemplate.html_body as string;
-
-    if (optionalFields) {
-      for (const key in optionalFields) {
-        if (templateHtml.includes(key)) {
-          templateHtml = this.replaceAll(
-            templateHtml,
-            key,
-            optionalFields[key as keyof typeof optionalFields]
-          );
-        }
-      }
-    }
-
-    return templateHtml;
-  }
-
   private async getPMFullName() {
     const campaignPm = await tryber.tables.WpAppqEvdCampaign.do()
       .select(
