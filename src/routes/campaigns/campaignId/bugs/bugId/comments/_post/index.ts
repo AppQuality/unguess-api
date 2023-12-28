@@ -3,8 +3,7 @@ import BugsRoute from "@src/features/routes/BugRoute";
 import { tryber, unguess } from "@src/features/database";
 import { formatInTimeZone, zonedTimeToUtc } from "date-fns-tz";
 import { formatISO } from "date-fns";
-import sgMail from "@sendgrid/mail";
-import { getCampaign } from "@src/utils/campaigns";
+import { sendTemplate } from "@src/features/mail/sendTemplate";
 
 export default class Route extends BugsRoute<{
   parameters: StoplightOperations["post-campaigns-cid-bugs-bid-comments"]["parameters"]["path"];
@@ -52,7 +51,7 @@ export default class Route extends BugsRoute<{
       const commentId = await this.addComment();
       if (!commentId) {
         this.setError(400, {
-          message: "Something went wrong!",
+          message: "Something went wrong, cannot addComment!",
         } as OpenapiError);
         return;
       }
@@ -60,7 +59,7 @@ export default class Route extends BugsRoute<{
 
       if (!comment) {
         this.setError(400, {
-          message: "Something went wrong!",
+          message: "Something went wrong, cannot getComment!!",
         } as OpenapiError);
         return;
       }
@@ -137,52 +136,14 @@ export default class Route extends BugsRoute<{
           "yyyy-MM-dd HH:mm:ss"
         ),
       })
-      .returning(["id", "text"]);
-    if (comment[0].id && comment[0].text) {
-      await this.sendEmail(comment[0].text);
-      return comment[0].id;
+      .returning("id");
+    const commentId = comment[0].id ?? comment[0];
+
+    if (commentId) {
+      await this.sendEmail();
+      return commentId;
     }
     return false;
-  }
-
-  private replaceAll = (str: string, find: string, replace: string) => {
-    return str.replace(new RegExp(find, "g"), replace);
-  };
-
-  private async getTemplate({
-    template,
-    optionalFields,
-  }: {
-    template: string;
-    optionalFields?: { [key: string]: any };
-  }) {
-    const mailTemplate = await tryber.tables.WpAppqUnlayerMailTemplate.do()
-      .select("html_body")
-      .join(
-        "wp_appq_event_transactional_mail",
-        "wp_appq_event_transactional_mail.template_id",
-        "wp_appq_unlayer_mail_template.id"
-      )
-      .where("wp_appq_event_transactional_mail.event_name", template)
-      .first();
-    console.log(mailTemplate, "mailTemplate");
-    if (!mailTemplate) return;
-
-    let templateHtml = mailTemplate.html_body as string;
-
-    if (optionalFields) {
-      for (const key in optionalFields) {
-        if (templateHtml.includes(key)) {
-          templateHtml = this.replaceAll(
-            templateHtml,
-            key,
-            optionalFields[key as keyof typeof optionalFields]
-          );
-        }
-      }
-    }
-
-    return templateHtml;
   }
 
   private async getPMFullName() {
@@ -212,31 +173,23 @@ export default class Route extends BugsRoute<{
       .first();
   }
 
-  private async sendEmail(text: string) {
+  private async sendEmail() {
+    if (!this.comment) return false;
     const bug = await this.getBugData();
     const pmFullName = await this.getPMFullName();
-    const html = await this.getTemplate({
+
+    await sendTemplate({
       template: "notify_campaign_bug_comment",
+      email: "platform@unguess.io",
+      subject: "Nuovo commento sul bug",
+      categories: [`CP${this.cid}_BUG_COMMENT_NOTIFICATION`],
       optionalFields: {
         "{Campaign.pm_full_name}": pmFullName,
         "{Bug.id}": this.bid,
         "{Bug.message}": bug?.message,
-        "{Comment}": text,
+        "{Comment}": this.comment,
         "{Inviter.url}": `${process.env.APP_URL}/campaigns/${this.cid}/bugs`,
       },
     });
-
-    if (!html) {
-      throw new Error("No html email template");
-    }
-    const notification = {
-      to: "platform@unguess.io",
-      from: { name: "UNGUESS", email: "info@unguess.io" },
-      subject: "Nuovo commento sul bug",
-      html: html,
-      category: `CP${this.cid}_BUG_COMMENT_NOTIFICATION`,
-    };
-
-    await sgMail.send(notification);
   }
 }

@@ -344,7 +344,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
       .set("Authorization", "Bearer user")
       .send({ text: "Test comment" });
-    console.log(response.error);
+
     expect(response.status).toBe(200);
     expect(mockedSendgrid.send).toHaveBeenCalledTimes(1);
     expect(mockedSendgrid.send).toHaveBeenCalledWith(
@@ -355,7 +355,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
           name: "UNGUESS",
         },
         subject: "Nuovo commento sul bug",
-        category: `CP${campaign_1.id}_BUG_COMMENT_NOTIFICATION`,
+        categories: [`CP${campaign_1.id}_BUG_COMMENT_NOTIFICATION`],
         html: expect.stringContaining(
           `Test mail it ${bug_1.id},${bug_1.message},${process.env.APP_URL}/campaigns/${campaign_1.id}/bugs,${context.profile1.name} ${context.profile1.surname},Test comment`
         ),
