@@ -60,7 +60,7 @@ export default class Route extends BugsRoute<{
         ).toISOString(),
         creator: {
           id: comment.profile_id,
-          name: (await this.getProfile(comment.profile_id)) || "",
+          name: (await this.getProfile(comment.profile_id)) || "Name Surname",
         },
       }))
     );
