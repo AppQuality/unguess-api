@@ -136,6 +136,16 @@ const profile_1 = {
   education_id: 152,
 };
 
+const profile_0 = {
+  id: 0,
+  name: "",
+  surname: "",
+  wp_user_id: 95132,
+  email: "mail@gmail.com",
+  employment_id: 266,
+  education_id: 152,
+};
+
 const profile_2 = {
   id: 34,
   name: "Tester 2",
@@ -217,6 +227,15 @@ const comment_1 = {
   is_deleted: 0,
 };
 
+const comment_0 = {
+  id: 2651,
+  text: "comment 0",
+  bug_id: bug_1.id,
+  profile_id: 0,
+  creation_date_utc: "2021-10-19 12:57:57.0",
+  is_deleted: 0,
+};
+
 const comment_2 = {
   id: 24562,
   text: "comment 2",
@@ -243,7 +262,11 @@ describe("DELETE /campaigns/{cid}/bugs/{bid}/comments/{cmid}", () => {
       bug_34,
       bug_4,
     ]);
-    await tryber.tables.WpAppqEvdProfile.do().insert([profile_1, profile_2]);
+    await tryber.tables.WpAppqEvdProfile.do().insert([
+      profile_1,
+      profile_2,
+      profile_0,
+    ]);
     await tryber.tables.WpAppqCustomer.do().insert([customer_1, customer_2]);
     await tryber.tables.WpAppqUserToCustomer.do().insert([
       user_to_customer_1,
@@ -261,6 +284,7 @@ describe("DELETE /campaigns/{cid}/bugs/{bid}/comments/{cmid}", () => {
       comment_1,
       comment_2,
       comment_3,
+      comment_0,
     ]);
   });
 
@@ -357,6 +381,15 @@ describe("DELETE /campaigns/{cid}/bugs/{bid}/comments/{cmid}", () => {
         `/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments/${comment_1.id}`
       )
       .set("Authorization", "Bearer user");
+    expect(response.status).toBe(200);
+  });
+
+  it("Should answer 200 if profile_id is 0 and user is admin", async () => {
+    const response = await request(app)
+      .delete(
+        `/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments/${comment_0.id}`
+      )
+      .set("Authorization", "Bearer admin");
     expect(response.status).toBe(200);
   });
 });

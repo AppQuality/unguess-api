@@ -229,7 +229,6 @@ export default class Route extends BugsRoute<{
     if (!html) {
       throw new Error("No html email template");
     }
-    console.log(html, "html");
     const notification = {
       to: "platform@unguess.io",
       from: { name: "UNGUESS", email: "info@unguess.io" },
