@@ -99,7 +99,7 @@ export default class Route extends BugsRoute<{
         ),
         creator: {
           id: 0,
-          name: "Name Surname",
+          name: "Name S.",
         },
       };
     }
@@ -111,6 +111,11 @@ export default class Route extends BugsRoute<{
 
     if (!author) return null;
 
+    const surname = author.surname
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + ".")
+      .join(" ");
+
     return {
       id: comment.id,
       text: comment.text,
@@ -119,7 +124,7 @@ export default class Route extends BugsRoute<{
       ),
       creator: {
         id: author.id,
-        name: `${author.name} ${author.surname}`,
+        name: `${author.name} ${surname}`,
       },
     };
   }

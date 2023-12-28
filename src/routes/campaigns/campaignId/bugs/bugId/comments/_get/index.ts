@@ -42,7 +42,12 @@ export default class Route extends BugsRoute<{
       .where("id", profileId)
       .first();
     if (!result) return null;
-    return `${result.name} ${result.surname}`;
+    const surname = result.surname
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + ".")
+      .join(" ");
+
+    return `${result.name} ${surname}`;
   }
 
   private async getBugComments() {
@@ -60,7 +65,7 @@ export default class Route extends BugsRoute<{
         ).toISOString(),
         creator: {
           id: comment.profile_id,
-          name: (await this.getProfile(comment.profile_id)) || "Name Surname",
+          name: (await this.getProfile(comment.profile_id)) || "Name S.",
         },
       }))
     );

@@ -323,7 +323,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}/comments", () => {
           text: comment_1.text,
           creator: {
             id: profile_1.wp_user_id,
-            name: `${profile_1.name} ${profile_1.surname}`,
+            name: `${profile_1.name} ${profile_1.surname.charAt(0)}.`,
           },
           creation_date: zonedTimeToUtc(
             comment_1.creation_date_utc,
@@ -347,7 +347,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}/comments", () => {
           text: comment_1.text,
           creator: {
             id: profile_1.wp_user_id,
-            name: `${profile_1.name} ${profile_1.surname}`,
+            name: `${profile_1.name} ${profile_1.surname.charAt(0)}.`,
           },
           creation_date: zonedTimeToUtc(
             comment_1.creation_date_utc,
@@ -365,5 +365,15 @@ describe("GET /campaigns/{cid}/bugs/{bid}/comments", () => {
     expect(response.body).toEqual({
       items: [],
     });
+  });
+
+  it("Should answer 200 with just a reduced surname", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(200);
+    expect(response.body.items[0].creator.name).toEqual(
+      `${profile_1.name} ${profile_1.surname.charAt(0)}.`
+    );
   });
 });

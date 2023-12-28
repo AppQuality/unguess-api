@@ -301,7 +301,9 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
         text: "comment text",
         creator: {
           id: context.profile1.id,
-          name: `${context.profile1.name} ${context.profile1.surname}`,
+          name: `${context.profile1.name} ${context.profile1.surname.charAt(
+            0
+          )}.`,
         },
       })
     );
@@ -334,7 +336,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
         text: "comment text",
         creator: {
           id: 0,
-          name: "Name Surname",
+          name: "Name S.",
         },
       })
     );
