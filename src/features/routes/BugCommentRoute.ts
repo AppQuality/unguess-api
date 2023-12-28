@@ -41,7 +41,6 @@ export default class BugCommentRoute<
       throw new Error("Invalid comment id");
     }
     const comment = await this.initComment();
-
     if (!comment) {
       this.setError(400, {
         code: 400,
@@ -57,17 +56,14 @@ export default class BugCommentRoute<
       .select()
       .where("id", this.comment_id)
       .first();
-
     if (!comment) return null;
     const author = await tryber.tables.WpAppqEvdProfile.do()
       .select("id", "name", "surname")
       .where("id", comment.profile_id)
       .first();
-
-    if (!author) return null;
+    if (!author && comment.profile_id !== 0) return null;
 
     this.comment = comment;
-
     return {
       id: comment.id,
       text: comment.text,
@@ -75,8 +71,11 @@ export default class BugCommentRoute<
         zonedTimeToUtc(comment.creation_date_utc, "UTC")
       ),
       creator: {
-        id: author.id,
-        name: `${author.name} ${author.surname}`,
+        id: author?.id,
+        name:
+          author?.id === 0
+            ? "Name Surname"
+            : `${author?.name} ${author?.surname}`,
       },
     };
   }
