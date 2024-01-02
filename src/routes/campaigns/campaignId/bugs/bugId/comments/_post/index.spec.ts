@@ -200,7 +200,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     await tryber.tables.WpAppqUnlayerMailTemplate.do().insert({
       id: 1,
       html_body:
-        "Test mail it {Bug.id},{Bug.message},{Inviter.url},{Campaign.pm_full_name},{Comment}",
+        "Test mail it {Bug.id},{Bug.title},{Bug.url},{Author.name},{Comment}, {Campaign.title}",
       name: "Test mail",
       json_body: "",
       last_editor_tester_id: 1,
@@ -359,7 +359,13 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
         subject: "Nuovo commento sul bug",
         categories: [`CP${campaign_1.id}_BUG_COMMENT_NOTIFICATION`],
         html: expect.stringContaining(
-          `Test mail it ${bug_1.id},${bug_1.message},${process.env.APP_URL}/campaigns/${campaign_1.id}/bugs,${context.profile1.name} ${context.profile1.surname},Test comment`
+          `Test mail it ${bug_1.id},${bug_1.message},${
+            process.env.APP_URL
+          }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
+            context.profile1.name
+          } ${context.profile1.surname
+            .charAt(0)
+            .toUpperCase()}.,Test comment, ${campaign_1.customer_title}`
         ),
       })
     );
