@@ -171,6 +171,12 @@ const bug_3 = {
   last_editor_id: 1,
 };
 
+const bug_4_pending = {
+  ...bug_3,
+  id: 4,
+  status_id: 3,
+};
+
 // Get Mocked Function
 const mockedSendgrid = jest.mocked(sgMail, true);
 
@@ -189,7 +195,12 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     await replicabilities.addDefaultItems();
     await statuses.addDefaultItems();
 
-    await tryber.tables.WpAppqEvdBug.do().insert([bug_1, bug_2, bug_3]);
+    await tryber.tables.WpAppqEvdBug.do().insert([
+      bug_1,
+      bug_2,
+      bug_3,
+      bug_4_pending,
+    ]);
 
     await unguess.tables.UgBugsComments.do().insert({
       text: "Comment 1",
@@ -260,6 +271,15 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     expect(response.status).toBe(400);
   });
 
+  it("Should fail if the bug is not in a accepted status", async () => {
+    const response = await request(app)
+      .post(`/campaigns/${campaign_1.id}/bugs/${bug_4_pending.id}/comments`)
+      .set("Authorization", "Bearer user")
+      .send({ text: "comment text" });
+
+    expect(response.status).toBe(400);
+  });
+
   // It should fail if the user is not the owner
   it("Should fail if the user is not the owner", async () => {
     const response = await request(app)
@@ -275,6 +295,15 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     const response = await request(app)
       .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
       .set("Authorization", "Bearer user");
+
+    expect(response.status).toBe(400);
+  });
+
+  it("Should fail if there is no comment", async () => {
+    const response = await request(app)
+      .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
+      .set("Authorization", "Bearer user")
+      .send({ text: "" });
 
     expect(response.status).toBe(400);
   });
