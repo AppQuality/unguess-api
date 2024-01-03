@@ -159,7 +159,7 @@ export default class Route extends BugsRoute<{
     const comments = await unguess.tables.UgBugsComments.do()
       .select(unguess.ref("profile_id").withSchema("ug_bugs_comments"))
       .where("bug_id", this.bid)
-      .andWhere("is_deleted", "!=", 0)
+      .andWhere("is_deleted", 0)
       .andWhere("profile_id", "!=", this.getProfileId());
 
     if (!comments.length) return [];
