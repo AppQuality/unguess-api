@@ -421,6 +421,33 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     );
   });
 
+  it("Should send an email with a preview of comment if the length is > 80", async () => {
+    const response = await request(app)
+      .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
+      .set("Authorization", "Bearer user")
+      .send({
+        text: "Always code as if the guy who ends up maintaining your code will be a violent psychopath who knows where you live",
+      });
+
+    expect(response.status).toBe(200);
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(1);
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledWith(
+      expect.objectContaining({
+        html: expect.stringContaining(
+          `Test mail it ${bug_1.id},${bug_1.message},${
+            process.env.APP_URL
+          }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
+            context.profile1.name
+          } ${context.profile1.surname
+            .charAt(0)
+            .toUpperCase()}.,Always code as if the guy who ends up maintaining your code will be a violent ps..., ${
+            campaign_1.customer_title
+          }`
+        ),
+      })
+    );
+  });
+
   it("Should NOT send an email if it's the first comment", async () => {
     const response = await request(app)
       .post(`/campaigns/${campaign_1.id}/bugs/${bug_3.id}/comments`)
