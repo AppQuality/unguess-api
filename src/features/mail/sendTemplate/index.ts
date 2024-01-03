@@ -8,7 +8,7 @@ export const sendTemplate = async ({
   optionalFields,
   categories,
 }: {
-  email: string;
+  email: string | string[];
   subject: string;
   template: string;
   optionalFields?: { [key: string]: any };

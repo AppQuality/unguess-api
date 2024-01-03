@@ -11,7 +11,7 @@ export const send = async ({
   html,
   categories,
 }: {
-  to: string;
+  to: string | string[];
   from?: string | { name: string; email: string };
   subject: string;
   html: string;
@@ -33,7 +33,7 @@ export const send = async ({
   };
 
   try {
-    const d = await sgMail.send(msg);
+    const d = await sgMail.sendMultiple(msg);
     return d;
   } catch (err) {
     console.log(err);
