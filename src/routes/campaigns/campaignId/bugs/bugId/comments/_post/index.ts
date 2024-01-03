@@ -156,7 +156,8 @@ export default class Route extends BugsRoute<{
   private async getRecipients() {
     const comments = await unguess.tables.UgBugsComments.do()
       .select(unguess.ref("profile_id").withSchema("ug_bugs_comments"))
-      .where("bug_id", this.bid);
+      .where("bug_id", this.bid)
+      .andWhere("profile_id", "!=", this.getProfileId());
 
     if (!comments.length) return [];
 
@@ -182,11 +183,15 @@ export default class Route extends BugsRoute<{
     const bug = await this.getBugData();
 
     const recipients = await this.getRecipients();
-    // console.log("🚀 ~ file: index.ts:185 ~ Route ~ sendEmail ~ recipients:", recipients)
+    console.log(
+      "🚀 ~ file: index.ts:185 ~ Route ~ sendEmail ~ recipients:",
+      recipients
+    );
+    if (!recipients.length) return false;
 
     await sendTemplate({
       template: "notify_campaign_bug_comment",
-      email: ["platform@unguess.io"],
+      email: recipients.map((r) => r.email),
       subject: "Nuovo commento sul bug",
       categories: [`CP${this.cid}_BUG_COMMENT_NOTIFICATION`],
       optionalFields: {

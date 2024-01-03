@@ -329,8 +329,6 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       .set("Authorization", "Bearer admin")
       .send({ text: "comment text" });
 
-    console.log(response.error);
-
     expect(response.status).toBe(200);
     expect(response.body).toEqual(
       expect.objectContaining({
@@ -352,7 +350,6 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(1);
     expect(mockedSendgrid.sendMultiple).toHaveBeenCalledWith(
       expect.objectContaining({
-        to: ["platform@unguess.io"],
         from: {
           email: "info@unguess.io",
           name: "UNGUESS",
@@ -370,5 +367,38 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
         ),
       })
     );
+  });
+
+  it("Should send an email only to other commenters", async () => {
+    await unguess.tables.UgBugsComments.do().insert({
+      text: "Comment 1",
+      is_deleted: 0,
+      bug_id: bug_1.id,
+      profile_id: context.profile3.id,
+      creation_date_utc: "2023-12-11 09:23:00",
+    });
+
+    const response = await request(app)
+      .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
+      .set("Authorization", "Bearer user")
+      .send({ text: "Test comment" });
+
+    expect(response.status).toBe(200);
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(1);
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: expect.arrayContaining([context.profile2.email]),
+      })
+    );
+  });
+
+  it("Should NOT send an email if it's the first comment", async () => {
+    const response = await request(app)
+      .post(`/campaigns/${campaign_1.id}/bugs/${bug_3.id}/comments`)
+      .set("Authorization", "Bearer user")
+      .send({ text: "Test comment" });
+
+    expect(response.status).toBe(200);
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(0);
   });
 });
