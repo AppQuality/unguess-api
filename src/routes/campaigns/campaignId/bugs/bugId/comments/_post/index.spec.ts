@@ -15,6 +15,7 @@ import sgMail from "@sendgrid/mail";
 jest.mock("@sendgrid/mail", () => ({
   setApiKey: jest.fn(),
   send: jest.fn(),
+  sendMultiple: jest.fn(),
 }));
 
 const campaign_type_1 = {
@@ -170,6 +171,12 @@ const bug_3 = {
   last_editor_id: 1,
 };
 
+const bug_4_pending = {
+  ...bug_3,
+  id: 4,
+  status_id: 3,
+};
+
 // Get Mocked Function
 const mockedSendgrid = jest.mocked(sgMail, true);
 
@@ -188,7 +195,12 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     await replicabilities.addDefaultItems();
     await statuses.addDefaultItems();
 
-    await tryber.tables.WpAppqEvdBug.do().insert([bug_1, bug_2, bug_3]);
+    await tryber.tables.WpAppqEvdBug.do().insert([
+      bug_1,
+      bug_2,
+      bug_3,
+      bug_4_pending,
+    ]);
 
     await unguess.tables.UgBugsComments.do().insert({
       text: "Comment 1",
@@ -200,7 +212,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     await tryber.tables.WpAppqUnlayerMailTemplate.do().insert({
       id: 1,
       html_body:
-        "Test mail it {Bug.id},{Bug.message},{Inviter.url},{Campaign.pm_full_name},{Comment}",
+        "Test mail it {Bug.id},{Bug.title},{Bug.url},{Author.name},{Comment}, {Campaign.title}",
       name: "Test mail",
       json_body: "",
       last_editor_tester_id: 1,
@@ -259,6 +271,15 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     expect(response.status).toBe(400);
   });
 
+  it("Should fail if the bug is not in a accepted status", async () => {
+    const response = await request(app)
+      .post(`/campaigns/${campaign_1.id}/bugs/${bug_4_pending.id}/comments`)
+      .set("Authorization", "Bearer user")
+      .send({ text: "comment text" });
+
+    expect(response.status).toBe(400);
+  });
+
   // It should fail if the user is not the owner
   it("Should fail if the user is not the owner", async () => {
     const response = await request(app)
@@ -274,6 +295,15 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     const response = await request(app)
       .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
       .set("Authorization", "Bearer user");
+
+    expect(response.status).toBe(400);
+  });
+
+  it("Should fail if there is no comment", async () => {
+    const response = await request(app)
+      .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
+      .set("Authorization", "Bearer user")
+      .send({ text: "" });
 
     expect(response.status).toBe(400);
   });
@@ -328,8 +358,6 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       .set("Authorization", "Bearer admin")
       .send({ text: "comment text" });
 
-    console.log(response.error);
-
     expect(response.status).toBe(200);
     expect(response.body).toEqual(
       expect.objectContaining({
@@ -348,10 +376,9 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       .send({ text: "Test comment" });
 
     expect(response.status).toBe(200);
-    expect(mockedSendgrid.send).toHaveBeenCalledTimes(1);
-    expect(mockedSendgrid.send).toHaveBeenCalledWith(
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(1);
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledWith(
       expect.objectContaining({
-        to: "platform@unguess.io",
         from: {
           email: "info@unguess.io",
           name: "UNGUESS",
@@ -359,9 +386,48 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
         subject: "Nuovo commento sul bug",
         categories: [`CP${campaign_1.id}_BUG_COMMENT_NOTIFICATION`],
         html: expect.stringContaining(
-          `Test mail it ${bug_1.id},${bug_1.message},${process.env.APP_URL}/campaigns/${campaign_1.id}/bugs,${context.profile1.name} ${context.profile1.surname},Test comment`
+          `Test mail it ${bug_1.id},${bug_1.message},${
+            process.env.APP_URL
+          }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
+            context.profile1.name
+          } ${context.profile1.surname
+            .charAt(0)
+            .toUpperCase()}.,Test comment, ${campaign_1.customer_title}`
         ),
       })
     );
+  });
+
+  it("Should send an email only to other commenters", async () => {
+    await unguess.tables.UgBugsComments.do().insert({
+      text: "Comment 1",
+      is_deleted: 0,
+      bug_id: bug_1.id,
+      profile_id: context.profile3.id,
+      creation_date_utc: "2023-12-11 09:23:00",
+    });
+
+    const response = await request(app)
+      .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
+      .set("Authorization", "Bearer user")
+      .send({ text: "Test comment" });
+
+    expect(response.status).toBe(200);
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(1);
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: expect.arrayContaining([context.profile2.email]),
+      })
+    );
+  });
+
+  it("Should NOT send an email if it's the first comment", async () => {
+    const response = await request(app)
+      .post(`/campaigns/${campaign_1.id}/bugs/${bug_3.id}/comments`)
+      .set("Authorization", "Bearer user")
+      .send({ text: "Test comment" });
+
+    expect(response.status).toBe(200);
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(0);
   });
 });

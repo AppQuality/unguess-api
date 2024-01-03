@@ -8,6 +8,7 @@ import request from "supertest";
 jest.mock("@sendgrid/mail", () => ({
   setApiKey: jest.fn(),
   send: jest.fn(),
+  sendMultiple: jest.fn(),
 }));
 
 // Get Mocked Function
@@ -123,8 +124,8 @@ describe("POST /workspaces/wid/users", () => {
         email: "vincenzo.cancelli@finestre.com",
       });
 
-    expect(mockedSendgrid.send).toHaveBeenCalledTimes(1);
-    expect(mockedSendgrid.send).toHaveBeenCalledWith(
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(1);
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledWith(
       expect.objectContaining({
         to: "vincenzo.cancelli@finestre.com",
         from: {
@@ -146,8 +147,8 @@ describe("POST /workspaces/wid/users", () => {
         locale: "it",
       });
 
-    expect(mockedSendgrid.send).toHaveBeenCalledTimes(1);
-    expect(mockedSendgrid.send).toHaveBeenCalledWith(
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(1);
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledWith(
       expect.objectContaining({
         to: "vincenzo.cancelli@finestre.com",
         from: {
@@ -169,8 +170,8 @@ describe("POST /workspaces/wid/users", () => {
         locale: "it",
       });
 
-    expect(mockedSendgrid.send).toHaveBeenCalledTimes(1);
-    const args: any = mockedSendgrid.send.mock.calls[0][0];
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(1);
+    const args: any = mockedSendgrid.sendMultiple.mock.calls[0][0];
 
     const invitation = await tryber.tables.WpAppqCustomerAccountInvitations.do()
       .select("token", "tester_id")
@@ -200,8 +201,8 @@ describe("POST /workspaces/wid/users", () => {
         event_name: "customer_special_mail",
       });
 
-    expect(mockedSendgrid.send).toHaveBeenCalledTimes(1);
-    expect(mockedSendgrid.send).toHaveBeenCalledWith({
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(1);
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledWith({
       to: "goofy.baud@saintoar.com",
       from: {
         email: "info@unguess.io",
@@ -225,8 +226,8 @@ describe("POST /workspaces/wid/users", () => {
           "A bug is never late, Frodo. Nor is he early; he arrives precisely when he means to.",
       });
 
-    expect(mockedSendgrid.send).toHaveBeenCalledTimes(1);
-    expect(mockedSendgrid.send).toHaveBeenCalledWith(
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(1);
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledWith(
       expect.objectContaining({
         html: "A special mail for a special user: A bug is never late, Frodo. Nor is he early; he arrives precisely when he means to.",
       })
@@ -242,8 +243,8 @@ describe("POST /workspaces/wid/users", () => {
         locale: "it",
       });
 
-    expect(mockedSendgrid.send).toHaveBeenCalledTimes(1);
-    expect(mockedSendgrid.send).toHaveBeenCalledWith(
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(1);
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledWith(
       expect.objectContaining({
         to: "paolo.verdi@example.com",
         from: {
@@ -266,8 +267,8 @@ describe("POST /workspaces/wid/users", () => {
         event_name: "customer_invitation_it_with_sender_name",
       });
 
-    expect(mockedSendgrid.send).toHaveBeenCalledTimes(1);
-    expect(mockedSendgrid.send).toHaveBeenCalledWith(
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(1);
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledWith(
       expect.objectContaining({
         html: expect.stringContaining("Test mail it from Mario Rossi"),
       })

@@ -12,6 +12,7 @@ export default class Route extends BugsRoute<{
 }> {
   private cid: number;
   private bid: number;
+  private author: { id: number; name: string } | undefined;
   private comment: string | undefined;
 
   constructor(configuration: RouteClassConfiguration) {
@@ -20,7 +21,6 @@ export default class Route extends BugsRoute<{
 
     this.cid = parseInt(params.cid);
     this.bid = parseInt(params.bid);
-
     this.comment = this.getBody().text;
   }
 
@@ -48,6 +48,7 @@ export default class Route extends BugsRoute<{
 
   protected async prepare(): Promise<void> {
     try {
+      this.author = await this.getAuthor();
       const commentId = await this.addComment();
       if (!commentId) {
         this.setError(400, {
@@ -82,39 +83,40 @@ export default class Route extends BugsRoute<{
     }
   }
 
+  private async getAuthor() {
+    const profileId = this.getProfileId();
+    if (profileId === 0) {
+      return {
+        id: 0,
+        name: "Name S.",
+      };
+    }
+
+    const author = await tryber.tables.WpAppqEvdProfile.do()
+      .select("id", "name", "surname")
+      .where("id", profileId)
+      .first();
+
+    if (!author) throw "author not found";
+
+    const surname = author.surname
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + ".")
+      .join(" ");
+
+    return {
+      id: author.id,
+      name: `${author.name} ${surname}`,
+    };
+  }
+
   private async getComment(id: number) {
     const comment = await unguess.tables.UgBugsComments.do()
       .select("id", "text", "creation_date_utc", "profile_id")
       .where("id", id)
       .first();
 
-    if (!comment) return null;
-
-    if (comment.profile_id === 0) {
-      return {
-        id: comment.id,
-        text: comment.text,
-        creation_date_utc: formatISO(
-          zonedTimeToUtc(comment.creation_date_utc, "UTC")
-        ),
-        creator: {
-          id: 0,
-          name: "Name S.",
-        },
-      };
-    }
-
-    const author = await tryber.tables.WpAppqEvdProfile.do()
-      .select("id", "name", "surname")
-      .where("id", comment?.profile_id)
-      .first();
-
-    if (!author) return null;
-
-    const surname = author.surname
-      .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + ".")
-      .join(" ");
+    if (!comment || !this.author) return null;
 
     return {
       id: comment.id,
@@ -123,8 +125,8 @@ export default class Route extends BugsRoute<{
         zonedTimeToUtc(comment.creation_date_utc, "UTC")
       ),
       creator: {
-        id: author.id,
-        name: `${author.name} ${surname}`,
+        id: this.author.id,
+        name: this.author.name,
       },
     };
   }
@@ -151,24 +153,22 @@ export default class Route extends BugsRoute<{
     return false;
   }
 
-  private async getPMFullName() {
-    const campaignPm = await tryber.tables.WpAppqEvdCampaign.do()
-      .select(
-        tryber.ref("id").withSchema("wp_appq_evd_campaign"),
-        tryber.ref("project_id").withSchema("wp_appq_evd_campaign"),
-        tryber.ref("status_id").withSchema("wp_appq_evd_campaign"),
-        tryber.ref("customer_title").withSchema("wp_appq_evd_campaign"),
-        tryber.ref("wp_appq_evd_profile.name").as("csm_name"),
-        tryber.ref("wp_appq_evd_profile.surname").as("csm_surname")
-      )
-      .join(
-        "wp_appq_evd_profile",
-        "wp_appq_evd_campaign.pm_id",
-        "wp_appq_evd_profile.id"
-      )
-      .where("wp_appq_evd_campaign.id", this.cid)
-      .first();
-    return `${campaignPm?.csm_name} ${campaignPm?.csm_surname}`;
+  private async getRecipients() {
+    const comments = await unguess.tables.UgBugsComments.do()
+      .select(unguess.ref("profile_id").withSchema("ug_bugs_comments"))
+      .where("bug_id", this.bid)
+      .andWhere("profile_id", "!=", this.getProfileId());
+
+    if (!comments.length) return [];
+
+    const recipients = await tryber.tables.WpAppqEvdProfile.do()
+      .select("name", "surname", "email")
+      .whereIn(
+        "id",
+        comments.map((c) => c.profile_id)
+      );
+
+    return recipients;
   }
 
   private async getBugData() {
@@ -181,19 +181,26 @@ export default class Route extends BugsRoute<{
   private async sendEmail() {
     if (!this.comment) return false;
     const bug = await this.getBugData();
-    const pmFullName = await this.getPMFullName();
+
+    const recipients = await this.getRecipients();
+    console.log(
+      "🚀 ~ file: index.ts:185 ~ Route ~ sendEmail ~ recipients:",
+      recipients
+    );
+    if (!recipients.length) return false;
 
     await sendTemplate({
       template: "notify_campaign_bug_comment",
-      email: "platform@unguess.io",
+      email: recipients.map((r) => r.email),
       subject: "Nuovo commento sul bug",
       categories: [`CP${this.cid}_BUG_COMMENT_NOTIFICATION`],
       optionalFields: {
-        "{Campaign.pm_full_name}": pmFullName,
+        "{Author.name}": this.author?.name || "Name S.",
         "{Bug.id}": this.bid,
-        "{Bug.message}": bug?.message,
+        "{Bug.title}": bug?.message,
         "{Comment}": this.comment,
-        "{Inviter.url}": `${process.env.APP_URL}/campaigns/${this.cid}/bugs`,
+        "{Campaign.title}": this.campaignName,
+        "{Bug.url}": `${process.env.APP_URL}/campaigns/${this.cid}/bugs/${this.bid}`,
       },
     });
   }
