@@ -5,6 +5,8 @@ import { formatInTimeZone, zonedTimeToUtc } from "date-fns-tz";
 import { formatISO } from "date-fns";
 import { sendTemplate } from "@src/features/mail/sendTemplate";
 
+const MAX_COMMENT_PREVIEW_LENGTH = 80;
+
 export default class Route extends BugsRoute<{
   parameters: StoplightOperations["post-campaigns-cid-bugs-bid-comments"]["parameters"]["path"];
   body: StoplightOperations["post-campaigns-cid-bugs-bid-comments"]["requestBody"]["content"]["application/json"];
@@ -157,6 +159,7 @@ export default class Route extends BugsRoute<{
     const comments = await unguess.tables.UgBugsComments.do()
       .select(unguess.ref("profile_id").withSchema("ug_bugs_comments"))
       .where("bug_id", this.bid)
+      .andWhere("is_deleted", 0)
       .andWhere("profile_id", "!=", this.getProfileId());
 
     if (!comments.length) return [];
@@ -178,15 +181,17 @@ export default class Route extends BugsRoute<{
       .first();
   }
 
-  private async sendEmail() {
+  private getCommentPreview() {
     if (!this.comment) return false;
+    if (this.comment.length <= MAX_COMMENT_PREVIEW_LENGTH) return this.comment;
+
+    return this.comment.substr(0, MAX_COMMENT_PREVIEW_LENGTH) + "...";
+  }
+
+  private async sendEmail() {
     const bug = await this.getBugData();
 
     const recipients = await this.getRecipients();
-    console.log(
-      "🚀 ~ file: index.ts:185 ~ Route ~ sendEmail ~ recipients:",
-      recipients
-    );
     if (!recipients.length) return false;
 
     await sendTemplate({
@@ -198,7 +203,7 @@ export default class Route extends BugsRoute<{
         "{Author.name}": this.author?.name || "Name S.",
         "{Bug.id}": this.bid,
         "{Bug.title}": bug?.message,
-        "{Comment}": this.comment,
+        "{Comment}": this.getCommentPreview(),
         "{Campaign.title}": this.campaignName,
         "{Bug.url}": `${process.env.APP_URL}/campaigns/${this.cid}/bugs/${this.bid}`,
       },
