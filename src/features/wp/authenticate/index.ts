@@ -41,15 +41,8 @@ export default async (userData: {
     user.id = result.tryber_wp_user_id; // user id is the same as tryber_wp_user_id
     user.unguess_wp_user_id = result.unguess_wp_user_id;
     user.email = result.user_email;
-
-    if (isAdminResult.length) {
-      user.role = "administrator";
-    }
-  }
-
-  if (isAdminResult.length) {
-    user.role = "administrator";
-
+    user.role = isAdminResult.length ? "administrator" : "customer";
+  } else if (isAdminResult.length) {
     const adminInfo = await db.query(
       db.format("SELECT user_email FROM wp_users WHERE ID = ?", [userData.ID]),
       "unguess"
