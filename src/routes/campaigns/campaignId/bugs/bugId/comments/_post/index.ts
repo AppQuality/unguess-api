@@ -153,24 +153,21 @@ export default class Route extends BugsRoute<{
     return false;
   }
 
-  private async getPMFullName() {
-    const campaignPm = await tryber.tables.WpAppqEvdCampaign.do()
-      .select(
-        tryber.ref("id").withSchema("wp_appq_evd_campaign"),
-        tryber.ref("project_id").withSchema("wp_appq_evd_campaign"),
-        tryber.ref("status_id").withSchema("wp_appq_evd_campaign"),
-        tryber.ref("customer_title").withSchema("wp_appq_evd_campaign"),
-        tryber.ref("wp_appq_evd_profile.name").as("csm_name"),
-        tryber.ref("wp_appq_evd_profile.surname").as("csm_surname")
-      )
-      .join(
-        "wp_appq_evd_profile",
-        "wp_appq_evd_campaign.pm_id",
-        "wp_appq_evd_profile.id"
-      )
-      .where("wp_appq_evd_campaign.id", this.cid)
-      .first();
-    return `${campaignPm?.csm_name} ${campaignPm?.csm_surname}`;
+  private async getRecipients() {
+    const comments = await unguess.tables.UgBugsComments.do()
+      .select(unguess.ref("profile_id").withSchema("ug_bugs_comments"))
+      .where("bug_id", this.bid);
+
+    if (!comments.length) return [];
+
+    const recipients = await tryber.tables.WpAppqEvdProfile.do()
+      .select("name", "surname", "email")
+      .whereIn(
+        "id",
+        comments.map((c) => c.profile_id)
+      );
+
+    return recipients;
   }
 
   private async getBugData() {
@@ -184,9 +181,12 @@ export default class Route extends BugsRoute<{
     if (!this.comment) return false;
     const bug = await this.getBugData();
 
+    const recipients = await this.getRecipients();
+    // console.log("🚀 ~ file: index.ts:185 ~ Route ~ sendEmail ~ recipients:", recipients)
+
     await sendTemplate({
       template: "notify_campaign_bug_comment",
-      email: "platform@unguess.io",
+      email: ["platform@unguess.io"],
       subject: "Nuovo commento sul bug",
       categories: [`CP${this.cid}_BUG_COMMENT_NOTIFICATION`],
       optionalFields: {

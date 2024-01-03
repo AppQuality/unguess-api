@@ -15,6 +15,7 @@ import sgMail from "@sendgrid/mail";
 jest.mock("@sendgrid/mail", () => ({
   setApiKey: jest.fn(),
   send: jest.fn(),
+  sendMultiple: jest.fn(),
 }));
 
 const campaign_type_1 = {
@@ -348,10 +349,10 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       .send({ text: "Test comment" });
 
     expect(response.status).toBe(200);
-    expect(mockedSendgrid.send).toHaveBeenCalledTimes(1);
-    expect(mockedSendgrid.send).toHaveBeenCalledWith(
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(1);
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledWith(
       expect.objectContaining({
-        to: "platform@unguess.io",
+        to: ["platform@unguess.io"],
         from: {
           email: "info@unguess.io",
           name: "UNGUESS",
