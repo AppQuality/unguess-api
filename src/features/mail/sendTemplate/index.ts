@@ -6,11 +6,13 @@ export const sendTemplate = async ({
   subject,
   template,
   optionalFields,
+  categories,
 }: {
-  email: string;
+  email: string | string[];
   subject: string;
   template: string;
   optionalFields?: { [key: string]: any };
+  categories?: string[];
 }) => {
   const mailTemplate = await tryber.tables.WpAppqUnlayerMailTemplate.do()
     .select("html_body")
@@ -40,5 +42,6 @@ export const sendTemplate = async ({
     to: email,
     subject,
     html: templateHtml,
+    ...(categories && { categories }),
   });
 };

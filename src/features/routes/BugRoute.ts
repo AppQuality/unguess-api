@@ -19,8 +19,9 @@ export default class BugRoute<
   constructor(configuration: RouteClassConfiguration) {
     super(configuration);
 
-    const { bid } = this.getParameters();
-    this.bug_id = parseInt(bid);
+    const params = this.getParameters();
+    if (!params?.bid) throw new Error("Missing bug id");
+    this.bug_id = Number(params.bid);
   }
 
   protected async init(): Promise<void> {

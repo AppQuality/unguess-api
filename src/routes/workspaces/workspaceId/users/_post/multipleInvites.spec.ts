@@ -9,6 +9,7 @@ import request from "supertest";
 jest.mock("@sendgrid/mail", () => ({
   setApiKey: jest.fn(),
   send: jest.fn(),
+  sendMultiple: jest.fn(),
 }));
 
 const campaign_type_1 = {
@@ -126,8 +127,8 @@ describe("POST /campaigns/{cid}/users mail checks", () => {
         email: "vincenzo.cancelli@finestre.com",
       });
 
-    expect(mockedSendgrid.send).toHaveBeenCalledTimes(1);
-    expect(mockedSendgrid.send).toHaveBeenCalledWith(
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(1);
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledWith(
       expect.objectContaining({
         to: "vincenzo.cancelli@finestre.com",
         from: {
@@ -149,8 +150,8 @@ describe("POST /campaigns/{cid}/users mail checks", () => {
         email: "vincenzo.cancelli@finestre.com",
       });
 
-    expect(mockedSendgrid.send).toHaveBeenCalledTimes(1);
-    expect(mockedSendgrid.send).toHaveBeenCalledWith(
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(1);
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledWith(
       expect.objectContaining({
         to: "vincenzo.cancelli@finestre.com",
         from: {
