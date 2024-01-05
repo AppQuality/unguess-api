@@ -1173,9 +1173,9 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["Bug"] & {
-            media?: components["schemas"]["BugMedia"][];
-            tags?: components["schemas"]["BugTag"][];
-            additional_fields?: components["schemas"]["BugAdditionalField"][];
+            media: components["schemas"]["BugMedia"][];
+            tags: components["schemas"]["BugTag"][];
+            additional_fields: components["schemas"]["BugAdditionalField"][];
             reporter: {
               tester_id: number;
               name: string;
@@ -2375,7 +2375,10 @@ export interface operations {
         id: string;
       };
     };
-    responses: {};
+    responses: {
+      /** Found */
+      302: never;
+    };
   };
   "get-campaigns-cid-bugs-bid-comments": {
     parameters: {
