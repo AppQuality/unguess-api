@@ -303,8 +303,151 @@ paths:
                           name:
                             type: string
                     required:
+                      - media
+                      - tags
+                      - additional_fields
                       - reporter
-              examples: {}
+              examples:
+                Example 1:
+                  value:
+                    id: 0
+                    internal_id: string
+                    campaign_id: 0
+                    title:
+                      full: string
+                      compact: string
+                      context:
+                        - string
+                    step_by_step: string
+                    expected_result: string
+                    current_result: string
+                    status:
+                      id: 0
+                      name: string
+                    severity:
+                      id: 0
+                      name: string
+                    type:
+                      id: 0
+                      name: string
+                    replicability:
+                      id: 0
+                      name: string
+                    priority:
+                      id: 0
+                      name: string
+                    custom_status:
+                      id: 0
+                      name: string
+                      color: string
+                      phase:
+                        id: 0
+                        name: string
+                      is_default: 0
+                    created: string
+                    occurred_date: string
+                    updated: string
+                    note: string
+                    device:
+                      manufacturer: string
+                      model: string
+                      os: string
+                      os_version: string
+                      type: smartphone
+                    application_section:
+                      id: 0
+                      prefix_title: string
+                      title: string
+                      simple_title: string
+                    duplicated_of_id: 0
+                    is_favorite: 0
+                    read: true
+                    media:
+                      - mime_type:
+                          type: video
+                          extension: string
+                        url: 'http://example.com'
+                        creation_date: string
+                    tags:
+                      - id: 0
+                        tag_id: 0
+                        name: string
+                        slug: string
+                        bug_id: 0
+                        campaign_id: 0
+                        author_wp_id: 0
+                        author_tid: 0
+                        creation_date: string
+                        is_visible_to_customer: 0
+                    additional_fields:
+                      - id: 0
+                        name: string
+                        value: string
+                        validation: string
+                        kind: regex
+                    reporter:
+                      tester_id: 0
+                      name: string
+                Example 2:
+                  value:
+                    id: 0
+                    internal_id: string
+                    campaign_id: 0
+                    title:
+                      full: string
+                      compact: string
+                      context:
+                        - string
+                    step_by_step: string
+                    expected_result: string
+                    current_result: string
+                    status:
+                      id: 0
+                      name: string
+                    severity:
+                      id: 0
+                      name: string
+                    type:
+                      id: 0
+                      name: string
+                    replicability:
+                      id: 0
+                      name: string
+                    priority:
+                      id: 0
+                      name: string
+                    custom_status:
+                      id: 0
+                      name: string
+                      color: string
+                      phase:
+                        id: 0
+                        name: string
+                      is_default: 0
+                    created: string
+                    occurred_date: string
+                    updated: string
+                    note: string
+                    device:
+                      manufacturer: string
+                      model: string
+                      os: string
+                      os_version: string
+                      type: smartphone
+                    application_section:
+                      id: 0
+                      prefix_title: string
+                      title: string
+                      simple_title: string
+                    duplicated_of_id: 0
+                    is_favorite: 0
+                    read: true
+                    media: []
+                    tags: []
+                    additional_fields: []
+                    reporter:
+                      tester_id: 0
+                      name: string
         '400':
           $ref: '#/components/responses/Error'
         '401':
@@ -2330,9 +2473,11 @@ paths:
         in: path
         required: true
     get:
-      summary: Your GET endpoint
+      summary: Get Media ID
       tags: []
-      responses: {}
+      responses:
+        '302':
+          description: Found
       operationId: get-media-id
       description: ''
   '/campaigns/{cid}/bugs/{bid}/comments':
@@ -2352,8 +2497,6 @@ paths:
                 properties:
                   items:
                     type: array
-                    x-stoplight:
-                      id: 0cydi7y7vsl1w
                     items:
                       $ref: '#/components/schemas/BugComment'
                 required:
@@ -2378,8 +2521,6 @@ paths:
           $ref: '#/components/responses/Error'
           description: ''
       operationId: get-campaigns-cid-bugs-bid-comments
-      x-stoplight:
-        id: r0d1wvxwiwbf3
       security:
         - JWT: []
     post:
@@ -2401,8 +2542,6 @@ paths:
         '500':
           $ref: '#/components/responses/Error'
           description: ''
-      x-stoplight:
-        id: rlzjy82r0itvm
       security:
         - JWT: []
       requestBody:
@@ -2413,8 +2552,6 @@ paths:
               properties:
                 text:
                   type: string
-                  x-stoplight:
-                    id: q1nsiz251ht8v
               required:
                 - text
   '/campaigns/{cid}/bugs/{bid}/comments/{cmid}':
@@ -2450,8 +2587,6 @@ paths:
         '500':
           $ref: '#/components/responses/Error'
           description: ''
-      x-stoplight:
-        id: 4noxjmx6ten6y
       security:
         - JWT: []
       requestBody:
@@ -3685,38 +3820,24 @@ components:
         - invitationPending
     BugComment:
       title: BugComment
-      x-stoplight:
-        id: ddukvzscrp0pl
       type: object
       properties:
         id:
           type: integer
-          x-stoplight:
-            id: sx3hbv88axcpm
         text:
           type: string
-          x-stoplight:
-            id: h16af30keslgo
         creation_date:
           type: string
-          x-stoplight:
-            id: 49ced8ziwjik6
         creator:
           type: object
-          x-stoplight:
-            id: in0if2rfkorh9
           required:
             - id
             - name
           properties:
             id:
               type: integer
-              x-stoplight:
-                id: j2493k7qdfxfq
             name:
               type: string
-              x-stoplight:
-                id: 8xqal4x8r400y
       required:
         - id
         - text
