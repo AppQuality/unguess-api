@@ -2497,8 +2497,6 @@ paths:
                 properties:
                   items:
                     type: array
-                    x-stoplight:
-                      id: 0cydi7y7vsl1w
                     items:
                       $ref: '#/components/schemas/BugComment'
                 required:
@@ -2523,8 +2521,6 @@ paths:
           $ref: '#/components/responses/Error'
           description: ''
       operationId: get-campaigns-cid-bugs-bid-comments
-      x-stoplight:
-        id: r0d1wvxwiwbf3
       security:
         - JWT: []
     post:
@@ -2546,8 +2542,6 @@ paths:
         '500':
           $ref: '#/components/responses/Error'
           description: ''
-      x-stoplight:
-        id: rlzjy82r0itvm
       security:
         - JWT: []
       requestBody:
@@ -2558,8 +2552,6 @@ paths:
               properties:
                 text:
                   type: string
-                  x-stoplight:
-                    id: q1nsiz251ht8v
               required:
                 - text
   '/campaigns/{cid}/bugs/{bid}/comments/{cmid}':
@@ -2595,8 +2587,6 @@ paths:
         '500':
           $ref: '#/components/responses/Error'
           description: ''
-      x-stoplight:
-        id: 4noxjmx6ten6y
       security:
         - JWT: []
       requestBody:
@@ -3830,38 +3820,24 @@ components:
         - invitationPending
     BugComment:
       title: BugComment
-      x-stoplight:
-        id: ddukvzscrp0pl
       type: object
       properties:
         id:
           type: integer
-          x-stoplight:
-            id: sx3hbv88axcpm
         text:
           type: string
-          x-stoplight:
-            id: h16af30keslgo
         creation_date:
           type: string
-          x-stoplight:
-            id: 49ced8ziwjik6
         creator:
           type: object
-          x-stoplight:
-            id: in0if2rfkorh9
           required:
             - id
             - name
           properties:
             id:
               type: integer
-              x-stoplight:
-                id: j2493k7qdfxfq
             name:
               type: string
-              x-stoplight:
-                id: 8xqal4x8r400y
       required:
         - id
         - text
