@@ -1739,24 +1739,7 @@ paths:
         '400':
           $ref: '#/components/responses/Error'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Campaign'
-                  start:
-                    type: integer
-                  limit:
-                    type: integer
-                  size:
-                    type: integer
-                  total:
-                    type: integer
+          $ref: '#/components/responses/Error'
         '403':
           $ref: '#/components/responses/Error'
         '404':
@@ -3852,7 +3835,7 @@ components:
       description: ''
   responses:
     Error:
-      description: Example response
+      description: Shared error response
       content:
         application/json:
           schema:
@@ -3889,7 +3872,6 @@ components:
     order:
       name: order
       in: query
-      required: false
       schema:
         type: string
       description: 'Order value (ASC, DESC)'
