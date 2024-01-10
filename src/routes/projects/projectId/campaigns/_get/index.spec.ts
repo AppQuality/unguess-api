@@ -96,9 +96,9 @@ const campaign_1 = {
 
 const campaign_2 = {
   id: 2,
-  start_date: "2017-07-20 00:00:00",
-  end_date: "2017-07-20 00:00:00",
-  close_date: "2017-07-20 00:00:00",
+  start_date: "2017-07-22 00:00:00",
+  end_date: "2017-07-22 00:00:00",
+  close_date: "2017-07-22 00:00:00",
   title: "Campagnetta Funzionale Provetta 2",
   customer_title: "titolo 2",
   status_id: 1,
@@ -395,6 +395,54 @@ describe("GET /projects/{pid}/campaigns", () => {
         ])
       );
     });
+  });
+
+  // Should order by the default ordering if the order parameter is not valid or not provided
+  it("Should order by the default ordering if the order parameter is not valid or not provided", async () => {
+    const response = await request(app)
+      .get(`/projects/${project_1.id}/campaigns?order=wrong`)
+      .set("authorization", "Bearer user");
+    expect(response.status).toBe(200);
+    expect(response.body.items).toEqual([
+      expect.objectContaining({
+        id: campaign_1.id,
+      }),
+      expect.objectContaining({
+        id: campaign_2.id,
+      }),
+    ]);
+  });
+
+  // Should order by the default ordering if the order parameter is valid and orderBy is not provided
+  it("Should order by the default ordering if the order parameter is valid and orderBy is not provided", async () => {
+    const response = await request(app)
+      .get(`/projects/${project_1.id}/campaigns?order=DESC`)
+      .set("authorization", "Bearer user");
+    expect(response.status).toBe(200);
+    expect(response.body.items).toEqual([
+      expect.objectContaining({
+        id: campaign_1.id,
+      }),
+      expect.objectContaining({
+        id: campaign_2.id,
+      }),
+    ]);
+  });
+
+  // Should order items by the provided orderBy and order
+  it("Should order items by the provided orderBy and order", async () => {
+    const response = await request(app)
+      .get(`/projects/${project_1.id}/campaigns?order=DESC&orderBy=start_date`)
+      .set("authorization", "Bearer user");
+    expect(response.status).toBe(200);
+    expect(response.body.items).toEqual([
+      expect.objectContaining({
+        id: campaign_2.id,
+      }),
+      expect.objectContaining({
+        id: campaign_1.id,
+      }),
+    ]);
   });
 
   // end of describe
