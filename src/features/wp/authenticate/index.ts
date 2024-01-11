@@ -24,7 +24,8 @@ export default async (userData: {
       user_id: userData.ID,
       meta_key: "wp_capabilities",
     })
-    .andWhere("meta_value", "LIKE", "%administrator%");
+    .andWhere("meta_value", "LIKE", "%administrator%")
+    .first();
 
   const userField = await unguess.tables.WpUnguessUserToCustomer.do()
     .select(
