@@ -22,6 +22,14 @@ describe("Authenticate", () => {
 
     await unguess.tables.WpUsermeta.do().insert([
       {
+        user_id: 1,
+        meta_key: "wp_capabilities",
+        meta_value: "administrator",
+      },
+    ]);
+
+    await unguess.tables.WpUsermeta.do().insert([
+      {
         user_id: 22,
         meta_key: "wp_capabilities",
         meta_value: "administrator",
