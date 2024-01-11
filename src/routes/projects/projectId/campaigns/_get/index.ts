@@ -17,6 +17,13 @@ export default class Route extends ProjectRoute<{
   private limit: number = LIMIT_QUERY_PARAM_DEFAULT;
   private start: number = START_QUERY_PARAM_DEFAULT;
   private total: number = 0;
+  private order: "ASC" | "DESC" | undefined;
+  private orderBy:
+    | "start_date"
+    | "end_date"
+    | "close_date"
+    | "title"
+    | undefined;
   private campaigns: StoplightComponents["schemas"]["CampaignWithOutput"][] =
     [];
 
@@ -26,6 +33,9 @@ export default class Route extends ProjectRoute<{
     const query = this.getQuery();
     if (query.limit) this.limit = parseInt(query.limit as unknown as string);
     if (query.start) this.start = parseInt(query.start as unknown as string);
+
+    this.order = this.getOrder();
+    this.orderBy = this.getOrderBy();
   }
 
   protected async prepare(): Promise<void> {
@@ -91,6 +101,10 @@ export default class Route extends ProjectRoute<{
           .as("campaign_family_id")
       )
       .where("wp_appq_evd_campaign.project_id", this.getProjectId());
+
+    if (this.order && this.orderBy) {
+      query.orderBy(this.orderBy, this.order);
+    }
 
     if (this.limit) {
       query.limit(this.limit).offset(this.start);
@@ -233,5 +247,33 @@ GROUP BY campaign_id;
       }
     }
     return results;
+  }
+
+  private getOrder() {
+    const query = this.getQuery();
+    if (query.order) {
+      if (["ASC", "DESC"].includes(query.order)) {
+        return query.order as "ASC" | "DESC";
+      }
+    }
+    return undefined;
+  }
+
+  private getOrderBy() {
+    const query = this.getQuery();
+    if (query.orderBy) {
+      if (
+        ["start_date", "end_date", "close_date", "title"].includes(
+          query.orderBy
+        )
+      ) {
+        return query.orderBy as
+          | "start_date"
+          | "end_date"
+          | "close_date"
+          | "title";
+      }
+    }
+    return undefined;
   }
 }

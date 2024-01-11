@@ -13,6 +13,21 @@ describe("Authenticate", () => {
       user_pass: HashPassword("admin"),
     });
 
+    await unguess.tables.WpUsers.do().insert({
+      ID: 22,
+      user_login: "adminWithoutProfile",
+      user_email: "admin2@unguess.io",
+      user_pass: HashPassword("admin"),
+    });
+
+    await unguess.tables.WpUsermeta.do().insert([
+      {
+        user_id: 22,
+        meta_key: "wp_capabilities",
+        meta_value: "administrator",
+      },
+    ]);
+
     await unguess.tables.WpUnguessUserToCustomer.do().insert({
       unguess_wp_user_id: 1,
       tryber_wp_user_id: 12,
@@ -41,6 +56,21 @@ describe("Authenticate", () => {
       password: "admin",
     });
     expect(response.status).toBe(200);
+  });
+
+  it("should return ad admin user even if there is no tryber profile linked", async () => {
+    const response = await request(app).post("/authenticate").send({
+      username: "admin2@unguess.io",
+      password: "admin",
+    });
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        id: 0,
+        role: "administrator",
+        email: "admin2@unguess.io",
+      })
+    );
   });
 
   it("should return 401 when password is not correct", async () => {

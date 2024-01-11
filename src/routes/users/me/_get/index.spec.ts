@@ -136,4 +136,13 @@ describe("GET /users/me", () => {
       `https://gravatar.com/avatar/mario.rossi@example.com`
     );
   });
+
+  it("Should return a profile_id and tryber_wp_user_id = 0 if administrator with broken profile", async () => {
+    const response = await request(app)
+      .get("/users/me")
+      .set("authorization", "Bearer admin");
+    expect(response.body.role).toBe("administrator");
+    expect(response.body.profile_id).toBe(0);
+    expect(response.body.tryber_wp_user_id).toBe(0);
+  });
 });

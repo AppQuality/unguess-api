@@ -909,7 +909,7 @@ export interface components {
     };
   };
   responses: {
-    /** Example response */
+    /** Shared error response */
     Error: {
       content: {
         "application/json": components["schemas"]["Error"];
@@ -1173,9 +1173,9 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["Bug"] & {
-            media?: components["schemas"]["BugMedia"][];
-            tags?: components["schemas"]["BugTag"][];
-            additional_fields?: components["schemas"]["BugAdditionalField"][];
+            media: components["schemas"]["BugMedia"][];
+            tags: components["schemas"]["BugTag"][];
+            additional_fields: components["schemas"]["BugAdditionalField"][];
             reporter: {
               tester_id: number;
               name: string;
@@ -1877,6 +1877,10 @@ export interface operations {
         limit?: components["parameters"]["limit"];
         /** Start pagination parameter */
         start?: components["parameters"]["start"];
+        /** Order value (ASC, DESC) */
+        order?: components["parameters"]["order"];
+        /** Order by accepted field */
+        orderBy?: components["parameters"]["orderBy"];
       };
     };
     responses: {
@@ -1893,18 +1897,7 @@ export interface operations {
         };
       };
       400: components["responses"]["Error"];
-      /** Unauthorized */
-      401: {
-        content: {
-          "application/json": {
-            items?: components["schemas"]["Campaign"][];
-            start?: number;
-            limit?: number;
-            size?: number;
-            total?: number;
-          };
-        };
-      };
+      401: components["responses"]["Error"];
       403: components["responses"]["Error"];
       404: components["responses"]["Error"];
       500: components["responses"]["Error"];
@@ -2375,7 +2368,10 @@ export interface operations {
         id: string;
       };
     };
-    responses: {};
+    responses: {
+      /** Found */
+      302: never;
+    };
   };
   "get-campaigns-cid-bugs-bid-comments": {
     parameters: {
