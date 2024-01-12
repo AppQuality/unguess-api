@@ -170,18 +170,12 @@ paths:
                                   - tag_name
                             siblings:
                               type: number
+                            comments:
+                              type: number
+                              x-stoplight:
+                                id: eixobe0xj10ck
                           required:
                             - siblings
-                        - type: object
-                          x-stoplight:
-                            id: mw1jwch3wrsnr
-                          properties:
-                            comments:
-                              type: array
-                              x-stoplight:
-                                id: w3huvyacf8kvw
-                              items:
-                                $ref: '#/components/schemas/BugComment'
                   start:
                     type: integer
                   limit:
