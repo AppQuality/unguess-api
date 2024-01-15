@@ -176,6 +176,7 @@ paths:
                                 id: eixobe0xj10ck
                           required:
                             - siblings
+                            - comments
                   start:
                     type: integer
                   limit:
