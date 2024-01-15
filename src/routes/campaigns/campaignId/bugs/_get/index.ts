@@ -468,6 +468,7 @@ export default class BugsRoute extends CampaignRoute<{
         siblings: bug.siblings,
         priority: bug.priority,
         custom_status: bug.custom_status,
+        comments: this.getCommentsCount(bug.id),
       };
     });
   }
@@ -681,5 +682,10 @@ export default class BugsRoute extends CampaignRoute<{
       size: 0,
       total: 0,
     });
+  }
+
+  private getCommentsCount(bugId: number) {
+    // TODO: implement knex query
+    return 0;
   }
 }

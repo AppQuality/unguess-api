@@ -880,5 +880,9 @@ describe("GET /campaigns/{cid}/bugs", () => {
     }
   });
 
+  // It should return correct comments count
+
+  // It should return comments count 0 if there are no comments
+
   // --- End of file
 });
