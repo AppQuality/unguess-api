@@ -403,6 +403,15 @@ const comment_3 = {
   creation_date_utc: "2021-10-19 12:57:57.0",
   is_deleted: 0,
 };
+const comment_4 = {
+  id: 24586,
+  text: "comment deleted",
+  bug_id: bug_1.id,
+  profile_id: 34,
+  creation_date_utc: "2021-10-19 12:57:57.0",
+  is_deleted: 1,
+};
+
 describe("GET /campaigns/{cid}/bugs", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
@@ -425,6 +434,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
           comment_1,
           comment_2,
           comment_3,
+          comment_4,
         ]);
 
         await bugs.insert(bug_1);
@@ -916,7 +926,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
 
   // It should return correct comments count
 
-  it("It should return correct comments count", async () => {
+  it("It should return correct comments count without deleted comments", async () => {
     const response = await request(app)
       .get(`/campaigns/${campaign_1.id}/bugs`)
       .set("Authorization", "Bearer user");
