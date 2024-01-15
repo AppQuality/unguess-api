@@ -486,7 +486,6 @@ describe("GET /campaigns/{cid}/bugs", () => {
     expect(response.body).toHaveProperty("limit");
     expect(response.body).toHaveProperty("size");
     expect(response.body).toHaveProperty("total");
-    console.log(response.body);
     expect(response.body.items).toHaveLength(3);
 
     expect(response.body).toMatchObject(

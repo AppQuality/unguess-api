@@ -172,8 +172,6 @@ paths:
                               type: number
                             comments:
                               type: number
-                              x-stoplight:
-                                id: eixobe0xj10ck
                           required:
                             - siblings
                             - comments
