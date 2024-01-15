@@ -1145,6 +1145,7 @@ export interface operations {
                 tag_name: string;
               }[];
               siblings: number;
+              comments: number;
             })[];
             start?: number;
             limit?: number;
