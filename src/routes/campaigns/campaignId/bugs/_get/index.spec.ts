@@ -17,6 +17,7 @@ import bugPriorities, {
   BugPriorityParams,
 } from "@src/__mocks__/database/bug_priority";
 import priorities from "@src/__mocks__/database/priority";
+import { unguess } from "@src/features/database";
 
 const customer_1 = {
   id: 999,
@@ -377,6 +378,31 @@ const bug_1_highest_priority: BugPriorityParams = {
   priority_id: 5,
 };
 
+const comment_1 = {
+  id: 2654,
+  text: "comment 1",
+  bug_id: bug_1.id,
+  profile_id: 1,
+  creation_date_utc: "2021-10-19 12:57:57.0",
+  is_deleted: 0,
+};
+
+const comment_2 = {
+  id: 24562,
+  text: "comment 2",
+  bug_id: bug_1.id,
+  profile_id: 34,
+  creation_date_utc: "2021-10-19 12:57:57.0",
+  is_deleted: 0,
+};
+const comment_3 = {
+  id: 23547,
+  text: "comment 3",
+  bug_id: bug_3.id,
+  profile_id: 1,
+  creation_date_utc: "2021-10-19 12:57:57.0",
+  is_deleted: 0,
+};
 describe("GET /campaigns/{cid}/bugs", () => {
   beforeAll(async () => {
     return new Promise(async (resolve, reject) => {
@@ -395,6 +421,11 @@ describe("GET /campaigns/{cid}/bugs", () => {
           meta_key: "bug_title_rule",
           meta_value: "1",
         });
+        await unguess.tables.UgBugsComments.do().insert([
+          comment_1,
+          comment_2,
+          comment_3,
+        ]);
 
         await bugs.insert(bug_1);
         await bugs.insert(bug_2);
@@ -440,6 +471,10 @@ describe("GET /campaigns/{cid}/bugs", () => {
     });
   });
 
+  afterAll(async () => {
+    await unguess.tables.UgBugsComments.do().delete();
+  });
+
   // It should answer 200 with paginated bugs
   it("Should answer 200 with paginated bugs", async () => {
     const response = await request(app)
@@ -451,7 +486,7 @@ describe("GET /campaigns/{cid}/bugs", () => {
     expect(response.body).toHaveProperty("limit");
     expect(response.body).toHaveProperty("size");
     expect(response.body).toHaveProperty("total");
-
+    console.log(response.body);
     expect(response.body.items).toHaveLength(3);
 
     expect(response.body).toMatchObject(
@@ -882,7 +917,19 @@ describe("GET /campaigns/{cid}/bugs", () => {
 
   // It should return correct comments count
 
-  // It should return comments count 0 if there are no comments
+  it("It should return correct comments count", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs`)
+      .set("Authorization", "Bearer user");
+    expect(response.body.items[2]).toHaveProperty("comments", 2);
+  });
 
-  // --- End of file
+  //It should return 0 if the bug has no comments
+
+  it("It should return 0 if the bug has no comments", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs`)
+      .set("Authorization", "Bearer user");
+    expect(response.body.items[0]).toHaveProperty("comments", 0);
+  });
 });

@@ -16,6 +16,7 @@ import { getBugDevice } from "@src/utils/bugs/getBugDevice";
 
 import * as db from "@src/features/db";
 import CampaignRoute from "@src/features/routes/CampaignRoute";
+import { unguess } from "@src/features/database";
 
 interface Tag {
   tag_id: number;
@@ -129,7 +130,7 @@ export default class BugsRoute extends CampaignRoute<{
     const filtered = this.filterBugs(enhancedBugs);
     const ordered = this.handleApplicationOrderBy(filtered);
     const paginated = this.paginateBugs(ordered);
-    const formatted = this.formatBugs(paginated);
+    const formatted = await this.formatBugs(paginated);
 
     return this.setSuccess(200, {
       items: formatted,
@@ -440,8 +441,8 @@ export default class BugsRoute extends CampaignRoute<{
       : this.defaultCustomStatus;
   }
 
-  private formatBugs(bugs: ReturnType<typeof this.paginateBugs>) {
-    return bugs.map((bug) => {
+  private async formatBugs(bugs: ReturnType<typeof this.paginateBugs>) {
+    const formattedBugs = bugs.map(async (bug) => {
       return {
         id: bug.id,
         internal_id: bug.internal_id,
@@ -468,9 +469,10 @@ export default class BugsRoute extends CampaignRoute<{
         siblings: bug.siblings,
         priority: bug.priority,
         custom_status: bug.custom_status,
-        comments: this.getCommentsCount(bug.id),
+        comments: await this.getCommentsCount(bug.id),
       };
     });
+    return await Promise.all(formattedBugs);
   }
 
   private filterBugs(bugs: ReturnType<typeof this.enhanceBugs>) {
@@ -684,8 +686,12 @@ export default class BugsRoute extends CampaignRoute<{
     });
   }
 
-  private getCommentsCount(bugId: number) {
-    // TODO: implement knex query
-    return 0;
+  private async getCommentsCount(bugId: number) {
+    const commentsCount = await unguess.tables.UgBugsComments.do()
+      .count("id", { as: "count" })
+      .where("bug_id", bugId)
+      .andWhere("is_deleted", 0);
+    if (!commentsCount || commentsCount.length === 0) return 0;
+    return Number(commentsCount[0].count);
   }
 }
