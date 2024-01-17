@@ -243,6 +243,7 @@ paths:
                           - tag_id: 0
                             tag_name: string
                         siblings: 0
+                        comments: 0
                     start: 0
                     limit: 0
                     size: 0
@@ -2540,8 +2541,32 @@ paths:
               properties:
                 text:
                   type: string
+                mentioned:
+                  type: array
+                  x-stoplight:
+                    id: 8tsa6gd4ayosa
+                  items:
+                    x-stoplight:
+                      id: 1c3ar5v6czrpc
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        x-stoplight:
+                          id: l8tc4q0ytcgjl
+                      full_name:
+                        type: string
+                        x-stoplight:
+                          id: nhp6mt9jaes9x
               required:
                 - text
+            examples:
+              Example 1:
+                value:
+                  text: string
+                  mentioned:
+                    - id: 0
+                      full_name: string
   '/campaigns/{cid}/bugs/{bid}/comments/{cmid}':
     parameters:
       - schema:
