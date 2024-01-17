@@ -18,6 +18,64 @@ jest.mock("@sendgrid/mail", () => ({
   sendMultiple: jest.fn(),
 }));
 
+const customer_1 = {
+  id: 999,
+  company: "Company 999",
+  company_logo: "logo999.png",
+  tokens: 100,
+};
+
+const customer_10 = {
+  id: 10,
+  company: "Company 10",
+  company_logo: "logo10.png",
+  tokens: 100,
+};
+
+const user_to_customer_1 = {
+  wp_user_id: 1,
+  customer_id: customer_1.id,
+};
+
+const user_to_customer_10 = {
+  wp_user_id: 15,
+  customer_id: customer_10.id,
+};
+
+const project_1 = {
+  id: 999,
+  display_name: "Project 999",
+  customer_id: customer_1.id,
+};
+
+const project_4 = {
+  id: 997,
+  display_name: "Project 4",
+  customer_id: 10,
+};
+
+const user_to_project_1 = {
+  wp_user_id: 1,
+  project_id: project_1.id,
+};
+
+const user_to_project_2 = {
+  wp_user_id: 15,
+  project_id: project_4.id,
+};
+
+const profile_1 = {
+  id: 1,
+  name: "User 1",
+  wp_user_id: 1,
+};
+
+const profile_2 = {
+  id: 34,
+  name: "User 2",
+  wp_user_id: 15,
+};
+
 const campaign_type_1 = {
   id: 1,
   name: "Functional Testing (Bug Hunting)",
@@ -194,6 +252,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     await severities.addDefaultItems();
     await replicabilities.addDefaultItems();
     await statuses.addDefaultItems();
+    await tryber.tables.WpAppqEvdProfile.do().insert([profile_1, profile_2]);
 
     await tryber.tables.WpAppqEvdBug.do().insert([
       bug_1,
@@ -201,7 +260,14 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       bug_3,
       bug_4_pending,
     ]);
-
+    await tryber.tables.WpAppqUserToProject.do().insert([
+      user_to_project_1,
+      user_to_project_2,
+    ]);
+    await tryber.tables.WpAppqUserToCustomer.do().insert([
+      user_to_customer_1,
+      user_to_customer_10,
+    ]);
     await unguess.tables.UgBugsComments.do().insert({
       text: "Comment 1",
       is_deleted: 0,
@@ -209,16 +275,28 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       profile_id: context.profile2.id,
       creation_date_utc: "2023-12-11 09:23:00",
     });
-    await tryber.tables.WpAppqUnlayerMailTemplate.do().insert({
-      id: 1,
-      html_body:
-        "Test mail it {Bug.id},{Bug.title},{Bug.url},{Author.name},{Comment}, {Campaign.title}",
-      name: "Test mail",
-      json_body: "",
-      last_editor_tester_id: 1,
-      lang: "it",
-      category_id: 1,
-    });
+    await tryber.tables.WpAppqUnlayerMailTemplate.do().insert([
+      {
+        id: 1,
+        html_body:
+          "Test mail it {Bug.id},{Bug.title},{Bug.url},{Author.name},{Comment}, {Campaign.title}",
+        name: "Test mail",
+        json_body: "",
+        last_editor_tester_id: 1,
+        lang: "it",
+        category_id: 1,
+      },
+      {
+        id: 15,
+        html_body:
+          "{User.name}, {User.surname} you have been mentioned in a comment",
+        name: "Comment mention",
+        json_body: "",
+        last_editor_tester_id: 1,
+        lang: "it",
+        category_id: 1,
+      },
+    ]);
 
     await tryber.tables.WpAppqEventTransactionalMail.do().insert({
       id: 1,
@@ -235,6 +313,9 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     await statuses.clear();
     await tryber.tables.WpAppqEventTransactionalMail.do().delete();
     await tryber.tables.WpAppqUnlayerMailTemplate.do().delete();
+    await tryber.tables.WpAppqUserToProject.do().delete();
+    await tryber.tables.WpAppqUserToCustomer.do().delete();
+    await tryber.tables.WpAppqEvdProfile.do().delete();
   });
 
   // Clear mocks call counter
@@ -456,5 +537,30 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
 
     expect(response.status).toBe(200);
     expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(0);
+  });
+
+  //it should send the correct email template if a user has been mentioned in a comment and can access the campaign
+  it("it should send the correct email template if a user has been mentioned in a comment and can access the campaign", async () => {
+    const response = await request(app)
+      .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
+      .set("Authorization", "Bearer user")
+      .send();
+    expect(response.status).toBe(200);
+  });
+  //it should NOT send an email if the user does not exist (profile_id invalid)
+  it("it should NOT send an email if the user does not exist (profile_id invalid)", async () => {
+    const response = await request(app)
+      .post(`/campaigns/${campaign_1.id}/bugs/${bug_3.id}/comments`)
+      .set("Authorization", "Bearer user")
+      .send();
+    expect(response.status).toBe(403);
+  });
+  //it should NOT send an email if the user can't access the campaign
+  it("it should NOT send an email if the user can't access the campaign", async () => {
+    const response = await request(app)
+      .post(`/campaigns/${campaign_1.id}/bugs/${bug_3.id}/comments`)
+      .set("Authorization", "Bearer user")
+      .send();
+    expect(response.status).toBe(403);
   });
 });
