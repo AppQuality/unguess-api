@@ -586,7 +586,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
           context.profile1.name
         } ${context.profile1.surname
           .charAt(0)
-          .toUpperCase()}.,Always code as if the guy who ends up maintaining your code will be a violent ps..., ${
+          .toUpperCase()}.,Always code as if the guy who ends up maintaining your code will be a violent ps...,${
           campaign_1.customer_title
         }`,
       })
@@ -633,7 +633,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
           campaign_1.customer_title
         }`,
         subject: "Nuovo commento sul bug",
-        to: [`${profile_1.email}`],
+        to: [`${context.profile3.email}`, `${profile_1.email}`],
       })
     );
     expect(mockedSendgrid.sendMultiple.mock.calls[1][0]).toMatchObject(
@@ -693,7 +693,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
           campaign_1.customer_title
         }`,
         subject: "Nuovo commento sul bug",
-        to: [`${profile_1.email}`],
+        to: [`${context.profile3.email}`, `${profile_1.email}`],
       })
     );
     expect(mockedSendgrid.sendMultiple.mock.calls[1][0]).toMatchObject(
