@@ -2548,9 +2548,10 @@ paths:
                     properties:
                       id:
                         type: integer
+                    required:
+                      - id
               required:
                 - text
-                - mentioned
             examples:
               Example 1:
                 value:
