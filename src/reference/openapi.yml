@@ -2543,21 +2543,13 @@ paths:
                   type: string
                 mentioned:
                   type: array
-                  x-stoplight:
-                    id: 8tsa6gd4ayosa
                   items:
-                    x-stoplight:
-                      id: 1c3ar5v6czrpc
                     type: object
                     properties:
                       id:
                         type: integer
-                        x-stoplight:
-                          id: l8tc4q0ytcgjl
                       full_name:
                         type: string
-                        x-stoplight:
-                          id: nhp6mt9jaes9x
               required:
                 - text
                 - mentioned
