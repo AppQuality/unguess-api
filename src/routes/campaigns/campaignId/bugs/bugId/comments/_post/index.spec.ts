@@ -25,14 +25,11 @@ const customer_1 = {
   tokens: 100,
 };
 
-const user_to_customer_1 = {
-  wp_user_id: 17,
-  customer_id: customer_1.id,
-};
-
-const user_to_customer_10 = {
-  wp_user_id: 77,
-  customer_id: customer_1.id,
+const customer_2 = {
+  id: 998,
+  company: "Company 998",
+  company_logo: "logo998.png",
+  tokens: 100,
 };
 
 const project_1 = {
@@ -41,14 +38,10 @@ const project_1 = {
   customer_id: customer_1.id,
 };
 
-const user_to_project_1 = {
-  wp_user_id: 17,
-  project_id: project_1.id,
-};
-
-const user_to_project_2 = {
-  wp_user_id: 77,
-  project_id: project_1.id,
+const project_2 = {
+  id: 998,
+  display_name: "Project 998",
+  customer_id: customer_2.id,
 };
 
 const profile_1 = {
@@ -79,6 +72,36 @@ const profile_3 = {
   email: "test3@ug.com",
   employment_id: 1125,
   education_id: 124,
+};
+
+const user_to_customer_1 = {
+  wp_user_id: profile_1.wp_user_id,
+  customer_id: customer_1.id,
+};
+
+const user_to_customer_10 = {
+  wp_user_id: profile_2.wp_user_id,
+  customer_id: customer_1.id,
+};
+
+const user_to_customer_2 = {
+  wp_user_id: profile_3.wp_user_id,
+  customer_id: customer_2.id,
+};
+
+const user_to_project_1 = {
+  wp_user_id: profile_1.wp_user_id,
+  project_id: project_1.id,
+};
+
+const user_to_project_2 = {
+  wp_user_id: profile_2.wp_user_id,
+  project_id: project_1.id,
+};
+
+const user_to_project_3 = {
+  wp_user_id: profile_3.wp_user_id,
+  project_id: project_2.id,
 };
 
 const campaign_type_1 = {
@@ -257,6 +280,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     await severities.addDefaultItems();
     await replicabilities.addDefaultItems();
     await statuses.addDefaultItems();
+
     await tryber.tables.WpAppqEvdProfile.do().insert([
       profile_1,
       profile_2,
@@ -269,14 +293,19 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       bug_3,
       bug_4_pending,
     ]);
+
     await tryber.tables.WpAppqUserToProject.do().insert([
       user_to_project_1,
       user_to_project_2,
+      user_to_project_3,
     ]);
+
     await tryber.tables.WpAppqUserToCustomer.do().insert([
       user_to_customer_1,
       user_to_customer_10,
+      user_to_customer_2,
     ]);
+
     await unguess.tables.UgBugsComments.do().insert([
       {
         text: "Comment 1",
@@ -293,12 +322,13 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
         creation_date_utc: "2023-12-11 09:23:00",
       },
     ]);
+
     await tryber.tables.WpAppqUnlayerMailTemplate.do().insert([
       {
         id: 1,
         html_body:
-          "Test mail it {Bug.id},{Bug.title},{Bug.url},{Author.name},{Comment}, {Campaign.title}",
-        name: "Test mail",
+          "New comment on bug {Bug.id},{Bug.title},{Bug.url},{Author.name},{Comment},{Campaign.title}",
+        name: "New comment on bug",
         json_body: "",
         last_editor_tester_id: 1,
         lang: "it",
@@ -310,6 +340,26 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       id: 1,
       event_name: "notify_campaign_bug_comment",
       template_id: 1,
+      last_editor_tester_id: 1,
+    });
+
+    await tryber.tables.WpAppqUnlayerMailTemplate.do().insert([
+      {
+        id: 2,
+        html_body:
+          "New comment mention on bug {Bug.id},{Bug.title},{Bug.url},{Author.name},{Comment},{Campaign.title}",
+        name: "New comment mention on bug",
+        json_body: "",
+        last_editor_tester_id: 1,
+        lang: "it",
+        category_id: 1,
+      },
+    ]);
+
+    await tryber.tables.WpAppqEventTransactionalMail.do().insert({
+      id: 2,
+      event_name: "notify_campaign_bug_comment_mention",
+      template_id: 2,
       last_editor_tester_id: 1,
     });
   });
@@ -331,7 +381,6 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     jest.clearAllMocks();
   });
 
-  // It should answer 403 if user is not logged in
   it("Should answer 403 if user is not logged in", async () => {
     const response = await request(app).post(
       `/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`
@@ -340,7 +389,6 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     expect(response.status).toBe(403);
   });
 
-  // It should fail if the campaign does not exist
   it("Should fail if the campaign does not exist", async () => {
     const response = await request(app)
       .post(`/campaigns/999/bugs/666/comments`)
@@ -350,7 +398,6 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     expect(response.status).toBe(400);
   });
 
-  // It should fail if the bug does not exist
   it("Should fail if the bug does not exist", async () => {
     const response = await request(app)
       .post(`/campaigns/${campaign_1.id}/bugs/666/comments`)
@@ -369,17 +416,17 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     expect(response.status).toBe(400);
   });
 
-  // It should fail if the user is not the owner
   it("Should fail if the user is not the owner", async () => {
     const response = await request(app)
       .post(`/campaigns/${campaign_2.id}/bugs/${bug_2.id}/comments`)
       .set("Authorization", "Bearer user")
-      .send({ text: "comment text" });
+      .send({
+        text: "comment text",
+      });
 
     expect(response.status).toBe(403);
   });
 
-  // Should fail if the body is not provided
   it("Should fail if the body is not provided", async () => {
     const response = await request(app)
       .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
@@ -392,17 +439,20 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     const response = await request(app)
       .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
       .set("Authorization", "Bearer user")
-      .send({ text: "" });
+      .send({
+        text: "",
+      });
 
     expect(response.status).toBe(400);
   });
 
-  //Should answer 200 if the user is the owner and a valid body is sent
   it("Should answer 200 if the user is the owner and a valid body is sent", async () => {
     const response = await request(app)
       .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
       .set("Authorization", "Bearer user")
-      .send({ text: "comment text" });
+      .send({
+        text: "comment text",
+      });
 
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("id");
@@ -412,7 +462,9 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     const response = await request(app)
       .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
       .set("Authorization", "Bearer user")
-      .send({ text: "comment text" });
+      .send({
+        text: "comment text",
+      });
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual(
@@ -428,12 +480,13 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     );
   });
 
-  //Should return a valid iso date
   it("Should return a valid iso date", async () => {
     const response = await request(app)
       .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
       .set("Authorization", "Bearer user")
-      .send({ text: "comment text" });
+      .send({
+        text: "comment text",
+      });
 
     expect(response.status).toBe(200);
     expect(response.body.creation_date).toMatch(
@@ -441,11 +494,13 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     );
   });
 
-  it("Should answer 200 with the comment if the user is an admin", async () => {
+  it("Should answer with the comment if the user is an admin", async () => {
     const response = await request(app)
       .post(`/campaigns/${campaign_2.id}/bugs/${bug_2.id}/comments`)
       .set("Authorization", "Bearer admin")
-      .send({ text: "comment text" });
+      .send({
+        text: "comment text",
+      });
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual(
@@ -458,11 +513,14 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       })
     );
   });
+
   it("Should send an email when the comment is created successfully", async () => {
     const response = await request(app)
       .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
       .set("Authorization", "Bearer user")
-      .send({ text: "Test comment" });
+      .send({
+        text: "Test comment",
+      });
 
     expect(response.status).toBe(200);
     expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(1);
@@ -474,15 +532,13 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
         },
         subject: "Nuovo commento sul bug",
         categories: [`CP${campaign_1.id}_BUG_COMMENT_NOTIFICATION`],
-        html: expect.stringContaining(
-          `Test mail it ${bug_1.id},${bug_1.message},${
-            process.env.APP_URL
-          }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
-            context.profile1.name
-          } ${context.profile1.surname
-            .charAt(0)
-            .toUpperCase()}.,Test comment, ${campaign_1.customer_title}`
-        ),
+        html: `New comment on bug ${bug_1.id},${bug_1.message},${
+          process.env.APP_URL
+        }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
+          context.profile1.name
+        } ${context.profile1.surname.charAt(0).toUpperCase()}.,Test comment,${
+          campaign_1.customer_title
+        }`,
       })
     );
   });
@@ -499,13 +555,15 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     const response = await request(app)
       .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
       .set("Authorization", "Bearer user")
-      .send({ text: "Test comment" });
+      .send({
+        text: "Test comment",
+      });
 
     expect(response.status).toBe(200);
     expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(1);
     expect(mockedSendgrid.sendMultiple).toHaveBeenCalledWith(
       expect.objectContaining({
-        to: expect.arrayContaining([profile_1.email]),
+        to: [context.profile3.email, profile_1.email],
       })
     );
   });
@@ -522,17 +580,15 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(1);
     expect(mockedSendgrid.sendMultiple).toHaveBeenCalledWith(
       expect.objectContaining({
-        html: expect.stringContaining(
-          `Test mail it ${bug_1.id},${bug_1.message},${
-            process.env.APP_URL
-          }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
-            context.profile1.name
-          } ${context.profile1.surname
-            .charAt(0)
-            .toUpperCase()}.,Always code as if the guy who ends up maintaining your code will be a violent ps..., ${
-            campaign_1.customer_title
-          }`
-        ),
+        html: `New comment on bug ${bug_1.id},${bug_1.message},${
+          process.env.APP_URL
+        }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
+          context.profile1.name
+        } ${context.profile1.surname
+          .charAt(0)
+          .toUpperCase()}.,Always code as if the guy who ends up maintaining your code will be a violent ps..., ${
+          campaign_1.customer_title
+        }`,
       })
     );
   });
@@ -548,8 +604,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(0);
   });
 
-  //it should send the correct email template if a user has been mentioned in a comment and can access the campaign
-  it("it should send the correct email template if a user has been mentioned in a comment and can access the campaign", async () => {
+  it("Should send 2 emails if a user has been mentioned in a comment", async () => {
     const response = await request(app)
       .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
       .set("Authorization", "Bearer user")
@@ -558,37 +613,50 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
         mentioned: [
           {
             id: profile_2.id,
-            full_name: `${profile_2.name} ${profile_2.surname}`,
           },
         ],
       });
 
-    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(1);
-    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledWith(
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(2);
+    expect(mockedSendgrid.sendMultiple.mock.calls[0][0]).toMatchObject(
       expect.objectContaining({
         categories: [`CP${campaign_1.id}_BUG_COMMENT_NOTIFICATION`],
         from: {
           email: "info@unguess.io",
           name: "UNGUESS",
         },
-        html: expect.stringContaining(
-          `Test mail it ${bug_1.id},${bug_1.message},${
-            process.env.APP_URL
-          }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
-            context.profile1.name
-          } ${context.profile1.surname
-            .charAt(0)
-            .toUpperCase()}.,Test comment, ${campaign_1.customer_title}`
-        ),
+        html: `New comment on bug ${bug_1.id},${bug_1.message},${
+          process.env.APP_URL
+        }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
+          context.profile1.name
+        } ${context.profile1.surname.charAt(0).toUpperCase()}.,Test comment,${
+          campaign_1.customer_title
+        }`,
         subject: "Nuovo commento sul bug",
-        to: [
-          `${context.profile3.email}, ${profile_1.email}, ${profile_2.email}`,
-        ],
+        to: [`${profile_1.email}`],
+      })
+    );
+    expect(mockedSendgrid.sendMultiple.mock.calls[1][0]).toMatchObject(
+      expect.objectContaining({
+        categories: [`CP${campaign_1.id}_BUG_COMMENT_MENTION_NOTIFICATION`],
+        from: {
+          email: "info@unguess.io",
+          name: "UNGUESS",
+        },
+        html: `New comment mention on bug ${bug_1.id},${bug_1.message},${
+          process.env.APP_URL
+        }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
+          context.profile1.name
+        } ${context.profile1.surname.charAt(0).toUpperCase()}.,Test comment,${
+          campaign_1.customer_title
+        }`,
+        subject: "Sei stato menzionato in un commento",
+        to: [`${profile_2.email}`],
       })
     );
   });
 
-  it("it should NOT send an email the user does not exist (profile_id invalid)", async () => {
+  it("Should NOT send an email if the user does not exist (profile_id invalid)", async () => {
     const response = await request(app)
       .post(`/campaigns/${campaign_1.id}/bugs/${bug_3.id}/comments`)
       .set("Authorization", "Bearer user")
@@ -597,7 +665,6 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
         mentioned: [
           {
             id: 999,
-            full_name: `Germano Mosconi`,
           },
         ],
       });
@@ -605,7 +672,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(0);
   });
 
-  it("it should NOT notify the user if the user can't access the campaign", async () => {
+  it("Should NOT notify the user if the user can't access the campaign", async () => {
     const response = await request(app)
       .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
       .set("Authorization", "Bearer user")
@@ -614,7 +681,6 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
         mentioned: [
           {
             id: profile_3.id,
-            full_name: `${profile_3.name} ${profile_3.surname}`,
           },
         ],
       });
@@ -628,11 +694,11 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       to: profile_1.email,
       categories: [`CP${campaign_1.id}_BUG_COMMENT_NOTIFICATION`],
       html: expect.stringContaining(
-        `Test mail it ${bug_1.id},${bug_1.message},${
+        `New comment on bug ${bug_1.id},${bug_1.message},${
           process.env.APP_URL
         }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
           context.profile1.name
-        } ${context.profile1.surname.charAt(0).toUpperCase()}.,Test comment, ${
+        } ${context.profile1.surname.charAt(0).toUpperCase()}.,Test comment,${
           campaign_1.customer_title
         }`
       ),
