@@ -2560,6 +2560,7 @@ paths:
                           id: nhp6mt9jaes9x
               required:
                 - text
+                - mentioned
             examples:
               Example 1:
                 value:
