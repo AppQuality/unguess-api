@@ -604,8 +604,68 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(0);
   });
 
-  it("Should send 2 emails if a user has been mentioned in a comment", async () => {
-    const response = await request(app)
+  it("Should send 2 emails if an user has been mentioned in a comment", async () => {
+    await request(app)
+      .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
+      .set("Authorization", "Bearer user")
+      .send({
+        text: "Test comment",
+        mentioned: [
+          {
+            id: profile_2.id,
+          },
+        ],
+      });
+
+    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(2);
+    expect(mockedSendgrid.sendMultiple.mock.calls[0][0]).toMatchObject(
+      expect.objectContaining({
+        categories: [`CP${campaign_1.id}_BUG_COMMENT_NOTIFICATION`],
+        from: {
+          email: "info@unguess.io",
+          name: "UNGUESS",
+        },
+        html: `New comment on bug ${bug_1.id},${bug_1.message},${
+          process.env.APP_URL
+        }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
+          context.profile1.name
+        } ${context.profile1.surname.charAt(0).toUpperCase()}.,Test comment,${
+          campaign_1.customer_title
+        }`,
+        subject: "Nuovo commento sul bug",
+        to: [`${profile_1.email}`],
+      })
+    );
+    expect(mockedSendgrid.sendMultiple.mock.calls[1][0]).toMatchObject(
+      expect.objectContaining({
+        categories: [`CP${campaign_1.id}_BUG_COMMENT_MENTION_NOTIFICATION`],
+        from: {
+          email: "info@unguess.io",
+          name: "UNGUESS",
+        },
+        html: `New comment mention on bug ${bug_1.id},${bug_1.message},${
+          process.env.APP_URL
+        }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
+          context.profile1.name
+        } ${context.profile1.surname.charAt(0).toUpperCase()}.,Test comment,${
+          campaign_1.customer_title
+        }`,
+        subject: "Sei stato menzionato in un commento",
+        to: [`${profile_2.email}`],
+      })
+    );
+  });
+
+  it("Should send only the mention email if an user has commented and has been mentioned", async () => {
+    await unguess.tables.UgBugsComments.do().insert({
+      text: "Comment 1",
+      is_deleted: 0,
+      bug_id: bug_1.id,
+      profile_id: profile_2.id,
+      creation_date_utc: "2023-12-11 09:23:00",
+    });
+
+    await request(app)
       .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
       .set("Authorization", "Bearer user")
       .send({
