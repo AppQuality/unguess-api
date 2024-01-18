@@ -16,6 +16,10 @@ export default class Route extends BugsRoute<{
   private bid: number;
   private author: { id: number; name: string } | undefined;
   private comment: string | undefined;
+  private mentioned: {
+    id?: number | undefined;
+    full_name?: string | undefined;
+  }[];
 
   constructor(configuration: RouteClassConfiguration) {
     super(configuration);
@@ -24,6 +28,7 @@ export default class Route extends BugsRoute<{
     this.cid = parseInt(params.cid);
     this.bid = parseInt(params.bid);
     this.comment = this.getBody().text;
+    this.mentioned = this.getBody().mentioned || [];
   }
 
   protected async filter(): Promise<boolean> {
@@ -147,7 +152,6 @@ export default class Route extends BugsRoute<{
       })
       .returning("id");
     const commentId = comment[0].id ?? comment[0];
-
     if (commentId) {
       await this.sendEmail();
       return commentId;
@@ -165,13 +169,24 @@ export default class Route extends BugsRoute<{
     if (!comments.length) return [];
 
     const recipients = await tryber.tables.WpAppqEvdProfile.do()
-      .select("name", "surname", "email")
+      .select("id", "name", "surname", "email")
       .whereIn(
         "id",
         comments.map((c) => c.profile_id)
       );
 
     return recipients;
+  }
+
+  private async getMentioned() {
+    if (!this.mentioned || this.mentioned.length < 0) return null;
+    const mentionedUsers = this.mentioned
+      .map((m) => m.id?.toString())
+      .filter((id) => id !== undefined);
+    const mentions = await tryber.tables.WpAppqEvdProfile.do()
+      .select("id")
+      .whereIn("id", mentionedUsers as string[]);
+    return mentions;
   }
 
   private async getBugData() {
@@ -193,10 +208,16 @@ export default class Route extends BugsRoute<{
 
     const recipients = await this.getRecipients();
     if (!recipients.length) return false;
+    const mentioned = await this.getMentioned();
+    const mentionedUsersIds = mentioned?.map((m) => m.id) || [];
+
+    const filteredRecipients = recipients.filter((r) => {
+      return !mentionedUsersIds.includes(r.id);
+    });
 
     await sendTemplate({
       template: "notify_campaign_bug_comment",
-      email: recipients.map((r) => r.email),
+      email: filteredRecipients.map((r) => r.email),
       subject: "Nuovo commento sul bug",
       categories: [`CP${this.cid}_BUG_COMMENT_NOTIFICATION`],
       optionalFields: {
