@@ -14,12 +14,12 @@ export default class Route extends BugsRoute<{
 }> {
   private cid: number;
   private bid: number;
-  private author: { id: number; name: string } | undefined;
+  private author: StoplightComponents["schemas"]["BugComment"]["creator"] = {
+    id: 0,
+    name: "Name S.",
+  };
   private comment: string | undefined;
-  private mentioned: {
-    id?: number | undefined;
-    full_name?: string | undefined;
-  }[];
+  private mentioned: StoplightOperations["post-campaigns-cid-bugs-bid-comments"]["requestBody"]["content"]["application/json"]["mentioned"];
 
   constructor(configuration: RouteClassConfiguration) {
     super(configuration);
@@ -50,6 +50,7 @@ export default class Route extends BugsRoute<{
       });
       return false;
     }
+
     return true;
   }
 
@@ -104,7 +105,7 @@ export default class Route extends BugsRoute<{
       .where("id", profileId)
       .first();
 
-    if (!author) throw "author not found";
+    if (!author) throw "Author not found";
 
     const surname = author.surname
       .split(" ")
@@ -156,6 +157,7 @@ export default class Route extends BugsRoute<{
       await this.sendEmail();
       return commentId;
     }
+
     return false;
   }
 
@@ -179,13 +181,15 @@ export default class Route extends BugsRoute<{
   }
 
   private async getMentioned() {
-    if (!this.mentioned || this.mentioned.length < 0) return null;
-    const mentionedUsers = this.mentioned
-      .map((m) => m.id?.toString())
-      .filter((id) => id !== undefined);
+    if (!this.mentioned || !this.mentioned.length) return [];
+
     const mentions = await tryber.tables.WpAppqEvdProfile.do()
-      .select("id")
-      .whereIn("id", mentionedUsers as string[]);
+      .select("id", "name", "surname", "email")
+      .whereIn(
+        "id",
+        this.mentioned.map((m) => m.id)
+      );
+
     return mentions;
   }
 
@@ -205,29 +209,42 @@ export default class Route extends BugsRoute<{
 
   private async sendEmail() {
     const bug = await this.getBugData();
-
     const recipients = await this.getRecipients();
-    if (!recipients.length) return false;
     const mentioned = await this.getMentioned();
-    const mentionedUsersIds = mentioned?.map((m) => m.id) || [];
+    const filteredRecipients = recipients.filter(
+      (r) => !mentioned.find((m) => m.id === r.id)
+    );
 
-    const filteredRecipients = recipients.filter((r) => {
-      return !mentionedUsersIds.includes(r.id);
-    });
+    if (recipients.length)
+      await sendTemplate({
+        template: "notify_campaign_bug_comment",
+        email: filteredRecipients.map((r) => r.email),
+        subject: "Nuovo commento sul bug",
+        categories: [`CP${this.cid}_BUG_COMMENT_NOTIFICATION`],
+        optionalFields: {
+          "{Author.name}": this.author?.name || "Name S.",
+          "{Bug.id}": this.bid,
+          "{Bug.title}": bug?.message,
+          "{Comment}": this.getCommentPreview(),
+          "{Campaign.title}": this.campaignName,
+          "{Bug.url}": `${process.env.APP_URL}/campaigns/${this.cid}/bugs/${this.bid}`,
+        },
+      });
 
-    await sendTemplate({
-      template: "notify_campaign_bug_comment",
-      email: filteredRecipients.map((r) => r.email),
-      subject: "Nuovo commento sul bug",
-      categories: [`CP${this.cid}_BUG_COMMENT_NOTIFICATION`],
-      optionalFields: {
-        "{Author.name}": this.author?.name || "Name S.",
-        "{Bug.id}": this.bid,
-        "{Bug.title}": bug?.message,
-        "{Comment}": this.getCommentPreview(),
-        "{Campaign.title}": this.campaignName,
-        "{Bug.url}": `${process.env.APP_URL}/campaigns/${this.cid}/bugs/${this.bid}`,
-      },
-    });
+    if (mentioned.length)
+      await sendTemplate({
+        template: "notify_campaign_bug_comment_mention",
+        email: mentioned.map((r) => r.email),
+        subject: "Sei stato menzionato in un commento",
+        categories: [`CP${this.cid}_BUG_COMMENT_MENTION_NOTIFICATION`],
+        optionalFields: {
+          "{Author.name}": this.author?.name || "Name S.",
+          "{Bug.id}": this.bid,
+          "{Bug.title}": bug?.message,
+          "{Comment}": this.getCommentPreview(),
+          "{Campaign.title}": this.campaignName,
+          "{Bug.url}": `${process.env.APP_URL}/campaigns/${this.cid}/bugs/${this.bid}`,
+        },
+      });
   }
 }
