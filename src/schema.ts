@@ -2422,8 +2422,7 @@ export interface operations {
         "application/json": {
           text: string;
           mentioned?: {
-            id?: number;
-            full_name?: string;
+            id: number;
           }[];
         };
       };
