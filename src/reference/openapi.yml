@@ -2548,8 +2548,6 @@ paths:
                     properties:
                       id:
                         type: integer
-                      full_name:
-                        type: string
               required:
                 - text
                 - mentioned
