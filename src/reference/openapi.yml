@@ -170,8 +170,11 @@ paths:
                                   - tag_name
                             siblings:
                               type: number
+                            comments:
+                              type: number
                           required:
                             - siblings
+                            - comments
                   start:
                     type: integer
                   limit:
