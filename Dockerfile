@@ -17,7 +17,7 @@ COPY . .
 RUN yarn build
 
 # Stage 3: Web
-FROM alpine:3.16 as web
+FROM node:18-alpine3.16 as web
 
 COPY --from=base /dist /app/build
 COPY --from=base /src/routes /app/src/routes
@@ -26,10 +26,12 @@ COPY --from=base /.git/refs /app/.git/refs
 COPY package*.json /app/
 
 WORKDIR /app
-RUN apk add --no-cache yarn
 ARG NPM_TOKEN
-RUN echo //registry.npmjs.org/:_authToken=${NPM_TOKEN} > .npmrc && \
+RUN apk add --no-cache yarn && \
+    echo //registry.npmjs.org/:_authToken=${NPM_TOKEN} > .npmrc && \
     yarn --prod --ignore-scripts && \
-    rm -f .npmrc
+    rm -f .npmrc && \
+    rm -rf /var/cache/apk/* && \
+    yarn cache clean
 
 CMD node build/index.js
