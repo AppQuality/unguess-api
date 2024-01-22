@@ -2,7 +2,7 @@
 FROM node:18-alpine3.16 AS node
 
 # Stage 2: Base
-FROM alpine:3.16 as base
+FROM node:18-alpine3.16 as base
 
 COPY --from=node / /
 
