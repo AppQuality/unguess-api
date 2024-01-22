@@ -229,8 +229,8 @@ export default class BugsRoute extends CampaignRoute<{
       AND b.publish = 1
       AND ${
         this.shouldShowNeedReview()
-          ? `(status.name = 'Approved' OR status.name = 'Need Review')`
-          : `status.name = 'Approved'`
+          ? `(status.id = 2 OR status.id = 4)`
+          : `status.id = 2`
       }
       ${
         this.orderBy !== PRIORITY__ID
@@ -273,7 +273,7 @@ export default class BugsRoute extends CampaignRoute<{
         p.name
       FROM wp_ug_priority_to_bug pb
       JOIN wp_ug_priority p ON (pb.priority_id = p.id)
-      where pb.bug_id IN (${bugs.map((bug) => bug.id).join(",")})
+      WHERE pb.bug_id IN (${bugs.map((bug) => bug.id).join(",")})
       `,
       "unguess"
     );
