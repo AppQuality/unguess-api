@@ -1,10 +1,5 @@
-# Stage 1: Node
-FROM node:18-alpine3.16 AS node
-
-# Stage 2: Base
+# Stage 1: Base
 FROM node:18-alpine3.16 as base
-
-COPY --from=node / /
 
 ARG NPM_TOKEN  
 RUN echo //registry.npmjs.org/:_authToken=${NPM_TOKEN} > .npmrc && \
@@ -16,7 +11,7 @@ RUN yarn --ignore-scripts && \
 COPY . .
 RUN yarn build
 
-# Stage 3: Web
+# Stage 2: Web
 FROM node:18-alpine3.16 as web
 
 COPY --from=base /dist /app/build
