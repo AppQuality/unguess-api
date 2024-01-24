@@ -202,9 +202,13 @@ export default class Route extends BugsRoute<{
 
   private getCommentPreview() {
     if (!this.comment) return false;
-    if (this.comment.length <= MAX_COMMENT_PREVIEW_LENGTH) return this.comment;
 
-    return this.comment.substr(0, MAX_COMMENT_PREVIEW_LENGTH) + "...";
+    // Remove HTML tags
+    const clean = this.comment.replace(/(<([^>]+)>)/gi, "");
+
+    if (clean.length <= MAX_COMMENT_PREVIEW_LENGTH) return clean;
+
+    return clean.substr(0, MAX_COMMENT_PREVIEW_LENGTH) + "...";
   }
 
   private async sendEmail() {
