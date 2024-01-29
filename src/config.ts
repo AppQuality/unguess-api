@@ -49,7 +49,8 @@ const config: {
       email: process.env.DEFAULT_SENDER_MAIL || "info@unguess.io",
       name: process.env.DEFAULT_SENDER_NAME || "UNGUESS",
     },
-    default_category: process.env.DEFAULT_CATEGORY || "UNGUESSAPP_STAGING",
+    default_category:
+      process.env.DEFAULT_CATEGORY || "UNGUESS_PLATFORM_NOTIFICATION_STAGING",
   },
   jwt: {
     secret: process.env.JWT_SECRET || "secret",

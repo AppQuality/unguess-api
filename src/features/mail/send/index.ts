@@ -21,15 +21,16 @@ export const send = async ({
     from = config.sendgrid.default_sender;
   }
 
-  if (!categories) {
-    categories = [config.sendgrid.default_category];
-  }
+  const categoriesList = [
+    config.sendgrid.default_category,
+    ...(categories ?? []),
+  ];
   const msg = {
     to,
     from,
     subject,
     html,
-    categories,
+    categories: categoriesList ?? categories,
   };
 
   try {
