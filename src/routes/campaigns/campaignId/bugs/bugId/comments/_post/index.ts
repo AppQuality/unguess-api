@@ -221,7 +221,7 @@ export default class Route extends BugsRoute<{
 
     if (recipients.length)
       await sendTemplate({
-        template: "notify_campaign_bug_comment",
+        template: "notify_campaign_bug_comment_en",
         email: filteredRecipients.map((r) => r.email),
         subject: "Nuovo commento sul bug",
         categories: [`CP${this.cid}_BUG_COMMENT_NOTIFICATION`],
@@ -237,7 +237,7 @@ export default class Route extends BugsRoute<{
 
     if (mentioned.length)
       await sendTemplate({
-        template: "notify_campaign_bug_comment_mention",
+        template: "notify_campaign_bug_comment_mention_en",
         email: mentioned.map((r) => r.email),
         subject: "Sei stato menzionato in un commento",
         categories: [`CP${this.cid}_BUG_COMMENT_MENTION_NOTIFICATION`],
