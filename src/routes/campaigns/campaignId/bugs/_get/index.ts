@@ -238,7 +238,6 @@ export default class BugsRoute extends CampaignRoute<{
           : ""
       }`
     );
-
     if (!bugs) return false as const;
 
     return bugs;

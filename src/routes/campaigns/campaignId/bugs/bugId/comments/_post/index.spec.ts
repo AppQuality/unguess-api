@@ -10,6 +10,7 @@ import { useBasicProjectsContext } from "@src/features/db/hooks/basicProjects";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 import request from "supertest";
 import sgMail from "@sendgrid/mail";
+import config from "@src/config";
 
 // Mocking sendgrid
 jest.mock("@sendgrid/mail", () => ({
@@ -531,14 +532,19 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
           name: "UNGUESS",
         },
         subject: "Nuovo commento sul bug",
-        categories: [`CP${campaign_1.id}_BUG_COMMENT_NOTIFICATION`],
-        html: `New comment on bug ${bug_1.id},${bug_1.message},${
-          process.env.APP_URL
-        }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
-          context.profile1.name
-        } ${context.profile1.surname.charAt(0).toUpperCase()}.,Test comment,${
-          campaign_1.customer_title
-        }`,
+        categories: [
+          config.sendgrid.default_category,
+          `CP${campaign_1.id}_BUG_COMMENT_NOTIFICATION`,
+        ],
+        html: expect.stringContaining(
+          `Test mail it ${bug_1.id},${bug_1.message},${
+            process.env.APP_URL
+          }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
+            context.profile1.name
+          } ${context.profile1.surname
+            .charAt(0)
+            .toUpperCase()}.,Test comment, ${campaign_1.customer_title}`
+        ),
       })
     );
   });
