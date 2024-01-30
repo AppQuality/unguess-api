@@ -905,6 +905,7 @@ export interface components {
       creator: {
         id: number;
         name: string;
+        isInternal: boolean;
       };
     };
   };

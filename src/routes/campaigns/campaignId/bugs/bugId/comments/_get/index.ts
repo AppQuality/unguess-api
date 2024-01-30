@@ -2,6 +2,7 @@
 import { tryber, unguess } from "@src/features/database";
 import BugsRoute from "@src/features/routes/BugRoute";
 import { ERROR_MESSAGE } from "@src/utils/constants";
+import { isInternal } from "@src/utils/users/isInternal";
 import { zonedTimeToUtc } from "date-fns-tz";
 
 export default class Route extends BugsRoute<{
@@ -50,27 +51,73 @@ export default class Route extends BugsRoute<{
     return `${result.name} ${surname}`;
   }
 
-  private async getBugComments() {
+  private async addProfileToComment(
+    comments: Awaited<ReturnType<typeof this.getComments>>
+  ) {
+    const profilesIds = comments.map((comment) => comment.profile_id);
+
+    const result = await tryber.tables.WpAppqEvdProfile.do()
+      .select("id", "name", "surname", "email")
+      .whereIn("id", profilesIds);
+
+    const commentsWithAuthors = comments.map((comment) => {
+      const profile = result.find(
+        (profile) => profile.id === comment.profile_id
+      );
+
+      if (!profile)
+        return {
+          ...comment,
+          creator: {
+            id: comment.profile_id,
+            name: `Name S.`,
+            isInternal: false,
+          },
+        };
+
+      const surname = profile.surname
+        .split(" ")
+        .map((word) => word.charAt(0).toUpperCase() + ".")
+        .join(" ");
+
+      return {
+        ...comment,
+        creator: {
+          id: comment.profile_id,
+          name: `${profile.name} ${surname}`,
+          isInternal: isInternal(profile.email),
+        },
+      };
+    });
+
+    return commentsWithAuthors;
+  }
+
+  private async getComments() {
     const result = await unguess.tables.UgBugsComments.do()
       .select()
       .where("bug_id", this.bug_id)
       .andWhere("is_deleted", 0);
-    const comments = await Promise.all(
-      result.map(async (comment) => ({
+
+    if (!result || !result.length) return [];
+
+    return result;
+  }
+
+  private async getBugComments() {
+    const comments = await this.getComments();
+    const commentsWithAuthors = await this.addProfileToComment(comments);
+
+    return {
+      items: commentsWithAuthors.map((comment) => ({
         id: comment.id,
         text: comment.text,
         creation_date: zonedTimeToUtc(
           comment.creation_date_utc,
           "UTC"
         ).toISOString(),
-        creator: {
-          id: comment.profile_id,
-          name: (await this.getProfile(comment.profile_id)) || "Name S.",
-        },
-      }))
-    );
-    return {
-      items: comments,
+        creator: comment.creator,
+      })),
     };
   }
 

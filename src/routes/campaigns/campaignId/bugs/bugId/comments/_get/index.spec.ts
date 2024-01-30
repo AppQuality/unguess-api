@@ -147,6 +147,16 @@ const profile_2 = {
   education_id: 152,
 };
 
+const internalUser = {
+  id: 36,
+  name: "Pippo",
+  surname: "PM",
+  wp_user_id: 14,
+  email: "pippo.pm@unguess.io",
+  employment_id: 4876671,
+  education_id: 152,
+};
+
 const bug_1: BugsParams = {
   id: 12999,
   internal_id: "UG12999",
@@ -235,6 +245,15 @@ const comment_3 = {
   is_deleted: 0,
 };
 
+const comment_4 = {
+  id: 23548,
+  text: "comment 4",
+  bug_id: bug_4.id,
+  profile_id: internalUser.id,
+  creation_date_utc: "2021-10-19 12:57:57.0",
+  is_deleted: 0,
+};
+
 describe("GET /campaigns/{cid}/bugs/{bid}/comments", () => {
   beforeAll(async () => {
     await tryber.tables.WpAppqEvdBug.do().insert([
@@ -244,7 +263,11 @@ describe("GET /campaigns/{cid}/bugs/{bid}/comments", () => {
       bug_34,
       bug_4,
     ]);
-    await tryber.tables.WpAppqEvdProfile.do().insert([profile_1, profile_2]);
+    await tryber.tables.WpAppqEvdProfile.do().insert([
+      profile_1,
+      profile_2,
+      internalUser,
+    ]);
     await tryber.tables.WpAppqCustomer.do().insert([customer_1, customer_2]);
     await tryber.tables.WpAppqUserToCustomer.do().insert([
       user_to_customer_1,
@@ -262,6 +285,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}/comments", () => {
       comment_1,
       comment_2,
       comment_3,
+      comment_4,
     ]);
   });
 
@@ -324,6 +348,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}/comments", () => {
           creator: {
             id: profile_1.wp_user_id,
             name: `${profile_1.name} ${profile_1.surname.charAt(0)}.`,
+            isInternal: false,
           },
           creation_date: zonedTimeToUtc(
             comment_1.creation_date_utc,
@@ -348,6 +373,7 @@ describe("GET /campaigns/{cid}/bugs/{bid}/comments", () => {
           creator: {
             id: profile_1.wp_user_id,
             name: `${profile_1.name} ${profile_1.surname.charAt(0)}.`,
+            isInternal: false,
           },
           creation_date: zonedTimeToUtc(
             comment_1.creation_date_utc,
@@ -375,5 +401,23 @@ describe("GET /campaigns/{cid}/bugs/{bid}/comments", () => {
     expect(response.body.items[0].creator.name).toEqual(
       `${profile_1.name} ${profile_1.surname.charAt(0)}.`
     );
+    expect(response.body.items[0].creator.isInternal).toBeFalsy();
+  });
+
+  it("Should answer 200 with isInternal falsy", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(200);
+
+    expect(response.body.items[0].creator.isInternal).toBeFalsy();
+  });
+
+  it("Should answer 200 and recognize internal user", async () => {
+    const response = await request(app)
+      .get(`/campaigns/${campaign_1.id}/bugs/${bug_4.id}/comments`)
+      .set("Authorization", "Bearer admin");
+    expect(response.status).toBe(200);
+    expect(response.body.items[0].creator.isInternal).toBeTruthy();
   });
 });

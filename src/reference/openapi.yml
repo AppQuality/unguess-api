@@ -3838,11 +3838,14 @@ components:
           required:
             - id
             - name
+            - isInternal
           properties:
             id:
               type: integer
             name:
               type: string
+            isInternal:
+              type: boolean
       required:
         - id
         - text

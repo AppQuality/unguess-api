@@ -49,7 +49,7 @@ const profile_1 = {
   name: "User 1",
   surname: "Surname 1",
   wp_user_id: 17,
-  email: "test@ug.com",
+  email: "test@unguess.io",
   employment_id: 1123,
   education_id: 123,
 };
@@ -475,6 +475,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
           name: `${context.profile1.name} ${context.profile1.surname.charAt(
             0
           )}.`,
+          isInternal: false,
         },
       })
     );
@@ -509,6 +510,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
         creator: {
           id: 0,
           name: "Name S.",
+          isInternal: true,
         },
       })
     );
