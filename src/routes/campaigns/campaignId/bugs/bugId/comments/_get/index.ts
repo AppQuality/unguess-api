@@ -37,20 +37,6 @@ export default class Route extends BugsRoute<{
     return this.setSuccess(200, comments);
   }
 
-  private async getProfile(profileId: number) {
-    const result = await tryber.tables.WpAppqEvdProfile.do()
-      .select("name", "surname")
-      .where("id", profileId)
-      .first();
-    if (!result) return null;
-    const surname = result.surname
-      .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + ".")
-      .join(" ");
-
-    return `${result.name} ${surname}`;
-  }
-
   private async addProfileToComment(
     comments: Awaited<ReturnType<typeof this.getComments>>
   ) {
