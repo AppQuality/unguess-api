@@ -2421,6 +2421,9 @@ export interface operations {
       content: {
         "application/json": {
           text: string;
+          mentioned?: {
+            id: number;
+          }[];
         };
       };
     };
