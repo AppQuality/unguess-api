@@ -4,6 +4,7 @@ import { tryber, unguess } from "@src/features/database";
 import { formatInTimeZone, zonedTimeToUtc } from "date-fns-tz";
 import { formatISO } from "date-fns";
 import { sendTemplate } from "@src/features/mail/sendTemplate";
+import { isInternal } from "@src/utils/users/isInternal";
 
 const MAX_COMMENT_PREVIEW_LENGTH = 80;
 
@@ -17,6 +18,7 @@ export default class Route extends BugsRoute<{
   private author: StoplightComponents["schemas"]["BugComment"]["creator"] = {
     id: 0,
     name: "Name S.",
+    isInternal: false,
   };
   private comment: string | undefined;
   private mentioned: StoplightOperations["post-campaigns-cid-bugs-bid-comments"]["requestBody"]["content"]["application/json"]["mentioned"];
@@ -97,11 +99,12 @@ export default class Route extends BugsRoute<{
       return {
         id: 0,
         name: "Name S.",
+        isInternal: true,
       };
     }
 
     const author = await tryber.tables.WpAppqEvdProfile.do()
-      .select("id", "name", "surname")
+      .select("id", "name", "surname", "email")
       .where("id", profileId)
       .first();
 
@@ -115,6 +118,7 @@ export default class Route extends BugsRoute<{
     return {
       id: author.id,
       name: `${author.name} ${surname}`,
+      isInternal: isInternal(author.email),
     };
   }
 
@@ -132,10 +136,7 @@ export default class Route extends BugsRoute<{
       creation_date_utc: formatISO(
         zonedTimeToUtc(comment.creation_date_utc, "UTC")
       ),
-      creator: {
-        id: this.author.id,
-        name: this.author.name,
-      },
+      creator: this.author,
     };
   }
 
