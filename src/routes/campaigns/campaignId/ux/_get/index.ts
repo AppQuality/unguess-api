@@ -116,7 +116,7 @@ export default class Route extends CampaignRoute<{
       secure: true,
       httpOnly: true,
       sameSite: "none",
-      domain: ".tryber.me",
+      domain: ".unguess.io",
     });
     this.setCookie(
       "CloudFront-Signature",
@@ -125,7 +125,7 @@ export default class Route extends CampaignRoute<{
         secure: true,
         httpOnly: true,
         sameSite: "none",
-        domain: ".tryber.me",
+        domain: ".unguess.io",
       }
     );
     this.setCookie(
@@ -135,7 +135,7 @@ export default class Route extends CampaignRoute<{
         secure: true,
         httpOnly: true,
         sameSite: "none",
-        domain: ".tryber.me",
+        domain: ".unguess.io",
       }
     );
   }
