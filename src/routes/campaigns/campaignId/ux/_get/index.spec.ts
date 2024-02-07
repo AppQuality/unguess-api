@@ -1,10 +1,22 @@
 import app from "@src/app";
 import { tryber, unguess } from "@src/features/database";
+import { getSignedCookie } from "@src/features/s3/cookieSign";
 import request from "supertest";
 
 jest.mock("@src/utils/checkUrl", () => ({
   checkUrl: jest.fn().mockImplementation(() => true),
 }));
+
+jest.mock("@src/features/s3/cookieSign");
+const mockedGetSignedCookie = jest.mocked(getSignedCookie, true);
+
+mockedGetSignedCookie.mockImplementation(({ url }) => {
+  return Promise.resolve({
+    "CloudFront-Policy": "policy",
+    "CloudFront-Signature": "signature",
+    "CloudFront-Key-Pair-Id": "keypairid",
+  });
+});
 
 const campaign = {
   platform_id: 1,

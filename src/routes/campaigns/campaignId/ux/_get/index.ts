@@ -1,6 +1,7 @@
 /** OPENAPI-CLASS: get-campaigns-cid-ux */
 import { tryber, unguess } from "@src/features/database";
 import CampaignRoute from "@src/features/routes/CampaignRoute";
+import { getSignedCookie } from "@src/features/s3/cookieSign";
 import { checkUrl } from "@src/utils/checkUrl";
 
 interface iUxCampaignData {
@@ -89,6 +90,7 @@ export default class Route extends CampaignRoute<{
 
   protected async prepare() {
     if (this.version && this.uxData) {
+      this.addCookieSign();
       const sentiment = await this.getSentiment();
 
       this.setSuccess(200, {
@@ -104,6 +106,38 @@ export default class Route extends CampaignRoute<{
         ...(sentiment.length && { sentiment: sentiment }),
       });
     }
+  }
+
+  private async addCookieSign() {
+    const signedCookies = await getSignedCookie({
+      url: `https://media*.tryber.me/CP${this.cp_id}/*`,
+    });
+    this.setCookie("CloudFront-Policy", signedCookies["CloudFront-Policy"], {
+      secure: true,
+      httpOnly: true,
+      sameSite: "none",
+      domain: ".tryber.me",
+    });
+    this.setCookie(
+      "CloudFront-Signature",
+      signedCookies["CloudFront-Signature"],
+      {
+        secure: true,
+        httpOnly: true,
+        sameSite: "none",
+        domain: ".tryber.me",
+      }
+    );
+    this.setCookie(
+      "CloudFront-Key-Pair-Id",
+      signedCookies["CloudFront-Key-Pair-Id"],
+      {
+        secure: true,
+        httpOnly: true,
+        sameSite: "none",
+        domain: ".tryber.me",
+      }
+    );
   }
 
   private async getFindings() {
@@ -252,10 +286,10 @@ export default class Route extends CampaignRoute<{
       video.push({
         start: r.start,
         end: r.end,
-        url: r.location,
+        url: this.mapToDistribution(r.location),
         description: r.description,
-        streamUrl: isValidStream ? stream : "",
-        poster: isValidPoster ? poster : undefined,
+        streamUrl: isValidStream ? this.mapToDistribution(stream) : "",
+        poster: isValidPoster ? this.mapToDistribution(poster) : undefined,
       });
     }
 
@@ -308,5 +342,36 @@ export default class Route extends CampaignRoute<{
     if (!severitiesToFilter.length) return true;
 
     return severitiesToFilter.includes(finding.severity_id);
+  }
+
+  private mapToDistribution(url: string) {
+    if (url.includes("mediaconvert-encoder-staging-bucket")) {
+      return url.replace(
+        "https://s3-eu-west-1.amazonaws.com/mediaconvert-encoder-staging-bucket",
+        "https://media-processed.dev.tryber.me"
+      );
+    }
+    if (url.includes("mediaconvert-encoder-production-bucket")) {
+      return url.replace(
+        "https://s3-eu-west-1.amazonaws.com/mediaconvert-encoder-production-bucket",
+        "https://media-processed.tryber.me"
+      );
+    }
+
+    if (url.includes("mediaconvert-encoder-production-bucket-origin")) {
+      return url.replace(
+        "https://s3-eu-west-1.amazonaws.com/mediaconvert-encoder-production-bucket-origin",
+        "https://media-origin.tryber.me"
+      );
+    }
+
+    if (url.includes("mediaconvert-encoder-staging-bucket-origin")) {
+      return url.replace(
+        "https://s3-eu-west-1.amazonaws.com/mediaconvert-encoder-staging-bucket-origin",
+        "https://media-origin.dev.tryber.me"
+      );
+    }
+
+    return url;
   }
 }

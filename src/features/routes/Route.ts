@@ -64,6 +64,21 @@ export default class Route<T extends RouteClassTypes> {
     };
   }
 
+  protected setCookie(
+    name: string,
+    value: string,
+    options:
+      | {
+          secure?: boolean;
+          httpOnly?: boolean;
+          sameSite?: "none" | "lax" | "strict";
+          domain?: string;
+        }
+      | undefined = {}
+  ) {
+    this.configuration.response.cookie(name, value, options);
+  }
+
   protected getBody() {
     if (typeof this.body === "undefined") throw new Error("Invalid body");
     return this.body;
