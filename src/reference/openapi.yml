@@ -2500,6 +2500,7 @@ paths:
                         creator:
                           id: 0
                           name: string
+                          isInternal: true
         '400':
           $ref: '#/components/responses/Error'
           description: ''
@@ -2600,6 +2601,73 @@ paths:
             schema:
               type: object
               properties: {}
+  /users/me/preferences:
+    get:
+      summary: Get User Preferences
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    x-stoplight:
+                      id: 2jk0lg6gcka58
+                    items:
+                      $ref: '#/components/schemas/UserPreference'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-users-me-preferences
+      x-stoplight:
+        id: 6mjyfdxg9g5ct
+      security:
+        - JWT: []
+  '/users/me/preferences/{prefid}':
+    parameters:
+      - schema:
+          type: string
+        name: prefid
+        in: path
+        required: true
+    put:
+      summary: Update user preferences
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPreference'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: put-users-me-preferences-prefid
+      x-stoplight:
+        id: 1rsbv33mfb9j0
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: boolean
+                  x-stoplight:
+                    id: bawunyi98pcfm
 components:
   schemas:
     Authentication:
@@ -3851,6 +3919,28 @@ components:
         - text
         - creation_date
         - creator
+    UserPreference:
+      title: UserPreference
+      x-stoplight:
+        id: rpmvamih4a8u7
+      type: object
+      required:
+        - id
+        - 'value:'
+        - 'name:'
+      properties:
+        id:
+          type: integer
+          x-stoplight:
+            id: fxwz33t1rxytq
+        'value:':
+          type: boolean
+          x-stoplight:
+            id: fvctp5xdmc2jb
+        'name:':
+          type: string
+          x-stoplight:
+            id: uc7kl678vnev7
   securitySchemes:
     JWT:
       type: http
