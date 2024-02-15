@@ -2615,8 +2615,6 @@ paths:
                 properties:
                   items:
                     type: array
-                    x-stoplight:
-                      id: 2jk0lg6gcka58
                     items:
                       $ref: '#/components/schemas/UserPreference'
         '400':
@@ -2626,8 +2624,6 @@ paths:
         '500':
           $ref: '#/components/responses/Error'
       operationId: get-users-me-preferences
-      x-stoplight:
-        id: 6mjyfdxg9g5ct
       security:
         - JWT: []
   '/users/me/preferences/{prefid}':
@@ -2654,8 +2650,6 @@ paths:
         '500':
           $ref: '#/components/responses/Error'
       operationId: put-users-me-preferences-prefid
-      x-stoplight:
-        id: 1rsbv33mfb9j0
       security:
         - JWT: []
       requestBody:
@@ -2668,8 +2662,6 @@ paths:
               properties:
                 value:
                   type: boolean
-                  x-stoplight:
-                    id: bawunyi98pcfm
 components:
   schemas:
     Authentication:
@@ -3923,8 +3915,6 @@ components:
         - creator
     UserPreference:
       title: UserPreference
-      x-stoplight:
-        id: rpmvamih4a8u7
       type: object
       required:
         - preference_id
@@ -3933,16 +3923,10 @@ components:
       properties:
         preference_id:
           type: integer
-          x-stoplight:
-            id: fxwz33t1rxytq
         value:
           type: integer
-          x-stoplight:
-            id: fvctp5xdmc2jb
         name:
           type: string
-          x-stoplight:
-            id: uc7kl678vnev7
   securitySchemes:
     JWT:
       type: http
