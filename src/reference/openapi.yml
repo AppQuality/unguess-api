@@ -3928,18 +3928,18 @@ components:
       type: object
       required:
         - preference_id
-        - 'value:'
-        - 'name:'
+        - value
+        - name
       properties:
         preference_id:
           type: integer
           x-stoplight:
             id: fxwz33t1rxytq
-        'value:':
+        value:
           type: integer
           x-stoplight:
             id: fvctp5xdmc2jb
-        'name:':
+        name:
           type: string
           x-stoplight:
             id: uc7kl678vnev7
