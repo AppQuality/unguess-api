@@ -21,6 +21,7 @@ docker pull 163482350712.dkr.ecr.eu-west-1.amazonaws.com/$DOCKER_IMAGE
 mkdir -p /var/docker/keys
 mkdir -p /home/ec2-user/$APPLICATION_NAME
 aws ssm get-parameter --region eu-west-1 --name "/unguess/api/$ENVIRONMENT/.env" --with-decryption --query "Parameter.Value" | sed -e 's/\\n/\n/g' -e 's/\\"/"/g' -e 's/^"//' -e 's/"$//' > /var/docker/.env
+aws ssm get-parameter --region eu-west-1 --name "/tryber/api/$ENVIRONMENT/cloudfront.pem" --with-decryption --query "Parameter.Value" | sed -e 's/\\n/\n/g' -e 's/\\"/"/g' -e 's/^"//' -e 's/"$//' > /var/docker/keys/cloudfront.pem
 
 source /var/docker/.env
 if test -f "$DOCKER_COMPOSE_FILE"; then
@@ -68,6 +69,9 @@ services:
       SENTRY_RELEASE: ${DOCKER_IMAGE}
       SENTRY_DSN: ${SENTRY_DSN}
       SENTRY_SAMPLE_RATE: ${SENTRY_SAMPLE_RATE:-1}
+      CLOUDFRONT_KEY_ID: ${CLOUDFRONT_KEY_ID}
+    volumes:
+      - /var/docker/keys:/app/keys
 
 " > $DOCKER_COMPOSE_FILE
 
