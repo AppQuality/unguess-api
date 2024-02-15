@@ -921,9 +921,9 @@ export interface components {
     };
     /** UserPreference */
     UserPreference: {
-      id: number;
-      "value:": boolean;
-      "name:": string;
+      preference_id: number;
+      value: number;
+      name: string;
     };
   };
   responses: {
@@ -2502,7 +2502,7 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": {
-          value?: boolean;
+          value: boolean;
         };
       };
     };
