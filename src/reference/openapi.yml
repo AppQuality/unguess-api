@@ -3936,7 +3936,7 @@ components:
           x-stoplight:
             id: fxwz33t1rxytq
         'value:':
-          type: boolean
+          type: integer
           x-stoplight:
             id: fvctp5xdmc2jb
         'name:':
