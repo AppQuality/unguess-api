@@ -3927,11 +3927,11 @@ components:
         id: rpmvamih4a8u7
       type: object
       required:
-        - id
+        - preference_id
         - 'value:'
         - 'name:'
       properties:
-        id:
+        preference_id:
           type: integer
           x-stoplight:
             id: fxwz33t1rxytq
