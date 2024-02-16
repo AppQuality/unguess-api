@@ -90,7 +90,11 @@ describe("PUT /users/me/preferences/{prefid}", () => {
       .set("authorization", "Bearer user")
       .send({ value: 0 });
     expect(response.status).toBe(200);
-    expect(response.body.value).toBe(0);
+    expect(response.body).toEqual({
+      preference_id: default_preference_1.id,
+      name: default_preference_1.name,
+      value: 0,
+    });
   });
 
   it("Should return the newly assigned active preference if the user does not have the preference assigned", async () => {
@@ -98,7 +102,6 @@ describe("PUT /users/me/preferences/{prefid}", () => {
       .put(`/users/me/preferences/${default_preference_3.id}`)
       .set("authorization", "Bearer user")
       .send({ value: 1 });
-
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
       preference_id: default_preference_3.id,

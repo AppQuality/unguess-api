@@ -20,12 +20,11 @@ export default class UserPreferencesRoute<
 
     const params = this.getParameters();
     if (!params?.prefid) throw new Error("Missing preference id");
-    this.preference_id = Number(params.cmid);
+    this.preference_id = Number(params.prefid);
   }
 
   protected async init(): Promise<void> {
     await super.init();
-
     if (isNaN(this.preference_id)) {
       this.setError(400, {
         code: 400,
