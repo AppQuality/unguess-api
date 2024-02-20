@@ -40,7 +40,7 @@ export default class Route extends CampaignRoute<{
         FROM wp_appq_evd_bug_type btype
                 JOIN wp_appq_additional_bug_types add_btype 
                   ON btype.id = add_btype.bug_type_id
-        WHERE btype.is_enabled = 1 AND add_btype.campaign_id = ?`,
+        WHERE add_btype.campaign_id = ?`,
         [this.cp_id]
       )
     );
