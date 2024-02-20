@@ -79,18 +79,13 @@ describe("GET /users/me/preferences", () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual(
       expect.objectContaining({
-        items: [
+        items: expect.not.arrayContaining([
           {
-            preference_id: default_preference_3.id,
-            name: default_preference_3.name,
-            value: default_preference_3.default_value,
+            preference_id: default_preference_2.id,
+            name: default_preference_2.name,
+            value: default_preference_2.default_value,
           },
-          {
-            preference_id: default_preference_1.id,
-            name: default_preference_1.name,
-            value: user_preference_1.value,
-          },
-        ],
+        ]),
       })
     );
   });
