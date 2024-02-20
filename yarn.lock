@@ -29,7 +29,7 @@
     knex "^2.5.1"
     mysql "^2.18.1"
 
-"@appquality/unguess-database@^0.12.13":
+"@appquality/unguess-database@0.12.13":
   version "0.12.13"
   resolved "https://registry.yarnpkg.com/@appquality/unguess-database/-/unguess-database-0.12.13.tgz#4d658ce81b9cd4919ac92a1532fa0c2e1f3cbfd1"
   integrity sha512-KGdyittI6C8dBSWtwOF1yYIkZDokpu68X+7QzXUmCGYi4DbwPQ/l6LK6DXGo60i2gj6/40nC03vwy/3FwnTG6Q==
