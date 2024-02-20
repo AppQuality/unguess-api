@@ -31,16 +31,16 @@ export default class UserPreferencesRoute<
         message: "Invalid preference id",
       } as OpenapiError);
 
-      throw new Error("Invalid comment id");
+      throw new Error("Invalid preference id");
     }
-    const comment = await this.initPreference();
-    if (!comment) {
+    const preference = await this.initPreference();
+    if (!preference) {
       this.setError(400, {
         code: 400,
-        message: "Comment not found",
+        message: "preference not found",
       } as OpenapiError);
 
-      throw new Error("Comment not found");
+      throw new Error("Preference not found");
     }
   }
 
