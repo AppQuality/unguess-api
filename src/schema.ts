@@ -2502,7 +2502,7 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": {
-          value: number;
+          value: boolean;
         };
       };
     };

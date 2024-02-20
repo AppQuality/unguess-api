@@ -2661,7 +2661,7 @@ paths:
                 - value
               properties:
                 value:
-                  type: integer
+                  type: boolean
 components:
   schemas:
     Authentication:
