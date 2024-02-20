@@ -67,7 +67,6 @@ export default class Route extends UserPreferencesRoute<{
   private async updateOrAssignPreference() {
     const profileId = this.getProfileId();
     const existingPreference = await this.getUserPreference(this.preference_id);
-
     if (!existingPreference) {
       const newPreference = await unguess.tables.UserPreferences.do()
         .insert({
@@ -77,7 +76,8 @@ export default class Route extends UserPreferencesRoute<{
           change_author_id: profileId,
         })
         .returning("preference_id");
-      return newPreference[0].preference_id;
+
+      return newPreference[0].preference_id ?? newPreference[0];
     }
     const updatedPreference = await unguess.tables.UserPreferences.do()
       .where({
@@ -89,7 +89,7 @@ export default class Route extends UserPreferencesRoute<{
         change_author_id: profileId,
       })
       .returning("preference_id");
-
-    return updatedPreference[0].preference_id;
+    console.log(updatedPreference);
+    return updatedPreference[0].preference_id ?? updatedPreference[0];
   }
 }
