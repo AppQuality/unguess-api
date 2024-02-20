@@ -29,14 +29,14 @@ export default class Route extends UserPreferencesRoute<{
 
   protected async prepare() {
     try {
-      const preferenceId = await this.updateOrAssignPreference();
-      if (!preferenceId) {
+      const updatedPreference = await this.updateOrAssignPreference();
+      if (!updatedPreference) {
         this.setError(400, {
           message: "Something went wrong, cannot update Preference!",
         } as OpenapiError);
         return;
       }
-      const preference = await this.getUserPreference(preferenceId);
+      const preference = await this.getUserPreference(this.preference_id);
 
       return this.setSuccess(200, preference);
     } catch (e: any) {
@@ -60,7 +60,6 @@ export default class Route extends UserPreferencesRoute<{
       .andWhere("user_preferences.profile_id", profileId)
       .first();
     if (!preference) return null;
-
     return preference;
   }
 
@@ -68,18 +67,14 @@ export default class Route extends UserPreferencesRoute<{
     const profileId = this.getProfileId();
     const existingPreference = await this.getUserPreference(this.preference_id);
     if (!existingPreference) {
-      const newPreference = await unguess.tables.UserPreferences.do()
-        .insert({
-          profile_id: profileId,
-          preference_id: this.preference_id,
-          value: this.value,
-          change_author_id: profileId,
-        })
-        .returning("preference_id");
-
-      return newPreference[0].preference_id ?? newPreference[0];
+      return await unguess.tables.UserPreferences.do().insert({
+        profile_id: profileId,
+        preference_id: this.preference_id,
+        value: this.value,
+        change_author_id: profileId,
+      });
     }
-    const updatedPreference = await unguess.tables.UserPreferences.do()
+    return await unguess.tables.UserPreferences.do()
       .where({
         profile_id: profileId,
         preference_id: this.preference_id,
@@ -87,9 +82,6 @@ export default class Route extends UserPreferencesRoute<{
       .update({
         value: this.value,
         change_author_id: profileId,
-      })
-      .returning("preference_id");
-    console.log(updatedPreference);
-    return updatedPreference[0].preference_id ?? updatedPreference[0];
+      });
   }
 }
