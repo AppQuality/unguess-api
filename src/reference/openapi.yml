@@ -2500,6 +2500,7 @@ paths:
                         creator:
                           id: 0
                           name: string
+                          isInternal: true
         '400':
           $ref: '#/components/responses/Error'
           description: ''
@@ -2600,6 +2601,67 @@ paths:
             schema:
               type: object
               properties: {}
+  /users/me/preferences:
+    get:
+      summary: Get User Preferences
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserPreference'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-users-me-preferences
+      security:
+        - JWT: []
+  '/users/me/preferences/{prefid}':
+    parameters:
+      - schema:
+          type: string
+        name: prefid
+        in: path
+        required: true
+    put:
+      summary: Update user preferences
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPreference'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: put-users-me-preferences-prefid
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - value
+              properties:
+                value:
+                  type: boolean
 components:
   schemas:
     Authentication:
@@ -3851,6 +3913,20 @@ components:
         - text
         - creation_date
         - creator
+    UserPreference:
+      title: UserPreference
+      type: object
+      required:
+        - preference_id
+        - value
+        - name
+      properties:
+        preference_id:
+          type: integer
+        value:
+          type: integer
+        name:
+          type: string
   securitySchemes:
     JWT:
       type: http
