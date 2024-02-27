@@ -269,12 +269,14 @@ export default class Route extends BugsRoute<{
         entity_name: "BUG",
         subject: "Nuovo commento sul bug",
         html: commentEmailHtml,
-        to: recipients.map((r) => ({
-          id: r.id,
-          name: r.name,
-          email: r.email,
-          notify: true, // TODO: get user prefs
-        })),
+        to: await Promise.all(
+          recipients.map(async (r) => ({
+            id: r.id,
+            name: r.name,
+            email: r.email,
+            notify: await this.getUserNotificationPreferences(r.id),
+          }))
+        ),
         cc: [],
         notification_type: "BUG_COMMENT",
       });
@@ -358,5 +360,32 @@ export default class Route extends BugsRoute<{
           throw error;
         });
     }
+  }
+
+  private async getUserNotificationPreferences(profileId: number) {
+    const userPrefs = await unguess.tables.Preferences.do()
+      .select(
+        "preferences.id as preference_id",
+        "preferences.name",
+        unguess.raw(
+          "COALESCE(user_preferences.value, preferences.default_value) as value"
+        )
+      )
+      .leftJoin("user_preferences", function () {
+        this.on("preferences.id", "=", "user_preferences.preference_id").andOn(
+          "user_preferences.profile_id",
+          "=",
+          unguess.raw("?", [profileId])
+        );
+      })
+      .join("preferences as default_prefs", function () {
+        this.on("default_prefs.id", "=", "preferences.id");
+      })
+      .where("preferences.is_active", 1)
+      .andWhere("preferences.name", "notifications_enable");
+    if (userPrefs && userPrefs.length) {
+      return userPrefs[0].value === "1";
+    }
+    return false;
   }
 }
