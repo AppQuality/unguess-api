@@ -383,9 +383,12 @@ export default class Route extends BugsRoute<{
       })
       .where("preferences.is_active", 1)
       .andWhere("preferences.name", "notifications_enable");
-    if (userPrefs && userPrefs.length) {
-      return userPrefs[0].value === "1";
+
+    let notify = true;
+    if (userPrefs && userPrefs.length > 0) {
+      if (!userPrefs[0].value) notify = false;
     }
-    return false;
+
+    return notify;
   }
 }
