@@ -297,7 +297,6 @@ export default class Route extends BugsRoute<{
         .post(url, bodyCommentRequest, {
           headers: headersCommentRequest,
         })
-        .then()
         .catch((error) => {
           console.error("API Gateway error:", error);
           throw error;
