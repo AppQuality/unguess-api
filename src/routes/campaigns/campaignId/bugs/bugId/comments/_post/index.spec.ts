@@ -13,11 +13,8 @@ import axios from "axios";
 
 // Mocking axios
 jest.mock("axios");
-axios.post = jest
-  .fn()
-  .mockImplementation((url, body, headers) =>
-    Promise.resolve({ status: 200, url, body, headers })
-  );
+
+axios.post = jest.fn().mockResolvedValue({ status: 200 });
 const mockedAxios = jest.mocked(axios, true);
 
 // Mocking sendgrid
