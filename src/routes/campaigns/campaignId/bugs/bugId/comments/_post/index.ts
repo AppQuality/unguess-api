@@ -260,7 +260,7 @@ export default class Route extends BugsRoute<{
           "{Bug.title}": bug?.message,
           "{Comment}": this.getCommentPreview(),
           "{Campaign.title}": this.campaignName,
-          "{Bug.url}": `${config.APP_URL}/campaigns/${this.cid}/bugs/${this.bid}`,
+          "{Bug.url}": `${config.APP_URL}campaigns/${this.cid}/bugs/${this.bid}`,
         },
       });
 
@@ -315,7 +315,7 @@ export default class Route extends BugsRoute<{
           "{Bug.title}": bug?.message,
           "{Comment}": this.getCommentPreview(),
           "{Campaign.title}": this.campaignName,
-          "{Bug.url}": `${config.APP_URL}/campaigns/${this.cid}/bugs/${this.bid}`,
+          "{Bug.url}": `${config.APP_URL}campaigns/${this.cid}/bugs/${this.bid}`,
         },
       });
 
