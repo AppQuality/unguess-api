@@ -270,6 +270,42 @@ const bug_4_pending = {
   status_id: 3,
 };
 
+const default_preference_1 = {
+  id: 11,
+  name: "notification_enabled",
+  description: "notification_enabled",
+  is_active: 1,
+  default_value: 1,
+};
+
+const user_1_notification_preference = {
+  id: 14,
+  profile_id: 6,
+  preference_id: default_preference_1.id,
+  value: 1,
+  creation_date: "2021-08-10 00:00:00",
+  last_update: "2021-08-10 00:00:00",
+  change_author_id: 6,
+};
+const user_2_notification_preference = {
+  id: 19,
+  profile_id: 18,
+  preference_id: default_preference_1.id,
+  value: 0,
+  creation_date: "2021-08-10 00:00:00",
+  last_update: "2021-08-10 00:00:00",
+  change_author_id: 18,
+};
+const user_3_notification_preference = {
+  id: 28,
+  profile_id: 25,
+  preference_id: default_preference_1.id,
+  value: 1,
+  creation_date: "2021-08-10 00:00:00",
+  last_update: "2021-08-10 00:00:00",
+  change_author_id: 25,
+};
+
 describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
   const context = useBasicProjectsContext();
 
@@ -279,6 +315,13 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       { ...campaign_1, project_id: context.prj1.id },
       { ...campaign_2, project_id: context.prj2.id },
     ]);
+    await unguess.tables.UserPreferences.do().insert([
+      user_1_notification_preference,
+      user_2_notification_preference,
+      user_3_notification_preference,
+    ]);
+
+    await unguess.tables.Preferences.do().insert([default_preference_1]);
 
     await bugType.addDefaultItems();
     await severities.addDefaultItems();
@@ -378,6 +421,8 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     await tryber.tables.WpAppqUserToProject.do().delete();
     await tryber.tables.WpAppqUserToCustomer.do().delete();
     await tryber.tables.WpAppqEvdProfile.do().delete();
+    await unguess.tables.Preferences.do().delete();
+    await unguess.tables.UserPreferences.do().delete();
   });
 
   // Clear mocks call counter
@@ -793,6 +838,44 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
 
     const body = JSON.parse(mockedAxios.post.mock.calls[0][1] as string);
 
+    expect(body.to).toEqual(
+      expect.not.arrayContaining([
+        expect.objectContaining({
+          email: profile_3.email,
+        }),
+      ])
+    );
+  });
+  it("Should NOT notify the user if the user has disabled the notifcations", async () => {
+    const response = await request(app)
+      .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
+      .set("Authorization", "Bearer user")
+      .send({
+        text: "Salve amico",
+      });
+    expect(response.status).toBe(200);
+
+    const body = JSON.parse(mockedAxios.post.mock.calls[0][1] as string);
+    console.log(body);
+    expect(body.to).toEqual(
+      expect.not.arrayContaining([
+        expect.objectContaining({
+          email: profile_2.email,
+        }),
+      ])
+    );
+  });
+  it("Should NOT notify the user if the user has the notifications enabled but doesn't have access to the campaign", async () => {
+    const response = await request(app)
+      .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
+      .set("Authorization", "Bearer user")
+      .send({
+        text: "Salve amico",
+      });
+    expect(response.status).toBe(200);
+
+    const body = JSON.parse(mockedAxios.post.mock.calls[0][1] as string);
+    console.log(body);
     expect(body.to).toEqual(
       expect.not.arrayContaining([
         expect.objectContaining({
