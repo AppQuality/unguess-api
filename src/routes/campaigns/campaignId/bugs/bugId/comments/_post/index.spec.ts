@@ -534,7 +534,6 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
 
     // access the second args of the first call
     const body = JSON.parse(mockedAxios.post.mock.calls[0][1] as string);
-    console.log("🚀 ~ it ~ body:", body);
 
     expect(body).toEqual(
       expect.objectContaining({
@@ -575,12 +574,19 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       });
 
     expect(response.status).toBe(200);
-    // expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(1);
-    // expect(mockedSendgrid.sendMultiple).toHaveBeenCalledWith(
-    //   expect.objectContaining({
-    //     to: [context.profile3.email, profile_1.email],
-    //   })
-    // );
+    expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+
+    // access the second args of the first call
+    const body = JSON.parse(mockedAxios.post.mock.calls[0][1] as string);
+
+    expect(body.data.to).toEqual([
+      expect.objectContaining({
+        email: context.profile3.email,
+      }),
+      expect.objectContaining({
+        email: profile_1.email,
+      }),
+    ]);
   });
 
   it("Should send an email with a preview of comment if the length is > 80", async () => {
@@ -592,20 +598,22 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       });
 
     expect(response.status).toBe(200);
-    // expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(1);
-    // expect(mockedSendgrid.sendMultiple).toHaveBeenCalledWith(
-    //   expect.objectContaining({
-    //     html: `New comment on bug ${bug_1.id},${bug_1.message},${
-    //       process.env.APP_URL
-    //     }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
-    //       context.profile1.name
-    //     } ${context.profile1.surname
-    //       .charAt(0)
-    //       .toUpperCase()}.,Always code as if the guy who ends up maintaining your code will be a violent ps...,${
-    //       campaign_1.customer_title
-    //     }`,
-    //   })
-    // );
+    expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+
+    // access the second args of the first call
+    const body = JSON.parse(mockedAxios.post.mock.calls[0][1] as string);
+
+    expect(body.data.html).toEqual(
+      `New comment on bug ${bug_1.id},${bug_1.message},${
+        process.env.APP_URL
+      }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
+        context.profile1.name
+      } ${context.profile1.surname
+        .charAt(0)
+        .toUpperCase()}.,Always code as if the guy who ends up maintaining your code will be a violent ps...,${
+        campaign_1.customer_title
+      }`
+    );
   });
 
   it("Should NOT send an email if it's the first comment", async () => {
@@ -616,7 +624,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
         text: "Test comment",
       });
     expect(response.status).toBe(200);
-    // expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(0);
+    expect(mockedAxios.post).toHaveBeenCalledTimes(0);
   });
 
   it("Should send 2 emails if an user has been mentioned in a comment", async () => {
