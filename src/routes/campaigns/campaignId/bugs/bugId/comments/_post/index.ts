@@ -3,8 +3,16 @@ import BugsRoute from "@src/features/routes/BugRoute";
 import { tryber, unguess } from "@src/features/database";
 import { formatInTimeZone, zonedTimeToUtc } from "date-fns-tz";
 import { formatISO } from "date-fns";
-import { sendTemplate } from "@src/features/mail/sendTemplate";
+import { getTemplate } from "@src/features/mail/getTemplate";
 import { isInternal } from "@src/utils/users/isInternal";
+import { defaultProvider } from "@aws-sdk/credential-provider-node";
+import { HttpRequest } from "@aws-sdk/protocol-http";
+import { SignatureV4 } from "@aws-sdk/signature-v4";
+import { Sha256 } from "@aws-crypto/sha256-js";
+import { URL } from "url";
+import axios from "axios";
+import { buildNotificationEmail } from "@src/features/mail/buildEmailNotification";
+import config from "@src/config";
 
 const MAX_COMMENT_PREVIEW_LENGTH = 80;
 
@@ -220,8 +228,28 @@ export default class Route extends BugsRoute<{
       (r) => !mentioned.find((m) => m.id === r.id)
     );
 
-    if (recipients.length)
-      await sendTemplate({
+    // Setup notification service
+    if (!process.env.NOTIFICATION_SERVICE_REST_API_ID) {
+      console.error("NOTIFICATION_SERVICE_REST_API_ID not found");
+      throw "NOTIFICATION_SERVICE_REST_API_ID not found";
+    }
+
+    const url = `https://${
+      process.env.NOTIFICATION_SERVICE_REST_API_ID
+    }.execute-api.${
+      process.env.AWS_REGION ?? "eu-west-1"
+    }.amazonaws.com/v1/notifications`;
+    const apiEndpoint = new URL(url);
+
+    const signer = new SignatureV4({
+      service: "execute-api",
+      region: process.env.AWS_REGION ?? "eu-west-1",
+      credentials: defaultProvider(),
+      sha256: Sha256,
+    });
+
+    if (recipients.length) {
+      const commentEmailHtml = await getTemplate({
         template: "notify_campaign_bug_comment",
         email: filteredRecipients.map((r) => r.email),
         subject: "Nuovo commento sul bug",
@@ -232,12 +260,52 @@ export default class Route extends BugsRoute<{
           "{Bug.title}": bug?.message,
           "{Comment}": this.getCommentPreview(),
           "{Campaign.title}": this.campaignName,
-          "{Bug.url}": `${process.env.APP_URL}/campaigns/${this.cid}/bugs/${this.bid}`,
+          "{Bug.url}": `${config.APP_URL}/campaigns/${this.cid}/bugs/${this.bid}`,
         },
       });
 
-    if (mentioned.length)
-      await sendTemplate({
+      const notificationComment = buildNotificationEmail({
+        entity_id: this.bid.toString(),
+        entity_name: "BUG",
+        subject: "Nuovo commento sul bug",
+        html: commentEmailHtml,
+        to: recipients.map((r) => ({
+          id: r.id,
+          name: r.name,
+          email: r.email,
+          notify: true, // TODO: get user prefs
+        })),
+        cc: [],
+        notification_type: "BUG_COMMENT",
+      });
+
+      const requestComment = new HttpRequest({
+        method: "POST",
+        hostname: apiEndpoint.host,
+        protocol: apiEndpoint.protocol,
+        path: apiEndpoint.pathname,
+        headers: {
+          host: apiEndpoint.hostname,
+        },
+        body: JSON.stringify(notificationComment),
+      });
+
+      const { headers: headersCommentRequest, body: bodyCommentRequest } =
+        await signer.sign(requestComment);
+
+      await axios
+        .post(url, bodyCommentRequest, {
+          headers: headersCommentRequest,
+        })
+        .then()
+        .catch((error) => {
+          console.error("API Gateway error:", error);
+          throw error;
+        });
+    }
+
+    if (mentioned.length) {
+      const mentionEmailHtml = await getTemplate({
         template: "notify_campaign_bug_comment_mention",
         email: mentioned.map((r) => r.email),
         subject: "Sei stato menzionato in un commento",
@@ -248,8 +316,48 @@ export default class Route extends BugsRoute<{
           "{Bug.title}": bug?.message,
           "{Comment}": this.getCommentPreview(),
           "{Campaign.title}": this.campaignName,
-          "{Bug.url}": `${process.env.APP_URL}/campaigns/${this.cid}/bugs/${this.bid}`,
+          "{Bug.url}": `${config.APP_URL}/campaigns/${this.cid}/bugs/${this.bid}`,
         },
       });
+
+      const notificationMention = buildNotificationEmail({
+        entity_id: this.bid.toString(),
+        entity_name: "BUG",
+        subject: "Sei stato menzionato in un commento",
+        html: mentionEmailHtml,
+        to: mentioned.map((r) => ({
+          id: r.id,
+          name: r.name,
+          email: r.email,
+          notify: true,
+        })),
+        cc: [],
+        notification_type: "BUG_COMMENT_MENTION",
+      });
+
+      const requestMention = new HttpRequest({
+        method: "POST",
+        hostname: apiEndpoint.host,
+        protocol: apiEndpoint.protocol,
+        path: apiEndpoint.pathname,
+        headers: {
+          host: apiEndpoint.hostname,
+        },
+        body: JSON.stringify(notificationMention),
+      });
+
+      const { headers: headersMentionRequest, body: bodyMentionRequest } =
+        await signer.sign(requestMention);
+
+      await axios
+        .post(url, bodyMentionRequest, {
+          headers: headersMentionRequest,
+        })
+        .then()
+        .catch((error) => {
+          console.error("API Gateway error:", error);
+          throw error;
+        });
+    }
   }
 }
