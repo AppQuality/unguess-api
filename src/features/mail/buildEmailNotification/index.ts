@@ -64,7 +64,7 @@ export const buildNotificationEmail = ({
   data: {
     from: {
       name: process.env.DEFAULT_SENDER_NAME || "UNGUESS",
-      email: process.env.DEFAULT_SENDER_MAIL || "service@unguess.io",
+      email: process.env.DEFAULT_SENDER_MAIL || "info@unguess.io",
     },
     to,
     cc,

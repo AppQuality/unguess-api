@@ -229,17 +229,12 @@ export default class Route extends BugsRoute<{
     );
 
     // Setup notification service
-    if (!process.env.NOTIFICATION_SERVICE_REST_API_ID) {
-      console.error("NOTIFICATION_SERVICE_REST_API_ID not found");
-      throw "NOTIFICATION_SERVICE_REST_API_ID not found";
-    }
+    const rest_api_id = process.env.NOTIFICATION_SERVICE_REST_API_ID || "";
+    const region = process.env.AWS_REGION || "eu-west-1";
 
-    const url = `https://${
-      process.env.NOTIFICATION_SERVICE_REST_API_ID
-    }.execute-api.${
-      process.env.AWS_REGION ?? "eu-west-1"
-    }.amazonaws.com/v1/notifications`;
+    const url = `https://${rest_api_id}.execute-api.${region}.amazonaws.com/v1/notifications`;
     const apiEndpoint = new URL(url);
+    console.log("🚀 ~ Route ~ sendEmail ~ url:", url, apiEndpoint);
 
     const signer = new SignatureV4({
       service: "execute-api",

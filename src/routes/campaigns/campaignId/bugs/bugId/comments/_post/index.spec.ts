@@ -539,7 +539,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
         entity_name: "BUG",
         data: expect.objectContaining({
           from: {
-            email: "service@unguess.io",
+            email: "info@unguess.io",
             name: "UNGUESS",
           },
           subject: "Nuovo commento sul bug",
@@ -648,7 +648,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
         notification_type: "BUG_COMMENT",
         data: expect.objectContaining({
           from: {
-            email: "service@unguess.io",
+            email: "info@unguess.io",
             name: "UNGUESS",
           },
           subject: "Nuovo commento sul bug",
@@ -672,7 +672,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
         channel: "email",
         data: expect.objectContaining({
           from: {
-            email: "service@unguess.io",
+            email: "info@unguess.io",
             name: "UNGUESS",
           },
           subject: "Sei stato menzionato in un commento",
@@ -721,7 +721,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
         notification_type: "BUG_COMMENT",
         data: expect.objectContaining({
           from: {
-            email: "service@unguess.io",
+            email: "info@unguess.io",
             name: "UNGUESS",
           },
           subject: "Nuovo commento sul bug",
@@ -745,7 +745,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
         channel: "email",
         data: expect.objectContaining({
           from: {
-            email: "service@unguess.io",
+            email: "info@unguess.io",
             name: "UNGUESS",
           },
           subject: "Sei stato menzionato in un commento",
