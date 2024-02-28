@@ -235,126 +235,131 @@ export default class Route extends BugsRoute<{
     const url = `https://${rest_api_id}.execute-api.${region}.amazonaws.com/v1/notifications`;
     const apiEndpoint = new URL(url);
 
-    const signer = new SignatureV4({
-      service: "execute-api",
-      region: process.env.AWS_REGION ?? "eu-west-1",
-      credentials: defaultProvider(),
-      sha256: Sha256,
-    });
-
-    console.log("request signed");
-
-    if (recipients.length) {
-      const commentEmailHtml = await getTemplate({
-        template: "notify_campaign_bug_comment",
-        email: filteredRecipients.map((r) => r.email),
-        subject: "Nuovo commento sul bug",
-        categories: [`CP${this.cid}_BUG_COMMENT_NOTIFICATION`],
-        optionalFields: {
-          "{Author.name}": this.author?.name || "Name S.",
-          "{Bug.id}": this.bid,
-          "{Bug.title}": bug?.message,
-          "{Comment}": this.getCommentPreview(),
-          "{Campaign.title}": this.campaignName,
-          "{Bug.url}": `${config.APP_URL}campaigns/${this.cid}/bugs/${this.bid}`,
-        },
+    try {
+      const signer = new SignatureV4({
+        service: "execute-api",
+        region: process.env.AWS_REGION ?? "eu-west-1",
+        credentials: defaultProvider(),
+        sha256: Sha256,
       });
 
-      const notificationComment = buildNotificationEmail({
-        entity_id: this.bid.toString(),
-        entity_name: "BUG",
-        subject: "Nuovo commento sul bug",
-        html: commentEmailHtml,
-        to: await Promise.all(
-          recipients.map(async (r) => ({
+      console.log("request signed");
+
+      if (recipients.length) {
+        const commentEmailHtml = await getTemplate({
+          template: "notify_campaign_bug_comment",
+          email: filteredRecipients.map((r) => r.email),
+          subject: "Nuovo commento sul bug",
+          categories: [`CP${this.cid}_BUG_COMMENT_NOTIFICATION`],
+          optionalFields: {
+            "{Author.name}": this.author?.name || "Name S.",
+            "{Bug.id}": this.bid,
+            "{Bug.title}": bug?.message,
+            "{Comment}": this.getCommentPreview(),
+            "{Campaign.title}": this.campaignName,
+            "{Bug.url}": `${config.APP_URL}campaigns/${this.cid}/bugs/${this.bid}`,
+          },
+        });
+
+        const notificationComment = buildNotificationEmail({
+          entity_id: this.bid.toString(),
+          entity_name: "BUG",
+          subject: "Nuovo commento sul bug",
+          html: commentEmailHtml,
+          to: await Promise.all(
+            recipients.map(async (r) => ({
+              id: r.id,
+              name: r.name,
+              email: r.email,
+              notify: await this.getUserNotificationPreferences(r.id),
+            }))
+          ),
+          cc: [],
+          notification_type: "BUG_COMMENT",
+        });
+
+        const requestComment = new HttpRequest({
+          method: "POST",
+          hostname: apiEndpoint.host,
+          protocol: apiEndpoint.protocol,
+          path: apiEndpoint.pathname,
+          headers: {
+            host: apiEndpoint.hostname,
+          },
+          body: JSON.stringify(notificationComment),
+        });
+
+        const { headers: headersCommentRequest, body: bodyCommentRequest } =
+          await signer.sign(requestComment);
+
+        await axios
+          .post(url, bodyCommentRequest, {
+            headers: headersCommentRequest,
+          })
+          .catch((error) => {
+            console.error("API Gateway error:", error);
+            throw error;
+          });
+      }
+
+      if (mentioned.length) {
+        const mentionEmailHtml = await getTemplate({
+          template: "notify_campaign_bug_comment_mention",
+          email: mentioned.map((r) => r.email),
+          subject: "Sei stato menzionato in un commento",
+          categories: [`CP${this.cid}_BUG_COMMENT_MENTION_NOTIFICATION`],
+          optionalFields: {
+            "{Author.name}": this.author?.name || "Name S.",
+            "{Bug.id}": this.bid,
+            "{Bug.title}": bug?.message,
+            "{Comment}": this.getCommentPreview(),
+            "{Campaign.title}": this.campaignName,
+            "{Bug.url}": `${config.APP_URL}campaigns/${this.cid}/bugs/${this.bid}`,
+          },
+        });
+
+        const notificationMention = buildNotificationEmail({
+          entity_id: this.bid.toString(),
+          entity_name: "BUG",
+          subject: "Sei stato menzionato in un commento",
+          html: mentionEmailHtml,
+          to: mentioned.map((r) => ({
             id: r.id,
             name: r.name,
             email: r.email,
-            notify: await this.getUserNotificationPreferences(r.id),
-          }))
-        ),
-        cc: [],
-        notification_type: "BUG_COMMENT",
-      });
-
-      const requestComment = new HttpRequest({
-        method: "POST",
-        hostname: apiEndpoint.host,
-        protocol: apiEndpoint.protocol,
-        path: apiEndpoint.pathname,
-        headers: {
-          host: apiEndpoint.hostname,
-        },
-        body: JSON.stringify(notificationComment),
-      });
-
-      const { headers: headersCommentRequest, body: bodyCommentRequest } =
-        await signer.sign(requestComment);
-
-      await axios
-        .post(url, bodyCommentRequest, {
-          headers: headersCommentRequest,
-        })
-        .catch((error) => {
-          console.error("API Gateway error:", error);
-          throw error;
+            notify: true,
+          })),
+          cc: [],
+          notification_type: "BUG_COMMENT_MENTION",
         });
-    }
 
-    if (mentioned.length) {
-      const mentionEmailHtml = await getTemplate({
-        template: "notify_campaign_bug_comment_mention",
-        email: mentioned.map((r) => r.email),
-        subject: "Sei stato menzionato in un commento",
-        categories: [`CP${this.cid}_BUG_COMMENT_MENTION_NOTIFICATION`],
-        optionalFields: {
-          "{Author.name}": this.author?.name || "Name S.",
-          "{Bug.id}": this.bid,
-          "{Bug.title}": bug?.message,
-          "{Comment}": this.getCommentPreview(),
-          "{Campaign.title}": this.campaignName,
-          "{Bug.url}": `${config.APP_URL}campaigns/${this.cid}/bugs/${this.bid}`,
-        },
-      });
-
-      const notificationMention = buildNotificationEmail({
-        entity_id: this.bid.toString(),
-        entity_name: "BUG",
-        subject: "Sei stato menzionato in un commento",
-        html: mentionEmailHtml,
-        to: mentioned.map((r) => ({
-          id: r.id,
-          name: r.name,
-          email: r.email,
-          notify: true,
-        })),
-        cc: [],
-        notification_type: "BUG_COMMENT_MENTION",
-      });
-
-      const requestMention = new HttpRequest({
-        method: "POST",
-        hostname: apiEndpoint.host,
-        protocol: apiEndpoint.protocol,
-        path: apiEndpoint.pathname,
-        headers: {
-          host: apiEndpoint.hostname,
-        },
-        body: JSON.stringify(notificationMention),
-      });
-
-      const { headers: headersMentionRequest, body: bodyMentionRequest } =
-        await signer.sign(requestMention);
-
-      await axios
-        .post(url, bodyMentionRequest, {
-          headers: headersMentionRequest,
-        })
-        .then()
-        .catch((error) => {
-          console.error("API Gateway error:", error);
-          throw error;
+        const requestMention = new HttpRequest({
+          method: "POST",
+          hostname: apiEndpoint.host,
+          protocol: apiEndpoint.protocol,
+          path: apiEndpoint.pathname,
+          headers: {
+            host: apiEndpoint.hostname,
+          },
+          body: JSON.stringify(notificationMention),
         });
+
+        const { headers: headersMentionRequest, body: bodyMentionRequest } =
+          await signer.sign(requestMention);
+
+        await axios
+          .post(url, bodyMentionRequest, {
+            headers: headersMentionRequest,
+          })
+          .then()
+          .catch((error) => {
+            console.error("API Gateway error:", error);
+            throw error;
+          });
+      }
+    } catch (error) {
+      console.error("Error sending email", error);
+      throw "Errors signed request";
     }
   }
 
