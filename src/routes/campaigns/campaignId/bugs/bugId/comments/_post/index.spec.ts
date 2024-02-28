@@ -18,6 +18,14 @@ jest.mock("axios");
 axios.post = jest.fn().mockResolvedValue({ status: 200 });
 const mockedAxios = jest.mocked(axios, true);
 
+// Mocking defaultProvider
+jest.mock("@aws-sdk/credential-provider-node", () => ({
+  defaultProvider: jest.fn().mockReturnValue({
+    accessKeyId: "",
+    secretAccessKey: "",
+  }),
+}));
+
 // Mocking sendgrid
 jest.mock("@sendgrid/mail", () => ({
   setApiKey: jest.fn(),
