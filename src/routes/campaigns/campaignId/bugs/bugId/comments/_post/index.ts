@@ -242,6 +242,8 @@ export default class Route extends BugsRoute<{
       sha256: Sha256,
     });
 
+    console.log("request signed");
+
     if (recipients.length) {
       const commentEmailHtml = await getTemplate({
         template: "notify_campaign_bug_comment",
