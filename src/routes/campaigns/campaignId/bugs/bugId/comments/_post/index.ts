@@ -243,8 +243,6 @@ export default class Route extends BugsRoute<{
         sha256: Sha256,
       });
 
-      console.log("request signed");
-
       if (recipients.length) {
         const commentEmailHtml = await getTemplate({
           template: "notify_campaign_bug_comment",
@@ -358,7 +356,7 @@ export default class Route extends BugsRoute<{
           });
       }
     } catch (error) {
-      console.error("Error sending email", error);
+      console.error(error);
       throw "Errors signed request";
     }
   }
