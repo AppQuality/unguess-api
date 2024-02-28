@@ -234,7 +234,6 @@ export default class Route extends BugsRoute<{
 
     const url = `https://${rest_api_id}.execute-api.${region}.amazonaws.com/v1/notifications`;
     const apiEndpoint = new URL(url);
-    console.log("🚀 ~ Route ~ sendEmail ~ url:", url, apiEndpoint);
 
     const signer = new SignatureV4({
       service: "execute-api",
