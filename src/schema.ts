@@ -375,6 +375,17 @@ export interface paths {
       };
     };
   };
+  "/users/me/preferences": {
+    get: operations["get-users-me-preferences"];
+  };
+  "/users/me/preferences/{prefid}": {
+    put: operations["put-users-me-preferences-prefid"];
+    parameters: {
+      path: {
+        prefid: string;
+      };
+    };
+  };
 }
 
 export interface components {
@@ -907,6 +918,12 @@ export interface components {
         name: string;
         isInternal: boolean;
       };
+    };
+    /** UserPreference */
+    UserPreference: {
+      preference_id: number;
+      value: number;
+      name: string;
     };
   };
   responses: {
@@ -2447,6 +2464,46 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": { [key: string]: unknown };
+      };
+    };
+  };
+  "get-users-me-preferences": {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            items?: components["schemas"]["UserPreference"][];
+          };
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  "put-users-me-preferences-prefid": {
+    parameters: {
+      path: {
+        prefid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["UserPreference"];
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          value: number;
+        };
       };
     };
   };

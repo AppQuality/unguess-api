@@ -9,7 +9,22 @@ import { tryber, unguess } from "@src/features/database";
 import { useBasicProjectsContext } from "@src/features/db/hooks/basicProjects";
 import { FUNCTIONAL_CAMPAIGN_TYPE_ID } from "@src/utils/constants";
 import request from "supertest";
-import sgMail from "@sendgrid/mail";
+import axios from "axios";
+import config from "@src/config";
+
+// Mocking axios
+jest.mock("axios");
+
+axios.post = jest.fn().mockResolvedValue({ status: 200 });
+const mockedAxios = jest.mocked(axios, true);
+
+// Mocking defaultProvider
+jest.mock("@aws-sdk/credential-provider-node", () => ({
+  defaultProvider: jest.fn().mockReturnValue({
+    accessKeyId: "",
+    secretAccessKey: "",
+  }),
+}));
 
 // Mocking sendgrid
 jest.mock("@sendgrid/mail", () => ({
@@ -17,32 +32,6 @@ jest.mock("@sendgrid/mail", () => ({
   send: jest.fn(),
   sendMultiple: jest.fn(),
 }));
-
-const customer_1 = {
-  id: 999,
-  company: "Company 999",
-  company_logo: "logo999.png",
-  tokens: 100,
-};
-
-const customer_2 = {
-  id: 998,
-  company: "Company 998",
-  company_logo: "logo998.png",
-  tokens: 100,
-};
-
-const project_1 = {
-  id: 999,
-  display_name: "Project 999",
-  customer_id: customer_1.id,
-};
-
-const project_2 = {
-  id: 998,
-  display_name: "Project 998",
-  customer_id: customer_2.id,
-};
 
 const profile_1 = {
   id: 6,
@@ -74,34 +63,64 @@ const profile_3 = {
   education_id: 124,
 };
 
+const profile_4 = {
+  id: 26,
+  name: "User 4",
+  surname: "Surname 4",
+  wp_user_id: 86,
+  email: "user4@ug.com",
+  employment_id: 1125,
+  education_id: 124,
+};
+
+const profile_5 = {
+  id: 27,
+  name: "User 5",
+  surname: "Surname 5",
+  wp_user_id: 87,
+  email: "user5@ug.com",
+  employment_id: 1125,
+  education_id: 124,
+};
+
+const profile_6 = {
+  id: 28,
+  name: "User 5",
+  surname: "Surname 5",
+  wp_user_id: 88,
+  email: "user5@ug.com",
+  employment_id: 1125,
+  education_id: 124,
+};
+
 const user_to_customer_1 = {
   wp_user_id: profile_1.wp_user_id,
-  customer_id: customer_1.id,
-};
-
-const user_to_customer_10 = {
-  wp_user_id: profile_2.wp_user_id,
-  customer_id: customer_1.id,
-};
-
-const user_to_customer_2 = {
-  wp_user_id: profile_3.wp_user_id,
-  customer_id: customer_2.id,
+  customer_id: 13213213,
 };
 
 const user_to_project_1 = {
   wp_user_id: profile_1.wp_user_id,
-  project_id: project_1.id,
+  project_id: 1321321321,
 };
 
-const user_to_project_2 = {
+const user_to_campaign_1 = {
+  wp_user_id: profile_1.wp_user_id,
+  campaign_id: 1,
+};
+
+const user_to_campaign_2 = {
   wp_user_id: profile_2.wp_user_id,
-  project_id: project_1.id,
+  campaign_id: 1,
 };
 
-const user_to_project_3 = {
-  wp_user_id: profile_3.wp_user_id,
-  project_id: project_2.id,
+const user_to_campaign_3 = {
+  wp_user_id: profile_4.wp_user_id,
+  campaign_id: 1,
+};
+
+const user_to_campaign_4 = {
+  wp_user_id: profile_5.wp_user_id,
+  campaign_id: 1,
 };
 
 const campaign_type_1 = {
@@ -263,8 +282,53 @@ const bug_4_pending = {
   status_id: 3,
 };
 
-// Get Mocked Function
-const mockedSendgrid = jest.mocked(sgMail, true);
+const default_preference_1 = {
+  id: 11,
+  name: "notifications_enabled",
+  description: "notifications_enabled",
+  is_active: 1,
+  default_value: 1,
+};
+
+const user_1_notification_preference = {
+  id: 14,
+  profile_id: profile_1.id,
+  preference_id: default_preference_1.id,
+  value: 1,
+  creation_date: "2021-08-10 00:00:00",
+  last_update: "2021-08-10 00:00:00",
+  change_author_id: profile_1.id,
+};
+
+const user_2_notification_preference = {
+  id: 19,
+  profile_id: profile_2.id,
+  preference_id: default_preference_1.id,
+  value: 0,
+  creation_date: "2021-08-10 00:00:00",
+  last_update: "2021-08-10 00:00:00",
+  change_author_id: profile_2.id,
+};
+
+const user_3_notification_preference = {
+  id: 20,
+  profile_id: profile_3.id,
+  preference_id: default_preference_1.id,
+  value: 1,
+  creation_date: "2021-08-10 00:00:00",
+  last_update: "2021-08-10 00:00:00",
+  change_author_id: profile_3.id,
+};
+
+const user_4_notification_preference = {
+  id: 21,
+  profile_id: profile_4.id,
+  preference_id: default_preference_1.id,
+  value: 0,
+  creation_date: "2021-08-10 00:00:00",
+  last_update: "2021-08-10 00:00:00",
+  change_author_id: profile_4.id,
+};
 
 describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
   const context = useBasicProjectsContext();
@@ -285,6 +349,20 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       profile_1,
       profile_2,
       profile_3,
+      profile_4,
+      profile_5,
+      profile_6,
+    ]);
+
+    await tryber.tables.WpAppqUserToCustomer.do().insert([user_to_customer_1]);
+
+    await tryber.tables.WpAppqUserToProject.do().insert([user_to_project_1]);
+
+    await tryber.tables.WpAppqUserToCampaign.do().insert([
+      user_to_campaign_1,
+      user_to_campaign_2,
+      user_to_campaign_3,
+      user_to_campaign_4,
     ]);
 
     await tryber.tables.WpAppqEvdBug.do().insert([
@@ -292,18 +370,6 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       bug_2,
       bug_3,
       bug_4_pending,
-    ]);
-
-    await tryber.tables.WpAppqUserToProject.do().insert([
-      user_to_project_1,
-      user_to_project_2,
-      user_to_project_3,
-    ]);
-
-    await tryber.tables.WpAppqUserToCustomer.do().insert([
-      user_to_customer_1,
-      user_to_customer_10,
-      user_to_customer_2,
     ]);
 
     await unguess.tables.UgBugsComments.do().insert([
@@ -362,6 +428,14 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       template_id: 2,
       last_editor_tester_id: 1,
     });
+
+    await unguess.tables.Preferences.do().insert(default_preference_1);
+    await unguess.tables.UserPreferences.do().insert([
+      user_1_notification_preference,
+      user_2_notification_preference,
+      user_3_notification_preference,
+      user_4_notification_preference,
+    ]);
   });
 
   afterAll(async () => {
@@ -516,7 +590,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     );
   });
 
-  it("Should send an email when the comment is created successfully", async () => {
+  it("Should send an email to who already commented when the comment is created successfully", async () => {
     const response = await request(app)
       .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
       .set("Authorization", "Bearer user")
@@ -525,22 +599,33 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       });
 
     expect(response.status).toBe(200);
-    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(1);
-    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledWith(
+    expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+
+    const body = JSON.parse(mockedAxios.post.mock.calls[0][1] as string);
+
+    expect(body).toEqual(
       expect.objectContaining({
-        from: {
-          email: "info@unguess.io",
-          name: "UNGUESS",
-        },
-        subject: "Nuovo commento sul bug",
-        categories: [`CP${campaign_1.id}_BUG_COMMENT_NOTIFICATION`],
-        html: `New comment on bug ${bug_1.id},${bug_1.message},${
-          process.env.APP_URL
-        }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
-          context.profile1.name
-        } ${context.profile1.surname.charAt(0).toUpperCase()}.,Test comment,${
-          campaign_1.customer_title
-        }`,
+        entity_id: `${bug_1.id}`,
+        entity_name: "BUG",
+        data: expect.objectContaining({
+          from: {
+            email: "info@unguess.io",
+            name: "UNGUESS",
+          },
+          subject: "Nuovo commento sul bug",
+          html: `New comment on bug ${bug_1.id},${bug_1.message},${
+            config.APP_URL
+          }campaigns/${campaign_1.id}/bugs/${bug_1.id},${
+            context.profile1.name
+          } ${context.profile1.surname.charAt(0).toUpperCase()}.,Test comment,${
+            campaign_1.customer_title
+          }`,
+          to: expect.arrayContaining([
+            expect.objectContaining({
+              email: profile_1.email,
+            }),
+          ]),
+        }),
       })
     );
   });
@@ -562,12 +647,15 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       });
 
     expect(response.status).toBe(200);
-    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(1);
-    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledWith(
+    expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+
+    const body = JSON.parse(mockedAxios.post.mock.calls[0][1] as string);
+
+    expect(body.data.to).toEqual([
       expect.objectContaining({
-        to: [context.profile3.email, profile_1.email],
-      })
-    );
+        email: profile_1.email,
+      }),
+    ]);
   });
 
   it("Should send an email with a preview of comment if the length is > 80", async () => {
@@ -579,19 +667,20 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       });
 
     expect(response.status).toBe(200);
-    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(1);
-    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledWith(
-      expect.objectContaining({
-        html: `New comment on bug ${bug_1.id},${bug_1.message},${
-          process.env.APP_URL
-        }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
-          context.profile1.name
-        } ${context.profile1.surname
-          .charAt(0)
-          .toUpperCase()}.,Always code as if the guy who ends up maintaining your code will be a violent ps...,${
-          campaign_1.customer_title
-        }`,
-      })
+    expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+
+    const body = JSON.parse(mockedAxios.post.mock.calls[0][1] as string);
+
+    expect(body.data.html).toEqual(
+      `New comment on bug ${bug_1.id},${bug_1.message},${
+        config.APP_URL
+      }campaigns/${campaign_1.id}/bugs/${bug_1.id},${
+        context.profile1.name
+      } ${context.profile1.surname
+        .charAt(0)
+        .toUpperCase()}.,Always code as if the guy who ends up maintaining your code will be a violent ps...,${
+        campaign_1.customer_title
+      }`
     );
   });
 
@@ -603,7 +692,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
         text: "Test comment",
       });
     expect(response.status).toBe(200);
-    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(0);
+    expect(mockedAxios.post).toHaveBeenCalledTimes(0);
   });
 
   it("Should send 2 emails if an user has been mentioned in a comment", async () => {
@@ -619,41 +708,54 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
         ],
       });
 
-    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(2);
-    expect(mockedSendgrid.sendMultiple.mock.calls[0][0]).toMatchObject(
+    expect(mockedAxios.post).toHaveBeenCalledTimes(2);
+
+    const body1 = JSON.parse(mockedAxios.post.mock.calls[0][1] as string);
+
+    expect(body1).toEqual(
       expect.objectContaining({
-        categories: [`CP${campaign_1.id}_BUG_COMMENT_NOTIFICATION`],
-        from: {
-          email: "info@unguess.io",
-          name: "UNGUESS",
-        },
-        html: `New comment on bug ${bug_1.id},${bug_1.message},${
-          process.env.APP_URL
-        }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
-          context.profile1.name
-        } ${context.profile1.surname.charAt(0).toUpperCase()}.,Test comment,${
-          campaign_1.customer_title
-        }`,
-        subject: "Nuovo commento sul bug",
-        to: [`${context.profile3.email}`, `${profile_1.email}`],
+        entity_id: `${bug_1.id}`,
+        entity_name: "BUG",
+        channel: "email",
+        notification_type: "BUG_COMMENT",
+        data: expect.objectContaining({
+          from: {
+            email: "info@unguess.io",
+            name: "UNGUESS",
+          },
+          subject: "Nuovo commento sul bug",
+          html: `New comment on bug ${bug_1.id},${bug_1.message},${
+            config.APP_URL
+          }campaigns/${campaign_1.id}/bugs/${bug_1.id},${
+            context.profile1.name
+          } ${context.profile1.surname.charAt(0).toUpperCase()}.,Test comment,${
+            campaign_1.customer_title
+          }`,
+        }),
       })
     );
-    expect(mockedSendgrid.sendMultiple.mock.calls[1][0]).toMatchObject(
+
+    const body2 = JSON.parse(mockedAxios.post.mock.calls[1][1] as string);
+
+    expect(body2).toEqual(
       expect.objectContaining({
-        categories: [`CP${campaign_1.id}_BUG_COMMENT_MENTION_NOTIFICATION`],
-        from: {
-          email: "info@unguess.io",
-          name: "UNGUESS",
-        },
-        html: `New comment mention on bug ${bug_1.id},${bug_1.message},${
-          process.env.APP_URL
-        }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
-          context.profile1.name
-        } ${context.profile1.surname.charAt(0).toUpperCase()}.,Test comment,${
-          campaign_1.customer_title
-        }`,
-        subject: "Sei stato menzionato in un commento",
-        to: [`${profile_2.email}`],
+        entity_id: `${bug_1.id}`,
+        entity_name: "BUG",
+        channel: "email",
+        data: expect.objectContaining({
+          from: {
+            email: "info@unguess.io",
+            name: "UNGUESS",
+          },
+          subject: "Sei stato menzionato in un commento",
+          html: `New comment mention on bug ${bug_1.id},${bug_1.message},${
+            config.APP_URL
+          }campaigns/${campaign_1.id}/bugs/${bug_1.id},${
+            context.profile1.name
+          } ${context.profile1.surname.charAt(0).toUpperCase()}.,Test comment,${
+            campaign_1.customer_title
+          }`,
+        }),
       })
     );
   });
@@ -679,41 +781,54 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
         ],
       });
 
-    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(2);
-    expect(mockedSendgrid.sendMultiple.mock.calls[0][0]).toMatchObject(
+    expect(mockedAxios.post).toHaveBeenCalledTimes(2);
+
+    const body1 = JSON.parse(mockedAxios.post.mock.calls[0][1] as string);
+
+    expect(body1).toEqual(
       expect.objectContaining({
-        categories: [`CP${campaign_1.id}_BUG_COMMENT_NOTIFICATION`],
-        from: {
-          email: "info@unguess.io",
-          name: "UNGUESS",
-        },
-        html: `New comment on bug ${bug_1.id},${bug_1.message},${
-          process.env.APP_URL
-        }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
-          context.profile1.name
-        } ${context.profile1.surname.charAt(0).toUpperCase()}.,Test comment,${
-          campaign_1.customer_title
-        }`,
-        subject: "Nuovo commento sul bug",
-        to: [`${context.profile3.email}`, `${profile_1.email}`],
+        entity_id: `${bug_1.id}`,
+        entity_name: "BUG",
+        channel: "email",
+        notification_type: "BUG_COMMENT",
+        data: expect.objectContaining({
+          from: {
+            email: "info@unguess.io",
+            name: "UNGUESS",
+          },
+          subject: "Nuovo commento sul bug",
+          html: `New comment on bug ${bug_1.id},${bug_1.message},${
+            config.APP_URL
+          }campaigns/${campaign_1.id}/bugs/${bug_1.id},${
+            context.profile1.name
+          } ${context.profile1.surname.charAt(0).toUpperCase()}.,Test comment,${
+            campaign_1.customer_title
+          }`,
+        }),
       })
     );
-    expect(mockedSendgrid.sendMultiple.mock.calls[1][0]).toMatchObject(
+
+    const body2 = JSON.parse(mockedAxios.post.mock.calls[1][1] as string);
+
+    expect(body2).toEqual(
       expect.objectContaining({
-        categories: [`CP${campaign_1.id}_BUG_COMMENT_MENTION_NOTIFICATION`],
-        from: {
-          email: "info@unguess.io",
-          name: "UNGUESS",
-        },
-        html: `New comment mention on bug ${bug_1.id},${bug_1.message},${
-          process.env.APP_URL
-        }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
-          context.profile1.name
-        } ${context.profile1.surname.charAt(0).toUpperCase()}.,Test comment,${
-          campaign_1.customer_title
-        }`,
-        subject: "Sei stato menzionato in un commento",
-        to: [`${profile_2.email}`],
+        entity_id: `${bug_1.id}`,
+        entity_name: "BUG",
+        channel: "email",
+        data: expect.objectContaining({
+          from: {
+            email: "info@unguess.io",
+            name: "UNGUESS",
+          },
+          subject: "Sei stato menzionato in un commento",
+          html: `New comment mention on bug ${bug_1.id},${bug_1.message},${
+            config.APP_URL
+          }campaigns/${campaign_1.id}/bugs/${bug_1.id},${
+            context.profile1.name
+          } ${context.profile1.surname.charAt(0).toUpperCase()}.,Test comment,${
+            campaign_1.customer_title
+          }`,
+        }),
       })
     );
   });
@@ -731,10 +846,83 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
         ],
       });
     expect(response.status).toBe(200);
-    expect(mockedSendgrid.sendMultiple).toHaveBeenCalledTimes(0);
+    expect(mockedAxios.post).toHaveBeenCalledTimes(0);
   });
 
-  it("Should NOT notify the user if the user can't access the campaign", async () => {
+  it("Should NOT notify the user if the user has disabled the notifcations", async () => {
+    await unguess.tables.UgBugsComments.do().insert({
+      text: "Comment test",
+      is_deleted: 0,
+      bug_id: bug_1.id,
+      profile_id: profile_2.id,
+      creation_date_utc: "2023-12-11 09:23:00",
+    });
+
+    const response = await request(app)
+      .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
+      .set("Authorization", "Bearer user")
+      .send({
+        text: "Salve amico",
+      });
+
+    expect(response.status).toBe(200);
+
+    expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+    const body = JSON.parse(mockedAxios.post.mock.calls[0][1] as string);
+
+    expect(body.data.to).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          email: profile_1.email,
+          notify: true,
+        }),
+        expect.objectContaining({
+          email: profile_2.email,
+          notify: false,
+        }),
+      ])
+    );
+  });
+
+  it("Should NOT notify a user who commented if this user has the notifications enabled but doesn't have access to the campaign anymore", async () => {
+    await unguess.tables.UgBugsComments.do().insert({
+      text: "Comment test2",
+      is_deleted: 0,
+      bug_id: bug_1.id,
+      profile_id: profile_3.id,
+      creation_date_utc: "2023-12-11 09:23:00",
+    });
+
+    const response = await request(app)
+      .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
+      .set("Authorization", "Bearer user")
+      .send({
+        text: "Salve amico",
+      });
+    expect(response.status).toBe(200);
+
+    expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+    const body = JSON.parse(mockedAxios.post.mock.calls[0][1] as string);
+
+    expect(body.data.to).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          email: profile_1.email,
+          notify: true,
+        }),
+      ])
+    );
+
+    expect(body.data.to).toEqual(
+      expect.not.arrayContaining([
+        expect.objectContaining({
+          email: profile_3.email,
+        }),
+      ])
+    );
+  });
+
+  it("Should notify the user if the user has the notifications disabled but has been mentioned", async () => {
     const response = await request(app)
       .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
       .set("Authorization", "Bearer user")
@@ -742,28 +930,126 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
         text: "Salve amico",
         mentioned: [
           {
-            id: profile_3.id,
+            id: profile_2.id,
           },
         ],
       });
     expect(response.status).toBe(200);
-    expect.objectContaining({
-      from: {
-        email: "info@unguess.io",
-        name: "UNGUESS",
-      },
-      subject: "Nuovo commento sul bug",
-      to: profile_1.email,
-      categories: [`CP${campaign_1.id}_BUG_COMMENT_NOTIFICATION`],
-      html: expect.stringContaining(
-        `New comment on bug ${bug_1.id},${bug_1.message},${
-          process.env.APP_URL
-        }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
-          context.profile1.name
-        } ${context.profile1.surname.charAt(0).toUpperCase()}.,Test comment,${
-          campaign_1.customer_title
-        }`
-      ),
+
+    expect(mockedAxios.post).toHaveBeenCalledTimes(2);
+    const body1 = JSON.parse(mockedAxios.post.mock.calls[0][1] as string);
+
+    expect(body1.data.to).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          email: profile_1.email,
+        }),
+      ])
+    );
+
+    const body2 = JSON.parse(mockedAxios.post.mock.calls[1][1] as string);
+
+    expect(body2.data.to).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          email: profile_2.email,
+        }),
+      ])
+    );
+  });
+
+  it("Should not notify multiple users if they have the notifications disabled", async () => {
+    await unguess.tables.UgBugsComments.do().insert({
+      text: "Comment test",
+      is_deleted: 0,
+      bug_id: bug_1.id,
+      profile_id: profile_3.id,
+      creation_date_utc: "2023-12-11 09:23:00",
     });
+
+    await unguess.tables.UgBugsComments.do().insert({
+      text: "Comment test",
+      is_deleted: 0,
+      bug_id: bug_1.id,
+      profile_id: profile_4.id,
+      creation_date_utc: "2023-12-11 09:23:00",
+    });
+
+    await unguess.tables.UgBugsComments.do().insert({
+      text: "Comment test 2",
+      is_deleted: 0,
+      bug_id: bug_1.id,
+      profile_id: profile_4.id,
+      creation_date_utc: "2023-12-11 09:24:00",
+    });
+
+    await unguess.tables.UgBugsComments.do().insert({
+      text: "Comment test",
+      is_deleted: 0,
+      bug_id: bug_1.id,
+      profile_id: profile_5.id,
+      creation_date_utc: "2023-12-11 09:23:00",
+    });
+
+    await unguess.tables.UgBugsComments.do().insert({
+      text: "Comment test",
+      is_deleted: 0,
+      bug_id: bug_1.id,
+      profile_id: profile_6.id,
+      creation_date_utc: "2023-12-11 09:23:00",
+    });
+
+    const response = await request(app)
+      .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
+      .set("Authorization", "Bearer user")
+      .send({
+        text: "Salve amico",
+        mentioned: [
+          {
+            id: profile_4.id,
+          },
+        ],
+      });
+
+    expect(response.status).toBe(200);
+
+    expect(mockedAxios.post).toHaveBeenCalledTimes(2);
+
+    const body1 = JSON.parse(mockedAxios.post.mock.calls[0][1] as string);
+
+    expect(body1.data.to).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          email: profile_1.email,
+        }),
+        expect.objectContaining({
+          email: profile_5.email,
+        }),
+      ])
+    );
+
+    expect(body1.data.to).toEqual(
+      expect.not.arrayContaining([
+        expect.objectContaining({
+          email: profile_3.email,
+        }),
+        expect.objectContaining({
+          email: profile_4.email,
+        }),
+        expect.objectContaining({
+          email: profile_6.email,
+        }),
+      ])
+    );
+
+    const body2 = JSON.parse(mockedAxios.post.mock.calls[1][1] as string);
+
+    expect(body2.data.to).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          email: profile_4.email,
+        }),
+      ])
+    );
   });
 });
