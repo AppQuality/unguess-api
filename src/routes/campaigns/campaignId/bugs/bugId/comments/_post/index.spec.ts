@@ -63,6 +63,36 @@ const profile_3 = {
   education_id: 124,
 };
 
+const profile_4 = {
+  id: 26,
+  name: "User 4",
+  surname: "Surname 4",
+  wp_user_id: 86,
+  email: "user4@ug.com",
+  employment_id: 1125,
+  education_id: 124,
+};
+
+const profile_5 = {
+  id: 27,
+  name: "User 5",
+  surname: "Surname 5",
+  wp_user_id: 87,
+  email: "user5@ug.com",
+  employment_id: 1125,
+  education_id: 124,
+};
+
+const profile_6 = {
+  id: 28,
+  name: "User 5",
+  surname: "Surname 5",
+  wp_user_id: 88,
+  email: "user5@ug.com",
+  employment_id: 1125,
+  education_id: 124,
+};
+
 const user_to_customer_1 = {
   wp_user_id: profile_1.wp_user_id,
   customer_id: 13213213,
@@ -80,6 +110,16 @@ const user_to_campaign_1 = {
 
 const user_to_campaign_2 = {
   wp_user_id: profile_2.wp_user_id,
+  campaign_id: 1,
+};
+
+const user_to_campaign_3 = {
+  wp_user_id: profile_4.wp_user_id,
+  campaign_id: 1,
+};
+
+const user_to_campaign_4 = {
+  wp_user_id: profile_5.wp_user_id,
   campaign_id: 1,
 };
 
@@ -280,6 +320,16 @@ const user_3_notification_preference = {
   change_author_id: profile_3.id,
 };
 
+const user_4_notification_preference = {
+  id: 21,
+  profile_id: profile_4.id,
+  preference_id: default_preference_1.id,
+  value: 0,
+  creation_date: "2021-08-10 00:00:00",
+  last_update: "2021-08-10 00:00:00",
+  change_author_id: profile_4.id,
+};
+
 describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
   const context = useBasicProjectsContext();
 
@@ -299,6 +349,9 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       profile_1,
       profile_2,
       profile_3,
+      profile_4,
+      profile_5,
+      profile_6,
     ]);
 
     await tryber.tables.WpAppqUserToCustomer.do().insert([user_to_customer_1]);
@@ -308,6 +361,8 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     await tryber.tables.WpAppqUserToCampaign.do().insert([
       user_to_campaign_1,
       user_to_campaign_2,
+      user_to_campaign_3,
+      user_to_campaign_4,
     ]);
 
     await tryber.tables.WpAppqEvdBug.do().insert([
@@ -379,6 +434,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       user_1_notification_preference,
       user_2_notification_preference,
       user_3_notification_preference,
+      user_4_notification_preference,
     ]);
   });
 
@@ -897,6 +953,101 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       expect.arrayContaining([
         expect.objectContaining({
           email: profile_2.email,
+        }),
+      ])
+    );
+  });
+
+  it("Should not notify multiple users if they have the notifications disabled", async () => {
+    await unguess.tables.UgBugsComments.do().insert({
+      text: "Comment test",
+      is_deleted: 0,
+      bug_id: bug_1.id,
+      profile_id: profile_3.id,
+      creation_date_utc: "2023-12-11 09:23:00",
+    });
+
+    await unguess.tables.UgBugsComments.do().insert({
+      text: "Comment test",
+      is_deleted: 0,
+      bug_id: bug_1.id,
+      profile_id: profile_4.id,
+      creation_date_utc: "2023-12-11 09:23:00",
+    });
+
+    await unguess.tables.UgBugsComments.do().insert({
+      text: "Comment test 2",
+      is_deleted: 0,
+      bug_id: bug_1.id,
+      profile_id: profile_4.id,
+      creation_date_utc: "2023-12-11 09:24:00",
+    });
+
+    await unguess.tables.UgBugsComments.do().insert({
+      text: "Comment test",
+      is_deleted: 0,
+      bug_id: bug_1.id,
+      profile_id: profile_5.id,
+      creation_date_utc: "2023-12-11 09:23:00",
+    });
+
+    await unguess.tables.UgBugsComments.do().insert({
+      text: "Comment test",
+      is_deleted: 0,
+      bug_id: bug_1.id,
+      profile_id: profile_6.id,
+      creation_date_utc: "2023-12-11 09:23:00",
+    });
+
+    const response = await request(app)
+      .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
+      .set("Authorization", "Bearer user")
+      .send({
+        text: "Salve amico",
+        mentioned: [
+          {
+            id: profile_4.id,
+          },
+        ],
+      });
+
+    expect(response.status).toBe(200);
+
+    expect(mockedAxios.post).toHaveBeenCalledTimes(2);
+
+    const body1 = JSON.parse(mockedAxios.post.mock.calls[0][1] as string);
+
+    expect(body1.data.to).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          email: profile_1.email,
+        }),
+        expect.objectContaining({
+          email: profile_5.email,
+        }),
+      ])
+    );
+
+    expect(body1.data.to).toEqual(
+      expect.not.arrayContaining([
+        expect.objectContaining({
+          email: profile_3.email,
+        }),
+        expect.objectContaining({
+          email: profile_4.email,
+        }),
+        expect.objectContaining({
+          email: profile_6.email,
+        }),
+      ])
+    );
+
+    const body2 = JSON.parse(mockedAxios.post.mock.calls[1][1] as string);
+
+    expect(body2.data.to).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          email: profile_4.email,
         }),
       ])
     );
