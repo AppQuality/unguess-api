@@ -185,8 +185,14 @@ export default class Route extends BugsRoute<{
         "id",
         comments.map((c) => c.profile_id)
       );
+    // filter out recipients without permission
+    const filteredRecipients = recipients.filter(
+      async (r) => await this.hasPermission(r.id)
+    );
 
-    return recipients;
+    console.log("filteredRecipients", filteredRecipients);
+
+    return filteredRecipients;
   }
 
   private async getMentioned() {
@@ -198,8 +204,10 @@ export default class Route extends BugsRoute<{
         "id",
         this.mentioned.map((m) => m.id)
       );
+    // Check if profileId has permission to see the bug
+    const filteredMentions = mentions.filter((r) => this.hasPermission(r.id));
 
-    return mentions;
+    return filteredMentions;
   }
 
   private async getBugData() {
@@ -363,29 +371,55 @@ export default class Route extends BugsRoute<{
   }
 
   private async getUserNotificationPreferences(profileId: number) {
-    const userPrefs = await unguess.tables.Preferences.do()
-      .select(
-        "preferences.id as preference_id",
-        "preferences.name",
-        unguess.raw(
-          "COALESCE(user_preferences.value, preferences.default_value) as value"
-        )
-      )
-      .leftJoin("user_preferences", function () {
-        this.on("preferences.id", "=", "user_preferences.preference_id").andOn(
-          "user_preferences.profile_id",
-          "=",
-          unguess.raw("?", [profileId])
-        );
-      })
-      .join("preferences as default_prefs", function () {
-        this.on("default_prefs.id", "=", "preferences.id");
-      })
-      .where("preferences.is_active", 1)
-      .andWhere("preferences.name", "notifications_enable");
-    if (userPrefs && userPrefs.length) {
-      return userPrefs[0].value === "1";
+    const userPrefs = await unguess.tables.UserPreferences.do()
+      .select("value")
+      .join("preferences", "user_preferences.preference_id", "preferences.id")
+      .where("user_preferences.profile_id", profileId)
+      .andWhere("preferences.name", "notification_enabled")
+      .andWhere("preferences.is_active", 1);
+    let notify = true;
+    if (userPrefs && userPrefs.length > 0) {
+      if (!userPrefs[0].value) notify = false;
     }
+    return notify;
+  }
+
+  private async hasPermission(profileId: number) {
+    const wpUser = await tryber.tables.WpAppqEvdProfile.do()
+      .select("wp_user_id")
+      .where("id", profileId)
+      .first();
+    if (!wpUser) return false;
+    // check workspace access
+    const hasWsAccess = await tryber.tables.WpAppqUserToCustomer.do()
+      .select()
+      .where({
+        wp_user_id: wpUser.wp_user_id,
+        customer_id: this.workspace_id || 0,
+      })
+      .first();
+    console.log("hasWsAccess", hasWsAccess);
+    if (hasWsAccess) return true;
+    //check project access
+    const hasProjectAccess = await tryber.tables.WpAppqUserToProject.do()
+      .select()
+      .where({
+        wp_user_id: wpUser.wp_user_id,
+        project_id: this.project_id || 0,
+      })
+      .first();
+    console.log("hasProjectAccess", hasProjectAccess);
+    if (hasProjectAccess) return true;
+    //check campaign access
+    const hasCampaignAccess = await tryber.tables.WpAppqUserToCampaign.do()
+      .select()
+      .where({
+        wp_user_id: wpUser.wp_user_id,
+        campaign_id: this.cid,
+      })
+      .first();
+    console.log("hasCampaignAccess", hasCampaignAccess);
+    if (hasCampaignAccess) return true;
     return false;
   }
 }

@@ -822,30 +822,6 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     expect(mockedAxios.post).toHaveBeenCalledTimes(0);
   });
 
-  it("Should NOT notify the user if the user can't access the campaign", async () => {
-    const response = await request(app)
-      .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
-      .set("Authorization", "Bearer user")
-      .send({
-        text: "Salve amico",
-        mentioned: [
-          {
-            id: profile_3.id,
-          },
-        ],
-      });
-    expect(response.status).toBe(200);
-
-    const body = JSON.parse(mockedAxios.post.mock.calls[0][1] as string);
-
-    expect(body.to).toEqual(
-      expect.not.arrayContaining([
-        expect.objectContaining({
-          email: profile_3.email,
-        }),
-      ])
-    );
-  });
   it("Should NOT notify the user if the user has disabled the notifcations", async () => {
     await unguess.tables.UgBugsComments.do().insert({
       text: "Comment test",
@@ -861,17 +837,23 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
         text: "Salve amico",
       });
     expect(response.status).toBe(200);
-
+    expect(mockedAxios.post).toHaveBeenCalledTimes(1);
     const body = JSON.parse(mockedAxios.post.mock.calls[0][1] as string);
-    expect(body.to).toEqual(
-      expect.not.arrayContaining([
+    expect(body.data.to).toEqual(
+      expect.arrayContaining([
         expect.objectContaining({
           email: profile_2.email,
+          notify: false,
+        }),
+        expect.objectContaining({
+          email: profile_1.email,
+          notify: true,
         }),
       ])
     );
   });
-  it("Should NOT notify the user if the user has the notifications enabled but doesn't have access to the campaign", async () => {
+
+  it("Should NOT notify a user who commented if this user has the notifications enabled but doesn't have access to the campaign anymore", async () => {
     await unguess.tables.UgBugsComments.do().insert({
       text: "Comment test2",
       is_deleted: 0,
@@ -886,9 +868,47 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
         text: "Salve amico",
       });
     expect(response.status).toBe(200);
-
+    expect(mockedAxios.post).toHaveBeenCalledTimes(1);
     const body = JSON.parse(mockedAxios.post.mock.calls[0][1] as string);
-    expect(body.to).toEqual(
+    expect(body.data.to).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          email: profile_1.email,
+          notify: true,
+        }),
+      ])
+    );
+    expect(body.data.to).toEqual(
+      expect.not.arrayContaining([
+        expect.objectContaining({
+          email: profile_3.email,
+        }),
+      ])
+    );
+  });
+  it("Should notify the user if the user has the notifications disabled but has been mentioned", async () => {
+    await unguess.tables.UgBugsComments.do().insert({
+      text: "Comment test",
+      is_deleted: 0,
+      bug_id: bug_1.id,
+      profile_id: profile_2.id,
+      creation_date_utc: "2023-12-11 09:23:00",
+    });
+    const response = await request(app)
+      .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
+      .set("Authorization", "Bearer user")
+      .send({
+        text: "Salve amico",
+        mentioned: [
+          {
+            id: profile_2.id,
+          },
+        ],
+      });
+    expect(response.status).toBe(200);
+    expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+    const body = JSON.parse(mockedAxios.post.mock.calls[0][1] as string);
+    expect(body.data.to).toEqual(
       expect.not.arrayContaining([
         expect.objectContaining({
           email: profile_3.email,
