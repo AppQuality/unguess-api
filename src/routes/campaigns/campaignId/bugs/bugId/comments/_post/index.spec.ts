@@ -856,7 +856,6 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     expect(response.status).toBe(200);
 
     const body = JSON.parse(mockedAxios.post.mock.calls[0][1] as string);
-    console.log(body);
     expect(body.to).toEqual(
       expect.not.arrayContaining([
         expect.objectContaining({
@@ -875,7 +874,6 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     expect(response.status).toBe(200);
 
     const body = JSON.parse(mockedAxios.post.mock.calls[0][1] as string);
-    console.log(body);
     expect(body.to).toEqual(
       expect.not.arrayContaining([
         expect.objectContaining({
