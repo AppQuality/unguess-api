@@ -199,7 +199,7 @@ export default class Route extends BugsRoute<{
     // Filter only recipients with permission
     const filteredRecipients = mapRec.filter((r) => r.hasPermission);
 
-    return recipients;
+    return filteredRecipients;
   }
 
   private async getMentioned() {
@@ -225,7 +225,7 @@ export default class Route extends BugsRoute<{
     // Filter only recipients with permission
     const filteredMentions = mapMen.filter((m) => m.hasPermission);
 
-    return mentions;
+    return filteredMentions;
   }
 
   private async getBugData() {
@@ -388,30 +388,17 @@ export default class Route extends BugsRoute<{
   }
 
   private async getUserNotificationPreferences(profileId: number) {
-    const userPrefs = await unguess.tables.Preferences.do()
-      .select(
-        "preferences.id as preference_id",
-        "preferences.name",
-        unguess.raw(
-          "COALESCE(user_preferences.value, preferences.default_value) as value"
-        )
-      )
-      .leftJoin("user_preferences", function () {
-        this.on("preferences.id", "=", "user_preferences.preference_id").andOn(
-          "user_preferences.profile_id",
-          "=",
-          unguess.raw("?", [profileId])
-        );
-      })
-      .join("preferences as default_prefs", function () {
-        this.on("default_prefs.id", "=", "preferences.id");
-      })
-      .where("preferences.is_active", 1)
-      .andWhere("preferences.name", "notifications_enable");
+    const userPrefs = await unguess.tables.UserPreferences.do()
+      .select("value")
+      .join("preferences", "preferences.id", "user_preferences.preference_id")
+      .where("user_preferences.profile_id", profileId)
+      .andWhere("preferences.name", "notifications_enabled")
+      .andWhere("preferences.is_active", 1)
+      .first();
 
     let notify = true;
-    if (userPrefs && userPrefs.length > 0) {
-      if (!userPrefs[0].value) notify = false;
+    if (userPrefs) {
+      if (!userPrefs.value) notify = false;
     }
 
     return notify;
