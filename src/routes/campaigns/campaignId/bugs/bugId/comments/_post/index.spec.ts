@@ -847,6 +847,13 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     );
   });
   it("Should NOT notify the user if the user has disabled the notifcations", async () => {
+    await unguess.tables.UgBugsComments.do().insert({
+      text: "Comment test",
+      is_deleted: 0,
+      bug_id: bug_1.id,
+      profile_id: profile_2.id,
+      creation_date_utc: "2023-12-11 09:23:00",
+    });
     const response = await request(app)
       .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
       .set("Authorization", "Bearer user")
@@ -865,6 +872,13 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     );
   });
   it("Should NOT notify the user if the user has the notifications enabled but doesn't have access to the campaign", async () => {
+    await unguess.tables.UgBugsComments.do().insert({
+      text: "Comment test2",
+      is_deleted: 0,
+      bug_id: bug_1.id,
+      profile_id: profile_3.id,
+      creation_date_utc: "2023-12-11 09:23:00",
+    });
     const response = await request(app)
       .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
       .set("Authorization", "Bearer user")
