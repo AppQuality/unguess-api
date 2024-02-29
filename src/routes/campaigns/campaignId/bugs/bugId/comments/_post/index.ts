@@ -3,8 +3,16 @@ import BugsRoute from "@src/features/routes/BugRoute";
 import { tryber, unguess } from "@src/features/database";
 import { formatInTimeZone, zonedTimeToUtc } from "date-fns-tz";
 import { formatISO } from "date-fns";
-import { sendTemplate } from "@src/features/mail/sendTemplate";
+import { getTemplate } from "@src/features/mail/getTemplate";
 import { isInternal } from "@src/utils/users/isInternal";
+import { defaultProvider } from "@aws-sdk/credential-provider-node";
+import { HttpRequest } from "@aws-sdk/protocol-http";
+import { SignatureV4 } from "@aws-sdk/signature-v4";
+import { Sha256 } from "@aws-crypto/sha256-js";
+import { URL } from "url";
+import axios from "axios";
+import { buildNotificationEmail } from "@src/features/mail/buildEmailNotification";
+import config from "@src/config";
 
 const MAX_COMMENT_PREVIEW_LENGTH = 80;
 
@@ -178,7 +186,20 @@ export default class Route extends BugsRoute<{
         comments.map((c) => c.profile_id)
       );
 
-    return recipients;
+    // Get only recipients with permission
+    const mapRec = await Promise.all(
+      recipients.map(async (r) => {
+        return {
+          ...r,
+          hasPermission: await this.hasPermission(r.id),
+        };
+      })
+    );
+
+    // Filter only recipients with permission
+    const filteredRecipients = mapRec.filter((r) => r.hasPermission);
+
+    return filteredRecipients;
   }
 
   private async getMentioned() {
@@ -191,7 +212,20 @@ export default class Route extends BugsRoute<{
         this.mentioned.map((m) => m.id)
       );
 
-    return mentions;
+    // Get only recipients with permission
+    const mapMen = await Promise.all(
+      mentions.map(async (m) => {
+        return {
+          ...m,
+          hasPermission: await this.hasPermission(m.id),
+        };
+      })
+    );
+
+    // Filter only recipients with permission
+    const filteredMentions = mapMen.filter((m) => m.hasPermission);
+
+    return filteredMentions;
   }
 
   private async getBugData() {
@@ -220,36 +254,193 @@ export default class Route extends BugsRoute<{
       (r) => !mentioned.find((m) => m.id === r.id)
     );
 
-    if (recipients.length)
-      await sendTemplate({
-        template: "notify_campaign_bug_comment",
-        email: filteredRecipients.map((r) => r.email),
-        subject: "Nuovo commento sul bug",
-        categories: [`CP${this.cid}_BUG_COMMENT_NOTIFICATION`],
-        optionalFields: {
-          "{Author.name}": this.author?.name || "Name S.",
-          "{Bug.id}": this.bid,
-          "{Bug.title}": bug?.message,
-          "{Comment}": this.getCommentPreview(),
-          "{Campaign.title}": this.campaignName,
-          "{Bug.url}": `${process.env.APP_URL}/campaigns/${this.cid}/bugs/${this.bid}`,
-        },
+    // Setup notification service
+    const rest_api_id = process.env.NOTIFICATION_SERVICE_REST_API_ID || "";
+    const region = process.env.AWS_REGION || "eu-west-1";
+
+    const url = `https://${rest_api_id}.execute-api.${region}.amazonaws.com/v1/notifications`;
+    const apiEndpoint = new URL(url);
+
+    try {
+      const signer = new SignatureV4({
+        service: "execute-api",
+        region: process.env.AWS_REGION ?? "eu-west-1",
+        credentials: defaultProvider(),
+        sha256: Sha256,
       });
 
-    if (mentioned.length)
-      await sendTemplate({
-        template: "notify_campaign_bug_comment_mention",
-        email: mentioned.map((r) => r.email),
-        subject: "Sei stato menzionato in un commento",
-        categories: [`CP${this.cid}_BUG_COMMENT_MENTION_NOTIFICATION`],
-        optionalFields: {
-          "{Author.name}": this.author?.name || "Name S.",
-          "{Bug.id}": this.bid,
-          "{Bug.title}": bug?.message,
-          "{Comment}": this.getCommentPreview(),
-          "{Campaign.title}": this.campaignName,
-          "{Bug.url}": `${process.env.APP_URL}/campaigns/${this.cid}/bugs/${this.bid}`,
-        },
-      });
+      if (recipients.length) {
+        const commentEmailHtml = await getTemplate({
+          template: "notify_campaign_bug_comment",
+          email: filteredRecipients.map((r) => r.email),
+          subject: "Nuovo commento sul bug",
+          categories: [`CP${this.cid}_BUG_COMMENT_NOTIFICATION`],
+          optionalFields: {
+            "{Author.name}": this.author?.name || "Name S.",
+            "{Bug.id}": this.bid,
+            "{Bug.title}": bug?.message,
+            "{Comment}": this.getCommentPreview(),
+            "{Campaign.title}": this.campaignName,
+            "{Bug.url}": `${config.APP_URL}campaigns/${this.cid}/bugs/${this.bid}`,
+          },
+        });
+
+        const notificationComment = buildNotificationEmail({
+          entity_id: this.bid.toString(),
+          entity_name: "BUG",
+          subject: "Nuovo commento sul bug",
+          html: commentEmailHtml,
+          to: await Promise.all(
+            recipients.map(async (r) => ({
+              id: r.id,
+              name: r.name,
+              email: r.email,
+              notify: await this.getUserNotificationPreferences(r.id),
+            }))
+          ),
+          cc: [],
+          notification_type: "BUG_COMMENT",
+        });
+
+        const requestComment = new HttpRequest({
+          method: "POST",
+          hostname: apiEndpoint.host,
+          protocol: apiEndpoint.protocol,
+          path: apiEndpoint.pathname,
+          headers: {
+            host: apiEndpoint.hostname,
+          },
+          body: JSON.stringify(notificationComment),
+        });
+
+        const { headers: headersCommentRequest, body: bodyCommentRequest } =
+          await signer.sign(requestComment);
+
+        await axios
+          .post(url, bodyCommentRequest, {
+            headers: headersCommentRequest,
+          })
+          .catch((error) => {
+            console.error("API Gateway error:", error);
+            throw error;
+          });
+      }
+
+      if (mentioned.length) {
+        const mentionEmailHtml = await getTemplate({
+          template: "notify_campaign_bug_comment_mention",
+          email: mentioned.map((r) => r.email),
+          subject: "Sei stato menzionato in un commento",
+          categories: [`CP${this.cid}_BUG_COMMENT_MENTION_NOTIFICATION`],
+          optionalFields: {
+            "{Author.name}": this.author?.name || "Name S.",
+            "{Bug.id}": this.bid,
+            "{Bug.title}": bug?.message,
+            "{Comment}": this.getCommentPreview(),
+            "{Campaign.title}": this.campaignName,
+            "{Bug.url}": `${config.APP_URL}campaigns/${this.cid}/bugs/${this.bid}`,
+          },
+        });
+
+        const notificationMention = buildNotificationEmail({
+          entity_id: this.bid.toString(),
+          entity_name: "BUG",
+          subject: "Sei stato menzionato in un commento",
+          html: mentionEmailHtml,
+          to: mentioned.map((r) => ({
+            id: r.id,
+            name: r.name,
+            email: r.email,
+            notify: true,
+          })),
+          cc: [],
+          notification_type: "BUG_COMMENT_MENTION",
+        });
+
+        const requestMention = new HttpRequest({
+          method: "POST",
+          hostname: apiEndpoint.host,
+          protocol: apiEndpoint.protocol,
+          path: apiEndpoint.pathname,
+          headers: {
+            host: apiEndpoint.hostname,
+          },
+          body: JSON.stringify(notificationMention),
+        });
+
+        const { headers: headersMentionRequest, body: bodyMentionRequest } =
+          await signer.sign(requestMention);
+
+        await axios
+          .post(url, bodyMentionRequest, {
+            headers: headersMentionRequest,
+          })
+          .then()
+          .catch((error) => {
+            console.error("API Gateway error:", error);
+            throw error;
+          });
+      }
+    } catch (error) {
+      console.error(error);
+      throw "Errors signed request";
+    }
+  }
+
+  private async getUserNotificationPreferences(profileId: number) {
+    const userPrefs = await unguess.tables.UserPreferences.do()
+      .select("value")
+      .join("preferences", "preferences.id", "user_preferences.preference_id")
+      .where("user_preferences.profile_id", profileId)
+      .andWhere("preferences.name", "notifications_enabled")
+      .andWhere("preferences.is_active", 1)
+      .first();
+
+    let notify = true;
+    if (userPrefs) {
+      if (!userPrefs.value) notify = false;
+    }
+
+    return notify;
+  }
+
+  private async hasPermission(profileId: number) {
+    const wpUser = await tryber.tables.WpAppqEvdProfile.do()
+      .select("wp_user_id")
+      .where("id", profileId)
+      .first();
+    if (!wpUser) return false;
+
+    // Check workspace access
+    const hasWsAccess = await tryber.tables.WpAppqUserToCustomer.do()
+      .select()
+      .where({
+        wp_user_id: wpUser.wp_user_id,
+        customer_id: this.workspace_id || 0,
+      })
+      .first();
+    if (hasWsAccess) return true;
+
+    // Check project access
+    const hasProjectAccess = await tryber.tables.WpAppqUserToProject.do()
+      .select()
+      .where({
+        wp_user_id: wpUser.wp_user_id,
+        project_id: this.project_id || 0,
+      })
+      .first();
+    if (hasProjectAccess) return true;
+
+    // Check campaign access
+    const hasCampaignAccess = await tryber.tables.WpAppqUserToCampaign.do()
+      .select()
+      .where({
+        wp_user_id: wpUser.wp_user_id,
+        campaign_id: this.cid,
+      })
+      .first();
+    if (hasCampaignAccess) return true;
+
+    return false;
   }
 }
