@@ -186,6 +186,19 @@ export default class Route extends BugsRoute<{
         comments.map((c) => c.profile_id)
       );
 
+    // Get only recipients with permission
+    const mapRec = await Promise.all(
+      recipients.map(async (r) => {
+        return {
+          ...r,
+          hasPermission: await this.hasPermission(r.id),
+        };
+      })
+    );
+
+    // Filter only recipients with permission
+    const filteredRecipients = mapRec.filter((r) => r.hasPermission);
+
     return recipients;
   }
 
@@ -198,6 +211,19 @@ export default class Route extends BugsRoute<{
         "id",
         this.mentioned.map((m) => m.id)
       );
+
+    // Get only recipients with permission
+    const mapMen = await Promise.all(
+      mentions.map(async (m) => {
+        return {
+          ...m,
+          hasPermission: await this.hasPermission(m.id),
+        };
+      })
+    );
+
+    // Filter only recipients with permission
+    const filteredMentions = mapMen.filter((m) => m.hasPermission);
 
     return mentions;
   }
@@ -389,5 +415,45 @@ export default class Route extends BugsRoute<{
     }
 
     return notify;
+  }
+
+  private async hasPermission(profileId: number) {
+    const wpUser = await tryber.tables.WpAppqEvdProfile.do()
+      .select("wp_user_id")
+      .where("id", profileId)
+      .first();
+    if (!wpUser) return false;
+
+    // Check workspace access
+    const hasWsAccess = await tryber.tables.WpAppqUserToCustomer.do()
+      .select()
+      .where({
+        wp_user_id: wpUser.wp_user_id,
+        customer_id: this.workspace_id || 0,
+      })
+      .first();
+    if (hasWsAccess) return true;
+
+    // Check project access
+    const hasProjectAccess = await tryber.tables.WpAppqUserToProject.do()
+      .select()
+      .where({
+        wp_user_id: wpUser.wp_user_id,
+        project_id: this.project_id || 0,
+      })
+      .first();
+    if (hasProjectAccess) return true;
+
+    // Check campaign access
+    const hasCampaignAccess = await tryber.tables.WpAppqUserToCampaign.do()
+      .select()
+      .where({
+        wp_user_id: wpUser.wp_user_id,
+        campaign_id: this.cid,
+      })
+      .first();
+    if (hasCampaignAccess) return true;
+
+    return false;
   }
 }

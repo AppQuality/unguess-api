@@ -12,6 +12,8 @@ import request from "supertest";
 import axios from "axios";
 import config from "@src/config";
 
+const context = useBasicProjectsContext();
+
 // Mocking axios
 jest.mock("axios");
 
@@ -32,32 +34,6 @@ jest.mock("@sendgrid/mail", () => ({
   send: jest.fn(),
   sendMultiple: jest.fn(),
 }));
-
-const customer_1 = {
-  id: 999,
-  company: "Company 999",
-  company_logo: "logo999.png",
-  tokens: 100,
-};
-
-const customer_2 = {
-  id: 998,
-  company: "Company 998",
-  company_logo: "logo998.png",
-  tokens: 100,
-};
-
-const project_1 = {
-  id: 999,
-  display_name: "Project 999",
-  customer_id: customer_1.id,
-};
-
-const project_2 = {
-  id: 998,
-  display_name: "Project 998",
-  customer_id: customer_2.id,
-};
 
 const profile_1 = {
   id: 6,
@@ -91,32 +67,17 @@ const profile_3 = {
 
 const user_to_customer_1 = {
   wp_user_id: profile_1.wp_user_id,
-  customer_id: customer_1.id,
-};
-
-const user_to_customer_10 = {
-  wp_user_id: profile_2.wp_user_id,
-  customer_id: customer_1.id,
-};
-
-const user_to_customer_2 = {
-  wp_user_id: profile_3.wp_user_id,
-  customer_id: customer_2.id,
+  customer_id: 13213213,
 };
 
 const user_to_project_1 = {
   wp_user_id: profile_1.wp_user_id,
-  project_id: project_1.id,
+  project_id: 1321321321,
 };
 
-const user_to_project_2 = {
-  wp_user_id: profile_2.wp_user_id,
-  project_id: project_1.id,
-};
-
-const user_to_project_3 = {
-  wp_user_id: profile_3.wp_user_id,
-  project_id: project_2.id,
+const user_to_campaign_1 = {
+  wp_user_id: profile_1.wp_user_id,
+  campaign_id: 1,
 };
 
 const campaign_type_1 = {
@@ -279,8 +240,6 @@ const bug_4_pending = {
 };
 
 describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
-  const context = useBasicProjectsContext();
-
   beforeAll(async () => {
     await tryber.tables.WpAppqCampaignType.do().insert(campaign_type_1);
     await tryber.tables.WpAppqEvdCampaign.do().insert([
@@ -299,23 +258,17 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
       profile_3,
     ]);
 
+    await tryber.tables.WpAppqUserToCustomer.do().insert([user_to_customer_1]);
+
+    await tryber.tables.WpAppqUserToProject.do().insert([user_to_project_1]);
+
+    await tryber.tables.WpAppqUserToCampaign.do().insert([user_to_campaign_1]);
+
     await tryber.tables.WpAppqEvdBug.do().insert([
       bug_1,
       bug_2,
       bug_3,
       bug_4_pending,
-    ]);
-
-    await tryber.tables.WpAppqUserToProject.do().insert([
-      user_to_project_1,
-      user_to_project_2,
-      user_to_project_3,
-    ]);
-
-    await tryber.tables.WpAppqUserToCustomer.do().insert([
-      user_to_customer_1,
-      user_to_customer_10,
-      user_to_customer_2,
     ]);
 
     await unguess.tables.UgBugsComments.do().insert([
@@ -528,7 +481,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     );
   });
 
-  it("Should send an email when the comment is created successfully", async () => {
+  it("Should send an email to who already commented when the comment is created successfully", async () => {
     const response = await request(app)
       .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
       .set("Authorization", "Bearer user")
@@ -558,6 +511,11 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
           } ${context.profile1.surname.charAt(0).toUpperCase()}.,Test comment,${
             campaign_1.customer_title
           }`,
+          to: expect.arrayContaining([
+            expect.objectContaining({
+              email: profile_1.email,
+            }),
+          ]),
         }),
       })
     );
@@ -785,7 +743,79 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     expect(mockedAxios.post).toHaveBeenCalledTimes(0);
   });
 
-  it("Should NOT notify the user if the user can't access the campaign", async () => {
+  it("Should NOT notify the user if the user has disabled the notifcations", async () => {
+    await unguess.tables.UgBugsComments.do().insert({
+      text: "Comment test",
+      is_deleted: 0,
+      bug_id: bug_1.id,
+      profile_id: profile_2.id,
+      creation_date_utc: "2023-12-11 09:23:00",
+    });
+    const response = await request(app)
+      .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
+      .set("Authorization", "Bearer user")
+      .send({
+        text: "Salve amico",
+      });
+    expect(response.status).toBe(200);
+    expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+    const body = JSON.parse(mockedAxios.post.mock.calls[0][1] as string);
+    expect(body.data.to).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          email: profile_2.email,
+          notify: false,
+        }),
+        expect.objectContaining({
+          email: profile_1.email,
+          notify: true,
+        }),
+      ])
+    );
+  });
+
+  it("Should NOT notify a user who commented if this user has the notifications enabled but doesn't have access to the campaign anymore", async () => {
+    // 2 comments by profile_id: 6 (profile_1)
+    await unguess.tables.UgBugsComments.do().insert({
+      text: "Comment test2",
+      is_deleted: 0,
+      bug_id: bug_1.id,
+      profile_id: profile_3.id, // profile_id: 25
+      creation_date_utc: "2023-12-11 09:23:00",
+    });
+    const response = await request(app)
+      .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
+      .set("Authorization", "Bearer user")
+      .send({
+        text: "Salve amico",
+      });
+    expect(response.status).toBe(200);
+    expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+    const body = JSON.parse(mockedAxios.post.mock.calls[0][1] as string);
+    expect(body.data.to).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          email: profile_1.email,
+          notify: true,
+        }),
+      ])
+    );
+    expect(body.data.to).toEqual(
+      expect.not.arrayContaining([
+        expect.objectContaining({
+          email: profile_3.email,
+        }),
+      ])
+    );
+  });
+  it("Should notify the user if the user has the notifications disabled but has been mentioned", async () => {
+    await unguess.tables.UgBugsComments.do().insert({
+      text: "Comment test",
+      is_deleted: 0,
+      bug_id: bug_1.id,
+      profile_id: profile_2.id,
+      creation_date_utc: "2023-12-11 09:23:00",
+    });
     const response = await request(app)
       .post(`/campaigns/${campaign_1.id}/bugs/${bug_1.id}/comments`)
       .set("Authorization", "Bearer user")
