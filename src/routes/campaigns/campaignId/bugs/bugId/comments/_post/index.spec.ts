@@ -615,7 +615,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
           subject: "Nuovo commento sul bug",
           html: `New comment on bug ${bug_1.id},${bug_1.message},${
             config.APP_URL
-          }campaigns/${campaign_1.id}/bugs/${bug_1.id},${
+          }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
             context.profile1.name
           } ${context.profile1.surname.charAt(0).toUpperCase()}.,Test comment,${
             campaign_1.customer_title
@@ -674,7 +674,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
     expect(body.data.html).toEqual(
       `New comment on bug ${bug_1.id},${bug_1.message},${
         config.APP_URL
-      }campaigns/${campaign_1.id}/bugs/${bug_1.id},${
+      }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
         context.profile1.name
       } ${context.profile1.surname
         .charAt(0)
@@ -726,7 +726,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
           subject: "Nuovo commento sul bug",
           html: `New comment on bug ${bug_1.id},${bug_1.message},${
             config.APP_URL
-          }campaigns/${campaign_1.id}/bugs/${bug_1.id},${
+          }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
             context.profile1.name
           } ${context.profile1.surname.charAt(0).toUpperCase()}.,Test comment,${
             campaign_1.customer_title
@@ -750,7 +750,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
           subject: "Sei stato menzionato in un commento",
           html: `New comment mention on bug ${bug_1.id},${bug_1.message},${
             config.APP_URL
-          }campaigns/${campaign_1.id}/bugs/${bug_1.id},${
+          }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
             context.profile1.name
           } ${context.profile1.surname.charAt(0).toUpperCase()}.,Test comment,${
             campaign_1.customer_title
@@ -799,7 +799,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
           subject: "Nuovo commento sul bug",
           html: `New comment on bug ${bug_1.id},${bug_1.message},${
             config.APP_URL
-          }campaigns/${campaign_1.id}/bugs/${bug_1.id},${
+          }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
             context.profile1.name
           } ${context.profile1.surname.charAt(0).toUpperCase()}.,Test comment,${
             campaign_1.customer_title
@@ -823,7 +823,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
           subject: "Sei stato menzionato in un commento",
           html: `New comment mention on bug ${bug_1.id},${bug_1.message},${
             config.APP_URL
-          }campaigns/${campaign_1.id}/bugs/${bug_1.id},${
+          }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
             context.profile1.name
           } ${context.profile1.surname.charAt(0).toUpperCase()}.,Test comment,${
             campaign_1.customer_title
