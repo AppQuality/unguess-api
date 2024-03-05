@@ -76,7 +76,7 @@ const config: {
     database: process.env.DB_SECONDARY_NAME || "unguess_wp",
     charset: process.env.DB_CHARSET || "UTF8MB4_BIN",
   },
-  APP_URL: process.env.APP_URL || "https://app.unguess.io/",
+  APP_URL: process.env.APP_URL || "https://app.unguess.io",
 };
 
 if (process.env.SSL_CHAIN && process.env.SSL_PRIVATE) {
