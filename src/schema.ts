@@ -1946,9 +1946,6 @@ export interface operations {
         };
       };
     };
-    requestBody: {
-      unknown;
-    };
   };
   "get-media-id": {
     parameters: {

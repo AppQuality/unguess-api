@@ -1800,14 +1800,14 @@ paths:
                   - $ref: '#/components/schemas/PaginationData'
               examples: {}
       operationId: get-campaigns-cid-video
-      requestBody:
-        content: {}
       description: Return all published video for a specific campaign
       parameters:
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/start'
         - $ref: '#/components/parameters/order'
         - $ref: '#/components/parameters/orderBy'
+      security:
+        - JWT: []
   '/media/{id}':
     parameters:
       - schema:
