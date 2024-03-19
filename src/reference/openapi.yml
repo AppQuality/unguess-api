@@ -1783,24 +1783,16 @@ paths:
                               type: string
                             streamUrl:
                               type: string
-                              x-stoplight:
-                                id: ww7a5c8esunft
                             tester:
                               type: object
-                              x-stoplight:
-                                id: w4x1bxywmdfoc
                               required:
                                 - id
                                 - name
                               properties:
                                 id:
                                   type: integer
-                                  x-stoplight:
-                                    id: w7fyhwrg2fb4k
                                 name:
                                   type: string
-                                  x-stoplight:
-                                    id: rz53ep3w7ho7f
                           required:
                             - id
                             - url
@@ -4016,26 +4008,16 @@ components:
         - workspace
     PaginationData:
       title: PaginationData
-      x-stoplight:
-        id: ylqav2ujda23a
       type: object
       properties:
         start:
           type: integer
-          x-stoplight:
-            id: j94rg5xsdrcmz
         size:
           type: integer
-          x-stoplight:
-            id: 4wrisizmn1k8i
         limit:
           type: integer
-          x-stoplight:
-            id: 9axd1z5ew9nrw
         total:
           type: integer
-          x-stoplight:
-            id: 3bjc6jzxfoivb
   securitySchemes:
     JWT:
       type: http
