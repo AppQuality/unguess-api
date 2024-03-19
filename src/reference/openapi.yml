@@ -1808,6 +1808,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Project'
+              examples: {}
         '400':
           $ref: '#/components/responses/Error'
         '401':
@@ -2707,6 +2708,16 @@ components:
         - role
         - name
         - token
+      x-examples:
+        Example 1:
+          id: 0
+          email: user@example.com
+          role: string
+          name: string
+          picture: string
+          token: string
+          iat: 0
+          exp: 0
     Bug:
       title: Bug
       type: object
