@@ -273,7 +273,7 @@ export default class Route extends BugsRoute<{
         const commentEmailHtml = await getTemplate({
           template: "notify_campaign_bug_comment_en",
           email: filteredRecipients.map((r) => r.email),
-          subject: "Nuovo commento sul bug",
+          subject: "New comment on bug",
           categories: [`CP${this.cid}_BUG_COMMENT_NOTIFICATION`],
           optionalFields: {
             "{Author.name}": this.author?.name || "Name S.",
@@ -288,7 +288,7 @@ export default class Route extends BugsRoute<{
         const notificationComment = buildNotificationEmail({
           entity_id: this.bid.toString(),
           entity_name: "BUG",
-          subject: "Nuovo commento sul bug",
+          subject: "New comment on bug",
           html: commentEmailHtml,
           to: await Promise.all(
             recipients.map(async (r) => ({
@@ -330,7 +330,7 @@ export default class Route extends BugsRoute<{
         const mentionEmailHtml = await getTemplate({
           template: "notify_campaign_bug_comment_mention_en",
           email: mentioned.map((r) => r.email),
-          subject: "Sei stato menzionato in un commento",
+          subject: "You have been mentioned in a comment",
           categories: [`CP${this.cid}_BUG_COMMENT_MENTION_NOTIFICATION`],
           optionalFields: {
             "{Author.name}": this.author?.name || "Name S.",
@@ -345,7 +345,7 @@ export default class Route extends BugsRoute<{
         const notificationMention = buildNotificationEmail({
           entity_id: this.bid.toString(),
           entity_name: "BUG",
-          subject: "Sei stato menzionato in un commento",
+          subject: "You have been mentioned in a comment",
           html: mentionEmailHtml,
           to: mentioned.map((r) => ({
             id: r.id,
