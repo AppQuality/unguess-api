@@ -1753,6 +1753,69 @@ paths:
           in: query
           name: updateTrend
           description: should update bug trend after request resolves?
+  '/campaigns/{cid}/video':
+    parameters:
+      - schema:
+          type: string
+        name: cid
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            url:
+                              type: string
+                            streamUrl:
+                              type: string
+                              x-stoplight:
+                                id: ww7a5c8esunft
+                            tester:
+                              type: object
+                              x-stoplight:
+                                id: w4x1bxywmdfoc
+                              required:
+                                - id
+                                - name
+                              properties:
+                                id:
+                                  type: integer
+                                  x-stoplight:
+                                    id: w7fyhwrg2fb4k
+                                name:
+                                  type: string
+                                  x-stoplight:
+                                    id: rz53ep3w7ho7f
+                          required:
+                            - id
+                            - url
+                            - tester
+                  - $ref: '#/components/schemas/PaginationData'
+              examples: {}
+      operationId: get-campaigns-cid-video
+      requestBody:
+        content: {}
+      description: Return all published video for a specific campaign
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/order'
+        - $ref: '#/components/parameters/orderBy'
   '/media/{id}':
     parameters:
       - schema:
@@ -3951,6 +4014,28 @@ components:
         - csm
       x-tags:
         - workspace
+    PaginationData:
+      title: PaginationData
+      x-stoplight:
+        id: ylqav2ujda23a
+      type: object
+      properties:
+        start:
+          type: integer
+          x-stoplight:
+            id: j94rg5xsdrcmz
+        size:
+          type: integer
+          x-stoplight:
+            id: 4wrisizmn1k8i
+        limit:
+          type: integer
+          x-stoplight:
+            id: 9axd1z5ew9nrw
+        total:
+          type: integer
+          x-stoplight:
+            id: 3bjc6jzxfoivb
   securitySchemes:
     JWT:
       type: http

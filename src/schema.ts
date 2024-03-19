@@ -245,6 +245,15 @@ export interface paths {
       };
     };
   };
+  "/campaigns/{cid}/video": {
+    /** Return all published video for a specific campaign */
+    get: operations["get-campaigns-cid-video"];
+    parameters: {
+      path: {
+        cid: string;
+      };
+    };
+  };
   "/media/{id}": {
     get: operations["get-media-id"];
     parameters: {
@@ -924,6 +933,13 @@ export interface components {
       isShared?: boolean;
       /** @description Number of shared items */
       sharedItems?: number;
+    };
+    /** PaginationData */
+    PaginationData: {
+      start?: number;
+      size?: number;
+      limit?: number;
+      total?: number;
     };
   };
   responses: {
@@ -1893,6 +1909,45 @@ export interface operations {
       401: components["responses"]["Error"];
       403: components["responses"]["Error"];
       500: components["responses"]["Error"];
+    };
+  };
+  /** Return all published video for a specific campaign */
+  "get-campaigns-cid-video": {
+    parameters: {
+      path: {
+        cid: string;
+      };
+      query: {
+        /** Limit pagination parameter */
+        limit?: components["parameters"]["limit"];
+        /** Start pagination parameter */
+        start?: components["parameters"]["start"];
+        /** Order value (ASC, DESC) */
+        order?: components["parameters"]["order"];
+        /** Order by accepted field */
+        orderBy?: components["parameters"]["orderBy"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            items?: {
+              id: number;
+              url: string;
+              streamUrl?: string;
+              tester: {
+                id: number;
+                name: string;
+              };
+            }[];
+          } & components["schemas"]["PaginationData"];
+        };
+      };
+    };
+    requestBody: {
+      unknown;
     };
   };
   "get-media-id": {
