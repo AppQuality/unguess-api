@@ -1385,15 +1385,18 @@ paths:
                 Example 1:
                   value:
                     items:
-                      - id: 1234
-                        email: user@example.com
+                      - id: 0
+                        profile_id: 0
                         name: string
-                        profile_id: 999
+                        email: string
                         invitationPending: true
+                        permissionFrom:
+                          type: workspace
+                          id: 0
                     start: 0
                     limit: 0
-                    size: 1
-                    total: 1
+                    size: 0
+                    total: 0
         '400':
           $ref: '#/components/responses/Error'
         '403':
@@ -1455,14 +1458,6 @@ paths:
             application/json:
               schema:
                 type: object
-                x-examples:
-                  Example 1:
-                    items:
-                      - id: 1234
-                        email: user@example.com
-                        name: string
-                        profile_id: 999
-                        invitationPending: true
                 properties:
                   items:
                     type: array
@@ -1470,6 +1465,18 @@ paths:
                       $ref: '#/components/schemas/Tenant'
                 required:
                   - items
+              examples:
+                Example 1:
+                  value:
+                    items:
+                      - id: 0
+                        profile_id: 0
+                        name: string
+                        email: string
+                        invitationPending: true
+                        permissionFrom:
+                          type: workspace
+                          id: 0
         '400':
           $ref: '#/components/responses/Error'
         '403':
@@ -2004,14 +2011,6 @@ paths:
             application/json:
               schema:
                 type: object
-                x-examples:
-                  Example 1:
-                    items:
-                      - id: 1234
-                        email: user@example.com
-                        name: string
-                        profile_id: 999
-                        invitationPending: true
                 properties:
                   items:
                     type: array
@@ -2019,6 +2018,18 @@ paths:
                       $ref: '#/components/schemas/Tenant'
                 required:
                   - items
+              examples:
+                Example 1:
+                  value:
+                    items:
+                      - id: 0
+                        profile_id: 0
+                        name: string
+                        email: string
+                        invitationPending: true
+                        permissionFrom:
+                          type: workspace
+                          id: 0
         '400':
           $ref: '#/components/responses/Error'
         '403':
@@ -2625,14 +2636,6 @@ paths:
             application/json:
               schema:
                 type: object
-                x-examples:
-                  Example 1:
-                    items:
-                      - id: 1234
-                        email: user@example.com
-                        name: string
-                        profile_id: 999
-                        invitationPending: true
                 properties:
                   items:
                     type: array
@@ -2640,6 +2643,18 @@ paths:
                       $ref: '#/components/schemas/Tenant'
                 required:
                   - items
+              examples:
+                Example 1:
+                  value:
+                    items:
+                      - id: 0
+                        profile_id: 0
+                        name: string
+                        email: string
+                        invitationPending: true
+                        permissionFrom:
+                          type: workspace
+                          id: 0
         '400':
           $ref: '#/components/responses/Error'
         '403':
@@ -2668,18 +2683,6 @@ components:
       title: Authentication
       type: object
       description: ''
-      x-examples:
-        example-1:
-          value:
-            username: string
-            name: string
-            surname: string
-            email: user@example.com
-            image: 'http://example.com'
-            id: 0
-            wp_user_id: 0
-            role: string
-            is_verified: true
       properties:
         id:
           type: integer
@@ -3467,6 +3470,16 @@ components:
         - name
         - email
         - invitationPending
+      x-examples:
+        Example 1:
+          id: 0
+          profile_id: 0
+          name: string
+          email: string
+          invitationPending: true
+          permissionFrom:
+            type: workspace
+            id: 0
     UseCase:
       title: UseCase
       type: object
