@@ -404,7 +404,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
 
     await tryber.tables.WpAppqEventTransactionalMail.do().insert({
       id: 1,
-      event_name: "notify_campaign_bug_comment",
+      event_name: "notify_campaign_bug_comment_en",
       template_id: 1,
       last_editor_tester_id: 1,
     });
@@ -424,7 +424,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
 
     await tryber.tables.WpAppqEventTransactionalMail.do().insert({
       id: 2,
-      event_name: "notify_campaign_bug_comment_mention",
+      event_name: "notify_campaign_bug_comment_mention_en",
       template_id: 2,
       last_editor_tester_id: 1,
     });
