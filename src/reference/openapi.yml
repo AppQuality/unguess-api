@@ -135,6 +135,33 @@ paths:
                 $ref: '#/components/schemas/CampaignWithOutput'
       security:
         - JWT: []
+  '/campaigns/{cid}/bugTypes':
+    parameters:
+      - $ref: '#/components/parameters/cid'
+    get:
+      summary: Get Campaigns BugTypes
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BugType'
+              examples: {}
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-bug-types
+      description: ''
+      security:
+        - JWT: []
+      parameters: []
   '/campaigns/{cid}/bugs':
     parameters:
       - $ref: '#/components/parameters/cid'
@@ -535,6 +562,138 @@ paths:
                   tags: []
       security:
         - JWT: []
+  '/campaigns/{cid}/bugs/{bid}/comments':
+    parameters:
+      - $ref: '#/components/parameters/cid'
+      - $ref: '#/components/parameters/bid'
+    get:
+      summary: Bug comments
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BugComment'
+                required:
+                  - items
+              examples:
+                Example 1:
+                  value:
+                    items:
+                      - id: 0
+                        text: string
+                        creation_date: string
+                        creator:
+                          id: 0
+                          name: string
+                          isInternal: true
+        '400':
+          $ref: '#/components/responses/Error'
+          description: ''
+        '403':
+          $ref: '#/components/responses/Error'
+          description: ''
+        '500':
+          $ref: '#/components/responses/Error'
+          description: ''
+      operationId: get-campaigns-cid-bugs-bid-comments
+      security:
+        - JWT: []
+    post:
+      summary: Bug comments
+      operationId: post-campaigns-cid-bugs-bid-comments
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BugComment'
+        '400':
+          $ref: '#/components/responses/Error'
+          description: ''
+        '403':
+          $ref: '#/components/responses/Error'
+          description: ''
+        '500':
+          $ref: '#/components/responses/Error'
+          description: ''
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                mentioned:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                    required:
+                      - id
+              required:
+                - text
+            examples:
+              Example 1:
+                value:
+                  text: string
+                  mentioned:
+                    - id: 0
+                      full_name: string
+  '/campaigns/{cid}/bugs/{bid}/comments/{cmid}':
+    parameters:
+      - schema:
+          type: string
+        name: cid
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: bid
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: cmid
+        in: path
+        required: true
+    delete:
+      summary: Delete Comment
+      operationId: delete-campaigns-cid-bugs-bid-comments-cmid
+      responses:
+        '200':
+          description: OK
+          content: {}
+        '400':
+          $ref: '#/components/responses/Error'
+          description: ''
+        '403':
+          $ref: '#/components/responses/Error'
+          description: ''
+        '500':
+          $ref: '#/components/responses/Error'
+          description: ''
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
   '/campaigns/{cid}/bugs/{bid}/siblings':
     parameters:
       - name: cid
@@ -653,33 +812,6 @@ paths:
       security:
         - JWT: []
       description: ''
-  '/campaigns/{cid}/bugTypes':
-    parameters:
-      - $ref: '#/components/parameters/cid'
-    get:
-      summary: Get Campaigns BugTypes
-      tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/BugType'
-              examples: {}
-        '400':
-          $ref: '#/components/responses/Error'
-        '403':
-          $ref: '#/components/responses/Error'
-        '500':
-          $ref: '#/components/responses/Error'
-      operationId: get-campaigns-cid-bug-types
-      description: ''
-      security:
-        - JWT: []
-      parameters: []
   '/campaigns/{cid}/clusters':
     parameters:
       - schema:
@@ -1614,6 +1746,21 @@ paths:
           in: query
           name: updateTrend
           description: should update bug trend after request resolves?
+  '/media/{id}':
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+    get:
+      summary: Get Media ID
+      tags: []
+      responses:
+        '302':
+          description: Found
+      operationId: get-media-id
+      description: ''
   /projects:
     post:
       summary: Create a new project
@@ -1959,6 +2106,67 @@ paths:
       operationId: get-users-me
       security:
         - JWT: []
+  /users/me/preferences:
+    get:
+      summary: Get User Preferences
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserPreference'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-users-me-preferences
+      security:
+        - JWT: []
+  '/users/me/preferences/{prefid}':
+    parameters:
+      - schema:
+          type: string
+        name: prefid
+        in: path
+        required: true
+    put:
+      summary: Update user preferences
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPreference'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: put-users-me-preferences-prefid
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - value
+              properties:
+                value:
+                  type: integer
   /workspaces:
     get:
       summary: Get User Workspaces
@@ -2454,214 +2662,6 @@ paths:
                   type: boolean
               required:
                 - user_id
-  '/media/{id}':
-    parameters:
-      - schema:
-          type: string
-        name: id
-        in: path
-        required: true
-    get:
-      summary: Get Media ID
-      tags: []
-      responses:
-        '302':
-          description: Found
-      operationId: get-media-id
-      description: ''
-  '/campaigns/{cid}/bugs/{bid}/comments':
-    parameters:
-      - $ref: '#/components/parameters/cid'
-      - $ref: '#/components/parameters/bid'
-    get:
-      summary: Bug comments
-      tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/BugComment'
-                required:
-                  - items
-              examples:
-                Example 1:
-                  value:
-                    items:
-                      - id: 0
-                        text: string
-                        creation_date: string
-                        creator:
-                          id: 0
-                          name: string
-                          isInternal: true
-        '400':
-          $ref: '#/components/responses/Error'
-          description: ''
-        '403':
-          $ref: '#/components/responses/Error'
-          description: ''
-        '500':
-          $ref: '#/components/responses/Error'
-          description: ''
-      operationId: get-campaigns-cid-bugs-bid-comments
-      security:
-        - JWT: []
-    post:
-      summary: Bug comments
-      operationId: post-campaigns-cid-bugs-bid-comments
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BugComment'
-        '400':
-          $ref: '#/components/responses/Error'
-          description: ''
-        '403':
-          $ref: '#/components/responses/Error'
-          description: ''
-        '500':
-          $ref: '#/components/responses/Error'
-          description: ''
-      security:
-        - JWT: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                text:
-                  type: string
-                mentioned:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      id:
-                        type: integer
-                    required:
-                      - id
-              required:
-                - text
-            examples:
-              Example 1:
-                value:
-                  text: string
-                  mentioned:
-                    - id: 0
-                      full_name: string
-  '/campaigns/{cid}/bugs/{bid}/comments/{cmid}':
-    parameters:
-      - schema:
-          type: string
-        name: cid
-        in: path
-        required: true
-      - schema:
-          type: string
-        name: bid
-        in: path
-        required: true
-      - schema:
-          type: string
-        name: cmid
-        in: path
-        required: true
-    delete:
-      summary: Delete Comment
-      operationId: delete-campaigns-cid-bugs-bid-comments-cmid
-      responses:
-        '200':
-          description: OK
-          content: {}
-        '400':
-          $ref: '#/components/responses/Error'
-          description: ''
-        '403':
-          $ref: '#/components/responses/Error'
-          description: ''
-        '500':
-          $ref: '#/components/responses/Error'
-          description: ''
-      security:
-        - JWT: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties: {}
-  /users/me/preferences:
-    get:
-      summary: Get User Preferences
-      tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/UserPreference'
-        '400':
-          $ref: '#/components/responses/Error'
-        '403':
-          $ref: '#/components/responses/Error'
-        '500':
-          $ref: '#/components/responses/Error'
-      operationId: get-users-me-preferences
-      security:
-        - JWT: []
-  '/users/me/preferences/{prefid}':
-    parameters:
-      - schema:
-          type: string
-        name: prefid
-        in: path
-        required: true
-    put:
-      summary: Update user preferences
-      tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserPreference'
-        '400':
-          $ref: '#/components/responses/Error'
-        '403':
-          $ref: '#/components/responses/Error'
-        '500':
-          $ref: '#/components/responses/Error'
-      operationId: put-users-me-preferences-prefid
-      security:
-        - JWT: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - value
-              properties:
-                value:
-                  type: integer
 components:
   schemas:
     Authentication:
@@ -2829,6 +2829,34 @@ components:
       required:
         - options
         - kind
+    BugComment:
+      title: BugComment
+      type: object
+      properties:
+        id:
+          type: integer
+        text:
+          type: string
+        creation_date:
+          type: string
+        creator:
+          type: object
+          required:
+            - id
+            - name
+            - isInternal
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            isInternal:
+              type: boolean
+      required:
+        - id
+        - text
+        - creation_date
+        - creator
     BugCustomStatus:
       title: BugCustomStatus
       type: object
@@ -3408,6 +3436,37 @@ components:
           type: string
       required:
         - name
+    Tenant:
+      title: Tenant
+      type: object
+      properties:
+        id:
+          type: number
+          description: tryber wp_user_id
+        profile_id:
+          type: number
+        name:
+          type: string
+        email:
+          type: string
+        invitationPending:
+          type: boolean
+        permissionFrom:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - workspace
+                - project
+            id:
+              type: integer
+      required:
+        - id
+        - profile_id
+        - name
+        - email
+        - invitationPending
     UseCase:
       title: UseCase
       type: object
@@ -3486,6 +3545,20 @@ components:
         - profile_id
         - tryber_wp_user_id
         - unguess_wp_user_id
+    UserPreference:
+      title: UserPreference
+      type: object
+      required:
+        - preference_id
+        - value
+        - name
+      properties:
+        preference_id:
+          type: integer
+        value:
+          type: integer
+        name:
+          type: string
     WidgetBugsByDevice:
       title: WidgetBugsByDevice
       type: object
@@ -3854,79 +3927,6 @@ components:
         - csm
       x-tags:
         - workspace
-    Tenant:
-      title: Tenant
-      type: object
-      properties:
-        id:
-          type: number
-          description: tryber wp_user_id
-        profile_id:
-          type: number
-        name:
-          type: string
-        email:
-          type: string
-        invitationPending:
-          type: boolean
-        permissionFrom:
-          type: object
-          properties:
-            type:
-              type: string
-              enum:
-                - workspace
-                - project
-            id:
-              type: integer
-      required:
-        - id
-        - profile_id
-        - name
-        - email
-        - invitationPending
-    BugComment:
-      title: BugComment
-      type: object
-      properties:
-        id:
-          type: integer
-        text:
-          type: string
-        creation_date:
-          type: string
-        creator:
-          type: object
-          required:
-            - id
-            - name
-            - isInternal
-          properties:
-            id:
-              type: integer
-            name:
-              type: string
-            isInternal:
-              type: boolean
-      required:
-        - id
-        - text
-        - creation_date
-        - creator
-    UserPreference:
-      title: UserPreference
-      type: object
-      required:
-        - preference_id
-        - value
-        - name
-      properties:
-        preference_id:
-          type: integer
-        value:
-          type: integer
-        name:
-          type: string
   securitySchemes:
     JWT:
       type: http
