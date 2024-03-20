@@ -188,7 +188,7 @@ describe("GET /campaigns/:campaignId/video", () => {
     expect(response.body.items).toBeInstanceOf(Array);
   });
 
-  it("Should return video of a specific campaign", async () => {
+  it("Should return publish video of a specific campaign", async () => {
     const response = await request(app)
       .get("/campaigns/1/video")
       .set("Authorization", "Bearer user");
