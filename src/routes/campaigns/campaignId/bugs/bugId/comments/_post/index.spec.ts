@@ -612,7 +612,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
             email: "info@unguess.io",
             name: "UNGUESS",
           },
-          subject: "Nuovo commento sul bug",
+          subject: "New comment on bug",
           html: `New comment on bug ${bug_1.id},${bug_1.message},${
             config.APP_URL
           }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
@@ -723,7 +723,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
             email: "info@unguess.io",
             name: "UNGUESS",
           },
-          subject: "Nuovo commento sul bug",
+          subject: "New comment on bug",
           html: `New comment on bug ${bug_1.id},${bug_1.message},${
             config.APP_URL
           }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
@@ -747,7 +747,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
             email: "info@unguess.io",
             name: "UNGUESS",
           },
-          subject: "Sei stato menzionato in un commento",
+          subject: "You have been mentioned in a comment",
           html: `New comment mention on bug ${bug_1.id},${bug_1.message},${
             config.APP_URL
           }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
@@ -796,7 +796,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
             email: "info@unguess.io",
             name: "UNGUESS",
           },
-          subject: "Nuovo commento sul bug",
+          subject: "New comment on bug",
           html: `New comment on bug ${bug_1.id},${bug_1.message},${
             config.APP_URL
           }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
@@ -820,7 +820,7 @@ describe("POST /campaigns/{cid}/bugs/{bid}/comments", () => {
             email: "info@unguess.io",
             name: "UNGUESS",
           },
-          subject: "Sei stato menzionato in un commento",
+          subject: "You have been mentioned in a comment",
           html: `New comment mention on bug ${bug_1.id},${bug_1.message},${
             config.APP_URL
           }/campaigns/${campaign_1.id}/bugs/${bug_1.id},${
