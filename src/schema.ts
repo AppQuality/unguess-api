@@ -245,6 +245,14 @@ export interface paths {
       };
     };
   };
+  "/comments/{cmid}/media": {
+    post: operations["post-comments-cmid-media"];
+    parameters: {
+      path: {
+        cmid: string;
+      };
+    };
+  };
   "/media/{id}": {
     get: operations["get-media-id"];
     parameters: {
@@ -1893,6 +1901,38 @@ export interface operations {
       401: components["responses"]["Error"];
       403: components["responses"]["Error"];
       500: components["responses"]["Error"];
+    };
+  };
+  "post-comments-cmid-media": {
+    parameters: {
+      path: {
+        cmid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            files: {
+              name: string;
+              path: string;
+            }[];
+            failed?: {
+              name: string;
+              /** @enum {string} */
+              errorCode: "FILE_TOO_BIG" | "INVALID_FILE_EXTENSION";
+            }[];
+          };
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "multipart/form-data": {
+          media: string | string[];
+        };
+      };
     };
   };
   "get-media-id": {

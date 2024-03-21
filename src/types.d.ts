@@ -1,3 +1,4 @@
+import { Busboy } from "connect-busboy";
 import { Response } from "express";
 import { Request } from "openapi-backend";
 
@@ -11,11 +12,23 @@ declare global {
   interface OpenapiRequest extends Request {
     user: UserType;
     query: { [key: string]: string | { [key: string]: string } };
+
+    pipe: (stream: NodeJS.Readable) => void;
+    busboy: Busboy;
   }
   interface OpenapiError extends Error {
     status_code: number;
     code?: number;
   }
+
+  type Media = {
+    name: string;
+    keyEnhancer?: ({}) => string;
+    size: number;
+    stream: fs.ReadStream;
+    mimeType: string;
+    tmpPath: string;
+  };
 
   type UserType = {
     id: number;
