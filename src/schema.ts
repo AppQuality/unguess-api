@@ -148,6 +148,15 @@ export interface paths {
       };
     };
   };
+  "/campaigns/{cid}/observations": {
+    /** Retrive all observations of a specific campaigns */
+    get: operations["get-campaigns-cid-observations"];
+    parameters: {
+      path: {
+        cid: string;
+      };
+    };
+  };
   "/campaigns/{cid}/os": {
     get: operations["get-campaigns-cid-os"];
     parameters: {
@@ -315,6 +324,15 @@ export interface paths {
     parameters: {
       path: {
         prefid: string;
+      };
+    };
+  };
+  "/video/{vid}/observations": {
+    /** Retrive all observations of a specific video */
+    get: operations["get-video-vid-observations"];
+    parameters: {
+      path: {
+        vid: string;
       };
     };
   };
@@ -1571,6 +1589,29 @@ export interface operations {
       500: components["responses"]["Error"];
     };
   };
+  /** Retrive all observations of a specific campaigns */
+  "get-campaigns-cid-observations": {
+    parameters: {
+      path: {
+        cid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            robaOsservazione?: string;
+            tags?: {
+              id?: string;
+              name?: string;
+              groupId?: string;
+            }[];
+          };
+        };
+      };
+    };
+  };
   "get-campaigns-cid-os": {
     parameters: {
       path: {
@@ -2225,6 +2266,29 @@ export interface operations {
       content: {
         "application/json": {
           value: number;
+        };
+      };
+    };
+  };
+  /** Retrive all observations of a specific video */
+  "get-video-vid-observations": {
+    parameters: {
+      path: {
+        vid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            robaOsservazione?: string;
+            tags?: {
+              id?: string;
+              name?: string;
+              groupId?: string;
+            }[];
+          };
         };
       };
     };
