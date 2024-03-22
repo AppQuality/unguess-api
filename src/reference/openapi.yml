@@ -1803,6 +1803,7 @@ paths:
                           enum:
                             - FILE_TOO_BIG
                             - INVALID_FILE_EXTENSION
+                            - GENERIC_ERROR
                       required:
                         - name
                         - errorCode

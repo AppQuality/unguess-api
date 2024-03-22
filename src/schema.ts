@@ -1921,7 +1921,10 @@ export interface operations {
             failed?: {
               name: string;
               /** @enum {string} */
-              errorCode: "FILE_TOO_BIG" | "INVALID_FILE_EXTENSION";
+              errorCode:
+                | "FILE_TOO_BIG"
+                | "INVALID_FILE_EXTENSION"
+                | "GENERIC_ERROR";
             }[];
           };
         };

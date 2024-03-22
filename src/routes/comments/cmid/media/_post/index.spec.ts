@@ -41,7 +41,6 @@ describe("Route POST /comments/{cmid}/media", () => {
       .attach("media", mockFileBuffer, "void.sh")
       .attach("media", mockFileBuffer, "void.exe")
       .set("authorization", "Bearer user");
-    console.log(response.body);
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("failed", [
       { errorCode: "INVALID_FILE_EXTENSION", name: "void.bat" },
