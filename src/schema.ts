@@ -88,6 +88,16 @@ export interface paths {
       };
     };
   };
+  "/campaigns/{cid}/bugs/{bid}/comments/{cmid}/media": {
+    post: operations["post-campaigns-cid-bugs-bid-comments-cmid-media"];
+    parameters: {
+      path: {
+        cmid: string;
+        cid: string;
+        bid: string;
+      };
+    };
+  };
   "/campaigns/{cid}/bugs/{bid}/siblings": {
     get: operations["get-campaigns-bug-siblings"];
     parameters: {
@@ -242,14 +252,6 @@ export interface paths {
       path: {
         /** Campaign id */
         cid: components["parameters"]["cid"];
-      };
-    };
-  };
-  "/comments/{cmid}/media": {
-    post: operations["post-comments-cmid-media"];
-    parameters: {
-      path: {
-        cmid: string;
       };
     };
   };
@@ -1351,6 +1353,43 @@ export interface operations {
       };
     };
   };
+  "post-campaigns-cid-bugs-bid-comments-cmid-media": {
+    parameters: {
+      path: {
+        cmid: string;
+        cid: string;
+        bid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            files: {
+              name: string;
+              path: string;
+            }[];
+            failed?: {
+              name: string;
+              /** @enum {string} */
+              errorCode:
+                | "FILE_TOO_BIG"
+                | "INVALID_FILE_EXTENSION"
+                | "GENERIC_ERROR";
+            }[];
+          };
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "multipart/form-data": {
+          media: string | string[];
+        };
+      };
+    };
+  };
   "get-campaigns-bug-siblings": {
     parameters: {
       path: {
@@ -1901,41 +1940,6 @@ export interface operations {
       401: components["responses"]["Error"];
       403: components["responses"]["Error"];
       500: components["responses"]["Error"];
-    };
-  };
-  "post-comments-cmid-media": {
-    parameters: {
-      path: {
-        cmid: string;
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/json": {
-            files: {
-              name: string;
-              path: string;
-            }[];
-            failed?: {
-              name: string;
-              /** @enum {string} */
-              errorCode:
-                | "FILE_TOO_BIG"
-                | "INVALID_FILE_EXTENSION"
-                | "GENERIC_ERROR";
-            }[];
-          };
-        };
-      };
-    };
-    requestBody: {
-      content: {
-        "multipart/form-data": {
-          media: string | string[];
-        };
-      };
     };
   };
   "get-media-id": {

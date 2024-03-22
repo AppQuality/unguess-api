@@ -1,13 +1,14 @@
 import OpenapiError from "@src/features/OpenapiError";
 import busboyMapper, { InvalidMedia } from "@src/features/busboyMapper";
-import UserRoute from "@src/features/routes/UserRoute";
+import BugCommentRoute from "@src/features/routes/BugCommentRoute";
 import upload from "@src/features/s3/upload";
 import path from "path";
 
-/** OPENAPI-CLASS: post-comments-cmid-media */
-export default class MediaRoute extends UserRoute<{
-  response: StoplightOperations["post-comments-cmid-media"]["responses"]["200"]["content"]["application/json"];
-  body: StoplightOperations["post-comments-cmid-media"]["requestBody"]["content"]["multipart/form-data"];
+/** OPENAPI-CLASS: post-campaigns-cid-bugs-bid-comments-cmid-media */
+export default class MediaRoute extends BugCommentRoute<{
+  response: StoplightOperations["post-campaigns-cid-bugs-bid-comments-cmid-media"]["responses"]["200"]["content"]["application/json"];
+  body: StoplightOperations["post-campaigns-cid-bugs-bid-comments-cmid-media"]["requestBody"]["content"]["multipart/form-data"];
+  parameters: StoplightOperations["post-campaigns-cid-bugs-bid-comments-cmid-media"]["parameters"]["path"];
 }> {
   private validMedia: Media[] = [];
   private invalidMedia: InvalidMedia[] = [];
@@ -46,7 +47,7 @@ export default class MediaRoute extends UserRoute<{
   }
 
   private async uploadFiles(): Promise<
-    StoplightOperations["post-comments-cmid-media"]["responses"]["200"]["content"]["application/json"]["files"]
+    StoplightOperations["post-campaigns-cid-bugs-bid-comments-cmid-media"]["responses"]["200"]["content"]["application/json"]["files"]
   > {
     const files = this.validMedia;
     const testerId = this.getProfileId();
