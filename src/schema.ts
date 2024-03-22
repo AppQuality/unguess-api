@@ -968,6 +968,19 @@ export interface components {
       limit?: number;
       total?: number;
     };
+    /**
+     * Video
+     * @description Video uploaded from a user
+     */
+    Video: {
+      id: string;
+      url: string;
+      streamUrl?: string;
+      tester: {
+        id: string;
+        name: string;
+      };
+    };
   };
   responses: {
     /** Shared error response */
@@ -1976,14 +1989,13 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            items?: {
-              id: number;
-              url: string;
-              streamUrl?: string;
-              tester: {
-                id: number;
-                name: string;
+            items: {
+              usecase: {
+                id: string;
+                title: string;
+                descriprion: string;
               };
+              videos: components["schemas"]["Video"][];
             }[];
           } & components["schemas"]["PaginationData"];
         };

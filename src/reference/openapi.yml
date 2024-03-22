@@ -1841,26 +1841,38 @@ paths:
                         items:
                           type: object
                           properties:
-                            id:
-                              type: integer
-                            url:
-                              type: string
-                            streamUrl:
-                              type: string
-                            tester:
+                            usecase:
                               type: object
+                              x-stoplight:
+                                id: f4r1n8c4uuioe
                               required:
                                 - id
-                                - name
+                                - title
+                                - descriprion
                               properties:
                                 id:
-                                  type: integer
-                                name:
                                   type: string
+                                  x-stoplight:
+                                    id: aqi0zf0ayztl7
+                                title:
+                                  type: string
+                                  x-stoplight:
+                                    id: 9ujacs1cwngg5
+                                descriprion:
+                                  type: string
+                                  x-stoplight:
+                                    id: 2exvfkkyf0li5
+                            videos:
+                              type: array
+                              x-stoplight:
+                                id: rryi9k26n8tyn
+                              items:
+                                $ref: '#/components/schemas/Video'
                           required:
-                            - id
-                            - url
-                            - tester
+                            - usecase
+                            - videos
+                    required:
+                      - items
                   - $ref: '#/components/schemas/PaginationData'
               examples: {}
       operationId: get-campaigns-cid-video
@@ -3690,6 +3702,7 @@ components:
           permissionFrom:
             type: workspace
             id: 0
+      description: ''
     UseCase:
       title: UseCase
       type: object
@@ -4162,6 +4175,43 @@ components:
           type: integer
         total:
           type: integer
+    Video:
+      title: Video
+      x-stoplight:
+        id: c9bsgiuqn7pzk
+      type: object
+      description: Video uploaded from a user
+      properties:
+        id:
+          type: string
+        url:
+          type: string
+          x-stoplight:
+            id: b8jaloc6uywjf
+        streamUrl:
+          type: string
+          x-stoplight:
+            id: 1jubraydzvyey
+        tester:
+          type: object
+          x-stoplight:
+            id: 17acrrg0dmbce
+          required:
+            - id
+            - name
+          properties:
+            id:
+              type: string
+              x-stoplight:
+                id: dclmyfzkalga6
+            name:
+              type: string
+              x-stoplight:
+                id: u6o8fcn428es2
+      required:
+        - id
+        - url
+        - tester
   securitySchemes:
     JWT:
       type: http
