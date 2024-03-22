@@ -1739,11 +1739,15 @@ paths:
           in: query
           name: showAsCustomer
         - $ref: '#/components/parameters/filterBy'
-  '/campaigns/{cid}/widgets':
+  '/campaigns/{cid}/uxTagsGroups':
     parameters:
-      - $ref: '#/components/parameters/cid'
+      - schema:
+          type: string
+        name: cid
+        in: path
+        required: true
     get:
-      summary: Get Campaign widget data
+      summary: Your GET endpoint
       tags: []
       responses:
         '200':
@@ -1751,41 +1755,68 @@ paths:
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: '#/components/schemas/WidgetBugsByUseCase'
-                  - $ref: '#/components/schemas/WidgetBugsByDevice'
-                  - $ref: '#/components/schemas/WidgetCampaignProgress'
-                  - $ref: '#/components/schemas/WidgetCampaignUniqueBugs'
-                  - $ref: '#/components/schemas/WidgetBugsByDuplicates'
+                type: array
+                items:
+                  type: object
+                  properties:
+                    groupId:
+                      type: integer
+                    groupName:
+                      type: string
+                    tags:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                          usageNumber:
+                            type: integer
+                        required:
+                          - id
+                          - name
+                          - usageNumber
+                  required:
+                    - groupId
+                    - groupName
+                    - tags
               examples:
-                Bugs by UseCase:
+                two-groups:
                   value:
-                    data:
-                      - title:
-                          full: UC1 asd
-                        description: string
-                        bugs: 10
-                        uniqueBugs: 8
-                        usecase_id: 1220
-                    kind: bugsByUseCase
-        '400':
-          $ref: '#/components/responses/Error'
-        '401':
-          $ref: '#/components/responses/Error'
-        '403':
-          $ref: '#/components/responses/Error'
-        '500':
-          $ref: '#/components/responses/Error'
-      operationId: get-campaigns-cid-widgets-wslug
+                    - groupId: 1
+                      groupName: severities
+                      tags:
+                        - id: 1
+                          name: high
+                          usageNumber: 1
+                        - id: 2
+                          name: low
+                          usageNumber: 55
+                        - id: 3
+                          name: medium
+                          usageNumber: 33
+                    - groupId: 2
+                      groupName: status
+                      tags:
+                        - id: 1
+                          name: solved
+                          usageNumber: 1
+                        - id: 2
+                          name: progress
+                          usageNumber: 55
+                empty-tags:
+                  value:
+                    - groupId: 10
+                      groupName: monetizable
+                      tags: []
+                empty-groups:
+                  value: []
+      operationId: get-campaigns-cid-uxtagsgroups
       security:
         - JWT: []
-      parameters:
-        - $ref: '#/components/parameters/wslug'
-        - schema:
-            type: boolean
-          in: query
-          name: updateTrend
-          description: should update bug trend after request resolves?
+      description: Retrieve all groups of public ux-tags for a specific campaign
   '/campaigns/{cid}/video':
     parameters:
       - schema:
@@ -1841,6 +1872,53 @@ paths:
         - $ref: '#/components/parameters/orderBy'
       security:
         - JWT: []
+  '/campaigns/{cid}/widgets':
+    parameters:
+      - $ref: '#/components/parameters/cid'
+    get:
+      summary: Get Campaign widget data
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/WidgetBugsByUseCase'
+                  - $ref: '#/components/schemas/WidgetBugsByDevice'
+                  - $ref: '#/components/schemas/WidgetCampaignProgress'
+                  - $ref: '#/components/schemas/WidgetCampaignUniqueBugs'
+                  - $ref: '#/components/schemas/WidgetBugsByDuplicates'
+              examples:
+                Bugs by UseCase:
+                  value:
+                    data:
+                      - title:
+                          full: UC1 asd
+                        description: string
+                        bugs: 10
+                        uniqueBugs: 8
+                        usecase_id: 1220
+                    kind: bugsByUseCase
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      operationId: get-campaigns-cid-widgets-wslug
+      security:
+        - JWT: []
+      parameters:
+        - $ref: '#/components/parameters/wslug'
+        - schema:
+            type: boolean
+          in: query
+          name: updateTrend
+          description: should update bug trend after request resolves?
   '/media/{id}':
     parameters:
       - schema:

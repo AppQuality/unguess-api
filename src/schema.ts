@@ -245,12 +245,12 @@ export interface paths {
       };
     };
   };
-  "/campaigns/{cid}/widgets": {
-    get: operations["get-campaigns-cid-widgets-wslug"];
+  "/campaigns/{cid}/uxTagsGroups": {
+    /** Retrieve all groups of public ux-tags for a specific campaign */
+    get: operations["get-campaigns-cid-uxtagsgroups"];
     parameters: {
       path: {
-        /** Campaign id */
-        cid: components["parameters"]["cid"];
+        cid: string;
       };
     };
   };
@@ -260,6 +260,15 @@ export interface paths {
     parameters: {
       path: {
         cid: string;
+      };
+    };
+  };
+  "/campaigns/{cid}/widgets": {
+    get: operations["get-campaigns-cid-widgets-wslug"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
       };
     };
   };
@@ -1921,35 +1930,28 @@ export interface operations {
       500: components["responses"]["Error"];
     };
   };
-  "get-campaigns-cid-widgets-wslug": {
+  /** Retrieve all groups of public ux-tags for a specific campaign */
+  "get-campaigns-cid-uxtagsgroups": {
     parameters: {
       path: {
-        /** Campaign id */
-        cid: components["parameters"]["cid"];
-      };
-      query: {
-        /** Campaign widget slug */
-        s: components["parameters"]["wslug"];
-        /** should update bug trend after request resolves? */
-        updateTrend?: boolean;
+        cid: string;
       };
     };
     responses: {
       /** OK */
       200: {
         content: {
-          "application/json":
-            | components["schemas"]["WidgetBugsByUseCase"]
-            | components["schemas"]["WidgetBugsByDevice"]
-            | components["schemas"]["WidgetCampaignProgress"]
-            | components["schemas"]["WidgetCampaignUniqueBugs"]
-            | components["schemas"]["WidgetBugsByDuplicates"];
+          "application/json": {
+            groupId: number;
+            groupName: string;
+            tags: {
+              id: number;
+              name: string;
+              usageNumber: number;
+            }[];
+          }[];
         };
       };
-      400: components["responses"]["Error"];
-      401: components["responses"]["Error"];
-      403: components["responses"]["Error"];
-      500: components["responses"]["Error"];
     };
   };
   /** Return all published video for a specific campaign */
@@ -1986,6 +1988,37 @@ export interface operations {
           } & components["schemas"]["PaginationData"];
         };
       };
+    };
+  };
+  "get-campaigns-cid-widgets-wslug": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+      };
+      query: {
+        /** Campaign widget slug */
+        s: components["parameters"]["wslug"];
+        /** should update bug trend after request resolves? */
+        updateTrend?: boolean;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json":
+            | components["schemas"]["WidgetBugsByUseCase"]
+            | components["schemas"]["WidgetBugsByDevice"]
+            | components["schemas"]["WidgetCampaignProgress"]
+            | components["schemas"]["WidgetCampaignUniqueBugs"]
+            | components["schemas"]["WidgetBugsByDuplicates"];
+        };
+      };
+      400: components["responses"]["Error"];
+      401: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
     };
   };
   "get-media-id": {
