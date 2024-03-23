@@ -248,7 +248,6 @@ export interface paths {
   "/campaigns/{cid}/videoTags": {
     /** Retrieve all groups of public ux-tags for a specific campaign */
     get: operations["get-campaigns-cid-videotags"];
-    post: operations["post-campaigns-cid-uxTagsGroups"];
     parameters: {
       path: {
         cid: string;
@@ -1957,38 +1956,16 @@ export interface operations {
         content: {
           "application/json": {
             group?: {
-              id: string;
+              id: number;
               name: string;
             };
             tags: {
               id: number;
               name: string;
+              color: string;
               usageNumber: number;
             }[];
           }[];
-        };
-      };
-    };
-  };
-  "post-campaigns-cid-uxTagsGroups": {
-    parameters: {
-      path: {
-        cid: string;
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/json": { [key: string]: unknown };
-        };
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          name: string;
-          groupId?: number;
         };
       };
     };

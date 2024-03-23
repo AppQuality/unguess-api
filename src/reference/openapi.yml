@@ -1747,8 +1747,8 @@ paths:
         in: path
         required: true
     get:
-      summary: Your GET endpoint
-      tags: []
+      summary: 'Get all video tags for a specific campaign'
+      operationId: get-campaigns-cid-videotags
       responses:
         '200':
           description: OK
@@ -1761,14 +1761,14 @@ paths:
                   properties:
                     group:
                       type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
                       required:
                         - id
                         - name
-                      properties:
-                        id:
-                          type: string
-                        name:
-                          type: string
                     tags:
                       type: array
                       items:
@@ -1778,73 +1778,18 @@ paths:
                             type: integer
                           name:
                             type: string
+                          color:
+                            type: string
                           usageNumber:
                             type: integer
                         required:
                           - id
                           - name
+                          - color
                           - usageNumber
                   required:
                     - tags
-              examples:
-                two-groups:
-                  value:
-                    - groupId: 1
-                      groupName: severities
-                      tags:
-                        - id: 1
-                          name: high
-                          usageNumber: 1
-                        - id: 2
-                          name: low
-                          usageNumber: 55
-                        - id: 3
-                          name: medium
-                          usageNumber: 33
-                    - groupId: 2
-                      groupName: status
-                      tags:
-                        - id: 1
-                          name: solved
-                          usageNumber: 1
-                        - id: 2
-                          name: progress
-                          usageNumber: 55
-                empty-tags:
-                  value:
-                    - groupId: 10
-                      groupName: monetizable
-                      tags: []
-                empty-groups:
-                  value: []
-      operationId: get-campaigns-cid-videotags
-      security:
-        - JWT: []
       description: Retrieve all groups of public ux-tags for a specific campaign
-    post:
-      summary: ''
-      operationId: post-campaigns-cid-uxTagsGroups
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties: {}
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                groupId:
-                  type: integer
-              required:
-                - name
-        description: ''
   '/campaigns/{cid}/video':
     parameters:
       - schema:
