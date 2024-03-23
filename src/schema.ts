@@ -245,9 +245,10 @@ export interface paths {
       };
     };
   };
-  "/campaigns/{cid}/uxTagsGroups": {
+  "/campaigns/{cid}/videoTags": {
     /** Retrieve all groups of public ux-tags for a specific campaign */
     get: operations["get-campaigns-cid-uxtagsgroups"];
+    post: operations["post-campaigns-cid-uxTagsGroups"];
     parameters: {
       path: {
         cid: string;
@@ -973,11 +974,11 @@ export interface components {
      * @description Video uploaded from a user
      */
     Video: {
-      id: string;
+      id: number;
       url: string;
       streamUrl?: string;
       tester: {
-        id: string;
+        id: number;
         name: string;
       };
     };
@@ -1955,14 +1956,39 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            groupId: number;
-            groupName: string;
+            group?: {
+              id: string;
+              name: string;
+            };
             tags: {
               id: number;
               name: string;
               usageNumber: number;
             }[];
           }[];
+        };
+      };
+    };
+  };
+  "post-campaigns-cid-uxTagsGroups": {
+    parameters: {
+      path: {
+        cid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": { [key: string]: unknown };
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          name: string;
+          groupId?: number;
         };
       };
     };
@@ -1991,7 +2017,7 @@ export interface operations {
           "application/json": {
             items: {
               usecase: {
-                id: string;
+                id: number;
                 title: string;
                 descriprion: string;
               };

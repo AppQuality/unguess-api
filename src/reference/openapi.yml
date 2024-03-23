@@ -1739,7 +1739,7 @@ paths:
           in: query
           name: showAsCustomer
         - $ref: '#/components/parameters/filterBy'
-  '/campaigns/{cid}/uxTagsGroups':
+  '/campaigns/{cid}/videoTags':
     parameters:
       - schema:
           type: string
@@ -1759,10 +1759,16 @@ paths:
                 items:
                   type: object
                   properties:
-                    groupId:
-                      type: integer
-                    groupName:
-                      type: string
+                    group:
+                      type: object
+                      required:
+                        - id
+                        - name
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
                     tags:
                       type: array
                       items:
@@ -1779,8 +1785,6 @@ paths:
                           - name
                           - usageNumber
                   required:
-                    - groupId
-                    - groupName
                     - tags
               examples:
                 two-groups:
@@ -1817,6 +1821,30 @@ paths:
       security:
         - JWT: []
       description: Retrieve all groups of public ux-tags for a specific campaign
+    post:
+      summary: ''
+      operationId: post-campaigns-cid-uxTagsGroups
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                groupId:
+                  type: integer
+              required:
+                - name
+        description: ''
   '/campaigns/{cid}/video':
     parameters:
       - schema:
@@ -1843,29 +1871,19 @@ paths:
                           properties:
                             usecase:
                               type: object
-                              x-stoplight:
-                                id: f4r1n8c4uuioe
                               required:
                                 - id
                                 - title
                                 - descriprion
                               properties:
                                 id:
-                                  type: string
-                                  x-stoplight:
-                                    id: aqi0zf0ayztl7
+                                  type: integer
                                 title:
                                   type: string
-                                  x-stoplight:
-                                    id: 9ujacs1cwngg5
                                 descriprion:
                                   type: string
-                                  x-stoplight:
-                                    id: 2exvfkkyf0li5
                             videos:
                               type: array
-                              x-stoplight:
-                                id: rryi9k26n8tyn
                               items:
                                 $ref: '#/components/schemas/Video'
                           required:
@@ -4177,37 +4195,25 @@ components:
           type: integer
     Video:
       title: Video
-      x-stoplight:
-        id: c9bsgiuqn7pzk
       type: object
       description: Video uploaded from a user
       properties:
         id:
-          type: string
+          type: integer
         url:
           type: string
-          x-stoplight:
-            id: b8jaloc6uywjf
         streamUrl:
           type: string
-          x-stoplight:
-            id: 1jubraydzvyey
         tester:
           type: object
-          x-stoplight:
-            id: 17acrrg0dmbce
           required:
             - id
             - name
           properties:
             id:
-              type: string
-              x-stoplight:
-                id: dclmyfzkalga6
+              type: integer
             name:
               type: string
-              x-stoplight:
-                id: u6o8fcn428es2
       required:
         - id
         - url
