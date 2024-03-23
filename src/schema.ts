@@ -247,7 +247,7 @@ export interface paths {
   };
   "/campaigns/{cid}/videoTags": {
     /** Retrieve all groups of public ux-tags for a specific campaign */
-    get: operations["get-campaigns-cid-uxtagsgroups"];
+    get: operations["get-campaigns-cid-videotags"];
     post: operations["post-campaigns-cid-uxTagsGroups"];
     parameters: {
       path: {
@@ -1945,7 +1945,7 @@ export interface operations {
     };
   };
   /** Retrieve all groups of public ux-tags for a specific campaign */
-  "get-campaigns-cid-uxtagsgroups": {
+  "get-campaigns-cid-videotags": {
     parameters: {
       path: {
         cid: string;

@@ -1817,7 +1817,7 @@ paths:
                       tags: []
                 empty-groups:
                   value: []
-      operationId: get-campaigns-cid-uxtagsgroups
+      operationId: get-campaigns-cid-videotags
       security:
         - JWT: []
       description: Retrieve all groups of public ux-tags for a specific campaign
