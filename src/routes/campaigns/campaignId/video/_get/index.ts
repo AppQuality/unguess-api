@@ -4,14 +4,13 @@ import { checkUrl } from "@src/features/checkUrl";
 import { tryber } from "@src/features/database";
 import CampaignRoute from "@src/features/routes/CampaignRoute";
 import { mapToDistribution } from "@src/features/s3/mapToDistribution";
-import { id } from "date-fns/locale";
 
 export default class GetCampaignVideo extends CampaignRoute<{
   response: StoplightOperations["get-campaigns-cid-video"]["responses"]["200"]["content"]["application/json"];
   parameters: StoplightOperations["get-campaigns-cid-video"]["parameters"]["path"];
   query: StoplightOperations["get-campaigns-cid-video"]["parameters"]["query"];
 }> {
-  private _usecases: { id: number; title: string; description: string }[] = [];
+  private usecases: { id: number; title: string; description: string }[] = [];
 
   constructor(configuration: RouteClassConfiguration) {
     super(configuration);
@@ -19,10 +18,7 @@ export default class GetCampaignVideo extends CampaignRoute<{
   }
   protected async init() {
     await super.init();
-    this._usecases = await this.getUsecase();
-  }
-  get usecases() {
-    return this._usecases;
+    this.usecases = await this.getUsecase();
   }
   protected async prepare(): Promise<void> {
     return this.setSuccess(200, {
