@@ -188,108 +188,139 @@ describe("GET /campaigns/:campaignId/video", () => {
     expect(response.body.items).toBeInstanceOf(Array);
   });
 
-  it("Should return publish video of a specific campaign", async () => {
+  it("Should return publish gruped video by usecase  of a specific campaign", async () => {
     const response = await request(app)
       .get("/campaigns/1/video")
       .set("Authorization", "Bearer user");
     expect(response.body.items.length).toBe(2);
   });
-
-  it("Should return items with media id as number", async () => {
+  it("Should return items with usecases", async () => {
     const response = await request(app)
       .get("/campaigns/1/video")
       .set("Authorization", "Bearer user");
-    expect(response.body.items).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
+    expect(response.body.items[0]).toEqual(
+      expect.objectContaining({
+        usecase: expect.objectContaining({
           id: expect.any(Number),
+          title: expect.any(String),
+          description: expect.any(String),
         }),
-      ])
+      })
     );
   });
-
-  it("Should return items with media url as string", async () => {
+  it("Should return items with usecases data", async () => {
     const response = await request(app)
       .get("/campaigns/1/video")
       .set("Authorization", "Bearer user");
-    expect(response.body.items).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          url: expect.any(String),
+    expect(response.body.items[0]).toEqual(
+      expect.objectContaining({
+        usecase: expect.objectContaining({
+          id: 10,
+          title: "Campaign Task title",
+          description: "Campaign Task content",
         }),
-      ])
+      })
+    );
+    expect(response.body.items[1]).toEqual(
+      expect.objectContaining({
+        usecase: expect.objectContaining({
+          id: 30,
+          title: "Campaign Task title",
+          description: "Campaign Task content",
+        }),
+      })
     );
   });
-  it("Should return items with media streamUrl as string", async () => {
+  it("Should return items with videos", async () => {
     const response = await request(app)
       .get("/campaigns/1/video")
       .set("Authorization", "Bearer user");
-    expect(response.body.items).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          streamUrl: expect.any(String),
-        }),
-      ])
-    );
-  });
-
-  it("Should return items with tester data", async () => {
-    const response = await request(app)
-      .get("/campaigns/1/video")
-      .set("Authorization", "Bearer user");
-    expect(response.body.items).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          tester: expect.objectContaining({
+    expect(response.body.items[0]).toEqual(
+      expect.objectContaining({
+        videos: expect.arrayContaining([
+          expect.objectContaining({
             id: expect.any(Number),
-            name: expect.any(String),
+            streamUrl: expect.any(String),
+            url: expect.any(String),
           }),
-        }),
-      ])
+        ]),
+      })
     );
   });
-
-  it("Should return items with tester", async () => {
+  it("Should return items with videos data", async () => {
     const response = await request(app)
       .get("/campaigns/1/video")
       .set("Authorization", "Bearer user");
-    expect(response.body.items).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          tester: expect.objectContaining({
+    expect(response.body.items[0]).toEqual(
+      expect.objectContaining({
+        videos: expect.arrayContaining([
+          expect.objectContaining({
             id: 1,
-            name: "Tester1",
+            url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            streamUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny-stream.m3u8",
           }),
-        }),
-        expect.objectContaining({
-          tester: expect.objectContaining({
-            id: 2,
-            name: "Tester2",
+        ]),
+      })
+    );
+    expect(response.body.items[1]).toEqual(
+      expect.objectContaining({
+        videos: expect.arrayContaining([
+          expect.objectContaining({
+            id: 3,
+            url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            streamUrl:
+              "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny-stream.m3u8",
           }),
-        }),
-      ])
+        ]),
+      })
     );
   });
 
-  it("Should return items with media", async () => {
+  it("Should return videos with tester", async () => {
     const response = await request(app)
       .get("/campaigns/1/video")
       .set("Authorization", "Bearer user");
-    expect(response.body.items).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          id: 1,
-          url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-          streamUrl:
-            "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny-stream.m3u8",
-        }),
-        expect.objectContaining({
-          id: 3,
-          url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-          streamUrl:
-            "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny-stream.m3u8",
-        }),
-      ])
+    expect(response.body.items[0]).toEqual(
+      expect.objectContaining({
+        videos: expect.arrayContaining([
+          expect.objectContaining({
+            tester: expect.objectContaining({
+              id: expect.any(Number),
+              name: expect.any(String),
+            }),
+          }),
+        ]),
+      })
+    );
+  });
+  it("Should return videos with tester data", async () => {
+    const response = await request(app)
+      .get("/campaigns/1/video")
+      .set("Authorization", "Bearer user");
+    expect(response.body.items[0]).toEqual(
+      expect.objectContaining({
+        videos: expect.arrayContaining([
+          expect.objectContaining({
+            tester: expect.objectContaining({
+              id: 1,
+              name: "Tester1",
+            }),
+          }),
+        ]),
+      })
+    );
+    expect(response.body.items[1]).toEqual(
+      expect.objectContaining({
+        videos: expect.arrayContaining([
+          expect.objectContaining({
+            tester: expect.objectContaining({
+              id: 2,
+              name: "Tester2",
+            }),
+          }),
+        ]),
+      })
     );
   });
 });
@@ -303,10 +334,33 @@ describe("GET /campaigns/:campaignId/video - there are no video", () => {
       .get("/campaigns/1/video")
       .set("Authorization", "Bearer user");
     expect(response.body).toHaveProperty("items");
+    expect(response.body.items[0].videos).toBeInstanceOf(Array);
+    expect(response.body.items[1].videos).toBeInstanceOf(Array);
+  });
+
+  it("Should return items with video as empty array if there are no media", async () => {
+    const response = await request(app)
+      .get("/campaigns/1/video")
+      .set("Authorization", "Bearer user");
+    expect(response.body).toHaveProperty("items");
+    expect(response.body.items[0].videos).toEqual([]);
+    expect(response.body.items[1].videos).toEqual([]);
+  });
+});
+
+describe("GET /campaigns/:campaignId/video - there are no usecases", () => {
+  beforeAll(async () => {
+    await tryber.tables.WpAppqCampaignTask.do().delete();
+  });
+  it("Should return items array", async () => {
+    const response = await request(app)
+      .get("/campaigns/1/video")
+      .set("Authorization", "Bearer user");
+    expect(response.body).toHaveProperty("items");
     expect(response.body.items).toBeInstanceOf(Array);
   });
 
-  it("Should return items as empty array if there are no observations", async () => {
+  it("Should return items with video as empty array if there are no media", async () => {
     const response = await request(app)
       .get("/campaigns/1/video")
       .set("Authorization", "Bearer user");

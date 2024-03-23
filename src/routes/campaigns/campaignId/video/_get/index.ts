@@ -1,18 +1,57 @@
 /** OPENAPI-CLASS: get-campaigns-cid-video */
 
-// import OpenapiError from "@src/features/OpenapiError";
 import { checkUrl } from "@src/features/checkUrl";
 import { tryber } from "@src/features/database";
 import CampaignRoute from "@src/features/routes/CampaignRoute";
 import { mapToDistribution } from "@src/features/s3/mapToDistribution";
+import { id } from "date-fns/locale";
+
 export default class GetCampaignVideo extends CampaignRoute<{
   response: StoplightOperations["get-campaigns-cid-video"]["responses"]["200"]["content"]["application/json"];
   parameters: StoplightOperations["get-campaigns-cid-video"]["parameters"]["path"];
+  query: StoplightOperations["get-campaigns-cid-video"]["parameters"]["query"];
 }> {
+  private _usecases: { id: number; title: string; description: string }[] = [];
+
+  constructor(configuration: RouteClassConfiguration) {
+    super(configuration);
+    const query = this.getQuery();
+  }
+  protected async init() {
+    await super.init();
+    this._usecases = await this.getUsecase();
+  }
+  get usecases() {
+    return this._usecases;
+  }
   protected async prepare(): Promise<void> {
     return this.setSuccess(200, {
-      items: await this.getVideos(),
+      items: await this.getFormattedItems(),
+      start: 0,
+      size: 0,
+      limit: 0,
+      total: 0,
     });
+  }
+
+  private async getFormattedItems() {
+    const items = [];
+    const videos = await this.getVideos();
+    if (!this.usecases) return [];
+    for (const usecase of this.usecases) {
+      items.push({
+        usecase,
+        videos: videos
+          .filter((video) => video.usecaseId === usecase.id)
+          .map((video) => ({
+            id: video.id,
+            url: video.url,
+            streamUrl: video.streamUrl,
+            tester: video.tester,
+          })),
+      });
+    }
+    return items;
   }
 
   private async getVideos() {
@@ -25,7 +64,8 @@ export default class GetCampaignVideo extends CampaignRoute<{
           .as("media_url"),
 
         tryber.ref("id").withSchema("wp_appq_evd_profile").as("tester_id"),
-        tryber.ref("name").withSchema("wp_appq_evd_profile").as("tester_name")
+        tryber.ref("name").withSchema("wp_appq_evd_profile").as("tester_name"),
+        tryber.ref("id").withSchema("wp_appq_campaign_task").as("usecase_id")
       )
       .join(
         "wp_appq_campaign_task",
@@ -51,9 +91,18 @@ export default class GetCampaignVideo extends CampaignRoute<{
         url: mapToDistribution(video.media_url),
         streamUrl: isValidStream ? mapToDistribution(stream) : undefined,
         tester: { id: video.tester_id, name: video.tester_name },
+        usecaseId: video.usecase_id,
       });
     }
-
     return results;
+  }
+
+  private async getUsecase() {
+    const usecases = await tryber.tables.WpAppqCampaignTask.do()
+      .select("id", "title", tryber.ref("content").as("description"))
+      .where("campaign_id", this.cp_id);
+    if (!usecases) return [];
+
+    return usecases;
   }
 }
