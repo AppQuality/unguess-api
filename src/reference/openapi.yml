@@ -1874,13 +1874,13 @@ paths:
                               required:
                                 - id
                                 - title
-                                - descriprion
+                                - description
                               properties:
                                 id:
                                   type: integer
                                 title:
                                   type: string
-                                descriprion:
+                                description:
                                   type: string
                             videos:
                               type: array

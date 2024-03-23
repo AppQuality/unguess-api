@@ -2019,7 +2019,7 @@ export interface operations {
               usecase: {
                 id: number;
                 title: string;
-                descriprion: string;
+                description: string;
               };
               videos: components["schemas"]["Video"][];
             }[];
