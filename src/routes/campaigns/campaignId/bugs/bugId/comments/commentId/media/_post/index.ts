@@ -63,7 +63,7 @@ export default class MediaRoute extends BugCommentRoute<{
         name: media.name,
         path: (
           await upload({
-            bucket: process.env.COMMENTS_MEDIA_BUCKET || "",
+            bucket: process.env.COMMENTS_MEDIA_BUCKET || "bucket",
             key: `${process.env.ENVIRONMENT}/T${testerId}/${path.basename(
               media.name,
               path.extname(media.name)

@@ -4,6 +4,11 @@ import upload from "@src/features/s3/upload";
 import request from "supertest";
 
 jest.mock("@src/features/s3/upload");
+jest.mock("@src/features/s3/getPresignedUrl", () => {
+  return {
+    getPresignedUrl: jest.fn((path: string) => path),
+  };
+});
 
 describe("Route POST /campaigns/1/bugs/1/comments/{cmid}/media", () => {
   beforeAll(async () => {
@@ -142,11 +147,11 @@ describe("Route POST /campaigns/1/bugs/1/comments/{cmid}/media", () => {
     expect(media).toHaveLength(2);
     expect(media[0]).toMatchObject({
       comment_id: 1,
-      url: "https://s3.amazonaws.com/unguess-comments-media/item.png",
+      url: "https://s3.amazonaws.com/bucket/item.png",
     });
     expect(media[1]).toMatchObject({
       comment_id: 1,
-      url: "https://s3.amazonaws.com/unguess-comments-media/item.png",
+      url: "https://s3.amazonaws.com/bucket/item.png",
     });
   });
 });
