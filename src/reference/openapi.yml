@@ -1747,7 +1747,7 @@ paths:
         in: path
         required: true
     get:
-      summary: 'Get all video tags for a specific campaign'
+      summary: Get all video tags for a specific campaign
       operationId: get-campaigns-cid-videotags
       responses:
         '200':
@@ -1790,6 +1790,8 @@ paths:
                   required:
                     - tags
       description: Retrieve all groups of public ux-tags for a specific campaign
+      security:
+        - JWT: []
   '/campaigns/{cid}/video':
     parameters:
       - schema:
