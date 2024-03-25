@@ -267,6 +267,16 @@ describe("GET /campaigns/:campaignId/videoTags", () => {
   });
 });
 
+// describe("GET /campaigns/:campaignId/videoTags - default video tags", () => {
+//   it("Should return 400 if campaign does not exist", async () => {
+//     const response = await request(app)
+//       .get("/campaigns/999/videoTags")
+//       .set("Authorization", "Bearer admin");
+//     expect(response.status).toBe(400);
+//   });
+
+// });
+
 describe("GET /campaigns/:campaignId/videoTags - no tag groups", () => {
   beforeAll(async () => {
     await tryber.tables.WpAppqUsecaseMediaTagType.do().delete();
