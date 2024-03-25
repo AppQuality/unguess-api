@@ -1,4 +1,5 @@
 import bodyParser from "body-parser";
+import busboy from "connect-busboy";
 import cors from "cors";
 import express from "express";
 import OpenAPIBackend, { Options, Request } from "openapi-backend";
@@ -36,6 +37,14 @@ api.init();
 const app = express();
 const sentry = new Sentry(app);
 
+app.use(
+  busboy({
+    highWaterMark: 2 * 1024 * 1024,
+    headers: {
+      "content-type": "multipart/form-data",
+    },
+  })
+);
 app.use(cors());
 app.use(bodyParser.json());
 app.use(

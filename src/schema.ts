@@ -88,6 +88,16 @@ export interface paths {
       };
     };
   };
+  "/campaigns/{cid}/bugs/{bid}/comments/{cmid}/media": {
+    post: operations["post-campaigns-cid-bugs-bid-comments-cmid-media"];
+    parameters: {
+      path: {
+        cmid: string;
+        cid: string;
+        bid: string;
+      };
+    };
+  };
   "/campaigns/{cid}/bugs/{bid}/siblings": {
     get: operations["get-campaigns-bug-siblings"];
     parameters: {
@@ -1340,6 +1350,43 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": { [key: string]: unknown };
+      };
+    };
+  };
+  "post-campaigns-cid-bugs-bid-comments-cmid-media": {
+    parameters: {
+      path: {
+        cmid: string;
+        cid: string;
+        bid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            files: {
+              name: string;
+              path: string;
+            }[];
+            failed?: {
+              name: string;
+              /** @enum {string} */
+              errorCode:
+                | "FILE_TOO_BIG"
+                | "INVALID_FILE_EXTENSION"
+                | "GENERIC_ERROR";
+            }[];
+          };
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "multipart/form-data": {
+          media: string | string[];
+        };
       };
     };
   };

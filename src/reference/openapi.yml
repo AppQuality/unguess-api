@@ -694,6 +694,89 @@ paths:
             schema:
               type: object
               properties: {}
+  '/campaigns/{cid}/bugs/{bid}/comments/{cmid}/media':
+    parameters:
+      - schema:
+          type: string
+        name: cmid
+        in: path
+        required: true
+      - $ref: '#/components/parameters/cid'
+      - $ref: '#/components/parameters/bid'
+    post:
+      summary: ''
+      operationId: post-campaigns-cid-bugs-bid-comments-cmid-media
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                x-examples:
+                  Example 1:
+                    files:
+                      - name: string
+                        path: string
+                    failed:
+                      - name: string
+                        errorCode: FILE_TOO_BIG
+                properties:
+                  files:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        path:
+                          type: string
+                      required:
+                        - name
+                        - path
+                  failed:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        errorCode:
+                          type: string
+                          enum:
+                            - FILE_TOO_BIG
+                            - INVALID_FILE_EXTENSION
+                            - GENERIC_ERROR
+                      required:
+                        - name
+                        - errorCode
+                required:
+                  - files
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                media:
+                  x-stoplight:
+                    id: wat9pyod399l1
+                  oneOf:
+                    - type: string
+                      x-stoplight:
+                        id: ox42x2u9ci2ul
+                    - type: array
+                      x-stoplight:
+                        id: 25zni9deyb058
+                      items:
+                        x-stoplight:
+                          id: 2l8dxzx05exp5
+                        type: string
+              required:
+                - media
+      description: ''
   '/campaigns/{cid}/bugs/{bid}/siblings':
     parameters:
       - name: cid
