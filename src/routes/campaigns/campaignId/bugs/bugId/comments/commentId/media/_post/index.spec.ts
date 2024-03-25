@@ -9,7 +9,7 @@ describe("Route POST /campaigns/1/bugs/1/comments/{cmid}/media", () => {
   beforeAll(async () => {
     (upload as jest.Mock).mockImplementation(
       ({ key, bucket }: { bucket: string; key: string }) => {
-        return `https://s3.amazonaws.com/${bucket}/${key}`;
+        return `https://s3.amazonaws.com/${bucket}/item.png`;
       }
     );
     await tryber.tables.WpAppqEvdProfile.do().insert({
@@ -82,6 +82,10 @@ describe("Route POST /campaigns/1/bugs/1/comments/{cmid}/media", () => {
     await tryber.tables.WpAppqCustomer.do().delete();
   });
 
+  afterEach(async () => {
+    await unguess.tables.UgBugsCommentsMedia.do().delete();
+  });
+
   it("Should answer 400 if the comment does not exist", async () => {
     const mockFileBuffer = Buffer.from("some data");
 
@@ -122,5 +126,27 @@ describe("Route POST /campaigns/1/bugs/1/comments/{cmid}/media", () => {
     expect(response.body).toHaveProperty("failed", [
       { errorCode: "FILE_TOO_BIG", name: "oversized.png" },
     ]);
+  });
+
+  it("Should insert the media in database", async () => {
+    const mockFileBuffer = Buffer.from("some data");
+
+    const response = await request(app)
+      .post("/campaigns/1/bugs/1/comments/1/media")
+      .attach("media", mockFileBuffer, "image.png")
+      .attach("media", mockFileBuffer, "image2.png")
+      .set("authorization", "Bearer user");
+    expect(response.status).toBe(200);
+
+    const media = await unguess.tables.UgBugsCommentsMedia.do().select();
+    expect(media).toHaveLength(2);
+    expect(media[0]).toMatchObject({
+      comment_id: 1,
+      url: "https://s3.amazonaws.com/unguess-comments-media/item.png",
+    });
+    expect(media[1]).toMatchObject({
+      comment_id: 1,
+      url: "https://s3.amazonaws.com/unguess-comments-media/item.png",
+    });
   });
 });

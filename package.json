@@ -20,7 +20,7 @@
   "license": "ISC",
   "dependencies": {
     "@appquality/tryber-database": "0.26.15",
-    "@appquality/unguess-database": "0.12.17",
+    "@appquality/unguess-database": "0.14.0",
     "@appquality/wp-auth": "^1.0.7",
     "@aws-sdk/credential-provider-node": "^3.521.0",
     "@aws-sdk/hash-node": "^3.374.0",

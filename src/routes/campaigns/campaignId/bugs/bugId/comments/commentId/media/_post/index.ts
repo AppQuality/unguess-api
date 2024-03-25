@@ -1,5 +1,6 @@
 import OpenapiError from "@src/features/OpenapiError";
 import busboyMapper, { InvalidMedia } from "@src/features/busboyMapper";
+import { unguess } from "@src/features/database";
 import BugCommentRoute from "@src/features/routes/BugCommentRoute";
 import upload from "@src/features/s3/upload";
 import path from "path";
@@ -40,8 +41,19 @@ export default class MediaRoute extends BugCommentRoute<{
   }
 
   protected async prepare() {
+    const uploadedFiles = await this.uploadFiles();
+    if (uploadedFiles.length) {
+      await unguess.tables.UgBugsCommentsMedia.do().insert(
+        uploadedFiles.map((file) => ({
+          comment_id: this.comment_id,
+          url: file.path,
+          uploader: this.getProfileId(),
+        }))
+      );
+    }
+
     this.setSuccess(200, {
-      files: await this.uploadFiles(),
+      files: uploadedFiles,
       failed: this.invalidMedia.length ? this.invalidMedia : undefined,
     });
   }
