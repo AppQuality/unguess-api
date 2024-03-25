@@ -1706,7 +1706,7 @@ paths:
           in: query
           name: showAsCustomer
         - $ref: '#/components/parameters/filterBy'
-  '/campaigns/{cid}/videoTags':
+  '/campaigns/{cid}/video-tags':
     parameters:
       - schema:
           type: string
@@ -1715,7 +1715,7 @@ paths:
         required: true
     get:
       summary: Get all video tags for a specific campaign
-      operationId: get-campaigns-cid-videotags
+      operationId: get-campaigns-cid-video-tags
       responses:
         '200':
           description: OK
@@ -1728,14 +1728,14 @@ paths:
                   properties:
                     group:
                       type: object
+                      required:
+                        - id
+                        - name
                       properties:
                         id:
                           type: integer
                         name:
                           type: string
-                      required:
-                        - id
-                        - name
                     tags:
                       type: array
                       items:
@@ -1755,10 +1755,59 @@ paths:
                           - color
                           - usageNumber
                   required:
+                    - group
                     - tags
+              examples:
+                Example 1:
+                  value:
+                    - group:
+                        id: 0
+                        name: string
+                      tags:
+                        - id: 0
+                          name: string
+                          color: string
+                          usageNumber: 0
       description: Retrieve all groups of public ux-tags for a specific campaign
       security:
         - JWT: []
+    post:
+      summary: POST videoTag
+      operationId: post-campaigns-cid-video-tags
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      description: Add videoTags with groups to a specific campaign
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                group:
+                  type: object
+                  required:
+                    - name
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                tag:
+                  type: string
+              required:
+                - group
+                - tag
+            examples:
+              Example 1: {}
+        description: 'If there''s a groupId, post new tag into that group; otherwise, create the group and add tag into the new group.'
   '/campaigns/{cid}/video':
     parameters:
       - schema:
