@@ -1963,7 +1963,10 @@ export interface operations {
             id?: number;
             name: string;
           };
-          tag: string;
+          tag: {
+            name: string;
+            style?: string;
+          };
         };
       };
     };

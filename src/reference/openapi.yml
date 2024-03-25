@@ -1801,7 +1801,14 @@ paths:
                     name:
                       type: string
                 tag:
-                  type: string
+                  type: object
+                  required:
+                    - name
+                  properties:
+                    name:
+                      type: string
+                    style:
+                      type: string
               required:
                 - group
                 - tag
