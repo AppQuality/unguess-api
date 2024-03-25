@@ -1960,7 +1960,7 @@ export interface operations {
       content: {
         "application/json": {
           group: {
-            id?: string;
+            id?: number;
             name: string;
           };
           tag: string;
