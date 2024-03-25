@@ -236,6 +236,24 @@ export interface paths {
       };
     };
   };
+  "/campaigns/{cid}/videoTags": {
+    /** Retrieve all groups of public ux-tags for a specific campaign */
+    get: operations["get-campaigns-cid-videotags"];
+    parameters: {
+      path: {
+        cid: string;
+      };
+    };
+  };
+  "/campaigns/{cid}/video": {
+    /** Return all published video for a specific campaign */
+    get: operations["get-campaigns-cid-video"];
+    parameters: {
+      path: {
+        cid: string;
+      };
+    };
+  };
   "/campaigns/{cid}/widgets": {
     get: operations["get-campaigns-cid-widgets-wslug"];
     parameters: {
@@ -306,6 +324,15 @@ export interface paths {
     parameters: {
       path: {
         prefid: string;
+      };
+    };
+  };
+  "/video/{vid}/observations": {
+    /** Retrive all observations of a specific video */
+    get: operations["get-video-vid-observations"];
+    parameters: {
+      path: {
+        vid: string;
       };
     };
   };
@@ -924,6 +951,26 @@ export interface components {
       isShared?: boolean;
       /** @description Number of shared items */
       sharedItems?: number;
+    };
+    /** PaginationData */
+    PaginationData: {
+      start?: number;
+      size?: number;
+      limit?: number;
+      total?: number;
+    };
+    /**
+     * Video
+     * @description Video uploaded from a user
+     */
+    Video: {
+      id: number;
+      url: string;
+      streamUrl?: string;
+      tester: {
+        id: number;
+        name: string;
+      };
     };
   };
   responses: {
@@ -1864,6 +1911,68 @@ export interface operations {
       500: components["responses"]["Error"];
     };
   };
+  /** Retrieve all groups of public ux-tags for a specific campaign */
+  "get-campaigns-cid-videotags": {
+    parameters: {
+      path: {
+        cid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            group?: {
+              id: number;
+              name: string;
+            };
+            tags: {
+              id: number;
+              name: string;
+              color: string;
+              usageNumber: number;
+            }[];
+          }[];
+        };
+      };
+    };
+  };
+  /** Return all published video for a specific campaign */
+  "get-campaigns-cid-video": {
+    parameters: {
+      path: {
+        cid: string;
+      };
+      query: {
+        /** Limit pagination parameter */
+        limit?: components["parameters"]["limit"];
+        /** Start pagination parameter */
+        start?: components["parameters"]["start"];
+        /** Order value (ASC, DESC) */
+        order?: components["parameters"]["order"];
+        /** Order by accepted field */
+        orderBy?: components["parameters"]["orderBy"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            items: {
+              usecase: {
+                id: number;
+                title: string;
+                description: string;
+              };
+              videos: components["schemas"]["Video"][];
+            }[];
+          } & components["schemas"]["PaginationData"];
+        };
+      };
+    };
+  };
   "get-campaigns-cid-widgets-wslug": {
     parameters: {
       path: {
@@ -2173,6 +2282,29 @@ export interface operations {
       content: {
         "application/json": {
           value: number;
+        };
+      };
+    };
+  };
+  /** Retrive all observations of a specific video */
+  "get-video-vid-observations": {
+    parameters: {
+      path: {
+        vid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            robaOsservazione?: string;
+            tags?: {
+              id?: string;
+              name?: string;
+              groupId?: string;
+            }[];
+          };
         };
       };
     };

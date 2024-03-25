@@ -1706,6 +1706,116 @@ paths:
           in: query
           name: showAsCustomer
         - $ref: '#/components/parameters/filterBy'
+  '/campaigns/{cid}/videoTags':
+    parameters:
+      - schema:
+          type: string
+        name: cid
+        in: path
+        required: true
+    get:
+      summary: Get all video tags for a specific campaign
+      operationId: get-campaigns-cid-videotags
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    group:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                      required:
+                        - id
+                        - name
+                    tags:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                          color:
+                            type: string
+                          usageNumber:
+                            type: integer
+                        required:
+                          - id
+                          - name
+                          - color
+                          - usageNumber
+                  required:
+                    - tags
+      description: Retrieve all groups of public ux-tags for a specific campaign
+      security:
+        - JWT: []
+  '/campaigns/{cid}/video':
+    parameters:
+      - schema:
+          type: string
+        name: cid
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            usecase:
+                              type: object
+                              required:
+                                - id
+                                - title
+                                - description
+                              properties:
+                                id:
+                                  type: integer
+                                title:
+                                  type: string
+                                description:
+                                  type: string
+                            videos:
+                              type: array
+                              items:
+                                $ref: '#/components/schemas/Video'
+                          required:
+                            - usecase
+                            - videos
+                    required:
+                      - items
+                  - $ref: '#/components/schemas/PaginationData'
+              examples: {}
+      operationId: get-campaigns-cid-video
+      description: Return all published video for a specific campaign
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/order'
+        - $ref: '#/components/parameters/orderBy'
+      security:
+        - JWT: []
   '/campaigns/{cid}/widgets':
     parameters:
       - $ref: '#/components/parameters/cid'
@@ -2179,6 +2289,39 @@ paths:
               properties:
                 value:
                   type: integer
+  '/video/{vid}/observations':
+    parameters:
+      - schema:
+          type: string
+        name: vid
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  robaOsservazione:
+                    type: string
+                  tags:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        groupId:
+                          type: string
+      operationId: get-video-vid-observations
+      description: Retrive all observations of a specific video
   /workspaces:
     get:
       summary: Get User Workspaces
@@ -3491,6 +3634,7 @@ components:
           permissionFrom:
             type: workspace
             id: 0
+      description: ''
     UseCase:
       title: UseCase
       type: object
@@ -3951,6 +4095,43 @@ components:
         - csm
       x-tags:
         - workspace
+    PaginationData:
+      title: PaginationData
+      type: object
+      properties:
+        start:
+          type: integer
+        size:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+    Video:
+      title: Video
+      type: object
+      description: Video uploaded from a user
+      properties:
+        id:
+          type: integer
+        url:
+          type: string
+        streamUrl:
+          type: string
+        tester:
+          type: object
+          required:
+            - id
+            - name
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+      required:
+        - id
+        - url
+        - tester
   securitySchemes:
     JWT:
       type: http
