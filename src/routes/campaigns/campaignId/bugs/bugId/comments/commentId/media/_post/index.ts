@@ -2,8 +2,12 @@ import OpenapiError from "@src/features/OpenapiError";
 import busboyMapper, { InvalidMedia } from "@src/features/busboyMapper";
 import { unguess } from "@src/features/database";
 import BugCommentRoute from "@src/features/routes/BugCommentRoute";
+import { getPresignedUrl } from "@src/features/s3/getPresignedUrl";
 import upload from "@src/features/s3/upload";
 import path from "path";
+
+type UploadFile =
+  StoplightOperations["post-campaigns-cid-bugs-bid-comments-cmid-media"]["responses"]["200"]["content"]["application/json"]["files"][number];
 
 /** OPENAPI-CLASS: post-campaigns-cid-bugs-bid-comments-cmid-media */
 export default class MediaRoute extends BugCommentRoute<{
@@ -42,25 +46,15 @@ export default class MediaRoute extends BugCommentRoute<{
 
   protected async prepare() {
     const uploadedFiles = await this.uploadFiles();
-    if (uploadedFiles.length) {
-      await unguess.tables.UgBugsCommentsMedia.do().insert(
-        uploadedFiles.map((file) => ({
-          comment_id: this.comment_id,
-          url: file.path,
-          uploader: this.getProfileId(),
-        }))
-      );
-    }
+    await this.saveMedia(uploadedFiles);
 
     this.setSuccess(200, {
-      files: uploadedFiles,
+      files: await this.signFiles(uploadedFiles),
       failed: this.invalidMedia.length ? this.invalidMedia : undefined,
     });
   }
 
-  private async uploadFiles(): Promise<
-    StoplightOperations["post-campaigns-cid-bugs-bid-comments-cmid-media"]["responses"]["200"]["content"]["application/json"]["files"]
-  > {
+  private async uploadFiles(): Promise<UploadFile[]> {
     const files = this.validMedia;
     const testerId = this.getProfileId();
     let uploadedFiles = [];
@@ -80,5 +74,30 @@ export default class MediaRoute extends BugCommentRoute<{
       });
     }
     return uploadedFiles;
+  }
+
+  private async saveMedia(uploadedFiles: UploadFile[]) {
+    if (!uploadedFiles.length) return;
+
+    await unguess.tables.UgBugsCommentsMedia.do().insert(
+      uploadedFiles.map((file) => ({
+        comment_id: this.comment_id,
+        url: file.path,
+        uploader: this.getProfileId(),
+      }))
+    );
+  }
+
+  private async signFiles(uploadedFiles: UploadFile[]) {
+    const signedFiles: UploadFile[] = [];
+
+    for (const file of uploadedFiles) {
+      signedFiles.push({
+        ...file,
+        path: await getPresignedUrl(file.path),
+      });
+    }
+
+    return signedFiles;
   }
 }
