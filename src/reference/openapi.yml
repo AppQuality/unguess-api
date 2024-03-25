@@ -1137,6 +1137,79 @@ paths:
       security:
         - JWT: []
       parameters: []
+  '/campaigns/{cid}/observations':
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Campaign id
+    get:
+      summary: Get Campaigns Observations
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    tags:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                          style:
+                            type: string
+                        required:
+                          - id
+                          - name
+                          - style
+                    sentiments:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          value:
+                            type: integer
+                          comment:
+                            type: string
+                          cluster:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                              name:
+                                type: string
+                        required:
+                          - id
+                          - value
+                          - comment
+                  required:
+                    - id
+                    - tags
+                    - sentiments
+              examples:
+                Example 1:
+                  value:
+                    - os: iOS 16
+      operationId: get-campaigns-cid-observations
+      description: Return all observations of a specific campaign
+      security:
+        - JWT: []
+      parameters: []
   '/campaigns/{cid}/priorities':
     parameters:
       - name: cid

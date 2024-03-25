@@ -157,6 +157,16 @@ export interface paths {
       };
     };
   };
+  "/campaigns/{cid}/observations": {
+    /** Return all observations of a specific campaign */
+    get: operations["get-campaigns-cid-observations"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+  };
   "/campaigns/{cid}/priorities": {
     get: operations["get-campaigns-cid-priorities"];
     parameters: {
@@ -1623,6 +1633,39 @@ export interface operations {
       400: components["responses"]["Error"];
       403: components["responses"]["Error"];
       500: components["responses"]["Error"];
+    };
+  };
+  /** Return all observations of a specific campaign */
+  "get-campaigns-cid-observations": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            id: number;
+            tags: {
+              id: number;
+              name: string;
+              style: string;
+            }[];
+            sentiments: {
+              id: number;
+              value: number;
+              comment: string;
+              cluster?: {
+                id?: number;
+                name?: string;
+              };
+            }[];
+          }[];
+        };
+      };
     };
   };
   "get-campaigns-cid-priorities": {
