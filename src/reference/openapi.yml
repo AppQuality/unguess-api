@@ -1097,39 +1097,6 @@ paths:
         - JWT: []
       parameters: []
       description: Used to extra info about a selected campaign
-  '/campaigns/{cid}/observations':
-    parameters:
-      - schema:
-          type: string
-        name: cid
-        in: path
-        required: true
-    get:
-      summary: Your GET endpoint
-      tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  robaOsservazione:
-                    type: string
-                  tags:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                        name:
-                          type: string
-                        groupId:
-                          type: string
-      operationId: get-campaigns-cid-observations
-      description: Retrive all observations of a specific campaigns
   '/campaigns/{cid}/os':
     parameters:
       - name: cid

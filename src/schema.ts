@@ -148,15 +148,6 @@ export interface paths {
       };
     };
   };
-  "/campaigns/{cid}/observations": {
-    /** Retrive all observations of a specific campaigns */
-    get: operations["get-campaigns-cid-observations"];
-    parameters: {
-      path: {
-        cid: string;
-      };
-    };
-  };
   "/campaigns/{cid}/os": {
     get: operations["get-campaigns-cid-os"];
     parameters: {
@@ -1609,29 +1600,6 @@ export interface operations {
       401: components["responses"]["Error"];
       403: components["responses"]["Error"];
       500: components["responses"]["Error"];
-    };
-  };
-  /** Retrive all observations of a specific campaigns */
-  "get-campaigns-cid-observations": {
-    parameters: {
-      path: {
-        cid: string;
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/json": {
-            robaOsservazione?: string;
-            tags?: {
-              id?: string;
-              name?: string;
-              groupId?: string;
-            }[];
-          };
-        };
-      };
     };
   };
   "get-campaigns-cid-os": {
