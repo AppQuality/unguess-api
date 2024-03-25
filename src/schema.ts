@@ -36,6 +36,15 @@ export interface paths {
       };
     };
   };
+  "/campaigns/{cid}/bugTypes": {
+    get: operations["get-campaigns-cid-bug-types"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+      };
+    };
+  };
   "/campaigns/{cid}/bugs": {
     get: operations["get-campaigns-cid-bugs"];
     parameters: {
@@ -57,6 +66,28 @@ export interface paths {
       };
     };
   };
+  "/campaigns/{cid}/bugs/{bid}/comments": {
+    get: operations["get-campaigns-cid-bugs-bid-comments"];
+    post: operations["post-campaigns-cid-bugs-bid-comments"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+        /** Defines an identifier for the bug object (BUG ID) */
+        bid: components["parameters"]["bid"];
+      };
+    };
+  };
+  "/campaigns/{cid}/bugs/{bid}/comments/{cmid}": {
+    delete: operations["delete-campaigns-cid-bugs-bid-comments-cmid"];
+    parameters: {
+      path: {
+        cid: string;
+        bid: string;
+        cmid: string;
+      };
+    };
+  };
   "/campaigns/{cid}/bugs/{bid}/siblings": {
     get: operations["get-campaigns-bug-siblings"];
     parameters: {
@@ -65,15 +96,6 @@ export interface paths {
         cid: string;
         /** Defines an identifier for the bug object (BUG ID) */
         bid: string;
-      };
-    };
-  };
-  "/campaigns/{cid}/bugTypes": {
-    get: operations["get-campaigns-cid-bug-types"];
-    parameters: {
-      path: {
-        /** Campaign id */
-        cid: components["parameters"]["cid"];
       };
     };
   };
@@ -223,6 +245,14 @@ export interface paths {
       };
     };
   };
+  "/media/{id}": {
+    get: operations["get-media-id"];
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+  };
   "/projects": {
     post: operations["post-projects"];
   };
@@ -267,6 +297,17 @@ export interface paths {
   };
   "/users/me": {
     get: operations["get-users-me"];
+  };
+  "/users/me/preferences": {
+    get: operations["get-users-me-preferences"];
+  };
+  "/users/me/preferences/{prefid}": {
+    put: operations["put-users-me-preferences-prefid"];
+    parameters: {
+      path: {
+        prefid: string;
+      };
+    };
   };
   "/workspaces": {
     get: operations["get-workspaces"];
@@ -345,47 +386,6 @@ export interface paths {
       };
     };
   };
-  "/media/{id}": {
-    get: operations["get-media-id"];
-    parameters: {
-      path: {
-        id: string;
-      };
-    };
-  };
-  "/campaigns/{cid}/bugs/{bid}/comments": {
-    get: operations["get-campaigns-cid-bugs-bid-comments"];
-    post: operations["post-campaigns-cid-bugs-bid-comments"];
-    parameters: {
-      path: {
-        /** Campaign id */
-        cid: components["parameters"]["cid"];
-        /** Defines an identifier for the bug object (BUG ID) */
-        bid: components["parameters"]["bid"];
-      };
-    };
-  };
-  "/campaigns/{cid}/bugs/{bid}/comments/{cmid}": {
-    delete: operations["delete-campaigns-cid-bugs-bid-comments-cmid"];
-    parameters: {
-      path: {
-        cid: string;
-        bid: string;
-        cmid: string;
-      };
-    };
-  };
-  "/users/me/preferences": {
-    get: operations["get-users-me-preferences"];
-  };
-  "/users/me/preferences/{prefid}": {
-    put: operations["put-users-me-preferences-prefid"];
-    parameters: {
-      path: {
-        prefid: string;
-      };
-    };
-  };
 }
 
 export interface components {
@@ -458,6 +458,17 @@ export interface components {
       options: string[];
       /** @enum {string} */
       kind: "select";
+    };
+    /** BugComment */
+    BugComment: {
+      id: number;
+      text: string;
+      creation_date: string;
+      creator: {
+        id: number;
+        name: string;
+        isInternal: boolean;
+      };
     };
     /** BugCustomStatus */
     BugCustomStatus: {
@@ -744,6 +755,20 @@ export interface components {
       id?: number;
       name: string;
     };
+    /** Tenant */
+    Tenant: {
+      /** @description tryber wp_user_id */
+      id: number;
+      profile_id: number;
+      name: string;
+      email: string;
+      invitationPending: boolean;
+      permissionFrom?: {
+        /** @enum {string} */
+        type?: "workspace" | "project";
+        id?: number;
+      };
+    };
     /** UseCase */
     UseCase: {
       title: string;
@@ -768,6 +793,12 @@ export interface components {
       unguess_wp_user_id: number;
       picture?: string;
       features?: components["schemas"]["Feature"][];
+    };
+    /** UserPreference */
+    UserPreference: {
+      preference_id: number;
+      value: number;
+      name: string;
     };
     /**
      * WidgetBugsByDevice
@@ -893,37 +924,6 @@ export interface components {
       isShared?: boolean;
       /** @description Number of shared items */
       sharedItems?: number;
-    };
-    /** Tenant */
-    Tenant: {
-      /** @description tryber wp_user_id */
-      id: number;
-      profile_id: number;
-      name: string;
-      email: string;
-      invitationPending: boolean;
-      permissionFrom?: {
-        /** @enum {string} */
-        type?: "workspace" | "project";
-        id?: number;
-      };
-    };
-    /** BugComment */
-    BugComment: {
-      id: number;
-      text: string;
-      creation_date: string;
-      creator: {
-        id: number;
-        name: string;
-        isInternal: boolean;
-      };
-    };
-    /** UserPreference */
-    UserPreference: {
-      preference_id: number;
-      value: number;
-      name: string;
     };
   };
   responses: {
@@ -1131,6 +1131,25 @@ export interface operations {
       };
     };
   };
+  "get-campaigns-cid-bug-types": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["BugType"][];
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
   "get-campaigns-cid-bugs": {
     parameters: {
       path: {
@@ -1249,6 +1268,81 @@ export interface operations {
       };
     };
   };
+  "get-campaigns-cid-bugs-bid-comments": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+        /** Defines an identifier for the bug object (BUG ID) */
+        bid: components["parameters"]["bid"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            items: components["schemas"]["BugComment"][];
+          };
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  "post-campaigns-cid-bugs-bid-comments": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: components["parameters"]["cid"];
+        /** Defines an identifier for the bug object (BUG ID) */
+        bid: components["parameters"]["bid"];
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["BugComment"];
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          text: string;
+          mentioned?: {
+            id: number;
+          }[];
+        };
+      };
+    };
+  };
+  "delete-campaigns-cid-bugs-bid-comments-cmid": {
+    parameters: {
+      path: {
+        cid: string;
+        bid: string;
+        cmid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: unknown;
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+    requestBody: {
+      content: {
+        "application/json": { [key: string]: unknown };
+      };
+    };
+  };
   "get-campaigns-bug-siblings": {
     parameters: {
       path: {
@@ -1296,25 +1390,6 @@ export interface operations {
       };
       400: components["responses"]["Error"];
       401: components["responses"]["Error"];
-      403: components["responses"]["Error"];
-      500: components["responses"]["Error"];
-    };
-  };
-  "get-campaigns-cid-bug-types": {
-    parameters: {
-      path: {
-        /** Campaign id */
-        cid: components["parameters"]["cid"];
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/json": components["schemas"]["BugType"][];
-        };
-      };
-      400: components["responses"]["Error"];
       403: components["responses"]["Error"];
       500: components["responses"]["Error"];
     };
@@ -1820,6 +1895,17 @@ export interface operations {
       500: components["responses"]["Error"];
     };
   };
+  "get-media-id": {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** Found */
+      302: never;
+    };
+  };
   "post-projects": {
     responses: {
       /** OK */
@@ -2049,6 +2135,46 @@ export interface operations {
       };
       403: components["responses"]["Error"];
       500: components["responses"]["Error"];
+    };
+  };
+  "get-users-me-preferences": {
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            items?: components["schemas"]["UserPreference"][];
+          };
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+  };
+  "put-users-me-preferences-prefid": {
+    parameters: {
+      path: {
+        prefid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["UserPreference"];
+        };
+      };
+      400: components["responses"]["Error"];
+      403: components["responses"]["Error"];
+      500: components["responses"]["Error"];
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          value: number;
+        };
+      };
     };
   };
   "get-workspaces": {
@@ -2377,132 +2503,6 @@ export interface operations {
           /** @description Tryber WP USER ID */
           user_id: number;
           include_shared?: boolean;
-        };
-      };
-    };
-  };
-  "get-media-id": {
-    parameters: {
-      path: {
-        id: string;
-      };
-    };
-    responses: {
-      /** Found */
-      302: never;
-    };
-  };
-  "get-campaigns-cid-bugs-bid-comments": {
-    parameters: {
-      path: {
-        /** Campaign id */
-        cid: components["parameters"]["cid"];
-        /** Defines an identifier for the bug object (BUG ID) */
-        bid: components["parameters"]["bid"];
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/json": {
-            items: components["schemas"]["BugComment"][];
-          };
-        };
-      };
-      400: components["responses"]["Error"];
-      403: components["responses"]["Error"];
-      500: components["responses"]["Error"];
-    };
-  };
-  "post-campaigns-cid-bugs-bid-comments": {
-    parameters: {
-      path: {
-        /** Campaign id */
-        cid: components["parameters"]["cid"];
-        /** Defines an identifier for the bug object (BUG ID) */
-        bid: components["parameters"]["bid"];
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/json": components["schemas"]["BugComment"];
-        };
-      };
-      400: components["responses"]["Error"];
-      403: components["responses"]["Error"];
-      500: components["responses"]["Error"];
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          text: string;
-          mentioned?: {
-            id: number;
-          }[];
-        };
-      };
-    };
-  };
-  "delete-campaigns-cid-bugs-bid-comments-cmid": {
-    parameters: {
-      path: {
-        cid: string;
-        bid: string;
-        cmid: string;
-      };
-    };
-    responses: {
-      /** OK */
-      200: unknown;
-      400: components["responses"]["Error"];
-      403: components["responses"]["Error"];
-      500: components["responses"]["Error"];
-    };
-    requestBody: {
-      content: {
-        "application/json": { [key: string]: unknown };
-      };
-    };
-  };
-  "get-users-me-preferences": {
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/json": {
-            items?: components["schemas"]["UserPreference"][];
-          };
-        };
-      };
-      400: components["responses"]["Error"];
-      403: components["responses"]["Error"];
-      500: components["responses"]["Error"];
-    };
-  };
-  "put-users-me-preferences-prefid": {
-    parameters: {
-      path: {
-        prefid: string;
-      };
-    };
-    responses: {
-      /** OK */
-      200: {
-        content: {
-          "application/json": components["schemas"]["UserPreference"];
-        };
-      };
-      400: components["responses"]["Error"];
-      403: components["responses"]["Error"];
-      500: components["responses"]["Error"];
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          value: number;
         };
       };
     };
