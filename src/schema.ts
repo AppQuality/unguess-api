@@ -2377,7 +2377,7 @@ export interface operations {
             title: string;
             description: string;
             tags: {
-              id: string;
+              id: number;
               name: string;
             }[];
           }[];
