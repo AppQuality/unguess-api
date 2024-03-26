@@ -2373,13 +2373,14 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            robaOsservazione?: string;
-            tags?: {
-              id?: string;
-              name?: string;
-              groupId?: string;
+            id: number;
+            title: string;
+            description: string;
+            tags: {
+              id: string;
+              name: string;
             }[];
-          };
+          }[];
         };
       };
     };

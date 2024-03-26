@@ -2432,21 +2432,33 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  robaOsservazione:
-                    type: string
-                  tags:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                        name:
-                          type: string
-                        groupId:
-                          type: string
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    title:
+                      type: string
+                    description:
+                      type: string
+                    tags:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          name:
+                            type: string
+                        required:
+                          - id
+                          - name
+                  required:
+                    - id
+                    - title
+                    - description
+                    - tags
       operationId: get-video-vid-observations
       description: Retrive all observations of a specific video
   /workspaces:
