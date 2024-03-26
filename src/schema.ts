@@ -342,6 +342,7 @@ export interface paths {
   "/video/{vid}/observations": {
     /** Retrive all observations of a specific video */
     get: operations["get-video-vid-observations"];
+    post: operations["post-video-vid-observations"];
     parameters: {
       path: {
         vid: string;
@@ -982,6 +983,28 @@ export interface components {
       tester: {
         id: number;
         name: string;
+      };
+    };
+    /** Observation */
+    Observation: {
+      id: number;
+      title: string;
+      description: string;
+      start: string;
+      end: string;
+      tags: components["schemas"]["VideoTag"][];
+    };
+    /** VideoTag */
+    VideoTag: {
+      group: {
+        id: number;
+        name: string;
+      };
+      tag: {
+        id: number;
+        name: string;
+        style: string;
+        usageNumber: number;
       };
     };
   };
@@ -1972,12 +1995,7 @@ export interface operations {
               id: number;
               name: string;
             };
-            tags: {
-              id: number;
-              name: string;
-              color: string;
-              usageNumber: number;
-            }[];
+            tags: components["schemas"]["VideoTag"][];
           }[];
         };
       };
@@ -2376,11 +2394,33 @@ export interface operations {
             id: number;
             title: string;
             description: string;
-            tags: {
-              id: number;
-              name: string;
-            }[];
+            start: number;
+            end: number;
+            tags: components["schemas"]["VideoTag"][];
           }[];
+        };
+      };
+    };
+  };
+  "post-video-vid-observations": {
+    parameters: {
+      path: {
+        vid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Observation"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          start: number;
+          end: number;
         };
       };
     };
