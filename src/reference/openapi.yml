@@ -1812,7 +1812,21 @@ paths:
                     tags:
                       type: array
                       items:
-                        $ref: '#/components/schemas/VideoTag'
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                          style:
+                            type: string
+                          usageNumber:
+                            type: integer
+                        required:
+                          - id
+                          - name
+                          - style
+                          - usageNumber
                   required:
                     - group
                     - tags

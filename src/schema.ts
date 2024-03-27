@@ -1995,7 +1995,12 @@ export interface operations {
               id: number;
               name: string;
             };
-            tags: components["schemas"]["VideoTag"][];
+            tags: {
+              id: number;
+              name: string;
+              style: string;
+              usageNumber: number;
+            }[];
           }[];
         };
       };
