@@ -1796,8 +1796,6 @@ paths:
                   required:
                     - name
                   properties:
-                    id:
-                      type: integer
                     name:
                       type: string
                 tag:
@@ -1814,7 +1812,7 @@ paths:
                 - tag
             examples:
               Example 1: {}
-        description: 'If there''s a groupId, post new tag into that group; otherwise, create the group and add tag into the new group.'
+        description: 'If there''s a group, post new tag into that group; otherwise, create the group and add tag into the new group.'
   '/campaigns/{cid}/video':
     parameters:
       - schema:

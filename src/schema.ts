@@ -1955,12 +1955,11 @@ export interface operations {
         };
       };
     };
-    /** If there's a groupId, post new tag into that group; otherwise, create the group and add tag into the new group. */
+    /** If there's a group, post new tag into that group; otherwise, create the group and add tag into the new group. */
     requestBody: {
       content: {
         "application/json": {
           group: {
-            id?: number;
             name: string;
           };
           tag: {
