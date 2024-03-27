@@ -11,11 +11,10 @@ export default class GetVideoTags extends CampaignRoute<{
   protected async filter() {
     const body = this.getBody();
     if (!(await super.filter())) return false;
-    if (this.isGroupNameInvalid(body.group.name)) {
-      this.setError(400, {} as OpenapiError);
-      return false;
-    }
-    if (body.group.id && (await this.isGroupIdInvalid(body.group.id))) {
+    if (
+      this.isGroupNameInvalid(body.group.name) ||
+      this.isTagNameInvalid(body.tag.name)
+    ) {
       this.setError(400, {} as OpenapiError);
       return false;
     }
@@ -25,18 +24,8 @@ export default class GetVideoTags extends CampaignRoute<{
   private isGroupNameInvalid(groupName: string) {
     return groupName === "";
   }
-  private async isGroupIdInvalid(groupId: number) {
-    const groupIds = await tryber.tables.WpAppqUsecaseMediaTagType.do()
-      .select("id")
-      .where({
-        campaign_id: this.getCampaignId(),
-        id: groupId,
-      });
-    return groupId < 0 || groupIds.length === 0;
-  }
-
-  private isBodyEmpty() {
-    return Object.keys(this.getBody()).length === 0;
+  private isTagNameInvalid(tagName: string) {
+    return tagName === "";
   }
 
   protected async prepare(): Promise<void> {
@@ -47,30 +36,45 @@ export default class GetVideoTags extends CampaignRoute<{
   private async insertNewTag() {
     const body = this.getBody();
     let groupId = 0;
+    const campaignTagGroups = await this.getCampaignTagGroups();
 
-    if (!body.group.id) {
-      const group = await tryber.tables.WpAppqUsecaseMediaTagType.do()
-        .select("id")
-        .where({
-          campaign_id: this.getCampaignId(),
-          name: body.group.name,
-        });
-      if (group.length === 0) {
-        const insert =
-          await tryber.tables.WpAppqUsecaseMediaTagType.do().insert({
-            campaign_id: this.getCampaignId(),
-            name: body.group.name,
-          });
-        groupId = insert[0];
-      } else {
-        groupId = group[0].id;
-      }
+    if (this.groupNotExist(campaignTagGroups)) {
+      groupId = (await this.insertTagGroup(body.group.name))[0].id;
+    } else {
+      const existingGroupId = campaignTagGroups.find(
+        (group) => group.name === body.group.name
+      )?.id;
+      groupId = existingGroupId ? existingGroupId : 0;
     }
 
     await tryber.tables.WpAppqUsecaseMediaObservationsTags.do().insert({
       name: body.tag.name,
-      type: body.group.id ? body.group.id : groupId,
+      type: groupId,
       style: body.tag.style ? body.tag.style : "white",
     });
+  }
+
+  private groupNotExist(tagGroups: { id: number; name: string }[]) {
+    const body = this.getBody();
+    return (
+      tagGroups.find((group) => group.name === body.group.name) === undefined
+    );
+  }
+  private async getCampaignTagGroups() {
+    const body = this.getBody();
+    return await tryber.tables.WpAppqUsecaseMediaTagType.do()
+      .select("id", "name")
+      .where({
+        campaign_id: this.getCampaignId(),
+        name: body.group.name,
+      });
+  }
+  private async insertTagGroup(groupName: string) {
+    return await tryber.tables.WpAppqUsecaseMediaTagType.do()
+      .insert({
+        campaign_id: this.getCampaignId(),
+        name: groupName,
+      })
+      .returning("id");
   }
 }

@@ -1,6 +1,5 @@
 import app from "@src/app";
 import { tryber, unguess } from "@src/features/database";
-import { af } from "date-fns/locale";
 import request from "supertest";
 
 beforeAll(async () => {
@@ -114,31 +113,84 @@ describe("GET /campaigns/:campaignId/video-tags", () => {
     expect(response.status).toBe(200);
   });
 
-  it("Should return an error if try to send a group id of an onther cp", async () => {
-    await tryber.tables.WpAppqUsecaseMediaTagType.do().insert({
-      id: 255,
-      name: "Findings",
-      campaign_id: 2,
+  it("Should create a tag releted to a existing campaign-tag-group", async () => {
+    await tryber.tables.WpAppqUsecaseMediaTagType.do().insert([
+      {
+        id: 1,
+        name: "Findings",
+        campaign_id: 1,
+      },
+      {
+        id: 255,
+        name: "Findings",
+        campaign_id: 2,
+      },
+    ]);
+    await tryber.tables.WpAppqUsecaseMediaObservationsTags.do().insert({
+      name: "positive",
+      type: 255,
+      style: "white",
     });
     const response = await request(app)
       .post("/campaigns/1/video-tags")
       .set("Authorization", "Bearer admin")
       .send({
-        group: { id: 255, name: "Findings" },
+        group: { name: "Findings" },
         tag: { name: "positive" },
       });
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(200);
+    const campaignTags =
+      await tryber.tables.WpAppqUsecaseMediaObservationsTags.do()
+        .select()
+        .join(
+          "wp_appq_usecase_media_tag_type",
+          "wp_appq_usecase_media_observations_tags.type",
+          "wp_appq_usecase_media_tag_type.id"
+        )
+        .where("campaign_id", 1);
+    expect(campaignTags.length).toBe(1);
+    expect(campaignTags[0]).toEqual(
+      expect.objectContaining({
+        name: "Findings",
+        campaign_id: 1,
+      })
+    );
+    const campaignGroups = await tryber.tables.WpAppqUsecaseMediaTagType.do()
+      .select()
+      .where("campaign_id", 1);
+    expect(campaignGroups.length).toBe(1);
+    expect(campaignGroups[0]).toEqual(
+      expect.objectContaining({
+        name: "Findings",
+        campaign_id: 1,
+      })
+    );
   });
 
-  it("Should return an error if try to send a non-existent group-id", async () => {
+  it("Should create a new group if try to send a group that does not exist", async () => {
+    const tagswBefore =
+      await tryber.tables.WpAppqUsecaseMediaObservationsTags.do().select();
+    expect(tagswBefore.length).toBe(0);
+    const groupsBefore =
+      await tryber.tables.WpAppqUsecaseMediaTagType.do().select();
+    expect(groupsBefore.length).toBe(0);
     const response = await request(app)
       .post("/campaigns/1/video-tags")
       .set("Authorization", "Bearer admin")
-      .send({
-        group: { id: 12345, name: "Findings" },
-        tag: { name: "positive" },
-      });
-    expect(response.status).toBe(400);
+      .send({ group: { name: "Findings" }, tag: { name: "positive" } });
+    expect(response.status).toBe(200);
+    const tagsAfter =
+      await tryber.tables.WpAppqUsecaseMediaObservationsTags.do().select();
+    expect(tagsAfter.length).toBe(1);
+    const groupsAfter =
+      await tryber.tables.WpAppqUsecaseMediaTagType.do().select();
+    expect(groupsAfter.length).toBe(1);
+    expect(groupsAfter[0]).toEqual(
+      expect.objectContaining({
+        name: "Findings",
+        campaign_id: 1,
+      })
+    );
   });
 
   it("Should return an error if try to send a group name empty", async () => {
@@ -148,8 +200,15 @@ describe("GET /campaigns/:campaignId/video-tags", () => {
       .send({ group: { name: "" }, tag: { name: "positive" } });
     expect(response.status).toBe(400);
   });
+  it("Should return an error if try to send a tag name empty", async () => {
+    const response = await request(app)
+      .post("/campaigns/1/video-tags")
+      .set("Authorization", "Bearer admin")
+      .send({ group: { name: "Findings" }, tag: { name: "" } });
+    expect(response.status).toBe(400);
+  });
 
-  it("Should insert tag to releated to an existing group if send group id", async () => {
+  it("Should insert tag to releated to an existing group if send group name", async () => {
     await tryber.tables.WpAppqUsecaseMediaTagType.do().insert({
       id: 10,
       name: "Findings",
@@ -162,7 +221,7 @@ describe("GET /campaigns/:campaignId/video-tags", () => {
       .post("/campaigns/1/video-tags")
       .set("Authorization", "Bearer admin")
       .send({
-        group: { id: 10, name: "Findings" },
+        group: { name: "Findings" },
         tag: { name: "positive", style: "#eb57cd" },
       });
     expect(response.status).toBe(200);
@@ -190,7 +249,7 @@ describe("GET /campaigns/:campaignId/video-tags", () => {
     const response = await request(app)
       .post("/campaigns/1/video-tags")
       .set("Authorization", "Bearer admin")
-      .send({ group: { id: 10, name: "Findings" }, tag: { name: "positive" } });
+      .send({ group: { name: "Findings" }, tag: { name: "positive" } });
     expect(response.status).toBe(200);
     const tagsAfter =
       await tryber.tables.WpAppqUsecaseMediaObservationsTags.do().select();
@@ -200,32 +259,6 @@ describe("GET /campaigns/:campaignId/video-tags", () => {
         name: "positive",
         type: 10,
         style: "white",
-      })
-    );
-  });
-
-  it("Should insert tag and create a group if don't send a group id", async () => {
-    const tagswBefore =
-      await tryber.tables.WpAppqUsecaseMediaObservationsTags.do().select();
-    expect(tagswBefore.length).toBe(0);
-    const groupsBefore =
-      await tryber.tables.WpAppqUsecaseMediaTagType.do().select();
-    expect(groupsBefore.length).toBe(0);
-    const response = await request(app)
-      .post("/campaigns/1/video-tags")
-      .set("Authorization", "Bearer admin")
-      .send({ group: { name: "Findings" }, tag: { name: "positive" } });
-    expect(response.status).toBe(200);
-    const tagsAfter =
-      await tryber.tables.WpAppqUsecaseMediaObservationsTags.do().select();
-    expect(tagsAfter.length).toBe(1);
-    const groupsAfter =
-      await tryber.tables.WpAppqUsecaseMediaTagType.do().select();
-    expect(groupsAfter.length).toBe(1);
-    expect(groupsAfter[0]).toEqual(
-      expect.objectContaining({
-        name: "Findings",
-        campaign_id: 1,
       })
     );
   });
