@@ -236,9 +236,11 @@ export interface paths {
       };
     };
   };
-  "/campaigns/{cid}/videoTags": {
+  "/campaigns/{cid}/video-tags": {
     /** Retrieve all groups of public ux-tags for a specific campaign */
-    get: operations["get-campaigns-cid-videotags"];
+    get: operations["get-campaigns-cid-video-tags"];
+    /** Add videoTags with groups to a specific campaign */
+    post: operations["post-campaigns-cid-video-tags"];
     parameters: {
       path: {
         cid: string;
@@ -1912,7 +1914,7 @@ export interface operations {
     };
   };
   /** Retrieve all groups of public ux-tags for a specific campaign */
-  "get-campaigns-cid-videotags": {
+  "get-campaigns-cid-video-tags": {
     parameters: {
       path: {
         cid: string;
@@ -1923,7 +1925,7 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            group?: {
+            group: {
               id: number;
               name: string;
             };
@@ -1934,6 +1936,36 @@ export interface operations {
               usageNumber: number;
             }[];
           }[];
+        };
+      };
+    };
+  };
+  /** Add videoTags with groups to a specific campaign */
+  "post-campaigns-cid-video-tags": {
+    parameters: {
+      path: {
+        cid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": { [key: string]: unknown };
+        };
+      };
+    };
+    /** If there's a group, post new tag into that group; otherwise, create the group and add tag into the new group. */
+    requestBody: {
+      content: {
+        "application/json": {
+          group: {
+            name: string;
+          };
+          tag: {
+            name: string;
+            style?: string;
+          };
         };
       };
     };

@@ -144,43 +144,43 @@ beforeAll(async () => {
   ]);
 });
 
-describe("GET /campaigns/:campaignId/videoTags", () => {
+describe("GET /campaigns/:campaignId/video-tags", () => {
   it("Should return 400 if campaign does not exist", async () => {
     const response = await request(app)
-      .get("/campaigns/999/videoTags")
+      .get("/campaigns/999/video-tags")
       .set("Authorization", "Bearer admin");
     expect(response.status).toBe(400);
   });
   it("Should return 403 if the user does not have enough permission", async () => {
     const response = await request(app)
-      .get("/campaigns/2/videoTags")
+      .get("/campaigns/2/video-tags")
       .set("Authorization", "Bearer tester");
     expect(response.status).toBe(403);
   });
 
   it("Should return 200 if the user have permission on CP", async () => {
     const response = await request(app)
-      .get("/campaigns/1/videoTags")
+      .get("/campaigns/1/video-tags")
       .set("Authorization", "Bearer user");
     expect(response.status).toBe(200);
   });
 
   it("Should return 200 if the user is admin", async () => {
     const response = await request(app)
-      .get("/campaigns/1/videoTags")
+      .get("/campaigns/1/video-tags")
       .set("Authorization", "Bearer admin");
     expect(response.status).toBe(200);
   });
 
   it("Should return an array", async () => {
     const response = await request(app)
-      .get("/campaigns/1/videoTags")
+      .get("/campaigns/1/video-tags")
       .set("Authorization", "Bearer user");
     expect(response.body).toBeInstanceOf(Array);
   });
   it("Should return an array tag for each item", async () => {
     const response = await request(app)
-      .get("/campaigns/1/videoTags")
+      .get("/campaigns/1/video-tags")
       .set("Authorization", "Bearer user");
     expect(response.body[0].tags).toBeInstanceOf(Array);
     expect(response.body[1].tags).toBeInstanceOf(Array);
@@ -189,13 +189,13 @@ describe("GET /campaigns/:campaignId/videoTags", () => {
 
   it("Should return grouped tags for a specific campaign", async () => {
     const response = await request(app)
-      .get("/campaigns/1/videoTags")
+      .get("/campaigns/1/video-tags")
       .set("Authorization", "Bearer user");
     expect(response.body.length).toBe(3);
   });
   it("Should return tag-group data for a specific campaign", async () => {
     const response = await request(app)
-      .get("/campaigns/1/videoTags")
+      .get("/campaigns/1/video-tags")
       .set("Authorization", "Bearer user");
     expect(response.body).toEqual(
       expect.arrayContaining([
@@ -222,14 +222,14 @@ describe("GET /campaigns/:campaignId/videoTags", () => {
   });
   it("Should return empty array if there are no tags releated to a group", async () => {
     const response = await request(app)
-      .get("/campaigns/1/videoTags")
+      .get("/campaigns/1/video-tags")
       .set("Authorization", "Bearer admin");
     expect(response.body[2].tags).toEqual([]);
   });
 
   it("Should return tag data of a specific campaign", async () => {
     const response = await request(app)
-      .get("/campaigns/1/videoTags")
+      .get("/campaigns/1/video-tags")
       .set("Authorization", "Bearer user");
     expect(response.body).toEqual(
       expect.arrayContaining([
@@ -267,13 +267,13 @@ describe("GET /campaigns/:campaignId/videoTags", () => {
   });
 });
 
-describe("GET /campaigns/:campaignId/videoTags - no tag groups", () => {
+describe("GET /campaigns/:campaignId/video-tags - no tag groups", () => {
   beforeAll(async () => {
     await tryber.tables.WpAppqUsecaseMediaTagType.do().delete();
   });
   it("Should return empty array if there are no groups and no tags", async () => {
     const response = await request(app)
-      .get("/campaigns/1/videoTags")
+      .get("/campaigns/1/video-tags")
       .set("Authorization", "Bearer admin");
     expect(response.status).toBe(200);
     expect(response.body).toEqual([]);

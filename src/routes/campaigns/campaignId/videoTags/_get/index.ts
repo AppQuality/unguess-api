@@ -1,11 +1,11 @@
-/** OPENAPI-CLASS: get-campaigns-cid-videotags */
+/** OPENAPI-CLASS: get-campaigns-cid-video-tags */
 
 import { tryber } from "@src/features/database";
 import CampaignRoute from "@src/features/routes/CampaignRoute";
 
 export default class GetVideoTags extends CampaignRoute<{
-  response: StoplightOperations["get-campaigns-cid-videotags"]["responses"]["200"]["content"]["application/json"];
-  parameters: StoplightOperations["get-campaigns-cid-videotags"]["parameters"]["path"];
+  response: StoplightOperations["get-campaigns-cid-video-tags"]["responses"]["200"]["content"]["application/json"];
+  parameters: StoplightOperations["get-campaigns-cid-video-tags"]["parameters"]["path"];
 }> {
   private tagsGroups: { id: number; name: string }[] = [];
   private tagUsage: { tagId: number; usageNumber: number }[] = [];
