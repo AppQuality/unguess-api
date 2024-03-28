@@ -69,7 +69,7 @@ export default class GetCampaignVideo extends VideoRoute<{
         "wp_appq_campaign_task.campaign_id",
         "wp_appq_evd_campaign.id"
       )
-      .where("wp_appq_user_task_media.media_id", this.video_id)
+      .where("wp_appq_user_task_media.id", this.video_id)
       .andWhere("wp_appq_user_task_media.status", 2)
       .andWhere("wp_appq_user_task_media.location", "like", "%.mp4")
       .first();
