@@ -669,7 +669,7 @@ paths:
         description: Defines an identifier for the bug object (BUG ID)
     post:
       summary: ''
-      operationId: post-campaigns-cid-bugs-bid-comments-cmid-media
+      operationId: post-campaigns-cid-bugs-bid-media
       responses:
         '200':
           description: OK
