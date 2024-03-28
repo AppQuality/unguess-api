@@ -2416,6 +2416,74 @@ paths:
               properties:
                 value:
                   type: integer
+  '/video/{vid}':
+    parameters:
+      - schema:
+          type: string
+        name: vid
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Video'
+                  - type: object
+                    properties:
+                      usecase:
+                        type: object
+                        required:
+                          - id
+                          - name
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                    required:
+                      - usecase
+                  - type: object
+                    properties:
+                      campaign:
+                        type: object
+                        required:
+                          - id
+                          - name
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                    required:
+                      - campaign
+              examples:
+                Example 1:
+                  value:
+                    id: 0
+                    url: string
+                    streamUrl: string
+                    tester:
+                      id: 0
+                      name: string
+                    usecase:
+                      id: 0
+                      name: string
+        '':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      operationId: get-video-vid
+      description: Retrive single video data
+      security:
+        - JWT: []
   '/video/{vid}/observations':
     parameters:
       - schema:

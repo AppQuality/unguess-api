@@ -339,6 +339,15 @@ export interface paths {
       };
     };
   };
+  "/video/{vid}": {
+    /** Retrive single video data */
+    get: operations["get-video-vid"];
+    parameters: {
+      path: {
+        vid: string;
+      };
+    };
+  };
   "/video/{vid}/observations": {
     /** Retrive all observations of a specific video */
     get: operations["get-video-vid-observations"];
@@ -2380,6 +2389,37 @@ export interface operations {
       content: {
         "application/json": {
           value: number;
+        };
+      };
+    };
+  };
+  /** Retrive single video data */
+  "get-video-vid": {
+    parameters: {
+      path: {
+        vid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Video"] & {
+            usecase: {
+              id: number;
+              name: string;
+            };
+          } & {
+            campaign: {
+              id: number;
+              name: string;
+            };
+          };
+        };
+      };
+      "": {
+        content: {
+          "application/json": { [key: string]: unknown };
         };
       };
     };
