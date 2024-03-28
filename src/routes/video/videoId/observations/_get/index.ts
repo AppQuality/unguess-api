@@ -36,8 +36,8 @@ export default class GetVideoObservations extends VideoRoute<{
       id: observation.id,
       title: observation.title,
       description: observation.description,
-      start: 0,
-      end: 0,
+      start: observation.start,
+      end: observation.end,
       tags:
         observationTags.find(
           (current) => current.observationId === observation.id
@@ -55,7 +55,15 @@ export default class GetVideoObservations extends VideoRoute<{
           .as("title"),
         tryber
           .ref("description")
+          .withSchema("wp_appq_usecase_media_observations"),
+        tryber
+          .ref("video_ts")
           .withSchema("wp_appq_usecase_media_observations")
+          .as("start"),
+        tryber
+          .ref("video_ts_end")
+          .withSchema("wp_appq_usecase_media_observations")
+          .as("end")
       )
       .join(
         "wp_appq_user_task_media",

@@ -143,6 +143,7 @@ beforeAll(async () => {
       description: "observation description",
       ux_note: "ux note",
       video_ts: 10,
+      video_ts_end: 20,
       updated_at: "2024-03-18 15:58:50",
     },
     {
@@ -151,6 +152,7 @@ beforeAll(async () => {
       description: "observation description2",
       ux_note: "ux note2",
       video_ts: 11,
+      video_ts_end: 21,
       updated_at: "2022-03-18 15:58:50",
     },
     {
@@ -159,6 +161,7 @@ beforeAll(async () => {
       description: "observation description",
       ux_note: "ux note",
       video_ts: 10,
+      video_ts_end: 20,
       updated_at: "2024-03-18 15:58:50",
     },
     {
@@ -167,6 +170,7 @@ beforeAll(async () => {
       description: "observation description2",
       ux_note: "ux note",
       video_ts: 10,
+      video_ts_end: 20,
       updated_at: "2021-03-18 15:58:50",
     },
   ]);
@@ -284,15 +288,15 @@ describe("GET /video/:vid/observations", () => {
           id: 100,
           title: "observation name",
           description: "observation description",
-          start: 0,
-          end: 0,
+          start: 10,
+          end: 20,
         }),
         expect.objectContaining({
           id: 101,
           title: "observation name2",
           description: "observation description2",
-          start: 0,
-          end: 0,
+          start: 11,
+          end: 21,
         }),
       ])
     );
