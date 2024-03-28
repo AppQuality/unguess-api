@@ -999,8 +999,8 @@ export interface components {
       id: number;
       title: string;
       description: string;
-      start: string;
-      end: string;
+      start: number;
+      end: number;
       tags: components["schemas"]["VideoTag"][];
     };
     /** VideoTag */

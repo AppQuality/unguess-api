@@ -4375,9 +4375,9 @@ components:
         description:
           type: string
         start:
-          type: string
+          type: integer
         end:
-          type: string
+          type: integer
         tags:
           type: array
           items:
