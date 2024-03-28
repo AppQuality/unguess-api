@@ -110,7 +110,7 @@ export default class Route extends CampaignRoute<{
 
   private async addCookieSign() {
     const signedCookies = await getSignedCookie({
-      url: `https://media*.tryber.me/CP${this.cp_id}/*`,
+      url: `https://media*.unguess.io/CP${this.cp_id}/*`,
     });
     this.setCookie("CloudFront-Policy", signedCookies["CloudFront-Policy"], {
       secure: true,
@@ -348,27 +348,27 @@ export default class Route extends CampaignRoute<{
     if (url.includes("mediaconvert-encoder-staging-bucket")) {
       return url.replace(
         "https://s3-eu-west-1.amazonaws.com/mediaconvert-encoder-staging-bucket",
-        "https://media-processed.dev.tryber.me"
+        "https://media-processed.dev.unguess.io"
       );
     }
     if (url.includes("mediaconvert-encoder-production-bucket")) {
       return url.replace(
         "https://s3-eu-west-1.amazonaws.com/mediaconvert-encoder-production-bucket",
-        "https://media-processed.tryber.me"
+        "https://media-processed.unguess.io"
       );
     }
 
     if (url.includes("mediaconvert-encoder-production-bucket-origin")) {
       return url.replace(
         "https://s3-eu-west-1.amazonaws.com/mediaconvert-encoder-production-bucket-origin",
-        "https://media-origin.tryber.me"
+        "https://media-origin.unguess.io"
       );
     }
 
     if (url.includes("mediaconvert-encoder-staging-bucket-origin")) {
       return url.replace(
         "https://s3-eu-west-1.amazonaws.com/mediaconvert-encoder-staging-bucket-origin",
-        "https://media-origin.dev.tryber.me"
+        "https://media-origin.dev.unguess.io"
       );
     }
 
