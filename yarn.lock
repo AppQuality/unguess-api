@@ -20,10 +20,10 @@
     call-me-maybe "^1.0.1"
     js-yaml "^4.1.0"
 
-"@appquality/tryber-database@0.29.1":
-  version "0.29.1"
-  resolved "https://registry.yarnpkg.com/@appquality/tryber-database/-/tryber-database-0.29.1.tgz#31d7e5b146af7ccb90b669eeaa2e6da97c909259"
-  integrity sha512-N91IN666eA45OJFw4tTqU75vARqr9NcSTD2b3vWkCyCGrr108BNgkec+BaHKp0tANL92XEQ4201iSdaOqS0P+g==
+"@appquality/tryber-database@0.29.2":
+  version "0.29.2"
+  resolved "https://registry.yarnpkg.com/@appquality/tryber-database/-/tryber-database-0.29.2.tgz#dcf41a49e453d8571167e8fd7ec6752c63c47654"
+  integrity sha512-9IQt/pvYB04gtkhBIFfnPX2PqpF+9/yEqa4pE8hwF3ifKWvJMzNuoyNSEEjbMz2iaMwVL6gy9A2BZBGxxZ5ajw==
   dependencies:
     better-sqlite3 "^8.1.0"
     knex "^2.5.1"

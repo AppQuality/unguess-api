@@ -31,7 +31,7 @@ export default class GetVideoTags extends CampaignRoute<{
           .map((tag) => ({
             id: tag.id,
             name: tag.name,
-            color: tag.color,
+            style: tag.style,
             usageNumber:
               this.tagUsage.find((usage) => usage.tagId === tag.id)
                 ?.usageNumber || 0,
@@ -50,8 +50,7 @@ export default class GetVideoTags extends CampaignRoute<{
           .withSchema("wp_appq_usecase_media_observations_tags"),
         tryber
           .ref("style")
-          .withSchema("wp_appq_usecase_media_observations_tags")
-          .as("color"),
+          .withSchema("wp_appq_usecase_media_observations_tags"),
         tryber
           .ref("id")
           .withSchema("wp_appq_usecase_media_tag_type")
