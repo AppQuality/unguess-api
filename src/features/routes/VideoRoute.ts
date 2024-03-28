@@ -11,6 +11,7 @@ export default class VideoRoute<
   }
 > extends ProjectRoute<T> {
   protected video_id: number;
+  protected usecase_id: number;
   protected campaign_id: number;
   protected project_id: number;
 
@@ -23,6 +24,7 @@ export default class VideoRoute<
     this.video_id = Number(params.vid);
     this.campaign_id = 0;
     this.project_id = 0;
+    this.usecase_id = 0;
   }
 
   protected async init(): Promise<void> {
@@ -45,9 +47,10 @@ export default class VideoRoute<
 
       throw new Error("Video not found");
     }
-    const cpData = await this.initCpdata();
-    this.campaign_id = cpData.campaignId;
-    this.project_id = cpData.projectId;
+    await this.initCpdata();
+    //await this.initUsecase();
+
+    this.usecase_id = video.usecaseId;
     await super.init();
   }
 
@@ -155,6 +158,27 @@ export default class VideoRoute<
       .first();
 
     if (typeof cp === "undefined") throw new Error("Invalid campaign");
-    return cp;
+
+    this.campaign_id = cp.campaignId;
+    this.project_id = cp.projectId;
+  }
+
+  protected async initUsecase() {
+    const usecase = await tryber.tables.WpAppqCampaignTask.do()
+      .select(
+        tryber.ref("id").withSchema("wp_appq_campaign_task"),
+        tryber.ref("title").withSchema("wp_appq_campaign_task")
+      )
+      .join(
+        "wp_appq_user_task_media",
+        "wp_appq_user_task_media.campaign_task_id",
+        "wp_appq_campaign_task.id"
+      )
+      .where("wp_appq_user_task_media.id", this.video_id)
+      .first();
+
+    if (typeof usecase === "undefined") throw new Error("Invalid usecase");
+
+    this.usecase_id = usecase.id;
   }
 }
