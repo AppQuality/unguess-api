@@ -333,46 +333,28 @@ describe("GET /video/:vid/observations", () => {
   });
 });
 
-// describe("GET /video/:vid/observations - there are no video", () => {
-//   beforeAll(async () => {
-//     await tryber.tables.WpAppqUserTaskMedia.do().delete();
-//   });
-//   it("Should return items array", async () => {
-//     const response = await request(app)
-//       .get("/video/1/observations")
-//       .set("Authorization", "Bearer user");
-//     expect(response.body).toHaveProperty("items");
-//     expect(response.body.items[0].videos).toBeInstanceOf(Array);
-//     expect(response.body.items[1].videos).toBeInstanceOf(Array);
-//   });
-
-//   it("Should return items with video as empty array if there are no media", async () => {
-//     const response = await request(app)
-//       .get("/video/1/observations")
-//       .set("Authorization", "Bearer user");
-//     expect(response.body).toHaveProperty("items");
-//     expect(response.body.items[0].videos).toEqual([]);
-//     expect(response.body.items[1].videos).toEqual([]);
-//   });
-// });
-
-// describe("GET /video/:vid/observations - there are no usecases", () => {
-//   beforeAll(async () => {
-//     await tryber.tables.WpAppqCampaignTask.do().delete();
-//   });
-//   it("Should return items array", async () => {
-//     const response = await request(app)
-//       .get("/video/1/observations")
-//       .set("Authorization", "Bearer user");
-//     expect(response.body).toHaveProperty("items");
-//     expect(response.body.items).toBeInstanceOf(Array);
-//   });
-
-//   it("Should return items with video as empty array if there are no media", async () => {
-//     const response = await request(app)
-//       .get("/video/1/observations")
-//       .set("Authorization", "Bearer user");
-//     expect(response.body).toHaveProperty("items");
-//     expect(response.body.items).toEqual([]);
-//   });
-// });
+describe("GET /video/:vid/observations - there are no observations", () => {
+  beforeAll(async () => {
+    await tryber.tables.WpAppqUsecaseMediaObservations.do().delete();
+  });
+  it("Should return empty array if there are no observations", async () => {
+    const response = await request(app)
+      .get("/video/10/observations")
+      .set("Authorization", "Bearer user");
+    expect(response.status).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body).toEqual([]);
+  });
+});
+describe("GET /video/:vid/observations - there are no video", () => {
+  beforeAll(async () => {
+    await tryber.tables.WpAppqUserTaskMedia.do().delete();
+  });
+  it("Should return 400 if there are no video", async () => {
+    const response = await request(app)
+      .get("/video/10/observations")
+      .set("Authorization", "Bearer user");
+    console.log(response.body);
+    expect(response.status).toBe(400);
+  });
+});
