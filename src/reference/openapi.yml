@@ -2444,12 +2444,8 @@ paths:
                       type: string
                     start:
                       type: integer
-                      x-stoplight:
-                        id: qxiozhzu580y2
                     end:
                       type: integer
-                      x-stoplight:
-                        id: box40lyzscshs
                     tags:
                       type: array
                       items:
@@ -4302,34 +4298,20 @@ components:
         - tester
     Observation:
       title: Observation
-      x-stoplight:
-        id: tpwshnkr4cugo
       type: object
       properties:
         id:
           type: integer
-          x-stoplight:
-            id: 1dno8791qu21l
         title:
           type: string
-          x-stoplight:
-            id: p3ktscecjt3et
         description:
           type: string
-          x-stoplight:
-            id: 2j427ksj3naiw
         start:
           type: string
-          x-stoplight:
-            id: p721fuqm0gwwq
         end:
           type: string
-          x-stoplight:
-            id: eh3iknv1r9ech
         tags:
           type: array
-          x-stoplight:
-            id: dk1h98wimzb28
           items:
             $ref: '#/components/schemas/VideoTag'
       required:
