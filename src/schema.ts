@@ -157,6 +157,16 @@ export interface paths {
       };
     };
   };
+  "/campaigns/{cid}/observations": {
+    /** Return all observations of a specific campaign */
+    get: operations["get-campaigns-cid-observations"];
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+  };
   "/campaigns/{cid}/priorities": {
     get: operations["get-campaigns-cid-priorities"];
     parameters: {
@@ -329,9 +339,19 @@ export interface paths {
       };
     };
   };
+  "/video/{vid}": {
+    /** Retrive single video data */
+    get: operations["get-video-vid"];
+    parameters: {
+      path: {
+        vid: string;
+      };
+    };
+  };
   "/video/{vid}/observations": {
     /** Retrive all observations of a specific video */
     get: operations["get-video-vid-observations"];
+    post: operations["post-video-vid-observations"];
     parameters: {
       path: {
         vid: string;
@@ -972,6 +992,28 @@ export interface components {
       tester: {
         id: number;
         name: string;
+      };
+    };
+    /** Observation */
+    Observation: {
+      id: number;
+      title: string;
+      description: string;
+      start: string;
+      end: string;
+      tags: components["schemas"]["VideoTag"][];
+    };
+    /** VideoTag */
+    VideoTag: {
+      group: {
+        id: number;
+        name: string;
+      };
+      tag: {
+        id: number;
+        name: string;
+        style: string;
+        usageNumber: number;
       };
     };
   };
@@ -1625,6 +1667,39 @@ export interface operations {
       500: components["responses"]["Error"];
     };
   };
+  /** Return all observations of a specific campaign */
+  "get-campaigns-cid-observations": {
+    parameters: {
+      path: {
+        /** Campaign id */
+        cid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": {
+            id: number;
+            tags: {
+              id: number;
+              name: string;
+              style: string;
+            }[];
+            sentiments: {
+              id: number;
+              value: number;
+              comment: string;
+              cluster?: {
+                id?: number;
+                name?: string;
+              };
+            }[];
+          }[];
+        };
+      };
+    };
+  };
   "get-campaigns-cid-priorities": {
     parameters: {
       path: {
@@ -1932,7 +2007,7 @@ export interface operations {
             tags: {
               id: number;
               name: string;
-              color: string;
+              style: string;
               usageNumber: number;
             }[];
           }[];
@@ -2318,6 +2393,37 @@ export interface operations {
       };
     };
   };
+  /** Retrive single video data */
+  "get-video-vid": {
+    parameters: {
+      path: {
+        vid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Video"] & {
+            usecase: {
+              id: number;
+              name: string;
+            };
+          } & {
+            campaign: {
+              id: number;
+              name: string;
+            };
+          };
+        };
+      };
+      "": {
+        content: {
+          "application/json": { [key: string]: unknown };
+        };
+      };
+    };
+  };
   /** Retrive all observations of a specific video */
   "get-video-vid-observations": {
     parameters: {
@@ -2330,13 +2436,36 @@ export interface operations {
       200: {
         content: {
           "application/json": {
-            robaOsservazione?: string;
-            tags?: {
-              id?: string;
-              name?: string;
-              groupId?: string;
-            }[];
-          };
+            id: number;
+            title: string;
+            description: string;
+            start: number;
+            end: number;
+            tags: components["schemas"]["VideoTag"][];
+          }[];
+        };
+      };
+    };
+  };
+  "post-video-vid-observations": {
+    parameters: {
+      path: {
+        vid: string;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["Observation"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          start: number;
+          end: number;
         };
       };
     };

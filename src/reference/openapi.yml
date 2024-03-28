@@ -1137,6 +1137,79 @@ paths:
       security:
         - JWT: []
       parameters: []
+  '/campaigns/{cid}/observations':
+    parameters:
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Campaign id
+    get:
+      summary: Get Campaigns Observations
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    tags:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                          style:
+                            type: string
+                        required:
+                          - id
+                          - name
+                          - style
+                    sentiments:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          value:
+                            type: integer
+                          comment:
+                            type: string
+                          cluster:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                              name:
+                                type: string
+                        required:
+                          - id
+                          - value
+                          - comment
+                  required:
+                    - id
+                    - tags
+                    - sentiments
+              examples:
+                Example 1:
+                  value:
+                    - os: iOS 16
+      operationId: get-campaigns-cid-observations
+      description: Return all observations of a specific campaign
+      security:
+        - JWT: []
+      parameters: []
   '/campaigns/{cid}/priorities':
     parameters:
       - name: cid
@@ -1745,14 +1818,14 @@ paths:
                             type: integer
                           name:
                             type: string
-                          color:
+                          style:
                             type: string
                           usageNumber:
                             type: integer
                         required:
                           - id
                           - name
-                          - color
+                          - style
                           - usageNumber
                   required:
                     - group
@@ -2343,6 +2416,74 @@ paths:
               properties:
                 value:
                   type: integer
+  '/video/{vid}':
+    parameters:
+      - schema:
+          type: string
+        name: vid
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Video'
+                  - type: object
+                    properties:
+                      usecase:
+                        type: object
+                        required:
+                          - id
+                          - name
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                    required:
+                      - usecase
+                  - type: object
+                    properties:
+                      campaign:
+                        type: object
+                        required:
+                          - id
+                          - name
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                    required:
+                      - campaign
+              examples:
+                Example 1:
+                  value:
+                    id: 0
+                    url: string
+                    streamUrl: string
+                    tester:
+                      id: 0
+                      name: string
+                    usecase:
+                      id: 0
+                      name: string
+        '':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      operationId: get-video-vid
+      description: Retrive single video data
+      security:
+        - JWT: []
   '/video/{vid}/observations':
     parameters:
       - schema:
@@ -2359,23 +2500,60 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  robaOsservazione:
-                    type: string
-                  tags:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                        name:
-                          type: string
-                        groupId:
-                          type: string
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    title:
+                      type: string
+                    description:
+                      type: string
+                    start:
+                      type: integer
+                    end:
+                      type: integer
+                    tags:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/VideoTag'
+                  required:
+                    - id
+                    - title
+                    - description
+                    - start
+                    - end
+                    - tags
       operationId: get-video-vid-observations
       description: Retrive all observations of a specific video
+      security:
+        - JWT: []
+    post:
+      summary: ''
+      operationId: post-video-vid-observations
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Observation'
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                start:
+                  type: integer
+                end:
+                  type: integer
+              required:
+                - start
+                - end
   /workspaces:
     get:
       summary: Get User Workspaces
@@ -4186,6 +4364,64 @@ components:
         - id
         - url
         - tester
+    Observation:
+      title: Observation
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        start:
+          type: string
+        end:
+          type: string
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/VideoTag'
+      required:
+        - id
+        - title
+        - description
+        - start
+        - end
+        - tags
+    VideoTag:
+      title: VideoTag
+      type: object
+      properties:
+        group:
+          type: object
+          required:
+            - id
+            - name
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+        tag:
+          type: object
+          required:
+            - id
+            - name
+            - style
+            - usageNumber
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            style:
+              type: string
+            usageNumber:
+              type: integer
+      required:
+        - group
+        - tag
   securitySchemes:
     JWT:
       type: http
