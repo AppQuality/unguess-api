@@ -301,9 +301,6 @@ describe("GET /video/:vid/observations", () => {
     const response = await request(app)
       .get("/video/10/observations")
       .set("Authorization", "Bearer user");
-    console.log(response.body[0].tags);
-    console.log(response.body[1].tags);
-
     expect(response.body).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
