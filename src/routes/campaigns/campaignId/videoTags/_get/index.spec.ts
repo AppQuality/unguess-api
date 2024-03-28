@@ -154,7 +154,7 @@ describe("GET /campaigns/:campaignId/video-tags", () => {
   it("Should return 403 if the user does not have enough permission", async () => {
     const response = await request(app)
       .get("/campaigns/2/video-tags")
-      .set("Authorization", "Bearer tester");
+      .set("Authorization", "Bearer user");
     expect(response.status).toBe(403);
   });
 
@@ -238,13 +238,13 @@ describe("GET /campaigns/:campaignId/video-tags", () => {
             expect.objectContaining({
               id: 2,
               name: "Tag1",
-              color: "#eb7734",
+              style: "#eb7734",
               usageNumber: 3,
             }),
             expect.objectContaining({
               id: 13,
               name: "Tag2",
-              color: "#9534eb",
+              style: "#9534eb",
               usageNumber: 2,
             }),
           ]),
@@ -254,7 +254,7 @@ describe("GET /campaigns/:campaignId/video-tags", () => {
             expect.objectContaining({
               id: 14,
               name: "Tag3",
-              color: "#9534eb",
+              style: "#9534eb",
               usageNumber: 0,
             }),
           ]),

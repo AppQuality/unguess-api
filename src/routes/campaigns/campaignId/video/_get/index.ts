@@ -51,7 +51,7 @@ export default class GetCampaignVideo extends CampaignRoute<{
   }
 
   private async getVideos() {
-    const query = tryber.tables.WpAppqUserTaskMedia.do()
+    const videos = await tryber.tables.WpAppqUserTaskMedia.do()
       .select(
         tryber.ref("id").withSchema("wp_appq_user_task_media").as("media_id"),
         tryber
@@ -76,7 +76,6 @@ export default class GetCampaignVideo extends CampaignRoute<{
       .where("wp_appq_campaign_task.campaign_id", this.cp_id)
       .andWhere("wp_appq_user_task_media.status", 2)
       .andWhere("wp_appq_user_task_media.location", "like", "%.mp4");
-    const videos = await query;
 
     const results = [];
     for (const video of videos) {
