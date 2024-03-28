@@ -2,14 +2,23 @@
   "name": "UNGUESS API",
   "description": "",
   "spectralExtends": [],
-  "extends": ["cHJqOjEyMzU4Ng@30"],
-  "formats": ["oas2", "oas3", "oas3.0", "oas3.1"],
+  "extends": [
+    "cHJqOjEyMzU4Ng@30"
+  ],
+  "formats": [
+    "oas2",
+    "oas3",
+    "oas3.0",
+    "oas3.1"
+  ],
   "aliases": {},
   "rules": {},
   "inheritedRules": [
     {
       "id": "TTR-29EgEEPLd1zYr12B1",
-      "given": ["#API_Contact"],
+      "given": [
+        "#API_Contact"
+      ],
       "severity": "warn",
       "then": {
         "function": "truthy",
@@ -22,7 +31,9 @@
     },
     {
       "id": "0oKUHms8KQwlCXK9xh1TS",
-      "given": ["#API_Contact"],
+      "given": [
+        "#API_Contact"
+      ],
       "severity": "warn",
       "then": {
         "function": "truthy",
@@ -35,7 +46,9 @@
     },
     {
       "id": "sn_BzTyy9PEkenxEYFLOf",
-      "given": ["#API_Document"],
+      "given": [
+        "#API_Document"
+      ],
       "severity": "warn",
       "then": {
         "function": "truthy",
@@ -48,7 +61,9 @@
     },
     {
       "id": "MOB3Qzi42Ifve0yJG4JcH",
-      "given": ["#API_Document"],
+      "given": [
+        "#API_Document"
+      ],
       "severity": "warn",
       "then": {
         "function": "truthy",
@@ -61,7 +76,9 @@
     },
     {
       "id": "0pXPAv4dm9opK6tjCGT75",
-      "given": ["#API_Document"],
+      "given": [
+        "#API_Document"
+      ],
       "severity": "warn",
       "then": {
         "function": "truthy",
@@ -74,7 +91,9 @@
     },
     {
       "id": "9zw9YzZZgErbu_u_PmtKh",
-      "given": ["#API_License"],
+      "given": [
+        "#API_License"
+      ],
       "severity": "warn",
       "then": {
         "function": "truthy",
@@ -87,7 +106,9 @@
     },
     {
       "id": "1Z6nT-97qjhZgiSxRT0-F",
-      "given": ["#All_Markdown"],
+      "given": [
+        "#All_Markdown"
+      ],
       "severity": "warn",
       "then": {
         "function": "pattern",
@@ -102,7 +123,9 @@
     },
     {
       "id": "-uPWmkgqF1By561n2gY2L",
-      "given": ["#All_Markdown"],
+      "given": [
+        "#All_Markdown"
+      ],
       "severity": "warn",
       "then": {
         "function": "pattern",
@@ -117,7 +140,9 @@
     },
     {
       "id": "qLqyx2KFUP2niemTbgKLY",
-      "given": ["#API_Tags"],
+      "given": [
+        "#API_Tags"
+      ],
       "severity": "warn",
       "then": {
         "function": "alphabetical",
@@ -132,7 +157,9 @@
     },
     {
       "id": "8PoBvQc4TS-NJNIQRea_s",
-      "given": ["#API_Tags"],
+      "given": [
+        "#API_Tags"
+      ],
       "severity": "warn",
       "then": {
         "function": "schema",
@@ -150,7 +177,9 @@
     },
     {
       "id": "HdCFlZQk4rvwoW2rQivJ-",
-      "given": ["#Operation_Object"],
+      "given": [
+        "#Operation_Object"
+      ],
       "severity": "warn",
       "then": {
         "function": "truthy",
@@ -163,7 +192,9 @@
     },
     {
       "id": "d_-e2DyySgbq-H-C1HnJW",
-      "given": ["#Operation_Object"],
+      "given": [
+        "#Operation_Object"
+      ],
       "severity": "warn",
       "then": {
         "function": "truthy",
@@ -176,7 +207,9 @@
     },
     {
       "id": "fUlimnQIn7O0aTEucjcn8",
-      "given": ["#Operation_Object"],
+      "given": [
+        "#Operation_Object"
+      ],
       "severity": "error",
       "then": {
         "function": "pattern",
@@ -192,7 +225,9 @@
     },
     {
       "id": "zMhCgr6ZiokGte_z8QRB0",
-      "given": ["#API_Tags"],
+      "given": [
+        "#API_Tags"
+      ],
       "severity": "off",
       "then": {
         "function": "length",
@@ -207,7 +242,9 @@
     },
     {
       "id": "_fpNLrrlzi5EyvELNFIwq",
-      "given": ["#Operation_Object"],
+      "given": [
+        "#Operation_Object"
+      ],
       "severity": "warn",
       "then": {
         "function": "length",
@@ -224,7 +261,9 @@
     },
     {
       "id": "zh_C-ccsDIAZt9KrPM1T6",
-      "given": ["#Path_Item"],
+      "given": [
+        "#Path_Item"
+      ],
       "severity": "error",
       "then": {
         "function": "pattern",
@@ -240,7 +279,9 @@
     },
     {
       "id": "3YsiKUUufa2bJ1T03e7yr",
-      "given": ["#API_Contact"],
+      "given": [
+        "#API_Contact"
+      ],
       "severity": "warn",
       "then": {
         "function": "truthy",
@@ -253,7 +294,9 @@
     },
     {
       "id": "Aa3AspiwZsQLem98LpjfJ",
-      "given": ["#Path_Object"],
+      "given": [
+        "#Path_Object"
+      ],
       "severity": "warn",
       "then": {
         "function": "pattern",
@@ -269,7 +312,9 @@
     },
     {
       "id": "N57gZl1ZShbwHTxoUHekf",
-      "given": ["#Path_Object"],
+      "given": [
+        "#Path_Object"
+      ],
       "severity": "warn",
       "then": {
         "function": "pattern",
@@ -285,7 +330,9 @@
     },
     {
       "id": "vO1oAyCOGzmuDthKngmkm",
-      "given": ["#API_Tags_Item"],
+      "given": [
+        "#API_Tags_Item"
+      ],
       "severity": "warn",
       "then": {
         "function": "truthy",
@@ -298,7 +345,9 @@
     },
     {
       "id": "ZAZfEaLBTF8d0EK4fb5t4",
-      "given": ["#API_Server"],
+      "given": [
+        "#API_Server"
+      ],
       "severity": "warn",
       "then": {
         "function": "schema",
@@ -320,7 +369,9 @@
     },
     {
       "id": "lsqR0DwBEurMpGl3rq8Ra",
-      "given": ["#API_Server_URL"],
+      "given": [
+        "#API_Server_URL"
+      ],
       "severity": "warn",
       "then": {
         "function": "pattern",
@@ -335,7 +386,9 @@
     },
     {
       "id": "xU1Z64QBF-gBpONwZlOyZ",
-      "given": ["#Operation_Object"],
+      "given": [
+        "#Operation_Object"
+      ],
       "severity": "warn",
       "then": {
         "function": "oasOpSuccessResponse",
@@ -348,7 +401,9 @@
     },
     {
       "id": "4YG10P1n8AC78BYDF02Hy",
-      "given": ["#API_Document"],
+      "given": [
+        "#API_Document"
+      ],
       "severity": "error",
       "then": {
         "function": "oasPathParam"
@@ -360,7 +415,9 @@
     },
     {
       "id": "6WNstuT1NcliyJqpb7Jlq",
-      "given": ["#Operation_Object"],
+      "given": [
+        "#Operation_Object"
+      ],
       "severity": "warn",
       "then": {
         "function": "oasOpParams",
@@ -373,7 +430,9 @@
     },
     {
       "id": "2RJvOs6WW8yucNVgzfYi3",
-      "given": ["#All_Enum"],
+      "given": [
+        "#All_Enum"
+      ],
       "severity": "warn",
       "then": {
         "function": "typedEnum"
@@ -385,7 +444,9 @@
     },
     {
       "id": "yT39n0E6zbgjPUaKM5ESA",
-      "given": ["#API_Document"],
+      "given": [
+        "#API_Document"
+      ],
       "severity": "error",
       "then": {
         "function": "oasDocumentSchema"
@@ -394,11 +455,15 @@
       "name": "oas2-schema",
       "description": "Validate structure of OpenAPI v2 specification.",
       "message": "{{error}}",
-      "formats": ["oas2"]
+      "formats": [
+        "oas2"
+      ]
     },
     {
       "id": "p5UStZMdvn96_Gifz2q9T",
-      "given": ["#API_Document"],
+      "given": [
+        "#API_Document"
+      ],
       "severity": "error",
       "then": {
         "function": "oasDocumentSchema"
@@ -407,11 +472,15 @@
       "name": "oas3-schema",
       "description": "Validate structure of OpenAPI v3 specification.",
       "message": "{{error}}",
-      "formats": ["oas3"]
+      "formats": [
+        "oas3"
+      ]
     },
     {
       "id": "X3bhe_82n-4xyiO1--LeX",
-      "given": ["#API_Document"],
+      "given": [
+        "#API_Document"
+      ],
       "severity": "warn",
       "then": {
         "function": "oasUnusedComponent"
@@ -420,11 +489,15 @@
       "name": "oas3-unused-component",
       "description": "Validate structure of OpenAPI v3 specification.",
       "message": "{{error}}",
-      "formats": ["oas3"]
+      "formats": [
+        "oas3"
+      ]
     },
     {
       "id": "dwTU0j6I8wkku-HiyYO5s",
-      "given": ["#API_Document"],
+      "given": [
+        "#API_Document"
+      ],
       "severity": "error",
       "then": {
         "function": "oasOpIdUnique"
@@ -436,7 +509,9 @@
     },
     {
       "id": "V3i5ziMkH-TIEnyKtD8VR",
-      "given": ["#Operation_Object"],
+      "given": [
+        "#Operation_Object"
+      ],
       "severity": "error",
       "then": {
         "function": "oasOpFormDataConsumeCheck"
@@ -445,11 +520,15 @@
       "name": "oas2-operation-formData-consume-check",
       "description": "Operations with \"in: formData\" parameter must include \"application/x-www-form-urlencoded\" or \"multipart/form-data\" in their \"consumes\" property.",
       "message": "Operations with \"in: formData\" parameter must include \"application/x-www-form-urlencoded\" or \"multipart/form-data\" in their \"consumes\" property.",
-      "formats": ["oas2"]
+      "formats": [
+        "oas2"
+      ]
     },
     {
       "id": "px28ipqP9TYsW03u0BF5S",
-      "given": ["#API_Document"],
+      "given": [
+        "#API_Document"
+      ],
       "severity": "warn",
       "then": {
         "function": "oasTagDefined"
@@ -461,7 +540,9 @@
     },
     {
       "id": "dfozmCZymSLcNkk0g10Ed",
-      "given": ["#All_Ref"],
+      "given": [
+        "#All_Ref"
+      ],
       "severity": "error",
       "then": {
         "function": "refSiblings"
@@ -470,43 +551,61 @@
       "name": "no-$ref-siblings",
       "description": "Property must not be placed among $ref",
       "message": "{{error}}",
-      "formats": ["oas3.0", "oas2"]
+      "formats": [
+        "oas3.0",
+        "oas2"
+      ]
     },
     {
       "id": "7-7dsv0NAw2q2C0iUjHby",
-      "given": ["#API_Document"],
+      "given": [
+        "#API_Document"
+      ],
       "severity": "warn",
       "then": {
         "function": "oasOpSecurityDefined",
         "functionOptions": {
-          "schemesPath": ["securityDefinitions"]
+          "schemesPath": [
+            "securityDefinitions"
+          ]
         }
       },
       "extendedFrom": "cHJqOjEyMzU4Ng@30",
       "name": "oas2-operation-security-defined",
       "description": "Operation \"security\" values must match a scheme defined in the \"securityDefinitions\" object.",
       "message": "{{error}}",
-      "formats": ["oas2"]
+      "formats": [
+        "oas2"
+      ]
     },
     {
       "id": "xbq7InWFYELa0sPFVTb0q",
-      "given": ["#API_Document"],
+      "given": [
+        "#API_Document"
+      ],
       "severity": "warn",
       "then": {
         "function": "oasOpSecurityDefined",
         "functionOptions": {
-          "schemesPath": ["components", "securitySchemes"]
+          "schemesPath": [
+            "components",
+            "securitySchemes"
+          ]
         }
       },
       "extendedFrom": "cHJqOjEyMzU4Ng@30",
       "name": "oas3-operation-security-defined",
       "description": "Operation `security` values must match a scheme defined in the `components.securitySchemes` object.",
       "message": "{{error}}",
-      "formats": ["oas3"]
+      "formats": [
+        "oas3"
+      ]
     },
     {
       "id": "mij6hzWOrEKecLEYork5b",
-      "given": ["#All_Enum"],
+      "given": [
+        "#All_Enum"
+      ],
       "severity": "warn",
       "then": {
         "function": "oasSchema",
@@ -525,7 +624,9 @@
     },
     {
       "id": "d6iho13IFpnpx_xy5PprM",
-      "given": ["#API_Document"],
+      "given": [
+        "#API_Document"
+      ],
       "severity": "error",
       "then": {
         "function": "schema",
@@ -545,11 +646,15 @@
       "name": "oas2-api-schemes",
       "description": "OpenAPI host \"schemes\" must be present and non-empty array.",
       "message": "OpenAPI host \"schemes\" must be present and non-empty array.",
-      "formats": ["oas2"]
+      "formats": [
+        "oas2"
+      ]
     },
     {
       "id": "xOqYHn8Jl-Xptkifl62vo",
-      "given": ["#API_Document"],
+      "given": [
+        "#API_Document"
+      ],
       "severity": "error",
       "then": {
         "function": "oasDiscriminator",
@@ -559,11 +664,15 @@
       "name": "oas2-discriminator",
       "description": "Discriminator property must be defined and required",
       "message": "Discriminator property must be defined and required",
-      "formats": ["oas2"]
+      "formats": [
+        "oas2"
+      ]
     },
     {
       "id": "2_7sE8rJpQ1Vpso3pzWql",
-      "given": ["#API_Server_URL"],
+      "given": [
+        "#API_Server_URL"
+      ],
       "severity": "warn",
       "then": {
         "function": "pattern",
@@ -577,7 +686,9 @@
     },
     {
       "id": "cVXLhksRtE2LD3LdD-0kt",
-      "given": ["#Request_Parameter_All"],
+      "given": [
+        "#Request_Parameter_All"
+      ],
       "severity": "warn",
       "then": {
         "function": "truthy",
@@ -589,7 +700,9 @@
     },
     {
       "id": "SQCHFIEcivbtqbFxnZ4OE",
-      "given": ["#API_Document_RecursiveSearch"],
+      "given": [
+        "#API_Document_RecursiveSearch"
+      ],
       "severity": "warn",
       "then": {
         "function": "undefined",
@@ -599,11 +712,15 @@
       "name": "oas2-anyOf",
       "description": "anyOf is not available in OpenAPI v2, it was added in OpenAPI v3",
       "message": "anyOf is not available in OpenAPI v2, it was added in OpenAPI v3",
-      "formats": ["oas2"]
+      "formats": [
+        "oas2"
+      ]
     },
     {
       "id": "PQ4U-6rKGRNTCgXojL8Dl",
-      "given": ["#API_Document_RecursiveSearch"],
+      "given": [
+        "#API_Document_RecursiveSearch"
+      ],
       "severity": "warn",
       "then": {
         "function": "undefined",
@@ -613,27 +730,38 @@
       "name": "oas2-oneOf",
       "description": "anyOf is not available in OpenAPI v2, it was added in OpenAPI v3",
       "message": "oneOf is not available in OpenAPI v2, it was added in OpenAPI v3",
-      "formats": ["oas2"]
+      "formats": [
+        "oas2"
+      ]
     },
     {
       "id": "Po-bkzhr4CFq-1vspm50h",
-      "given": ["#All_Example"],
+      "given": [
+        "#All_Example"
+      ],
       "severity": "warn",
       "then": {
         "function": "xor",
         "functionOptions": {
-          "properties": ["externalValue", "value"]
+          "properties": [
+            "externalValue",
+            "value"
+          ]
         }
       },
       "extendedFrom": "cHJqOjEyMzU4Ng@30",
       "name": "oas3-examples-value-or-externalValue",
       "description": "Examples must have either \"value\" or \"externalValue\" field.",
       "message": "Examples must have either \"value\" or \"externalValue\" field.",
-      "formats": ["oas3"]
+      "formats": [
+        "oas3"
+      ]
     },
     {
       "id": "9EErbbP2qMhOXWNF_04Ss",
-      "given": ["#All_Example_Schema"],
+      "given": [
+        "#All_Example_Schema"
+      ],
       "severity": "error",
       "then": {
         "function": "oasExample",
@@ -647,11 +775,15 @@
       "name": "oas2-valid-schema-example",
       "description": "Examples must be valid against their defined schema.",
       "message": "{{error}}",
-      "formats": ["oas2"]
+      "formats": [
+        "oas2"
+      ]
     },
     {
       "id": "zNO9WruRlSKHirdlFKY1q",
-      "given": ["#All_Example_Schema"],
+      "given": [
+        "#All_Example_Schema"
+      ],
       "severity": "error",
       "then": {
         "function": "oasExample",
@@ -665,11 +797,15 @@
       "name": "oas3-valid-schema-example",
       "description": "Examples must be valid against their defined schema.",
       "message": "{{error}}",
-      "formats": ["oas3"]
+      "formats": [
+        "oas3"
+      ]
     },
     {
       "id": "q-lDeHs5I_V7eyJHV9VDu",
-      "given": ["#All_Example_Media"],
+      "given": [
+        "#All_Example_Media"
+      ],
       "severity": "error",
       "then": {
         "function": "oasExample",
@@ -683,11 +819,15 @@
       "name": "oas2-valid-media-example",
       "description": "Examples must be valid against their defined schema.",
       "message": "{{error}}",
-      "formats": ["oas2"]
+      "formats": [
+        "oas2"
+      ]
     },
     {
       "id": "lFapy3MLytSBsIHJNVAmm",
-      "given": ["#All_Example_Media"],
+      "given": [
+        "#All_Example_Media"
+      ],
       "severity": "error",
       "then": {
         "function": "oasExample",
@@ -701,7 +841,9 @@
       "name": "oas3-valid-media-example",
       "description": "Examples must be valid against their defined schema.",
       "message": "{{error}}",
-      "formats": ["oas3"]
+      "formats": [
+        "oas3"
+      ]
     }
   ],
   "inheritedTargets": [
@@ -712,11 +854,15 @@
       "name": "API_Document",
       "targets": [
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "$"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$"
         }
       ]
@@ -728,11 +874,15 @@
       "name": "API_Description",
       "targets": [
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "$.info.description"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$.info.description"
         }
       ]
@@ -744,11 +894,15 @@
       "name": "Operation_Object",
       "targets": [
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "#Path_Item[get,put,post,delete,options,head,patch,trace]"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "#Path_Item[get,put,post,delete,options,head,patch,trace]"
         }
       ]
@@ -760,11 +914,15 @@
       "name": "Operation_Responses",
       "targets": [
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "#Operation_Object.responses"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "#Operation_Object.responses"
         }
       ]
@@ -775,11 +933,15 @@
       "name": "Path_Item",
       "targets": [
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "$.paths[*]"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$.paths[*]"
         }
       ]
@@ -791,11 +953,15 @@
       "name": "API_Contact",
       "targets": [
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "$.info.contact"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$.info.contact"
         }
       ]
@@ -807,11 +973,15 @@
       "name": "API_License",
       "targets": [
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "$.info.license"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$.info.license"
         }
       ]
@@ -823,11 +993,15 @@
       "name": "All_Markdown",
       "targets": [
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "$..[description,title]"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$..[description,title]"
         }
       ]
@@ -839,11 +1013,15 @@
       "name": "API_Tags",
       "targets": [
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "$.tags"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$.tags"
         }
       ]
@@ -855,11 +1033,15 @@
       "name": "API_Server",
       "targets": [
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$.servers"
         },
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "$.host"
         }
       ]
@@ -871,27 +1053,39 @@
       "name": "Response_All_Object",
       "targets": [
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "$.responses"
         },
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "#Operation_Responses"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$.components.responses"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "#Operation_Responses"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$..responses"
         },
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "$..responses"
         }
       ]
@@ -903,11 +1097,15 @@
       "name": "API_Server_URL",
       "targets": [
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$.servers[*].url"
         },
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "$.host"
         }
       ]
@@ -919,11 +1117,15 @@
       "name": "All_Ref",
       "targets": [
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "$..[?(@property === '$ref')]"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$..[?(@property === '$ref')]"
         }
       ]
@@ -935,11 +1137,15 @@
       "name": "All_Enum",
       "targets": [
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "$..[?(@ && @.enum && @.type)]"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$..[?(@ && @.enum && @.type)]"
         }
       ]
@@ -951,11 +1157,15 @@
       "name": "Request_Parameter_All",
       "targets": [
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "$..parameters[*]"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$..parameters[*]"
         }
       ]
@@ -967,11 +1177,15 @@
       "name": "Request_Parameter_Query",
       "targets": [
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "$..parameters[?(@.in==\"query\")]"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$..parameters[?(@.in==\"query\")]"
         }
       ]
@@ -983,11 +1197,15 @@
       "name": "Request_Parameter_Header",
       "targets": [
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "$..parameters[?(@.in==\"header\")]"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$..parameters[?(@.in==\"header\")]"
         }
       ]
@@ -999,11 +1217,15 @@
       "name": "Request_Parameter_Cookie",
       "targets": [
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "$..parameters[?(@.in==\"cookie\")]"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$..parameters[?(@.in==\"cookie\")]"
         }
       ]
@@ -1015,11 +1237,15 @@
       "name": "Request_Parameter_Path",
       "targets": [
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "$..parameters[?(@.in==\"path\")]"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$..parameters[?(@.in==\"path\")]"
         }
       ]
@@ -1031,11 +1257,15 @@
       "name": "Path_Object",
       "targets": [
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "$.paths"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$.paths"
         }
       ]
@@ -1047,31 +1277,45 @@
       "name": "All_Example_Schema",
       "targets": [
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "$..definitions..[?(@property !== 'properties' && @ && (@.example !== void 0 || @['x-example'] !== void 0 || @.default !== void 0) && (@.enum || @.type || @.format || @.$ref || @.properties || @.items))]"
         },
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "$..parameters..[?(@property !== 'properties' && @ && (@.example !== void 0 || @['x-example'] !== void 0 || @.default !== void 0) && (@.enum || @.type || @.format || @.$ref || @.properties || @.items))]"
         },
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "$..responses..[?(@property !== 'properties' && @ && (@.example !== void 0 || @['x-example'] !== void 0 || @.default !== void 0) && (@.enum || @.type || @.format || @.$ref || @.properties || @.items))]"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$.components.schemas..[?(@property !== 'properties' && @ && (@ && @.example !== void 0 || @.default !== void 0) && (@.enum || @.type || @.format || @.$ref || @.properties || @.items))]"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$..content..[?(@property !== 'properties' && @ && (@ && @.example !== void 0 || @.default !== void 0) && (@.enum || @.type || @.format || @.$ref || @.properties || @.items))]"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$..headers..[?(@property !== 'properties' && @ && (@ && @.example !== void 0 || @.default !== void 0) && (@.enum || @.type || @.format || @.$ref || @.properties || @.items))]"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$..parameters..[?(@property !== 'properties' && @ && (@ && @.example !== void 0 || @.default !== void 0) && (@.enum || @.type || @.format || @.$ref || @.properties || @.items))]"
         }
       ]
@@ -1083,11 +1327,15 @@
       "name": "API_Document_RecursiveSearch",
       "targets": [
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "$.."
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$.."
         }
       ]
@@ -1099,31 +1347,45 @@
       "name": "All_Example",
       "targets": [
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "$..examples[*]"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$.components.examples[*]"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$.paths[*][*]..content[*].examples[*]"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$.paths[*][*]..parameters[*].examples[*]"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$.components.parameters[*].examples[*]"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$.paths[*][*]..headers[*].examples[*]"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$.components.headers[*].examples[*]"
         }
       ]
@@ -1135,19 +1397,27 @@
       "name": "All_Example_Media",
       "targets": [
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "$..responses..[?(@ && @.schema && @.examples)]"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$..content..[?(@ && @.schema && (@.example !== void 0 || @.examples))]"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$..headers..[?(@ && @.schema && (@.example !== void 0 || @.examples))]"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$..parameters..[?(@ && @.schema && (@.example !== void 0 || @.examples))]"
         }
       ]
@@ -1159,11 +1429,15 @@
       "name": "API_Tags_Item",
       "targets": [
         {
-          "formats": ["oas2"],
+          "formats": [
+            "oas2"
+          ],
           "given": "$.tags[*]"
         },
         {
-          "formats": ["oas3"],
+          "formats": [
+            "oas3"
+          ],
           "given": "$.tags[*]"
         }
       ]
@@ -1258,18 +1532,27 @@
   "library": {
     "cHJqOjEyMzU4Ng@30": {
       "description": "This is Stoplight's built-in style guide, containing style and validation rules for OAS (OpenAPI Specification).\n\n> This Style Guide is applied to all new projects by default.",
-      "formats": ["oas2", "oas3", "oas3.0", "oas3.1"],
+      "formats": [
+        "oas2",
+        "oas3",
+        "oas3.0",
+        "oas3.1"
+      ],
       "aliases": {
         "API_Document": {
           "description": "The complete API specification document. This can be used to target any part of the OpenAPI document using **field**.\n\n*Use this if you don't find specific targets that cater to your usecase.* ",
           "name": "API_Document",
           "targets": [
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "$"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$"
             }
           ]
@@ -1279,11 +1562,15 @@
           "name": "API_Description",
           "targets": [
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "$.info.description"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$.info.description"
             }
           ]
@@ -1293,11 +1580,15 @@
           "name": "Operation_Object",
           "targets": [
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "#Path_Item[get,put,post,delete,options,head,patch,trace]"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "#Path_Item[get,put,post,delete,options,head,patch,trace]"
             }
           ]
@@ -1307,11 +1598,15 @@
           "name": "Operation_Responses",
           "targets": [
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "#Operation_Object.responses"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "#Operation_Object.responses"
             }
           ]
@@ -1320,11 +1615,15 @@
           "name": "Path_Item",
           "targets": [
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "$.paths[*]"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$.paths[*]"
             }
           ]
@@ -1334,11 +1633,15 @@
           "name": "API_Contact",
           "targets": [
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "$.info.contact"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$.info.contact"
             }
           ]
@@ -1348,11 +1651,15 @@
           "name": "API_License",
           "targets": [
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "$.info.license"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$.info.license"
             }
           ]
@@ -1362,11 +1669,15 @@
           "name": "All_Markdown",
           "targets": [
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "$..[description,title]"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$..[description,title]"
             }
           ]
@@ -1376,11 +1687,15 @@
           "name": "API_Tags",
           "targets": [
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "$.tags"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$.tags"
             }
           ]
@@ -1390,11 +1705,15 @@
           "name": "API_Server",
           "targets": [
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$.servers"
             },
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "$.host"
             }
           ]
@@ -1404,27 +1723,39 @@
           "name": "Response_All_Object",
           "targets": [
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "$.responses"
             },
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "#Operation_Responses"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$.components.responses"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "#Operation_Responses"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$..responses"
             },
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "$..responses"
             }
           ]
@@ -1434,11 +1765,15 @@
           "name": "API_Server_URL",
           "targets": [
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$.servers[*].url"
             },
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "$.host"
             }
           ]
@@ -1448,11 +1783,15 @@
           "name": "All_Ref",
           "targets": [
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "$..[?(@property === '$ref')]"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$..[?(@property === '$ref')]"
             }
           ]
@@ -1462,11 +1801,15 @@
           "name": "All_Enum",
           "targets": [
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "$..[?(@ && @.enum && @.type)]"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$..[?(@ && @.enum && @.type)]"
             }
           ]
@@ -1476,11 +1819,15 @@
           "name": "Request_Parameter_All",
           "targets": [
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "$..parameters[*]"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$..parameters[*]"
             }
           ]
@@ -1490,11 +1837,15 @@
           "name": "Request_Parameter_Query",
           "targets": [
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "$..parameters[?(@.in==\"query\")]"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$..parameters[?(@.in==\"query\")]"
             }
           ]
@@ -1504,11 +1855,15 @@
           "name": "Request_Parameter_Header",
           "targets": [
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "$..parameters[?(@.in==\"header\")]"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$..parameters[?(@.in==\"header\")]"
             }
           ]
@@ -1518,11 +1873,15 @@
           "name": "Request_Parameter_Cookie",
           "targets": [
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "$..parameters[?(@.in==\"cookie\")]"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$..parameters[?(@.in==\"cookie\")]"
             }
           ]
@@ -1532,11 +1891,15 @@
           "name": "Request_Parameter_Path",
           "targets": [
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "$..parameters[?(@.in==\"path\")]"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$..parameters[?(@.in==\"path\")]"
             }
           ]
@@ -1546,11 +1909,15 @@
           "name": "Path_Object",
           "targets": [
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "$.paths"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$.paths"
             }
           ]
@@ -1560,31 +1927,45 @@
           "name": "All_Example_Schema",
           "targets": [
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "$..definitions..[?(@property !== 'properties' && @ && (@.example !== void 0 || @['x-example'] !== void 0 || @.default !== void 0) && (@.enum || @.type || @.format || @.$ref || @.properties || @.items))]"
             },
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "$..parameters..[?(@property !== 'properties' && @ && (@.example !== void 0 || @['x-example'] !== void 0 || @.default !== void 0) && (@.enum || @.type || @.format || @.$ref || @.properties || @.items))]"
             },
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "$..responses..[?(@property !== 'properties' && @ && (@.example !== void 0 || @['x-example'] !== void 0 || @.default !== void 0) && (@.enum || @.type || @.format || @.$ref || @.properties || @.items))]"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$.components.schemas..[?(@property !== 'properties' && @ && (@ && @.example !== void 0 || @.default !== void 0) && (@.enum || @.type || @.format || @.$ref || @.properties || @.items))]"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$..content..[?(@property !== 'properties' && @ && (@ && @.example !== void 0 || @.default !== void 0) && (@.enum || @.type || @.format || @.$ref || @.properties || @.items))]"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$..headers..[?(@property !== 'properties' && @ && (@ && @.example !== void 0 || @.default !== void 0) && (@.enum || @.type || @.format || @.$ref || @.properties || @.items))]"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$..parameters..[?(@property !== 'properties' && @ && (@ && @.example !== void 0 || @.default !== void 0) && (@.enum || @.type || @.format || @.$ref || @.properties || @.items))]"
             }
           ]
@@ -1594,11 +1975,15 @@
           "name": "API_Document_RecursiveSearch",
           "targets": [
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "$.."
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$.."
             }
           ]
@@ -1608,31 +1993,45 @@
           "name": "All_Example",
           "targets": [
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "$..examples[*]"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$.components.examples[*]"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$.paths[*][*]..content[*].examples[*]"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$.paths[*][*]..parameters[*].examples[*]"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$.components.parameters[*].examples[*]"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$.paths[*][*]..headers[*].examples[*]"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$.components.headers[*].examples[*]"
             }
           ]
@@ -1642,19 +2041,27 @@
           "name": "All_Example_Media",
           "targets": [
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "$..responses..[?(@ && @.schema && @.examples)]"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$..content..[?(@ && @.schema && (@.example !== void 0 || @.examples))]"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$..headers..[?(@ && @.schema && (@.example !== void 0 || @.examples))]"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$..parameters..[?(@ && @.schema && (@.example !== void 0 || @.examples))]"
             }
           ]
@@ -1664,11 +2071,15 @@
           "name": "API_Tags_Item",
           "targets": [
             {
-              "formats": ["oas2"],
+              "formats": [
+                "oas2"
+              ],
               "given": "$.tags[*]"
             },
             {
-              "formats": ["oas3"],
+              "formats": [
+                "oas3"
+              ],
               "given": "$.tags[*]"
             }
           ]
@@ -1676,7 +2087,9 @@
       },
       "rules": {
         "contact-url": {
-          "given": ["#API_Contact"],
+          "given": [
+            "#API_Contact"
+          ],
           "severity": "warn",
           "then": {
             "function": "truthy",
@@ -1687,7 +2100,9 @@
           "message": "Contact object should have \"url\""
         },
         "contact-email": {
-          "given": ["#API_Contact"],
+          "given": [
+            "#API_Contact"
+          ],
           "severity": "warn",
           "then": {
             "function": "truthy",
@@ -1698,7 +2113,9 @@
           "message": "Contact object should have \"email\""
         },
         "info-contact": {
-          "given": ["#API_Document"],
+          "given": [
+            "#API_Document"
+          ],
           "severity": "warn",
           "then": {
             "function": "truthy",
@@ -1709,7 +2126,9 @@
           "message": "Info object should have \"contact\" object."
         },
         "info-description": {
-          "given": ["#API_Document"],
+          "given": [
+            "#API_Document"
+          ],
           "severity": "warn",
           "then": {
             "function": "truthy",
@@ -1720,7 +2139,9 @@
           "message": "Info object should have \"description\" object."
         },
         "info-license": {
-          "given": ["#API_Document"],
+          "given": [
+            "#API_Document"
+          ],
           "severity": "warn",
           "then": {
             "function": "truthy",
@@ -1731,7 +2152,9 @@
           "message": "Info object should have \"license\" object."
         },
         "license-url": {
-          "given": ["#API_License"],
+          "given": [
+            "#API_License"
+          ],
           "severity": "warn",
           "then": {
             "function": "truthy",
@@ -1742,7 +2165,9 @@
           "message": "License object should include \"url\"."
         },
         "no-eval-in-markdown": {
-          "given": ["#All_Markdown"],
+          "given": [
+            "#All_Markdown"
+          ],
           "severity": "warn",
           "then": {
             "function": "pattern",
@@ -1755,7 +2180,9 @@
           "message": "Markdown descriptions must not have \"eval(\"."
         },
         "no-script-tags-in-markdown": {
-          "given": ["#All_Markdown"],
+          "given": [
+            "#All_Markdown"
+          ],
           "severity": "warn",
           "then": {
             "function": "pattern",
@@ -1768,7 +2195,9 @@
           "message": "Markdown descriptions must not have \"<script>\" tags."
         },
         "openapi-tags-alphabetical": {
-          "given": ["#API_Tags"],
+          "given": [
+            "#API_Tags"
+          ],
           "severity": "warn",
           "then": {
             "function": "alphabetical",
@@ -1781,7 +2210,9 @@
           "message": "OpenAPI object should have alphabetical \"tags\"."
         },
         "openapi-tags": {
-          "given": ["#API_Tags"],
+          "given": [
+            "#API_Tags"
+          ],
           "severity": "warn",
           "then": {
             "function": "schema",
@@ -1797,7 +2228,9 @@
           "message": "OpenAPI object should have non-empty \"tags\" array."
         },
         "operation-description": {
-          "given": ["#Operation_Object"],
+          "given": [
+            "#Operation_Object"
+          ],
           "severity": "warn",
           "then": {
             "function": "truthy",
@@ -1808,7 +2241,9 @@
           "message": "Operation \"description\" should be present and non-empty string."
         },
         "operation-operationId": {
-          "given": ["#Operation_Object"],
+          "given": [
+            "#Operation_Object"
+          ],
           "severity": "warn",
           "then": {
             "function": "truthy",
@@ -1819,7 +2254,9 @@
           "message": "Operation should have \"operationId\"."
         },
         "operation-operationId-valid-in-url": {
-          "given": ["#Operation_Object"],
+          "given": [
+            "#Operation_Object"
+          ],
           "severity": "error",
           "then": {
             "function": "pattern",
@@ -1833,7 +2270,9 @@
           "message": "OperationId should not have characters that are invalid when used in URL."
         },
         "operation-singular-tag": {
-          "given": ["#API_Tags"],
+          "given": [
+            "#API_Tags"
+          ],
           "severity": "off",
           "then": {
             "function": "length",
@@ -1846,7 +2285,9 @@
           "message": "Operation should not have more than a single tag."
         },
         "operation-tags": {
-          "given": ["#Operation_Object"],
+          "given": [
+            "#Operation_Object"
+          ],
           "severity": "warn",
           "then": {
             "function": "length",
@@ -1861,7 +2302,9 @@
           "message": "Operation should have non-empty \"tags\" array."
         },
         "path-declarations-must-exist": {
-          "given": ["#Path_Item"],
+          "given": [
+            "#Path_Item"
+          ],
           "severity": "error",
           "then": {
             "function": "pattern",
@@ -1875,7 +2318,9 @@
           "message": "Path parameter declarations must not be empty, ex.\"/given/{}\" is invalid."
         },
         "contact-name": {
-          "given": ["#API_Contact"],
+          "given": [
+            "#API_Contact"
+          ],
           "severity": "warn",
           "then": {
             "function": "truthy",
@@ -1886,7 +2331,9 @@
           "message": "Contact object should have \"name\""
         },
         "path-keys-no-trailing-slash": {
-          "given": ["#Path_Object"],
+          "given": [
+            "#Path_Object"
+          ],
           "severity": "warn",
           "then": {
             "function": "pattern",
@@ -1900,7 +2347,9 @@
           "message": "Path should not end with slash."
         },
         "path-not-include-query": {
-          "given": ["#Path_Object"],
+          "given": [
+            "#Path_Object"
+          ],
           "severity": "warn",
           "then": {
             "function": "pattern",
@@ -1914,7 +2363,9 @@
           "message": "Path should not include query string."
         },
         "tag-description": {
-          "given": ["#API_Tags_Item"],
+          "given": [
+            "#API_Tags_Item"
+          ],
           "severity": "warn",
           "then": {
             "function": "truthy",
@@ -1925,7 +2376,9 @@
           "message": "Tag object should have \"description\"."
         },
         "api-servers": {
-          "given": ["#API_Server"],
+          "given": [
+            "#API_Server"
+          ],
           "severity": "warn",
           "then": {
             "function": "schema",
@@ -1945,7 +2398,9 @@
           "message": "Server should be present."
         },
         "server-trailing-slash": {
-          "given": ["#API_Server_URL"],
+          "given": [
+            "#API_Server_URL"
+          ],
           "severity": "warn",
           "then": {
             "function": "pattern",
@@ -1958,7 +2413,9 @@
           "message": "Server URL should not have trailing slash"
         },
         "operation-success-response": {
-          "given": ["#Operation_Object"],
+          "given": [
+            "#Operation_Object"
+          ],
           "severity": "warn",
           "then": {
             "function": "oasOpSuccessResponse",
@@ -1969,7 +2426,9 @@
           "message": "Operation should have at least one \"2xx\" or \"3xx\" response."
         },
         "path-params": {
-          "given": ["#API_Document"],
+          "given": [
+            "#API_Document"
+          ],
           "severity": "error",
           "then": {
             "function": "oasPathParam"
@@ -1979,7 +2438,9 @@
           "message": "{{error}}"
         },
         "operation-parameters": {
-          "given": ["#Operation_Object"],
+          "given": [
+            "#Operation_Object"
+          ],
           "severity": "warn",
           "then": {
             "function": "oasOpParams",
@@ -1990,7 +2451,9 @@
           "message": "Operation parameters are unique and non-repeating."
         },
         "typed-enum": {
-          "given": ["#All_Enum"],
+          "given": [
+            "#All_Enum"
+          ],
           "severity": "warn",
           "then": {
             "function": "typedEnum"
@@ -2000,7 +2463,9 @@
           "message": "{{error}}"
         },
         "oas2-schema": {
-          "given": ["#API_Document"],
+          "given": [
+            "#API_Document"
+          ],
           "severity": "error",
           "then": {
             "function": "oasDocumentSchema"
@@ -2008,10 +2473,14 @@
           "name": "oas2-schema",
           "description": "Validate structure of OpenAPI v2 specification.",
           "message": "{{error}}",
-          "formats": ["oas2"]
+          "formats": [
+            "oas2"
+          ]
         },
         "oas3-schema": {
-          "given": ["#API_Document"],
+          "given": [
+            "#API_Document"
+          ],
           "severity": "error",
           "then": {
             "function": "oasDocumentSchema"
@@ -2019,10 +2488,14 @@
           "name": "oas3-schema",
           "description": "Validate structure of OpenAPI v3 specification.",
           "message": "{{error}}",
-          "formats": ["oas3"]
+          "formats": [
+            "oas3"
+          ]
         },
         "oas3-unused-component": {
-          "given": ["#API_Document"],
+          "given": [
+            "#API_Document"
+          ],
           "severity": "warn",
           "then": {
             "function": "oasUnusedComponent"
@@ -2030,10 +2503,14 @@
           "name": "oas3-unused-component",
           "description": "Validate structure of OpenAPI v3 specification.",
           "message": "{{error}}",
-          "formats": ["oas3"]
+          "formats": [
+            "oas3"
+          ]
         },
         "operation-operationId-unique": {
-          "given": ["#API_Document"],
+          "given": [
+            "#API_Document"
+          ],
           "severity": "error",
           "then": {
             "function": "oasOpIdUnique"
@@ -2043,7 +2520,9 @@
           "message": "Every operation must have unique operationId"
         },
         "oas2-operation-formData-consume-check": {
-          "given": ["#Operation_Object"],
+          "given": [
+            "#Operation_Object"
+          ],
           "severity": "error",
           "then": {
             "function": "oasOpFormDataConsumeCheck"
@@ -2051,10 +2530,14 @@
           "name": "oas2-operation-formData-consume-check",
           "description": "Operations with \"in: formData\" parameter must include \"application/x-www-form-urlencoded\" or \"multipart/form-data\" in their \"consumes\" property.",
           "message": "Operations with \"in: formData\" parameter must include \"application/x-www-form-urlencoded\" or \"multipart/form-data\" in their \"consumes\" property.",
-          "formats": ["oas2"]
+          "formats": [
+            "oas2"
+          ]
         },
         "operation-tag-defined": {
-          "given": ["#API_Document"],
+          "given": [
+            "#API_Document"
+          ],
           "severity": "warn",
           "then": {
             "function": "oasTagDefined"
@@ -2064,7 +2547,9 @@
           "message": "Operation tags must be defined in global tags"
         },
         "no-$ref-siblings": {
-          "given": ["#All_Ref"],
+          "given": [
+            "#All_Ref"
+          ],
           "severity": "error",
           "then": {
             "function": "refSiblings"
@@ -2072,38 +2557,56 @@
           "name": "no-$ref-siblings",
           "description": "Property must not be placed among $ref",
           "message": "{{error}}",
-          "formats": ["oas3.0", "oas2"]
+          "formats": [
+            "oas3.0",
+            "oas2"
+          ]
         },
         "oas2-operation-security-defined": {
-          "given": ["#API_Document"],
+          "given": [
+            "#API_Document"
+          ],
           "severity": "warn",
           "then": {
             "function": "oasOpSecurityDefined",
             "functionOptions": {
-              "schemesPath": ["securityDefinitions"]
+              "schemesPath": [
+                "securityDefinitions"
+              ]
             }
           },
           "name": "oas2-operation-security-defined",
           "description": "Operation \"security\" values must match a scheme defined in the \"securityDefinitions\" object.",
           "message": "{{error}}",
-          "formats": ["oas2"]
+          "formats": [
+            "oas2"
+          ]
         },
         "oas3-operation-security-defined": {
-          "given": ["#API_Document"],
+          "given": [
+            "#API_Document"
+          ],
           "severity": "warn",
           "then": {
             "function": "oasOpSecurityDefined",
             "functionOptions": {
-              "schemesPath": ["components", "securitySchemes"]
+              "schemesPath": [
+                "components",
+                "securitySchemes"
+              ]
             }
           },
           "name": "oas3-operation-security-defined",
           "description": "Operation `security` values must match a scheme defined in the `components.securitySchemes` object.",
           "message": "{{error}}",
-          "formats": ["oas3"]
+          "formats": [
+            "oas3"
+          ]
         },
         "duplicated-entry-in-enum": {
-          "given": ["#All_Enum"],
+          "given": [
+            "#All_Enum"
+          ],
           "severity": "warn",
           "then": {
             "function": "oasSchema",
@@ -2120,7 +2623,9 @@
           "message": "{{error}}"
         },
         "oas2-api-schemes": {
-          "given": ["#API_Document"],
+          "given": [
+            "#API_Document"
+          ],
           "severity": "error",
           "then": {
             "function": "schema",
@@ -2139,10 +2644,14 @@
           "name": "oas2-api-schemes",
           "description": "OpenAPI host \"schemes\" must be present and non-empty array.",
           "message": "OpenAPI host \"schemes\" must be present and non-empty array.",
-          "formats": ["oas2"]
+          "formats": [
+            "oas2"
+          ]
         },
         "oas2-discriminator": {
-          "given": ["#API_Document"],
+          "given": [
+            "#API_Document"
+          ],
           "severity": "error",
           "then": {
             "function": "oasDiscriminator",
@@ -2151,10 +2660,14 @@
           "name": "oas2-discriminator",
           "description": "Discriminator property must be defined and required",
           "message": "Discriminator property must be defined and required",
-          "formats": ["oas2"]
+          "formats": [
+            "oas2"
+          ]
         },
         "server-not-example": {
-          "given": ["#API_Server_URL"],
+          "given": [
+            "#API_Server_URL"
+          ],
           "severity": "warn",
           "then": {
             "function": "pattern",
@@ -2166,7 +2679,9 @@
           "message": "Server URL must not point at example.com."
         },
         "parameter-description": {
-          "given": ["#Request_Parameter_All"],
+          "given": [
+            "#Request_Parameter_All"
+          ],
           "severity": "warn",
           "then": {
             "function": "truthy",
@@ -2176,7 +2691,9 @@
           "message": "Parameter objects must have \"description\"."
         },
         "oas2-anyOf": {
-          "given": ["#API_Document_RecursiveSearch"],
+          "given": [
+            "#API_Document_RecursiveSearch"
+          ],
           "severity": "warn",
           "then": {
             "function": "undefined",
@@ -2185,10 +2702,14 @@
           "name": "oas2-anyOf",
           "description": "anyOf is not available in OpenAPI v2, it was added in OpenAPI v3",
           "message": "anyOf is not available in OpenAPI v2, it was added in OpenAPI v3",
-          "formats": ["oas2"]
+          "formats": [
+            "oas2"
+          ]
         },
         "oas2-oneOf": {
-          "given": ["#API_Document_RecursiveSearch"],
+          "given": [
+            "#API_Document_RecursiveSearch"
+          ],
           "severity": "warn",
           "then": {
             "function": "undefined",
@@ -2197,24 +2718,35 @@
           "name": "oas2-oneOf",
           "description": "anyOf is not available in OpenAPI v2, it was added in OpenAPI v3",
           "message": "oneOf is not available in OpenAPI v2, it was added in OpenAPI v3",
-          "formats": ["oas2"]
+          "formats": [
+            "oas2"
+          ]
         },
         "oas3-examples-value-or-externalValue": {
-          "given": ["#All_Example"],
+          "given": [
+            "#All_Example"
+          ],
           "severity": "warn",
           "then": {
             "function": "xor",
             "functionOptions": {
-              "properties": ["externalValue", "value"]
+              "properties": [
+                "externalValue",
+                "value"
+              ]
             }
           },
           "name": "oas3-examples-value-or-externalValue",
           "description": "Examples must have either \"value\" or \"externalValue\" field.",
           "message": "Examples must have either \"value\" or \"externalValue\" field.",
-          "formats": ["oas3"]
+          "formats": [
+            "oas3"
+          ]
         },
         "oas2-valid-schema-example": {
-          "given": ["#All_Example_Schema"],
+          "given": [
+            "#All_Example_Schema"
+          ],
           "severity": "error",
           "then": {
             "function": "oasExample",
@@ -2227,10 +2759,14 @@
           "name": "oas2-valid-schema-example",
           "description": "Examples must be valid against their defined schema.",
           "message": "{{error}}",
-          "formats": ["oas2"]
+          "formats": [
+            "oas2"
+          ]
         },
         "oas3-valid-schema-example": {
-          "given": ["#All_Example_Schema"],
+          "given": [
+            "#All_Example_Schema"
+          ],
           "severity": "error",
           "then": {
             "function": "oasExample",
@@ -2243,10 +2779,14 @@
           "name": "oas3-valid-schema-example",
           "description": "Examples must be valid against their defined schema.",
           "message": "{{error}}",
-          "formats": ["oas3"]
+          "formats": [
+            "oas3"
+          ]
         },
         "oas2-valid-media-example": {
-          "given": ["#All_Example_Media"],
+          "given": [
+            "#All_Example_Media"
+          ],
           "severity": "error",
           "then": {
             "function": "oasExample",
@@ -2259,10 +2799,14 @@
           "name": "oas2-valid-media-example",
           "description": "Examples must be valid against their defined schema.",
           "message": "{{error}}",
-          "formats": ["oas2"]
+          "formats": [
+            "oas2"
+          ]
         },
         "oas3-valid-media-example": {
-          "given": ["#All_Example_Media"],
+          "given": [
+            "#All_Example_Media"
+          ],
           "severity": "error",
           "then": {
             "function": "oasExample",
@@ -2275,7 +2819,9 @@
           "name": "oas3-valid-media-example",
           "description": "Examples must be valid against their defined schema.",
           "message": "{{error}}",
-          "formats": ["oas3"]
+          "formats": [
+            "oas3"
+          ]
         }
       },
       "x-embeddedFunctions": [

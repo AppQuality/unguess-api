@@ -653,56 +653,20 @@ paths:
                   mentioned:
                     - id: 0
                       full_name: string
-  '/campaigns/{cid}/bugs/{bid}/comments/{cmid}':
+  '/campaigns/{cid}/bugs/{bid}/media':
     parameters:
-      - schema:
+      - name: cid
+        in: path
+        schema:
           type: string
-        name: cid
+        description: Campaign id
+        required: true
+      - name: bid
         in: path
         required: true
-      - schema:
+        schema:
           type: string
-        name: bid
-        in: path
-        required: true
-      - schema:
-          type: string
-        name: cmid
-        in: path
-        required: true
-    delete:
-      summary: Delete Comment
-      operationId: delete-campaigns-cid-bugs-bid-comments-cmid
-      responses:
-        '200':
-          description: OK
-          content: {}
-        '400':
-          $ref: '#/components/responses/Error'
-          description: ''
-        '403':
-          $ref: '#/components/responses/Error'
-          description: ''
-        '500':
-          $ref: '#/components/responses/Error'
-          description: ''
-      security:
-        - JWT: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties: {}
-  '/campaigns/{cid}/bugs/{bid}/comments/{cmid}/media':
-    parameters:
-      - schema:
-          type: string
-        name: cmid
-        in: path
-        required: true
-      - $ref: '#/components/parameters/cid'
-      - $ref: '#/components/parameters/bid'
+        description: Defines an identifier for the bug object (BUG ID)
     post:
       summary: ''
       operationId: post-campaigns-cid-bugs-bid-comments-cmid-media
@@ -774,9 +738,50 @@ paths:
                         x-stoplight:
                           id: 2l8dxzx05exp5
                         type: string
-              required:
-                - media
       description: ''
+      x-stoplight:
+        id: xk14qfhoc2smy
+  '/campaigns/{cid}/bugs/{bid}/comments/{cmid}':
+    parameters:
+      - schema:
+          type: string
+        name: cid
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: bid
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: cmid
+        in: path
+        required: true
+    delete:
+      summary: Delete Comment
+      operationId: delete-campaigns-cid-bugs-bid-comments-cmid
+      responses:
+        '200':
+          description: OK
+          content: {}
+        '400':
+          $ref: '#/components/responses/Error'
+          description: ''
+        '403':
+          $ref: '#/components/responses/Error'
+          description: ''
+        '500':
+          $ref: '#/components/responses/Error'
+          description: ''
+      security:
+        - JWT: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
   '/campaigns/{cid}/bugs/{bid}/siblings':
     parameters:
       - name: cid
