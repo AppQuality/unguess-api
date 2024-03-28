@@ -354,7 +354,6 @@ describe("GET /video/:vid/observations - there are no video", () => {
     const response = await request(app)
       .get("/video/10/observations")
       .set("Authorization", "Bearer user");
-    console.log(response.body);
     expect(response.status).toBe(400);
   });
 });
